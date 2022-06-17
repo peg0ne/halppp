@@ -43,7 +43,7 @@ fn main() {
             return;
         }
 
-        println!("TOKEN: {}, TYPE: {:?}", x.0, x.1);
+        // println!("TOKEN: {}, TYPE: {:?}", x.0, x.1);
         match x.1 {
             Token::Class => {
                 let class_opt = construct(peekable_ast);
@@ -53,7 +53,6 @@ fn main() {
                 let class_out = class_opt.unwrap();
                 let class = class_out.0;
                 peekable_ast = class_out.1;
-                println!("{:?}", class);
                 let inheritance_opt = class.inherit.to_owned();
                 if inheritance_opt.is_some() {
                     let a = inheritance_opt.unwrap();
@@ -64,16 +63,28 @@ fn main() {
                         );
                         return;
                     }
+                    let mut found_inheritor = false;
                     for c in program.classes.iter() {
                         if c.id == a {
-                            continue;
-                        } else {
-                            display_err_message(
-                                format!("Invalid Inheritance of: {}, Inherits: {:?}", class.id, a)
-                                    .as_str(),
-                            );
-                            return;
+                            found_inheritor = true;
+                            break;
                         }
+                    }
+                    if !found_inheritor {
+                        display_err_message(
+                            format!("Invalid Inheritance of: {}, Inherits: {:?}", class.id, a)
+                                .as_str(),
+                        );
+                        return;
+                    }
+                }
+                for c in program.classes.iter() {
+                    if c.id == class.id {
+                        display_err_message(
+                            format!("Duplicate instances of: {}, Inherits: {}", class.id, c.id)
+                                .as_str(),
+                        );
+                        return;
                     }
                 }
                 program.classes.push(class);
