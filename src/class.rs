@@ -60,6 +60,10 @@ pub fn construct(
         match x.1 {
             Token::SemiColon => break,
             Token::Class => break,
+            Token::Private => {}, //Handle public variable creation
+            Token::Protected => {}, //Handle protected variable creation
+            Token::Public => {}, //Handle public variable creation
+            Token::Function => {}, //Handle function creation
             _ => {}
         }
     }
