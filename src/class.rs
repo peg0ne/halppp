@@ -19,11 +19,9 @@ pub fn construct(
     };
     // Set Class Id
     let mut next = get_next_or_exit(ast.next(), "invalid class definition");
-    if class.id.len() == 0 {
-        match next.1 {
-            Token::Id => class.id = next.0.to_owned(),
-            _ => display_err_message(format!("Expected id got: {:?}", next.1).as_str()),
-        }
+    match next.1 {
+        Token::Id => class.id = next.0.to_owned(),
+        _ => display_err_message(format!("Expected id got: {:?}", next.1).as_str()),
     }
     // Set Inheritance
     next = get_next_or_exit(
@@ -46,6 +44,12 @@ pub fn construct(
                     .as_str(),
                 ),
             }
+        }
+        Token::NewLine => {
+            let _ = get_next_or_exit(
+                ast.next(),
+                format!("Invalid class definition of: {}", class.id).as_str(),
+            );
         }
         _ => {}
     }

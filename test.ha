@@ -17,4 +17,5 @@ pub fn get_aplusb => int
 ;
 
 fn test string c, int h => Class
-    return class
+    return c
+

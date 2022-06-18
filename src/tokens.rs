@@ -26,6 +26,8 @@ pub enum Token {
     Sub,
     ForwardSlash,
     Asterix,
+    NewLine,
+    EOF,
 }
 
 impl Token {
@@ -56,6 +58,7 @@ impl Token {
             "-" => Token::Sub,
             "/" => Token::ForwardSlash,
             "*" => Token::Asterix,
+            "\n" => Token::NewLine,
             _ => Token::Id,
         }
     }
@@ -69,6 +72,9 @@ impl Token {
             Token::MacroDefinition => true,
             Token::Get => true,
             Token::Include => true,
+            Token::NewLine => true,
+            Token::SemiColon => true,
+            Token::EOF => true,
             _ => false,
         }
     }

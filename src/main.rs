@@ -8,7 +8,6 @@ mod tokens;
 mod utils;
 
 use crate::{
-    ast::create,
     fileutil::{get_content, get_file_path},
     message::display_err_message,
     structs::Program,
@@ -24,7 +23,7 @@ fn main() {
     };
     let file_path: String = get_file_path();
     let content: String = get_content(&file_path);
-    let ast = create(&content);
+    let ast = ast::create(&content);
     let mut peekable_ast = ast.iter().peekable();
 
     while peekable_ast.peek().is_some() {
@@ -50,6 +49,8 @@ fn main() {
                         function::validate(&function, &program);
                         program.functions.push(function);
                     }
+                    Token::NewLine => {}
+                    Token::EOF => break,
                     _ => display_err_message(format!("Token not handled: {:?}", next.1).as_str()),
                 }
             }
