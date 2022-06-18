@@ -32,7 +32,7 @@ pub fn construct(
         match next.1 {
             Token::CoolArrow => break,
             Token::NewLine => break,
-            _ => break,
+            _ => continue,
         }
     }
     // Set Return Value
@@ -47,9 +47,7 @@ pub fn construct(
         Token::Id => {
             variable.v_type = next.0;
         }
-        Token::NewLine => {
-            variable.v_type = String::from("void");
-        }
+        Token::NewLine => {}
         _ => display_err_message(format!("Expected return value type got: {:?}", next.1).as_str()),
     }
     function.return_value = Some(variable);

@@ -18,4 +18,10 @@ pub fn get_aplusb => int
 
 fn test string c, int h => Class
     return c
+;
 
+fn tester string c, int h =>
+    return
+;
+
+fn holop =>

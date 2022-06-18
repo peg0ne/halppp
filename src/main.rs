@@ -41,12 +41,14 @@ fn main() {
                         let (class, ast) = class::construct(peekable_ast);
                         peekable_ast = ast;
                         class::validate(&class, &program);
+                        println!("Class created \n- {:?}\n", &class);
                         program.classes.push(class);
                     }
                     Token::Function => {
                         let (function, ast) = function::construct(peekable_ast);
                         peekable_ast = ast;
                         function::validate(&function, &program);
+                        println!("Function created \n- {:?}\n", &function);
                         program.functions.push(function);
                     }
                     Token::NewLine => {}
