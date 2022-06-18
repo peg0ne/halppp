@@ -14,5 +14,7 @@ pub fn get_aplusb => int
     return impl_add()
 
     extend => ClassFunctions
-; 
+;
 
+fn test string c, int h => Class
+    return class

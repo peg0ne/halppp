@@ -1,6 +1,7 @@
 mod ast;
 mod class;
 mod fileutil;
+mod function;
 mod message;
 mod structs;
 mod tokens;
@@ -8,7 +9,6 @@ mod utils;
 
 use crate::{
     ast::create,
-    class::construct,
     fileutil::{get_content, get_file_path},
     message::display_err_message,
     structs::Program,
@@ -22,76 +22,36 @@ fn main() {
         functions: Vec::new(),
         classes: Vec::new(),
     };
-    let file_path: Option<String> = get_file_path();
-    if file_path.is_none() {
-        return;
-    }
-
-    let content_opt: Option<String> = get_content(&file_path.unwrap());
-    if content_opt.is_none() {
-        return;
-    }
-    let content = content_opt.unwrap();
+    let file_path: String = get_file_path();
+    let content: String = get_content(&file_path);
     let ast = create(&content);
     let mut peekable_ast = ast.iter().peekable();
-    while peekable_ast.peek().is_some() {
-        let x = peekable_ast.next().unwrap();
-        if !x.1.is_base() {
-            display_err_message(
-                format!("Token not allowed in base: {}, Type: {:?}", x.0, x.1).as_str(),
-            );
-            return;
-        }
 
-        // println!("TOKEN: {}, TYPE: {:?}", x.0, x.1);
-        match x.1 {
-            Token::Class => {
-                let class_opt = construct(peekable_ast);
-                if class_opt.is_none() {
-                    return;
+    while peekable_ast.peek().is_some() {
+        match peekable_ast.next() {
+            None => return,
+            Some(next) => {
+                if !next.1.is_base() {
+                    display_err_message(
+                        format!("Token not allowed in base: {}, Type: {:?}", next.0, next.1)
+                            .as_str(),
+                    );
                 }
-                let class_out = class_opt.unwrap();
-                let class = class_out.0;
-                peekable_ast = class_out.1;
-                let inheritance_opt = class.inherit.to_owned();
-                if inheritance_opt.is_some() {
-                    let a = inheritance_opt.unwrap();
-                    if program.classes.len() == 0 {
-                        display_err_message(
-                            format!("Invalid Inheritance of: {}, Inherits: {:?}", class.id, a)
-                                .as_str(),
-                        );
-                        return;
+                match next.1 {
+                    Token::Class => {
+                        let (class, ast) = class::construct(peekable_ast);
+                        peekable_ast = ast;
+                        class::validate(&class, &program);
+                        program.classes.push(class);
                     }
-                    let mut found_inheritor = false;
-                    for c in program.classes.iter() {
-                        if c.id == a {
-                            found_inheritor = true;
-                            break;
-                        }
+                    Token::Function => {
+                        let (function, ast) = function::construct(peekable_ast);
+                        peekable_ast = ast;
+                        function::validate(&function, &program);
+                        program.functions.push(function);
                     }
-                    if !found_inheritor {
-                        display_err_message(
-                            format!("Invalid Inheritance of: {}, Inherits: {:?}", class.id, a)
-                                .as_str(),
-                        );
-                        return;
-                    }
+                    _ => display_err_message(format!("Token not handled: {:?}", next.1).as_str()),
                 }
-                for c in program.classes.iter() {
-                    if c.id == class.id {
-                        display_err_message(
-                            format!("Duplicate instances of: {}, Inherits: {}", class.id, c.id)
-                                .as_str(),
-                        );
-                        return;
-                    }
-                }
-                program.classes.push(class);
-            }
-            _ => {
-                display_err_message(format!("Token not handled: {:?}", x.1).as_str());
-                return;
             }
         }
     }

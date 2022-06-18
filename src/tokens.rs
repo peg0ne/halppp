@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Token {
     Id,
     Number,
@@ -69,7 +69,7 @@ impl Token {
             Token::MacroDefinition => true,
             Token::Get => true,
             Token::Include => true,
-            _ => false
+            _ => false,
         }
     }
 }

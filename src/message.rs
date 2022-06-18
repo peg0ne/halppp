@@ -20,8 +20,9 @@ impl MessageSeverity {
     }
 }
 
-pub fn display_err_message(msg: &str) { 
+pub fn display_err_message(msg: &str) {
     display_message(MessageSeverity::Error, msg);
+    std::process::exit(1);
 }
 
 pub fn display_hint_message(msg: &str) {
