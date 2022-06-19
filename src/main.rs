@@ -8,9 +8,9 @@ mod tokens;
 mod utils;
 
 use crate::{
-    fileutil::{get_content, get_file_path},
+    fileutil::{get_content, get_file_path, write_program},
     message::display_err_message,
-    structs::Program,
+    structs::{Program, VariableState},
     tokens::Token,
 };
 
@@ -25,6 +25,7 @@ fn main() {
     let content: String = get_content(&file_path);
     let ast = ast::create(&content);
     let mut peekable_ast = ast.iter().peekable();
+    let mut output = String::from("#include <string>\nusing namespace std;\n");
 
     while peekable_ast.peek().is_some() {
         match peekable_ast.next() {
@@ -41,14 +42,17 @@ fn main() {
                         let (class, ast) = class::construct(peekable_ast);
                         peekable_ast = ast;
                         class::validate(&class, &program);
-                        println!("Class created \n- {:?}\n", &class);
+                        println!("{}", class.to_cpp().as_str());
+                        output.push_str(class.to_cpp().as_str());
                         program.classes.push(class);
                     }
                     Token::Function => {
-                        let (function, ast) = function::construct(peekable_ast);
+                        let (function, ast) =
+                            function::construct(peekable_ast, VariableState::Public);
                         peekable_ast = ast;
                         function::validate(&function, &program);
-                        println!("Function created \n- {:?}\n", &function);
+                        println!("{}", function.to_cpp(false).as_str());
+                        output.push_str(function.to_cpp(false).as_str());
                         program.functions.push(function);
                     }
                     Token::NewLine => {}
@@ -58,4 +62,5 @@ fn main() {
             }
         }
     }
+    write_program(output)
 }

@@ -8,10 +8,12 @@ class Class => ParentClass
     int b
     fn impl_add => int
         return a+b
+    ;
 
-pub string c
-pub fn get_aplusb => int
-    return impl_add()
+    pub string c
+    pub fn get_aplusb int a, int b => int
+        return impl_add()
+    ;
 
     extend => ClassFunctions
 ;
@@ -25,3 +27,8 @@ fn tester string c, int h =>
 ;
 
 fn holop =>
+;
+
+fn main => int
+    cout << argc << " hello " << argv[1]
+    return 0

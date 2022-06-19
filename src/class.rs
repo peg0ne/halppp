@@ -1,8 +1,9 @@
 use std::{iter::Peekable, slice::Iter};
 
 use crate::{
+    function,
     message::display_err_message,
-    structs::{Class, Program},
+    structs::{Class, Program, Variable, VariableState},
     utils::get_next_or_exit,
     Token,
 };
@@ -45,15 +46,11 @@ pub fn construct(
                 ),
             }
         }
-        Token::NewLine => {
-            let _ = get_next_or_exit(
-                ast.next(),
-                format!("Invalid class definition of: {}", class.id).as_str(),
-            );
-        }
+        Token::NewLine => {}
         _ => {}
     }
     //Construct inner Class values
+    let mut variable_state = VariableState::Private;
     loop {
         let x = get_next_or_exit(
             ast.next(),
@@ -62,10 +59,31 @@ pub fn construct(
         match x.1 {
             Token::SemiColon => break,
             Token::Class => break,
-            Token::Private => {}   //Handle public variable creation
-            Token::Protected => {} //Handle protected variable creation
-            Token::Public => {}    //Handle public variable creation
-            Token::Function => {}  //Handle function creation
+            Token::Private => variable_state = VariableState::Private,
+            Token::Protected => variable_state = VariableState::Protected,
+            Token::Public => variable_state = VariableState::Public,
+            Token::Function => {
+                let (function, ast_) = function::construct(ast, variable_state);
+                ast = ast_;
+                class.functions.push(function);
+            }
+            Token::Type => {
+                let mut variable = Variable {
+                    id: String::new(),
+                    v_type: x.0,
+                    v_value: None,
+                    variable_state: variable_state,
+                };
+                let v = get_next_or_exit(
+                    ast.next(),
+                    format!("Invalid variable declaration in class [{}]", class.id).as_str(),
+                );
+                match v.1 {
+                    Token::Id => variable.id = v.0,
+                    _ => {}
+                }
+                class.variables.push(variable);
+            }
             _ => {}
         }
     }

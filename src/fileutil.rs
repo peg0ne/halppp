@@ -1,4 +1,9 @@
-use std::{env, fs::File, io::Read, path::Path};
+use std::{
+    env,
+    fs::File,
+    io::{Read, Write},
+    path::Path,
+};
 
 use crate::message::display_err_message;
 
@@ -32,4 +37,9 @@ pub fn get_content(fp: &String) -> String {
     };
 
     return s;
+}
+
+pub fn write_program(program: String) {
+    let mut file = std::fs::File::create("test.cpp").expect("create failed");
+    file.write_all(program.as_bytes()).expect("write failed");
 }
