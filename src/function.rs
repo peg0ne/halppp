@@ -51,6 +51,7 @@ pub fn construct(
         _ => display_err_message(format!("Expected return value type got: {:?}", next.1).as_str()),
     }
     function.return_value = Some(variable);
+    // Set Inner Function stuff
     loop {
         let x = get_next_or_exit(
             ast.next(),
