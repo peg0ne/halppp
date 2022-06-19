@@ -49,6 +49,26 @@ pub struct Function {
 }
 
 impl Function {
+    pub fn to_py(self: &Function, in_class: bool) -> String {
+        let mut function = String::new();
+        let spacing = if in_class { "    " } else { "" };
+        function.push_str(format!("{}def {}(", spacing, self.id).as_str());
+        let mut i = 0;
+        loop {
+            if i + 1 > self.arguments.len() {
+                break;
+            }
+            function.push_str(
+                format!("{}: {}", self.arguments[i].id, self.arguments[i].v_type).as_str(),
+            );
+            if i + 1 != self.arguments.len() {
+                function.push_str(", ");
+            }
+            i += 1;
+        }
+        function.push_str("):\n");
+        function
+    }
     pub fn to_cpp(self: &Function, in_class: bool) -> String {
         let mut function = String::new();
         let spacing = if in_class { "    " } else { "" };
@@ -95,6 +115,20 @@ pub struct Class {
 }
 
 impl Class {
+    pub fn to_py(self: &Class) -> String {
+        let mut class = String::from(format!("class {}", self.id));
+        match &self.inherit {
+            None => class.push_str(":\n"),
+            Some(a) => class.push_str(format!("({}):\n", a).as_str()),
+        }
+        for v in self.variables.iter() {
+            class.push_str(format!("    {}: {}\n", v.id, v.v_type).as_str())
+        }
+        for f in self.functions.iter() {
+            class.push_str(f.to_py(true).as_str());
+        }
+        class
+    }
     pub fn to_cpp(self: &Class) -> String {
         let mut class = String::from(format!("class {}", self.id));
         match &self.inherit {
