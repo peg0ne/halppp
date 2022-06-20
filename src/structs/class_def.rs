@@ -47,7 +47,7 @@ impl Class {
                 VariableState::Protected => class.push_str("  protected:\n"),
                 VariableState::Public => class.push_str("  public:\n"),
             }
-            class.push_str(v.to_cpp("    ", "\n").as_str());
+            class.push_str(v.to_cpp("    ", ";\n").as_str());
         }
         for f in self.functions.iter() {
             match f.variable_state {

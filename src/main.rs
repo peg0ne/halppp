@@ -20,7 +20,7 @@ fn main() {
     let file_path: String = get_file_path();
     let content: String = get_content(&file_path);
     let ast = ast::create(&content);
-    // let mut output = String::new();
+    let mut output = String::from("#include <string>\nusing namespace std;\n");
 
     let mut compiler = Compiler {
         program: Program {
@@ -46,12 +46,12 @@ fn main() {
         match next.token {
             Token::Class => {
                 let class = class::construct(&mut compiler);
-                // output.push_str(class.to_py().as_str());
+                output.push_str(class.to_cpp().as_str());
                 compiler.add_class(class);
             }
             Token::Function => {
                 let function = function::construct(&mut compiler, VariableState::Public);
-                // output.push_str(function.to_py(false).as_str());
+                output.push_str(function.to_cpp(false).as_str());
                 compiler.add_fn(function);
             }
             Token::NewLine => {}
@@ -59,5 +59,5 @@ fn main() {
             _ => display_err_message(format!("Token not handled: {:?}", next.token).as_str()),
         }
     }
-    // write_program(output);
+    write_program(output);
 }
