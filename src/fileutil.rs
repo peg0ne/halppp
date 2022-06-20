@@ -40,6 +40,6 @@ pub fn get_content(fp: &String) -> String {
 }
 
 pub fn write_program(program: String) {
-    let mut file = std::fs::File::create("test.cpp").expect("create failed");
+    let mut file = std::fs::File::create("test.py").expect("create failed");
     file.write_all(program.as_bytes()).expect("write failed");
 }

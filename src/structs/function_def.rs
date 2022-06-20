@@ -26,9 +26,7 @@ impl Function {
             if i + 1 > self.arguments.len() {
                 break;
             }
-            function.push_str(
-                format!("{}: {}", self.arguments[i].id, self.arguments[i].v_type).as_str(),
-            );
+            function.push_str(self.arguments[i].to_py("").as_str());
             if i + 1 != self.arguments.len() {
                 function.push_str(", ");
             }
@@ -49,9 +47,7 @@ impl Function {
             if i + 1 > self.arguments.len() {
                 break;
             }
-            function.push_str(
-                format!("{} {}", self.arguments[i].v_type, self.arguments[i].id).as_str(),
-            );
+            function.push_str(self.arguments[i].to_cpp("").as_str());
             if i + 1 != self.arguments.len() {
                 function.push_str(", ");
             }
