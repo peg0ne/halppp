@@ -21,7 +21,7 @@ fn main() {
     let file_path: String = get_file_path();
     let content: String = get_content(&file_path);
     let ast = ast::create(&content);
-    let mut output = String::from("#include <string>\nusing namespace std;\n");
+    let mut output = String::new();
 
     let mut compiler = Compiler {
         program: Program {

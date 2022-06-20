@@ -1,8 +1,5 @@
 use crate::{
-    enums::Token,
-    message::{display_err_message, display_hint_message},
-    structs::Compiler,
-    utils::get_next_or_exit,
+    enums::Token, message::display_err_message, structs::Compiler, utils::get_next_or_exit,
 };
 
 pub fn construct(compiler: &mut Compiler) -> Vec<String> {
