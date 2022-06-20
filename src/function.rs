@@ -1,16 +1,16 @@
 use std::{iter::Peekable, slice::Iter};
 
 use crate::{
+    enums::{token::Token, variable_state::VariableState},
     message::display_err_message,
-    structs::{Function, Program, Variable, VariableState},
+    structs::{ast_token::AstToken, function::Function, program::Program, variable::Variable},
     utils::get_next_or_exit,
-    Token,
 };
 
 pub fn construct(
-    mut ast: Peekable<Iter<(String, Token)>>,
+    mut ast: Peekable<Iter<AstToken>>,
     variable_state: VariableState,
-) -> (Function, Peekable<Iter<(String, Token)>>) {
+) -> (Function, Peekable<Iter<AstToken>>) {
     //Create Function
     let mut function = Function {
         id: String::new(),
@@ -20,9 +20,9 @@ pub fn construct(
     };
     // Set Function Id
     let mut next = get_next_or_exit(ast.next(), "invalid function definition");
-    match next.1 {
-        Token::Id => function.id = next.0.to_owned(),
-        _ => display_err_message(format!("Expected id got: {:?}", next.1).as_str()),
+    match next.token {
+        Token::Id => function.id = next.name,
+        _ => display_err_message(format!("Expected id got: {:?}", next.token).as_str()),
     }
     // Set Arguments
     let mut variable = Variable {
@@ -36,7 +36,7 @@ pub fn construct(
             ast.next(),
             format!("Invalid function definition of: {}", function.id).as_str(),
         );
-        match next.1 {
+        match next.token {
             Token::CoolArrow => {
                 if !variable.has_minimum() {
                     break;
@@ -59,9 +59,9 @@ pub fn construct(
             }
             _ => {
                 if !variable.has_type() {
-                    variable.v_type = next.0;
+                    variable.v_type = next.name;
                 } else if !variable.has_id() {
-                    variable.id = next.0;
+                    variable.id = next.name;
                 } else {
                     display_err_message(format!("Invalid variable declaration in arguments: [VARIABLE ALREADY DECLARED] {:?}", variable).as_str());
                 }
@@ -76,15 +76,17 @@ pub fn construct(
         v_value: None,
         variable_state: VariableState::Private,
     };
-    match next.1 {
+    match next.token {
         Token::Id => {
-            variable.v_type = next.0;
+            variable.v_type = next.name;
         }
         Token::Type => {
-            variable.v_type = next.0;
+            variable.v_type = next.name;
         }
         Token::NewLine => {}
-        _ => display_err_message(format!("Expected return value type got: {:?}", next.1).as_str()),
+        _ => display_err_message(
+            format!("Expected return value type got: {:?}", next.token).as_str(),
+        ),
     }
     function.return_value = Some(variable);
     // Set Inner Function stuff
@@ -93,7 +95,7 @@ pub fn construct(
             ast.next(),
             format!("Function is not closed [{}]", function.id).as_str(),
         );
-        match x.1 {
+        match x.token {
             Token::SemiColon => break,
             Token::Function => break,
             Token::EOF => break,

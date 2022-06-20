@@ -1,17 +1,17 @@
 mod ast;
 mod class;
+mod enums;
 mod fileutil;
 mod function;
 mod message;
 mod structs;
-mod tokens;
 mod utils;
 
 use crate::{
+    enums::{token::Token, variable_state::VariableState},
     fileutil::{get_content, get_file_path, write_program},
     message::display_err_message,
-    structs::{Program, VariableState},
-    tokens::Token,
+    structs::program::Program,
 };
 
 fn main() {
@@ -31,13 +31,16 @@ fn main() {
         match peekable_ast.next() {
             None => return,
             Some(next) => {
-                if !next.1.is_base() {
+                if !next.token.is_base() {
                     display_err_message(
-                        format!("Token not allowed in base: {}, Type: {:?}", next.0, next.1)
-                            .as_str(),
+                        format!(
+                            "Token not allowed in base: {}, Type: {:?}",
+                            next.name, next.token
+                        )
+                        .as_str(),
                     );
                 }
-                match next.1 {
+                match next.token {
                     Token::Class => {
                         let (class, ast) = class::construct(peekable_ast);
                         peekable_ast = ast;
@@ -57,7 +60,9 @@ fn main() {
                     }
                     Token::NewLine => {}
                     Token::EOF => break,
-                    _ => display_err_message(format!("Token not handled: {:?}", next.1).as_str()),
+                    _ => {
+                        display_err_message(format!("Token not handled: {:?}", next.token).as_str())
+                    }
                 }
             }
         }

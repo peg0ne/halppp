@@ -1,16 +1,14 @@
 use std::{iter::Peekable, slice::Iter};
 
 use crate::{
+    enums::{token::Token, variable_state::VariableState},
     function,
     message::display_err_message,
-    structs::{Class, Program, Variable, VariableState},
+    structs::{ast_token::AstToken, class::Class, program::Program, variable::Variable},
     utils::get_next_or_exit,
-    Token,
 };
 
-pub fn construct(
-    mut ast: Peekable<Iter<(String, Token)>>,
-) -> (Class, Peekable<Iter<(String, Token)>>) {
+pub fn construct(mut ast: Peekable<Iter<AstToken>>) -> (Class, Peekable<Iter<AstToken>>) {
     // Create Class
     let mut class = Class {
         id: String::new(),
@@ -20,27 +18,27 @@ pub fn construct(
     };
     // Set Class Id
     let mut next = get_next_or_exit(ast.next(), "invalid class definition");
-    match next.1 {
-        Token::Id => class.id = next.0.to_owned(),
-        _ => display_err_message(format!("Expected id got: {:?}", next.1).as_str()),
+    match next.token {
+        Token::Id => class.id = next.name,
+        _ => display_err_message(format!("Expected id got: {:?}", next.token).as_str()),
     }
     // Set Inheritance
     next = get_next_or_exit(
         ast.next(),
         format!("Invalid class definition of: {}", class.id).as_str(),
     );
-    match next.1 {
+    match next.token {
         Token::CoolArrow => {
             next = get_next_or_exit(
                 ast.next(),
                 format!("Invalid class definition of: {}", class.id).as_str(),
             );
-            match next.1 {
-                Token::Id => class.inherit = Some(next.0.to_owned()),
+            match next.token {
+                Token::Id => class.inherit = Some(next.name),
                 _ => display_err_message(
                     format!(
                         "Expected Id for inheritance for [{}] got: {:?}",
-                        class.id, next.1
+                        class.id, next.token
                     )
                     .as_str(),
                 ),
@@ -56,7 +54,7 @@ pub fn construct(
             ast.next(),
             format!("Class is not closed [{}]", class.id).as_str(),
         );
-        match x.1 {
+        match x.token {
             Token::SemiColon => break,
             Token::Class => break,
             Token::Private => variable_state = VariableState::Private,
@@ -70,7 +68,7 @@ pub fn construct(
             Token::Type => {
                 let mut variable = Variable {
                     id: String::new(),
-                    v_type: x.0,
+                    v_type: x.name,
                     v_value: None,
                     variable_state: variable_state,
                 };
@@ -78,8 +76,8 @@ pub fn construct(
                     ast.next(),
                     format!("Invalid variable declaration in class [{}]", class.id).as_str(),
                 );
-                match v.1 {
-                    Token::Id => variable.id = v.0,
+                match v.token {
+                    Token::Id => variable.id = v.name,
                     _ => {}
                 }
                 class.variables.push(variable);
