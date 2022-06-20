@@ -3,6 +3,7 @@ mod class;
 mod enums;
 mod fileutil;
 mod function;
+mod include;
 mod message;
 mod structs;
 mod utils;
@@ -11,8 +12,8 @@ mod variable;
 use crate::{
     enums::{Token, VariableState},
     fileutil::{get_content, get_file_path, write_program},
-    message::display_err_message,
-    structs::{Compiler, Program},
+    message::{display_err_message, display_hint_message},
+    structs::{Compiler, Include, Program, Use},
     utils::get_next_or_exit,
 };
 
@@ -28,6 +29,8 @@ fn main() {
             structs: Vec::new(),
             functions: Vec::new(),
             classes: Vec::new(),
+            includes: Vec::new(),
+            usings: Vec::new(),
         },
         ast: ast.iter().peekable(),
     };
@@ -53,6 +56,38 @@ fn main() {
                 let function = function::construct(&mut compiler, VariableState::Public);
                 output.push_str(function.to_cpp(false).as_str());
                 compiler.add_fn(function);
+            }
+            Token::Include => {
+                let include = include::construct(&mut compiler);
+                for i in include.iter() {
+                    output.push_str(Include::from(i.to_owned()).to_cpp().as_str());
+                    if compiler.contains_inc(i) {
+                        display_hint_message(
+                            format!(
+                                "[IncludeHint]: Duplicate entry of include found [{}]",
+                                next.name
+                            )
+                            .as_str(),
+                        );
+                    }
+                }
+                compiler.add_inc(include);
+            }
+            Token::Use => {
+                let using = include::construct(&mut compiler);
+                for i in using.iter() {
+                    output.push_str(Use::from(i.to_owned()).to_cpp().as_str());
+                    if compiler.contains_use(i) {
+                        display_hint_message(
+                            format!(
+                                "[UseHint]: Duplicate entry of include found [{}]",
+                                next.name
+                            )
+                            .as_str(),
+                        );
+                    }
+                }
+                compiler.add_use(using);
             }
             Token::NewLine => {}
             Token::EOF => break,

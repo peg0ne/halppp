@@ -1,4 +1,4 @@
-use crate::structs::{Class, Function, Global, Struct};
+use crate::structs::{Class, Function, Global, Include, Struct, Use};
 
 #[derive(Debug)]
 pub struct Program {
@@ -6,4 +6,6 @@ pub struct Program {
     pub structs: Vec<Struct>,
     pub functions: Vec<Function>,
     pub classes: Vec<Class>,
+    pub includes: Vec<Include>,
+    pub usings: Vec<Use>,
 }
