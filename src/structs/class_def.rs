@@ -27,7 +27,7 @@ impl Class {
             Some(a) => class.push_str(format!("({}):\n", a).as_str()),
         }
         for v in self.variables.iter() {
-            class.push_str(v.to_py("    ").as_str());
+            class.push_str(v.to_py("    ", "\n").as_str());
         }
         for f in self.functions.iter() {
             class.push_str(f.to_py(true).as_str());
@@ -47,7 +47,7 @@ impl Class {
                 VariableState::Protected => class.push_str("  protected:\n"),
                 VariableState::Public => class.push_str("  public:\n"),
             }
-            class.push_str(v.to_cpp("    ").as_str());
+            class.push_str(v.to_cpp("    ", "\n").as_str());
         }
         for f in self.functions.iter() {
             match f.variable_state {

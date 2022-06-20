@@ -62,10 +62,10 @@ impl Variable {
             variable_state: VariableState::Private,
         }
     }
-    pub fn to_py(self: &Variable, spacing: &str) -> String {
-        return format!("{}{}: {}", spacing, self.id, self.v_type);
+    pub fn to_py(self: &Variable, spacing: &str, new_line: &str) -> String {
+        return format!("{}{}: {}{}", spacing, self.id, self.v_type, new_line);
     }
-    pub fn to_cpp(self: &Variable, spacing: &str) -> String {
-        return format!("{}{} {}", spacing, self.v_type, self.id);
+    pub fn to_cpp(self: &Variable, spacing: &str, new_line: &str) -> String {
+        return format!("{}{} {}{}", spacing, self.v_type, self.id, new_line);
     }
 }
