@@ -1,4 +1,4 @@
-use crate::{enums::token::Token, structs::ast_token::AstToken};
+use crate::{enums::Token, structs::AstToken};
 
 pub fn create(content: &String) -> Vec<AstToken> {
     let mut peekable = content.chars().peekable();

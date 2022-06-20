@@ -1,4 +1,4 @@
-use crate::enums::variable_state::VariableState;
+use crate::enums::VariableState;
 
 #[derive(Clone, Debug)]
 pub struct Variable {
@@ -39,6 +39,19 @@ impl Variable {
             v_type: String::new(),
             v_value: None,
             variable_state: VariableState::Private,
+        }
+    }
+    pub fn from(
+        id: String,
+        v_type: String,
+        v_value: Option<String>,
+        variable_state: VariableState,
+    ) -> Variable {
+        Variable {
+            id: id,
+            v_type: v_type,
+            v_value: v_value,
+            variable_state: variable_state,
         }
     }
     pub fn return_void() -> Variable {

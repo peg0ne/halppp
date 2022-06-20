@@ -1,4 +1,4 @@
-use crate::enums::token::Token;
+use crate::enums::Token;
 
 #[derive(Debug, Clone)]
 pub struct AstToken {
@@ -7,6 +7,12 @@ pub struct AstToken {
 }
 
 impl AstToken {
+    pub fn new() -> AstToken {
+        AstToken {
+            name: String::from(""),
+            token: Token::Id,
+        }
+    }
     pub fn from_id(id: String) -> AstToken {
         AstToken {
             name: id.to_owned(),

@@ -1,6 +1,6 @@
 use crate::{
-    enums::variable_state::VariableState,
-    structs::{function::Function, variable::Variable},
+    enums::VariableState,
+    structs::{Function, Variable},
 };
 
 #[derive(Clone, Debug)]
@@ -12,6 +12,14 @@ pub struct Class {
 }
 
 impl Class {
+    pub fn new() -> Class {
+        Class {
+            id: String::new(),
+            inherit: None,
+            functions: Vec::new(),
+            variables: Vec::new(),
+        }
+    }
     pub fn to_py(self: &Class) -> String {
         let mut class = String::from(format!("class {}", self.id));
         match &self.inherit {

@@ -1,4 +1,4 @@
-use crate::{enums::variable_state::VariableState, structs::variable::Variable};
+use crate::{enums::VariableState, structs::Variable};
 
 #[derive(Clone, Debug)]
 pub struct Function {
@@ -9,6 +9,14 @@ pub struct Function {
 }
 
 impl Function {
+    pub fn new(state: VariableState) -> Function {
+        Function {
+            id: String::new(),
+            arguments: vec![],
+            return_value: None,
+            variable_state: state,
+        }
+    }
     pub fn to_py(self: &Function, in_class: bool) -> String {
         let mut function = String::new();
         let spacing = if in_class { "    " } else { "" };

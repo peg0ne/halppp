@@ -1,4 +1,4 @@
-use crate::structs::{ast_token::AstToken, class::Class, function::Function, program::Program};
+use crate::structs::{AstToken, Class, Function, Program};
 use std::{iter::Peekable, slice::Iter};
 
 pub struct Compiler<'a> {

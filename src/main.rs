@@ -6,12 +6,13 @@ mod function;
 mod message;
 mod structs;
 mod utils;
+mod variable;
 
 use crate::{
-    enums::{token::Token, variable_state::VariableState},
+    enums::{Token, VariableState},
     fileutil::{get_content, get_file_path},
     message::display_err_message,
-    structs::{compiler::Compiler, program::Program},
+    structs::{Compiler, Program},
     utils::get_next_or_exit,
 };
 

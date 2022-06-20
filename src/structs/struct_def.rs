@@ -1,4 +1,4 @@
-use crate::structs::variable::Variable;
+use crate::structs::Variable;
 
 #[derive(Clone, Debug)]
 pub struct Struct {

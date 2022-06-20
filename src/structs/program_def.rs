@@ -1,4 +1,4 @@
-use crate::structs::{class::Class, function::Function, global::Global, struct_def::Struct};
+use crate::structs::{Class, Function, Global, Struct};
 
 #[derive(Debug)]
 pub struct Program {
