@@ -1,16 +1,11 @@
-use std::{iter::Peekable, slice::Iter};
-
 use crate::{
     enums::{token::Token, variable_state::VariableState},
     message::display_err_message,
-    structs::{ast_token::AstToken, function::Function, program::Program, variable::Variable},
+    structs::{compiler::Compiler, function::Function, variable::Variable},
     utils::get_next_or_exit,
 };
 
-pub fn construct(
-    mut ast: Peekable<Iter<AstToken>>,
-    variable_state: VariableState,
-) -> (Function, Peekable<Iter<AstToken>>) {
+pub fn construct(compiler: &mut Compiler, variable_state: VariableState) -> Function {
     //Create Function
     let mut function = Function {
         id: String::new(),
@@ -19,32 +14,23 @@ pub fn construct(
         variable_state: variable_state,
     };
     // Set Function Id
-    let mut next = get_next_or_exit(ast.next(), "invalid function definition");
+    let mut next = get_next_or_exit(compiler.ast.next(), "invalid function definition");
     match next.token {
         Token::Id => function.id = next.name,
         _ => display_err_message(format!("Expected id got: {:?}", next.token).as_str()),
     }
     // Set Arguments
-    let mut variable = Variable {
-        id: String::new(),
-        v_type: String::new(),
-        v_value: None,
-        variable_state: VariableState::Private,
-    };
+    let mut variable = Variable::new();
     loop {
         next = get_next_or_exit(
-            ast.next(),
+            compiler.ast.next(),
             format!("Invalid function definition of: {}", function.id).as_str(),
         );
         match next.token {
             Token::CoolArrow => {
-                if !variable.has_minimum() {
-                    break;
+                if variable.has_minimum() {
+                    function.arguments.push(variable.to_owned());
                 }
-
-                function.arguments.push(variable.to_owned());
-                variable.v_type = String::new();
-                variable.id = String::new();
                 break;
             }
             Token::NewLine => continue,
@@ -54,8 +40,7 @@ pub fn construct(
                 }
 
                 function.arguments.push(variable.to_owned());
-                variable.v_type = String::new();
-                variable.id = String::new();
+                variable = Variable::new();
             }
             _ => {
                 if !variable.has_type() {
@@ -69,13 +54,8 @@ pub fn construct(
         }
     }
     // Set Return Value
-    next = get_next_or_exit(ast.next(), "Invalid Function Return Value");
-    variable = Variable {
-        id: String::from("return_value"),
-        v_type: String::from("void"),
-        v_value: None,
-        variable_state: VariableState::Private,
-    };
+    next = get_next_or_exit(compiler.ast.next(), "Invalid Function Return Value");
+    variable = Variable::return_void();
     match next.token {
         Token::Id => {
             variable.v_type = next.name;
@@ -92,7 +72,7 @@ pub fn construct(
     // Set Inner Function stuff
     loop {
         let x = get_next_or_exit(
-            ast.next(),
+            compiler.ast.next(),
             format!("Function is not closed [{}]", function.id).as_str(),
         );
         match x.token {
@@ -102,20 +82,13 @@ pub fn construct(
             _ => {}
         }
     }
-    return (function, ast);
+    validate(&function, compiler);
+    return function;
 }
 
-pub fn validate(function: &Function, program: &Program) {
+fn validate(function: &Function, compiler: &Compiler) {
     // Check Duplicate Functions
-    for f in program.functions.iter() {
-        if f.id == function.id {
-            display_err_message(
-                format!(
-                    "Duplicate instances of: {}, Inherits: {}",
-                    function.id, f.id
-                )
-                .as_str(),
-            );
-        }
+    if compiler.contains_function(&function.id) {
+        display_err_message(format!("Duplicate instances Function of: {}", function.id).as_str());
     }
 }

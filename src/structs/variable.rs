@@ -33,4 +33,20 @@ impl Variable {
         }
         return v;
     }
+    pub fn new() -> Variable {
+        Variable {
+            id: String::new(),
+            v_type: String::new(),
+            v_value: None,
+            variable_state: VariableState::Private,
+        }
+    }
+    pub fn return_void() -> Variable {
+        Variable {
+            id: String::from("return_value"),
+            v_type: String::from("void"),
+            v_value: None,
+            variable_state: VariableState::Private,
+        }
+    }
 }

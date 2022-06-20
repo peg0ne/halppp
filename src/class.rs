@@ -1,14 +1,12 @@
-use std::{iter::Peekable, slice::Iter};
-
 use crate::{
     enums::{token::Token, variable_state::VariableState},
     function,
     message::display_err_message,
-    structs::{ast_token::AstToken, class::Class, program::Program, variable::Variable},
+    structs::{class::Class, compiler::Compiler, variable::Variable},
     utils::get_next_or_exit,
 };
 
-pub fn construct(mut ast: Peekable<Iter<AstToken>>) -> (Class, Peekable<Iter<AstToken>>) {
+pub fn construct(compiler: &mut Compiler) -> Class {
     // Create Class
     let mut class = Class {
         id: String::new(),
@@ -17,20 +15,20 @@ pub fn construct(mut ast: Peekable<Iter<AstToken>>) -> (Class, Peekable<Iter<Ast
         variables: Vec::new(),
     };
     // Set Class Id
-    let mut next = get_next_or_exit(ast.next(), "invalid class definition");
+    let mut next = get_next_or_exit(compiler.next(), "invalid class definition");
     match next.token {
         Token::Id => class.id = next.name,
         _ => display_err_message(format!("Expected id got: {:?}", next.token).as_str()),
     }
     // Set Inheritance
     next = get_next_or_exit(
-        ast.next(),
+        compiler.next(),
         format!("Invalid class definition of: {}", class.id).as_str(),
     );
     match next.token {
         Token::CoolArrow => {
             next = get_next_or_exit(
-                ast.next(),
+                compiler.next(),
                 format!("Invalid class definition of: {}", class.id).as_str(),
             );
             match next.token {
@@ -51,7 +49,7 @@ pub fn construct(mut ast: Peekable<Iter<AstToken>>) -> (Class, Peekable<Iter<Ast
     let mut variable_state = VariableState::Private;
     loop {
         let x = get_next_or_exit(
-            ast.next(),
+            compiler.next(),
             format!("Class is not closed [{}]", class.id).as_str(),
         );
         match x.token {
@@ -61,8 +59,7 @@ pub fn construct(mut ast: Peekable<Iter<AstToken>>) -> (Class, Peekable<Iter<Ast
             Token::Protected => variable_state = VariableState::Protected,
             Token::Public => variable_state = VariableState::Public,
             Token::Function => {
-                let (function, ast_) = function::construct(ast, variable_state);
-                ast = ast_;
+                let function = function::construct(compiler, variable_state);
                 class.functions.push(function);
             }
             Token::Type => {
@@ -73,7 +70,7 @@ pub fn construct(mut ast: Peekable<Iter<AstToken>>) -> (Class, Peekable<Iter<Ast
                     variable_state: variable_state,
                 };
                 let v = get_next_or_exit(
-                    ast.next(),
+                    compiler.next(),
                     format!("Invalid variable declaration in class [{}]", class.id).as_str(),
                 );
                 match v.token {
@@ -85,30 +82,24 @@ pub fn construct(mut ast: Peekable<Iter<AstToken>>) -> (Class, Peekable<Iter<Ast
             _ => {}
         }
     }
-    return (class, ast);
+    validate(&class, compiler);
+    return class;
 }
 
-pub fn validate(class: &Class, program: &Program) {
+fn validate(class: &Class, compiler: &Compiler) {
     // Check Duplicate Classes
-    for c in program.classes.iter() {
-        if c.id == class.id {
-            display_err_message(
-                format!("Duplicate instances of: {}, Inherits: {}", class.id, c.id).as_str(),
-            );
-        }
+    if compiler.contains_class(&class.id) {
+        display_err_message(format!("Duplicate instances of: {}", class.id).as_str());
     }
     // Check Inheritance
     match &class.inherit {
         None => {}
         Some(i) => {
-            for c in program.classes.iter() {
-                if c.id == i.to_string() {
-                    return;
-                }
+            if !compiler.contains_class(i) {
+                display_err_message(
+                    format!("Invalid Inheritance of: {}, Inherits: {:?}", class.id, i).as_str(),
+                );
             }
-            display_err_message(
-                format!("Invalid Inheritance of: {}, Inherits: {:?}", class.id, i).as_str(),
-            );
         }
     }
 }
