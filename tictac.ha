@@ -8,7 +8,7 @@ pub
     fn display =>
         foreach i until 9
             cout << square[i] << "\t"
-            if i =|= (2 : 5 : 8) do cout << "\n"
+            if i =|= (2 : 5 : 8) do cout << "\n";
         ;
     ;
 
@@ -18,7 +18,7 @@ pub
                 return square[i] == 'X' ? 1 : 2
             ;
         ;
-        for i = 0; i < 9; i += 3
+        for i = 0 i < 9 i += 3
             if square[i + 1] =&= (square[i] : square[i + 2])
                 return square[i] == 'X' ? 1 : 2
             ;
@@ -31,7 +31,9 @@ pub
         return 0
     ;
 
-    fn mark int player, int box => do square[box] = player == 1 ? 'X' : 'Y';
+    fn mark int player, int box =>
+        square[box] = player == 1 ? 'X' : 'Y'
+    ;
 ;
 
 fn main =>
@@ -51,5 +53,5 @@ fn main =>
             dobr flag = 1
         ;
     ;
-    if flag == 0 do cout << "\nSorry, The game is a draw\n"
+    if flag == 0 do cout << "\nSorry, The game is a draw\n";
 ;

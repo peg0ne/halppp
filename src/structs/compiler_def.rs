@@ -8,7 +8,6 @@ pub struct Compiler<'a> {
 
 impl<'a> Compiler<'a> {
     pub fn next(self: &mut Compiler<'a>) -> Option<&'a AstToken> {
-        println!("{:?}", self.ast.peek());
         self.ast.next()
     }
     pub fn peek(self: &mut Compiler<'a>) -> Option<&&AstToken> {

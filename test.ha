@@ -1,5 +1,8 @@
+inc => iostream
+use => std
+
 class ParentClass
-    protected int x
+    protected int x = 0
     protected int y
 ;
 

@@ -1,6 +1,8 @@
 mod ast_token_def;
 mod class_def;
 mod compiler_def;
+mod condition_def;
+mod for_def;
 mod function_def;
 mod global_def;
 mod imports;
@@ -12,6 +14,8 @@ pub use crate::structs::{
     ast_token_def::AstToken,
     class_def::Class,
     compiler_def::Compiler,
+    condition_def::Condition,
+    for_def::For,
     function_def::Function,
     global_def::Global,
     imports::{Get, Include, Use},

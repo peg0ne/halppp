@@ -1,9 +1,11 @@
 mod ast;
 mod class;
+mod condition;
 mod enums;
 mod fileutil;
+mod foreach;
 mod function;
-mod include;
+mod imports;
 mod message;
 mod structs;
 mod utils;
@@ -13,7 +15,7 @@ use crate::{
     enums::{Token, VariableState},
     fileutil::{get_content, get_file_path, write_program},
     message::{display_err_message, display_hint_message},
-    structs::{Compiler, Include, Program, Use},
+    structs::{AstToken, Compiler, Include, Program, Use},
     utils::get_next_or_exit,
 };
 
@@ -58,41 +60,24 @@ fn main() {
                 compiler.add_fn(function);
             }
             Token::Include => {
-                let include = include::construct(&mut compiler);
-                for i in include.iter() {
+                let incs = imports::imports_creation(&mut compiler, next);
+                for i in incs.iter() {
                     output.push_str(Include::from(i.to_owned()).to_cpp().as_str());
-                    if compiler.contains_inc(i) {
-                        display_hint_message(
-                            format!(
-                                "[IncludeHint]: Duplicate entry of include found [{}]",
-                                next.name
-                            )
-                            .as_str(),
-                        );
-                    }
                 }
-                compiler.add_inc(include);
             }
             Token::Use => {
-                let using = include::construct(&mut compiler);
-                for i in using.iter() {
+                let uses = imports::imports_creation(&mut compiler, next);
+                for i in uses.iter() {
                     output.push_str(Use::from(i.to_owned()).to_cpp().as_str());
-                    if compiler.contains_use(i) {
-                        display_hint_message(
-                            format!(
-                                "[UseHint]: Duplicate entry of include found [{}]",
-                                next.name
-                            )
-                            .as_str(),
-                        );
-                    }
                 }
-                compiler.add_use(using);
+            }
+            Token::Get => {
+                imports::imports_creation(&mut compiler, next);
             }
             Token::NewLine => {}
             Token::EOF => break,
             _ => display_err_message(format!("Token not handled: {:?}", next.token).as_str()),
         }
     }
-    write_program(output);
+    write_program(output)
 }

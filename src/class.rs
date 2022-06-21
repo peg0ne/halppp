@@ -4,6 +4,7 @@ use crate::{
     message::display_err_message,
     structs::{Class, Compiler, Variable},
     utils::{get_id_or_exit, get_next_or_exit},
+    variable,
 };
 
 pub fn construct(compiler: &mut Compiler) -> Class {
@@ -44,7 +45,7 @@ pub fn construct(compiler: &mut Compiler) -> Class {
                 class.functions.push(function);
             }
             Token::Type => {
-                let id = get_id_or_exit(
+                let mut id = get_id_or_exit(
                     compiler.next(),
                     format!(
                         "[ClassError] No Identifier for variable: {} in class [{}]",
@@ -52,7 +53,25 @@ pub fn construct(compiler: &mut Compiler) -> Class {
                     )
                     .as_str(),
                 );
-                let variable = Variable::from(id, next.name, None, variable_state);
+                let mut value: Option<String> = None;
+                loop {
+                    match compiler.peek() {
+                        None => {}
+                        Some(p) => match p.token {
+                            Token::Equals => {
+                                value = variable::get_value(compiler);
+                                break;
+                            }
+                            Token::NewLine => break,
+                            _ => {
+                                id.push_str(p.name.as_str());
+                                compiler.next();
+                                continue;
+                            }
+                        },
+                    }
+                }
+                let variable = Variable::from(id, next.name, value, variable_state);
                 class.variables.push(variable);
             }
             _ => {}
