@@ -35,3 +35,5 @@ fn holop =>
 fn main => int
     cout << argc << " hello " << argv[1]
     return 0
+;
+
