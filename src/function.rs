@@ -30,7 +30,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState) -> Func
         );
         match x.token {
             Token::For => {
-                foreach::construct(compiler);
+                function.expressions.push(foreach::construct(compiler));
                 continue;
             }
             Token::Condition => {

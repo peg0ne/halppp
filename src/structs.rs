@@ -2,6 +2,7 @@ mod ast_token_def;
 mod class_def;
 mod compiler_def;
 mod condition_def;
+mod expression_def;
 mod for_def;
 mod function_def;
 mod global_def;
@@ -15,6 +16,7 @@ pub use crate::structs::{
     class_def::Class,
     compiler_def::Compiler,
     condition_def::Condition,
+    expression_def::Expression,
     for_def::For,
     function_def::Function,
     global_def::Global,

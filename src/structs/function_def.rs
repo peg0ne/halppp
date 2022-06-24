@@ -1,4 +1,7 @@
-use crate::{enums::VariableState, structs::Variable};
+use crate::{
+    enums::VariableState,
+    structs::{Expression, Variable},
+};
 
 #[derive(Clone, Debug)]
 pub struct Function {
@@ -6,6 +9,7 @@ pub struct Function {
     pub arguments: Vec<Variable>,
     pub return_value: Option<Variable>,
     pub variable_state: VariableState,
+    pub expressions: Vec<Expression>,
 }
 
 impl Function {
@@ -15,6 +19,7 @@ impl Function {
             arguments: vec![],
             return_value: None,
             variable_state: state,
+            expressions: vec![],
         }
     }
     pub fn to_py(self: &Function, in_class: bool) -> String {
