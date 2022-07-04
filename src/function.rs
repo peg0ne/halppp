@@ -1,7 +1,7 @@
 use crate::{
     condition,
     enums::{Token, VariableState},
-    foreach,
+    expression, foreach,
     message::display_err_message,
     structs::{Compiler, Function},
     utils::{get_id_or_exit, get_next_or_exit},
@@ -29,18 +29,15 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState) -> Func
             format!("Function is not closed [{}]", function.id).as_str(),
         );
         match x.token {
-            Token::For => {
-                function.expressions.push(foreach::construct(compiler));
-                continue;
-            }
-            Token::Condition => {
-                condition::construct(compiler);
-                continue;
-            }
+            Token::For => function.expressions.push(foreach::construct(compiler)),
+            Token::Condition => function.expressions.push(condition::construct(compiler)),
             Token::SemiColon => break,
             Token::Function => break,
             Token::EOF => break,
-            _ => {}
+            Token::NewLine => continue,
+            _ => function
+                .expressions
+                .push(expression::construct(compiler, x.name.as_str())),
         }
     }
     validate(&function, compiler);

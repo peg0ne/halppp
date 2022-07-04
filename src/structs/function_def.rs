@@ -59,6 +59,9 @@ impl Function {
             i += 1;
         }
         function.push_str(") {\n");
+        for expr in self.expressions.iter() {
+            function.push_str(expr.to_cpp(1).as_str());
+        }
         function.push_str(format!("{}}}\n", spacing).as_str());
         function
     }

@@ -9,9 +9,11 @@ pub fn create(content: &String) -> Vec<AstToken> {
             None => break,
             Some(c) => c,
         };
-        if is_char_token(c) {
-            let is_cool = c == '=' && peekable.peek().unwrap_or(&' ') == &'>';
-            if !is_cool {
+        if is_char_token(c) && id != "=" {
+            let next = peekable.peek().unwrap_or(&' ');
+            let is_cool = c == '=' && next == &'>';
+            let is_equality = c == '=' && next == &'=';
+            if !is_cool && !is_equality {
                 id = try_add_token(id, &mut ast);
                 ast.push(AstToken::from_char(c));
                 continue;

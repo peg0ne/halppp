@@ -2,6 +2,7 @@ mod ast;
 mod class;
 mod condition;
 mod enums;
+mod expression;
 mod fileutil;
 mod foreach;
 mod function;
@@ -14,8 +15,8 @@ mod variable;
 use crate::{
     enums::{Token, VariableState},
     fileutil::{get_content, get_file_path, write_program},
-    message::{display_err_message, display_hint_message},
-    structs::{AstToken, Compiler, Include, Program, Use},
+    message::display_err_message,
+    structs::{Compiler, Include, Program, Use},
     utils::get_next_or_exit,
 };
 
@@ -76,7 +77,9 @@ fn main() {
             }
             Token::NewLine => {}
             Token::EOF => break,
-            _ => display_err_message(format!("Token not handled: {:?}", next.token).as_str()),
+            _ => {
+                display_err_message(format!("Token not handled: {:?}", next.token).as_str());
+            }
         }
     }
     write_program(output)
