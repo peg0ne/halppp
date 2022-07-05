@@ -26,21 +26,3 @@ fn Some<T> T value => Option<T>
 fn None<T> => Option<T>
     doremi Option<T>()
 ;
-
-fn main =>
-    if a == b
-        return 1
-    ;
-    Option<int> e
-    cout << e.is_some() << " < expected: 7, got: " << e.value_or(7) << "\n"
-
-    let a = Some(0)
-    cout << a.is_some() << " < expected: 0, got: "<< a.value_or(1) << "\n"
-
-    let b = Some(10)
-    cout << b.is_some() << " < expected: 10, got: "<< b.value_or(5) << "\n"
-
-    let c = None<int>()
-    cout << c.is_some() << " < expected: 2, got: " << c.value_or(2) << "\n"
-    return 0
-;

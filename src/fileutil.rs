@@ -15,8 +15,9 @@ pub fn get_file_path() -> String {
     return args[1].to_owned();
 }
 
-pub fn get_content(fp: &String) -> String {
-    let path = Path::new(&fp);
+pub fn get_content(fp: &String, folder_path: &String) -> String {
+    let full_fp = format!("{}{}", folder_path, &fp);
+    let path = Path::new(&full_fp);
     let display = path.display();
 
     let mut file = match File::open(&path) {
@@ -39,7 +40,8 @@ pub fn get_content(fp: &String) -> String {
     return s;
 }
 
-pub fn write_program(program: String) {
-    let mut file = std::fs::File::create("test.cpp").expect("create failed");
+pub fn write_program(program: String, file_name: String, folder_path: String) {
+    let f_name = format!("{}{}.c", folder_path, file_name.replace(".ha", ""));
+    let mut file = std::fs::File::create(f_name).expect("create failed");
     file.write_all(program.as_bytes()).expect("write failed");
 }

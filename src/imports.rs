@@ -12,30 +12,63 @@ pub fn construct(compiler: &mut Compiler) -> Vec<String> {
         Token::CoolArrow => {}
         _ => display_err_message("[Import]: Missing [=>] in declaration"),
     }
+    let mut id = String::new();
     loop {
         let next = get_next_or_exit(compiler.next(), "[Import]: Import declaration invalid");
         match next.token {
-            Token::NewLine => break,
-            Token::EOF => break,
-            Token::Comma => continue,
+            Token::NewLine => {
+                let mut found = false;
+                for i in imports.iter() {
+                    if i.to_owned() == id {
+                        display_hint_message(
+                            format!("[Import]: Token duplicate in entry {}", id).as_str(),
+                        );
+                        found = true;
+                    }
+                }
+                if !found {
+                    imports.push(id);
+                }
+                break;
+            },
+            Token::EOF => {
+                let mut found = false;
+                for i in imports.iter() {
+                    if i.to_owned() == id {
+                        display_hint_message(
+                            format!("[Import]: Token duplicate in entry {}", id).as_str(),
+                        );
+                        found = true;
+                    }
+                }
+                if !found {
+                    imports.push(id);
+                }
+                break;
+            },
+            Token::Comma => {
+                let mut found = false;
+                for i in imports.iter() {
+                    if i.to_owned() == id {
+                        display_hint_message(
+                            format!("[Import]: Token duplicate in entry {}", id).as_str(),
+                        );
+                        found = true;
+                    }
+                }
+                if !found {
+                    imports.push(id);
+                }
+                id = String::new();
+                continue;
+            },
             _ => {
                 if next.token.is_base() {
                     display_err_message(
                         format!("[Import]: Token not allowed: [{}]", next.name).as_str(),
                     );
                 }
-                let mut found = false;
-                for i in imports.iter() {
-                    if i.to_owned() == next.name {
-                        display_hint_message(
-                            format!("[Import]: Token duplicate in entry {}", next.name).as_str(),
-                        );
-                        found = true;
-                    }
-                }
-                if !found {
-                    imports.push(next.name);
-                }
+                id.push_str(next.name.as_str());
             }
         }
     }
@@ -64,6 +97,9 @@ pub fn imports_creation(compiler: &mut Compiler, next: AstToken) -> Vec<String> 
                     found = true;
                 }
             }
+            Token::Get => {
+
+            }
             _ => display_err_message(format!("[{:?}]: Unhandled import", next.token).as_str()),
         }
     }
@@ -71,6 +107,7 @@ pub fn imports_creation(compiler: &mut Compiler, next: AstToken) -> Vec<String> 
         match next.token {
             Token::Use => compiler.add_use(import),
             Token::Include => compiler.add_inc(import),
+            Token::Get => {},
             _ => display_err_message(format!("[{:?}]: Unhandled import", next.token).as_str()),
         }
     }

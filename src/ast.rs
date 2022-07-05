@@ -83,6 +83,9 @@ pub fn create(content: &String) -> Vec<AstToken> {
     ast.push(AstToken::eof());
     ast.push(AstToken::eof());
     ast.push(AstToken::eof());
+    ast.push(AstToken::eof());
+    ast.push(AstToken::eof());
+    ast.push(AstToken::eof());
     return ast;
 }
 

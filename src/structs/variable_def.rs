@@ -62,15 +62,6 @@ impl Variable {
             variable_state: VariableState::Private,
         }
     }
-    pub fn to_py(self: &Variable, spacing: &str, new_line: &str) -> String {
-        let mut base = format!("{}{}: {}", spacing, self.id, self.v_type);
-        match &self.v_value {
-            None => {}
-            Some(v) => base.push_str(format!(" = {}", v).as_str()),
-        }
-        base.push_str(format!("{}", new_line).as_str());
-        base
-    }
     pub fn to_cpp(self: &Variable, spacing: &str, new_line: &str) -> String {
         let mut base = format!("{}{} {}", spacing, self.v_type, self.id);
         match &self.v_value {

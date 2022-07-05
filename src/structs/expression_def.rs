@@ -8,13 +8,6 @@ pub struct Expression {
 }
 
 impl Expression {
-    pub fn new() -> Expression {
-        Expression {
-            e_condition: None,
-            e_for: None,
-            line: None,
-        }
-    }
     pub fn to_cpp(self: &Expression, indentation: i32) -> String {
         let mut expression = String::new();
         let spacing = "    ";

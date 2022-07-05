@@ -24,24 +24,6 @@ impl Function {
             template: vec![],
         }
     }
-    pub fn to_py(self: &Function, in_class: bool) -> String {
-        let mut function = String::new();
-        let spacing = if in_class { "    " } else { "" };
-        function.push_str(format!("{}def {}(", spacing, self.id).as_str());
-        let mut i = 0;
-        loop {
-            if i + 1 > self.arguments.len() {
-                break;
-            }
-            function.push_str(self.arguments[i].to_py("", "").as_str());
-            if i + 1 != self.arguments.len() {
-                function.push_str(", ");
-            }
-            i += 1;
-        }
-        function.push_str("):\n");
-        function
-    }
     pub fn to_cpp(self: &Function, in_class: bool) -> String {
         let mut function = String::new();
         if self.template.len() > 0 {

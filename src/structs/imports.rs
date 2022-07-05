@@ -1,12 +1,12 @@
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Include {
     pub include: String,
 }
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Use {
     pub using: String,
 }
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Get {
     pub get: String,
 }

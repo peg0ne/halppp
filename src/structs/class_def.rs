@@ -24,20 +24,6 @@ impl Class {
             template: Vec::new(),
         }
     }
-    pub fn to_py(self: &Class) -> String {
-        let mut class = String::from(format!("class {}", self.id));
-        match &self.inherit {
-            None => class.push_str(":\n"),
-            Some(a) => class.push_str(format!("({}):\n", a).as_str()),
-        }
-        for v in self.variables.iter() {
-            class.push_str(v.to_py("    ", "\n").as_str());
-        }
-        for f in self.functions.iter() {
-            class.push_str(f.to_py(true).as_str());
-        }
-        class
-    }
     pub fn to_cpp(self: &Class) -> String {
         let mut class = String::new();
         if self.template.len() > 0 {

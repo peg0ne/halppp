@@ -26,7 +26,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
         }
     }
     loop {
-        let (variable, is_end) = variable::construct_args(compiler);
+        let (variable, is_end) = variable::construct_args(compiler, None);
         if !variable.has_minimum() {
             break;
         }

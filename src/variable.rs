@@ -5,8 +5,9 @@ use crate::{
     utils::get_next_or_exit,
 };
 
-pub fn construct_args(compiler: &mut Compiler) -> (Variable, bool) {
+pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Variable, bool) {
     let mut variable = Variable::new();
+    if type_name.is_some() {variable.v_type = type_name.unwrap()}
     let mut is_end = false;
     loop {
         let mut next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
@@ -21,6 +22,18 @@ pub fn construct_args(compiler: &mut Compiler) -> (Variable, bool) {
             }
             Token::Equals => variable.v_value = get_value(compiler),
             Token::Comma => break,
+            Token::Asterix => {
+                if !variable.has_type() {
+                    display_err_message(
+                        format!(
+                            "[Variable]: Pointer infront of type not allowed:\n{:?}",
+                            variable
+                        )
+                        .as_str(),
+                    );
+                }
+                variable.v_type.push_str(next.name.as_str());
+            }
             Token::LessThan => {
                 if !variable.has_id() && !variable.has_type() {
                     display_err_message(

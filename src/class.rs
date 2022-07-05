@@ -75,66 +75,16 @@ pub fn construct(compiler: &mut Compiler) -> Class {
                     ));
                     class.functions.push(function);
                     continue;
-                }
-                let mut id = get_id_or_exit(
-                    compiler.next(),
-                    format!(
-                        "[ClassError] No Identifier for variable: {} in class [{}]",
-                        next.name, class.id
-                    )
-                    .as_str(),
-                );
-                let mut value: Option<String> = None;
-                loop {
-                    match compiler.peek() {
-                        None => {}
-                        Some(p) => match p.token {
-                            Token::Equals => {
-                                value = variable::get_value(compiler);
-                                break;
-                            }
-                            Token::NewLine => break,
-                            _ => {
-                                id.push_str(p.name.as_str());
-                                compiler.next();
-                                continue;
-                            }
-                        },
-                    }
-                }
-                let variable = Variable::from(id, next.name, value, variable_state);
-                class.variables.push(variable);
+                } 
+                let (mut variable, _) = variable::construct_args(compiler, Some(next.name));
+                variable.variable_state = variable_state;
+                class.variables.push(variable)
             }
             Token::Type => {
-                let mut id = get_id_or_exit(
-                    compiler.next(),
-                    format!(
-                        "[ClassError] No Identifier for variable: {} in class [{}]",
-                        next.name, class.id
-                    )
-                    .as_str(),
-                );
-                let mut value: Option<String> = None;
-                loop {
-                    match compiler.peek() {
-                        None => {}
-                        Some(p) => match p.token {
-                            Token::Equals => {
-                                value = variable::get_value(compiler);
-                                break;
-                            }
-                            Token::NewLine => break,
-                            _ => {
-                                id.push_str(p.name.as_str());
-                                compiler.next();
-                                continue;
-                            }
-                        },
-                    }
-                }
-                let variable = Variable::from(id, next.name, value, variable_state);
-                class.variables.push(variable);
-            }
+                let (mut variable, _) = variable::construct_args(compiler, Some(next.name));
+                variable.variable_state = variable_state;
+                class.variables.push(variable)
+            },
             _ => {}
         }
     }

@@ -2,7 +2,7 @@ use crate::{
     enums::Token,
     expression, foreach,
     structs::{Compiler, Condition, Expression},
-    utils::{get_id_or_exit, get_next_or_exit},
+    utils::get_next_or_exit,
 };
 
 pub fn construct(compiler: &mut Compiler) -> Expression {
