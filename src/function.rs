@@ -70,9 +70,17 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
             Token::Function => break,
             Token::EOF => break,
             Token::NewLine => continue,
-            _ => function
-                .expressions
-                .push(expression::construct(compiler, x)),
+            _ => {
+                function.expressions.push(expression::construct(compiler, x.to_owned()));
+                match x.token {
+                    Token::Do => break,
+                    Token::Dore => break,
+                    Token::Doremi => break,
+                    Token::Doco => break,
+                    Token::Dobr => break,
+                    _ => {}
+                };
+            }
         }
     }
     validate(&function, compiler);

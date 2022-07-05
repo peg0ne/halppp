@@ -41,7 +41,7 @@ pub fn get_content(fp: &String, folder_path: &String) -> String {
 }
 
 pub fn write_program(program: String, file_name: String, folder_path: String) {
-    let f_name = format!("{}{}.c", folder_path, file_name.replace(".ha", ""));
+    let f_name = format!("{}{}.cpp", folder_path, file_name.replace(".ha", ""));
     let mut file = std::fs::File::create(f_name).expect("create failed");
     file.write_all(program.as_bytes()).expect("write failed");
 }
