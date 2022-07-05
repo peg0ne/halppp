@@ -1,11 +1,29 @@
 use crate::{
     enums::Token,
-    structs::{Compiler, Expression},
+    structs::{Compiler, Expression, AstToken},
     utils::get_next_or_exit,
 };
 
-pub fn construct(compiler: &mut Compiler, first: &str) -> Expression {
-    let mut expression = String::from(first);
+pub fn construct(compiler: &mut Compiler, first: AstToken) -> Expression {
+    let mut doing = String::new();
+    let mut expression = match first.token {
+        Token::Do => String::from("\n"),
+        Token::Doremi => String::from("\nreturn"),
+        Token::Dore => {
+            doing = String::from(";\nreturn");
+            String::from("\n")
+        },
+        Token::Dobr => {
+            doing = String::from(";\nbreak");
+            String::from("\n")
+        },
+        Token::Doco => {
+            doing = String::from(";\ncontinue");
+            String::from("\n")
+        },
+        Token::Let => String::from("auto"),
+        _ => String::from(first.name),
+    };
     loop {
         let x = get_next_or_exit(
             compiler.next(),
@@ -14,12 +32,19 @@ pub fn construct(compiler: &mut Compiler, first: &str) -> Expression {
         match x.token {
             Token::EOF => break,
             Token::NewLine => break,
+            Token::Do => expression.push_str("\n"),
+            Token::Dore => expression.push_str("\nreturn"),
+            Token::Dobr => expression.push_str("\nbreak"),
+            Token::Doco => expression.push_str("\ncontinue"),
+            Token::Doremi => expression.push_str("\nreturn"),
+            Token::Let => expression.push_str("auto"),
             _ => {
                 expression.push_str(" ");
                 expression.push_str(x.name.as_str());
             }
         }
     }
+    expression.push_str(doing.as_str());
     Expression {
         e_condition: None,
         e_for: None,

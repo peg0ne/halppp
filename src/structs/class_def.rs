@@ -5,19 +5,23 @@ use crate::{
 
 #[derive(Clone, Debug)]
 pub struct Class {
+    pub is_struct: bool,
     pub id: String,
     pub inherit: Option<String>,
     pub functions: Vec<Function>,
     pub variables: Vec<Variable>,
+    pub template: Vec<String>,
 }
 
 impl Class {
     pub fn new() -> Class {
         Class {
+            is_struct: false,
             id: String::new(),
             inherit: None,
             functions: Vec::new(),
             variables: Vec::new(),
+            template: Vec::new(),
         }
     }
     pub fn to_py(self: &Class) -> String {
@@ -35,7 +39,24 @@ impl Class {
         class
     }
     pub fn to_cpp(self: &Class) -> String {
-        let mut class = String::from(format!("class {}", self.id));
+        let mut class = String::new();
+        if self.template.len() > 0 {
+            class.push_str("template <typename ");
+            let mut i = 0;
+            while i < self.template.len() {
+                class.push_str(self.template[i].as_str());
+                if i + 1 < self.template.len() {
+                    class.push_str(", ");
+                }
+                i += 1;
+            }
+            class.push_str(">\n")
+        }
+        if self.is_struct {
+            class.push_str(format!("struct {}", self.id).as_str())
+        } else {
+            class.push_str(format!("class {}", self.id).as_str())
+        }
         match &self.inherit {
             None => {}
             Some(a) => class.push_str(format!(": public {}", a).as_str()),

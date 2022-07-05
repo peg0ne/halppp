@@ -28,7 +28,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
             _ => {
                 for_def
                     .lines
-                    .push(expression::construct(compiler, x.name.as_str()));
+                    .push(expression::construct(compiler, x));
                 continue;
             }
         }

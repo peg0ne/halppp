@@ -3,14 +3,28 @@ use crate::{
     enums::{Token, VariableState},
     expression, foreach,
     message::display_err_message,
-    structs::{Compiler, Function},
+    structs::{Compiler, Function, Variable},
     utils::{get_id_or_exit, get_next_or_exit},
     variable,
+    template,
 };
 
-pub fn construct(compiler: &mut Compiler, variable_state: VariableState) -> Function {
+pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constructor: bool) -> Function {
     let mut function = Function::new(variable_state);
-    function.id = get_id_or_exit(compiler.next(), "[FunctionError]: No Function Id");
+    if !constructor {
+        function.id = get_id_or_exit(compiler.next(), "[FunctionError]: No Function Id");
+    }
+    match compiler.peek() {
+        Some(p) => {
+            match p.token {
+                Token::LessThan => function.template = template::construct(compiler),
+                _ => {}
+            }
+        }
+        None => {
+            display_err_message(format!("Error when trying to parse function: {}", function.id).as_str());
+        }
+    }
     loop {
         let (variable, is_end) = variable::construct_args(compiler);
         if !variable.has_minimum() {
@@ -21,7 +35,28 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState) -> Func
             break;
         }
     }
-    function.return_value = Some(variable::get_type(compiler));
+    if function.id == String::from("main") {
+        function.arguments.push(Variable::from(
+            String::from("argc"),
+            String::from("int"),
+            None,
+            VariableState::Private,
+        ));
+        function.arguments.push(Variable::from(
+            String::from("argv[]"),
+            String::from("char*"),
+            None,
+            VariableState::Private,
+        ));
+        function.return_value = Some(Variable::from(
+            String::from(""),
+            String::from("int"),
+            None,
+            VariableState::Private,
+        ));
+    } else {
+        function.return_value = Some(variable::get_type(compiler));
+    }
     // Set Inner Function stuff
     loop {
         let x = get_next_or_exit(
@@ -37,7 +72,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState) -> Func
             Token::NewLine => continue,
             _ => function
                 .expressions
-                .push(expression::construct(compiler, x.name.as_str())),
+                .push(expression::construct(compiler, x)),
         }
     }
     validate(&function, compiler);

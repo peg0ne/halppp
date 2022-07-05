@@ -18,10 +18,9 @@ class Class => ParentClass
         return impl_add()
     ;
 
-    extend => ClassFunctions
 ;
 
-fn test string c, int h => Class
+fn test string c, int h => string
     return c
 ;
 
@@ -32,8 +31,7 @@ fn tester string c, int h =>
 fn holop =>
 ;
 
-fn main => int
+fn main =>
     cout << argc << " hello " << argv[1]
-    return 0
 ;
 

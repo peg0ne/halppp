@@ -11,6 +11,7 @@ mod message;
 mod structs;
 mod utils;
 mod variable;
+mod template;
 
 use crate::{
     enums::{Token, VariableState},
@@ -50,13 +51,19 @@ fn main() {
             );
         }
         match next.token {
+            Token::Struct => {
+                let mut class = class::construct(&mut compiler);
+                class.is_struct = true;
+                output.push_str(class.to_cpp().as_str());
+                compiler.add_class(class);
+            }
             Token::Class => {
                 let class = class::construct(&mut compiler);
                 output.push_str(class.to_cpp().as_str());
                 compiler.add_class(class);
             }
             Token::Function => {
-                let function = function::construct(&mut compiler, VariableState::Public);
+                let function = function::construct(&mut compiler, VariableState::Public, false);
                 output.push_str(function.to_cpp(false).as_str());
                 compiler.add_fn(function);
             }

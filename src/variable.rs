@@ -9,7 +9,7 @@ pub fn construct_args(compiler: &mut Compiler) -> (Variable, bool) {
     let mut variable = Variable::new();
     let mut is_end = false;
     loop {
-        let next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
+        let mut next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
         match next.token {
             Token::CoolArrow => {
                 is_end = true;
@@ -21,6 +21,29 @@ pub fn construct_args(compiler: &mut Compiler) -> (Variable, bool) {
             }
             Token::Equals => variable.v_value = get_value(compiler),
             Token::Comma => break,
+            Token::LessThan => {
+                if !variable.has_id() && !variable.has_type() {
+                    display_err_message(
+                        format!(
+                            "[Variable]: Variable declaration cannot have template without id and type:\n{:?}",
+                            variable
+                        )
+                        .as_str(),
+                    );
+                }
+                variable.v_type.push_str("<");
+                loop {
+                    next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
+                    match next.token {
+                        Token::MoreThan => {
+                            variable.v_type.push_str(">");
+                            break;
+                        }
+                        _ => variable.v_type.push_str(next.name.as_str()),
+                    }
+                }
+                continue;
+            }
             _ => {
                 if !variable.has_type() {
                     variable.v_type = next.name;
@@ -67,7 +90,7 @@ pub fn get_value(compiler: &mut Compiler) -> Option<String> {
 }
 
 pub fn get_type(compiler: &mut Compiler) -> Variable {
-    let next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Function Return Value");
+    let mut next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Function Return Value");
     let mut variable = Variable::return_void();
     match next.token {
         Token::Id => {
@@ -84,6 +107,37 @@ pub fn get_type(compiler: &mut Compiler) -> Variable {
             )
             .as_str(),
         ),
+    }
+    match compiler.peek() {
+        Some(p) => {
+            match p.token {
+                Token::LessThan =>  {
+                    next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
+                    if !variable.has_id() {
+                        display_err_message(
+                            format!(
+                                "[Variable]: Variable declaration cannot have template without id:\n{:?}",
+                                variable
+                            )
+                            .as_str(),
+                        );
+                    }
+                    variable.v_type.push_str(next.name.as_str());
+                    loop {
+                        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
+                        match next.token {
+                            Token::MoreThan => {
+                                variable.v_type.push_str(next.name.as_str());
+                                break;
+                            }
+                            _ => variable.v_type.push_str(next.name.as_str()),
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+        _ => {}
     }
     return variable;
 }

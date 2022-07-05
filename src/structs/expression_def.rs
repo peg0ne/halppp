@@ -21,7 +21,7 @@ impl Expression {
         if self.e_condition.is_some() {
             let condition = self.e_condition.as_ref().unwrap();
             let formatted = format!(
-                "{}{}(true{}{}{}) {{\n",
+                "{}{}({}{}{}) {{\n",
                 spacing,
                 condition.conditioner,
                 condition.value1,

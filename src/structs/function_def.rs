@@ -10,6 +10,7 @@ pub struct Function {
     pub return_value: Option<Variable>,
     pub variable_state: VariableState,
     pub expressions: Vec<Expression>,
+    pub template: Vec<String>,
 }
 
 impl Function {
@@ -20,6 +21,7 @@ impl Function {
             return_value: None,
             variable_state: state,
             expressions: vec![],
+            template: vec![],
         }
     }
     pub fn to_py(self: &Function, in_class: bool) -> String {
@@ -42,6 +44,18 @@ impl Function {
     }
     pub fn to_cpp(self: &Function, in_class: bool) -> String {
         let mut function = String::new();
+        if self.template.len() > 0 {
+            function.push_str("template <typename ");
+            let mut i = 0;
+            while i < self.template.len() {
+                function.push_str(self.template[i].as_str());
+                if i + 1 < self.template.len() {
+                    function.push_str(", ");
+                }
+                i += 1;
+            }
+            function.push_str(">\n")
+        }
         let spacing = if in_class { "    " } else { "" };
         match &self.return_value {
             None => function.push_str(format!("{}void {}(", spacing, self.id).as_str()),

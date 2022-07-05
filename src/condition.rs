@@ -10,6 +10,22 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
     loop {
         let x = get_next_or_exit(compiler.next(), "[Condition] Condition is not closed");
         match x.token {
+            Token::NewLine => break,
+            Token::Do => break,
+            Token::Dobr => break,
+            Token::Doco => break,
+            Token::Dore => break,
+            Token::Doremi => break,
+            _ => {
+                condition_def.value1.push_str(x.name.as_str());
+                condition_def.value1.push_str(" ");
+                continue;
+            }
+        }
+    }
+    loop {
+        let x = get_next_or_exit(compiler.next(), "[Condition] Condition is not closed");
+        match x.token {
             Token::Condition => {
                 condition_def.lines.push(construct(compiler));
                 continue;
@@ -24,7 +40,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
             _ => {
                 condition_def
                     .lines
-                    .push(expression::construct(compiler, x.name.as_str()));
+                    .push(expression::construct(compiler, x));
                 continue;
             }
         }
