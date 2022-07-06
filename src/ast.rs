@@ -9,6 +9,32 @@ pub fn create(content: &String) -> Vec<AstToken> {
             None => break,
             Some(c) => c,
         };
+        if c == '"' {
+            id = try_add_token(id, &mut ast);
+            id.push(c);
+            loop {
+                let c = match peekable.next() {
+                    None => break,
+                    Some(c) => c,
+                };
+                id.push(c);
+                if c == '"' { break; }
+            }
+            continue;
+        }
+        if c == '\'' {
+            id = try_add_token(id, &mut ast);
+            id.push(c);
+            loop {
+                let c = match peekable.next() {
+                    None => break,
+                    Some(c) => c,
+                };
+                id.push(c);
+                if c == '\'' { break; }
+            }
+            continue;
+        }
         if is_char_number(c) {
             let part_of_num = match peekable.peek() {
                 Some(p) => p.to_owned() == '.' || is_char_number(p.to_owned()),
