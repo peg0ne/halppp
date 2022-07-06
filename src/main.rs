@@ -17,7 +17,7 @@ use crate::{
     enums::{Token, VariableState},
     fileutil::{get_content, get_file_path, write_program},
     message::{display_err_message, display_hint_message},
-    structs::{Compiler, Include, Program, Use, Expression},
+    structs::{Compiler, Include, Program, Use},
     utils::get_next_or_exit,
 };
 
