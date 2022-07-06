@@ -22,7 +22,6 @@ pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Va
             }
             Token::Equals => {
                 variable.v_value = get_value(compiler, true);
-                println!("{:?}", variable);
                 break;
             },
             Token::Comma => break,

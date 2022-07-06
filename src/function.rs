@@ -3,7 +3,7 @@ use crate::{
     enums::{Token, VariableState},
     expression, foreach,
     message::display_err_message,
-    structs::{Compiler, Function, Variable},
+    structs::{Compiler, Function, Variable, Expression},
     utils::{get_id_or_exit, get_next_or_exit},
     variable,
     template,
@@ -82,6 +82,13 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
                 };
             }
         }
+    }
+    if function.id == String::from("main") {
+        function.expressions.push(Expression {
+            e_condition: None,
+            e_for: None,
+            line: Some(String::from("return 0")),
+        });
     }
     validate(&function, compiler);
     return function;

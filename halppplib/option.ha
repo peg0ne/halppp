@@ -17,3 +17,6 @@ struct Option<T>
 ;
 fn Some<T> T value => Option<T> doremi Option<T>(value)
 fn None<T> => Option<T> doremi Option<T>()
+
+fn main =>
+    

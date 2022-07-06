@@ -16,8 +16,8 @@ mod template;
 use crate::{
     enums::{Token, VariableState},
     fileutil::{get_content, get_file_path, write_program},
-    message::display_err_message,
-    structs::{Compiler, Include, Program, Use},
+    message::{display_err_message, display_hint_message},
+    structs::{Compiler, Include, Program, Use, Expression},
     utils::get_next_or_exit,
 };
 
@@ -52,12 +52,12 @@ fn main() {
         includes: Vec::new(),
         usings: Vec::new(),
     };
-    let output = compile(file_name.to_owned(), folder_path.to_owned(), p);
+    let output = compile(file_name.to_owned(), folder_path.to_owned(), p, true);
     write_program(output, file_name, folder_path);
 }
 
-fn compile(file_path: String, folder_path: String, p: Program) -> String {
-    println!("{}{}", folder_path,file_path);
+fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) -> String {
+    println!("compiling: {}{}", folder_path,file_path);
     let content: String = get_content(&file_path, &folder_path);
     let ast = ast::create(&content);
     let mut output = String::new();
@@ -141,7 +141,7 @@ fn compile(file_path: String, folder_path: String, p: Program) -> String {
                         reversed.push(file_name.pop().unwrap());
                     }
                     file_name = reversed;
-                    output.push_str(compile(file_name, folder_path.to_owned(), compiler.program.to_owned()).as_str());
+                    output.push_str(compile(file_name, folder_path.to_owned(), compiler.program.to_owned(), false).as_str());
                 }
             }
             Token::NewLine => {}
@@ -151,5 +151,15 @@ fn compile(file_path: String, folder_path: String, p: Program) -> String {
             }
         }
     }
+    validate_compiled(&mut compiler, is_main);   
     return output
+}
+
+fn validate_compiled(compiler: &mut Compiler, is_main: bool) {
+    let mut has_main = false;
+    for f in compiler.program.functions.iter_mut() {
+        if f.id == "main" { has_main = true; }
+    }
+    if !has_main && is_main { display_hint_message("Main function is not present!"); }
+    if has_main && !is_main { display_hint_message("Main function not in main file"); }
 }
