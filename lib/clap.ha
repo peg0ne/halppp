@@ -5,9 +5,9 @@ struct Clap
     char **_argv
     pub fn has string check => bool
         foreach i until _argc
-            if _argv[i] == check doremi true
+            if _argv[i] == check doremi 1
         ;
-        return false
+        return 0
     ;
     pub fn peek string check => Option<string>
         foreach i until _argc
