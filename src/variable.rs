@@ -20,7 +20,11 @@ pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Va
                 is_end = true;
                 break;
             }
-            Token::Equals => variable.v_value = get_value(compiler),
+            Token::Equals => {
+                variable.v_value = get_value(compiler, true);
+                println!("{:?}", variable);
+                break;
+            },
             Token::Comma => break,
             Token::Asterix => {
                 if !variable.has_type() {
@@ -86,17 +90,23 @@ pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Va
     (variable, is_end)
 }
 
-pub fn get_value(compiler: &mut Compiler) -> Option<String> {
+pub fn get_value(compiler: &mut Compiler, found_setter: bool) -> Option<String> {
     let mut value = String::new();
-    let mut next = get_next_or_exit(compiler.next(), "[Variable]: Invalid value setter");
-    match next.token {
-        Token::Equals => {}
-        _ => return None,
-    }
-    loop {
+    let mut next;
+    if !found_setter {
         next = get_next_or_exit(compiler.next(), "[Variable]: Invalid value setter");
         match next.token {
-            Token::NewLine => return Some(value),
+            Token::Equals => {}
+            _ => return None,
+        }
+    }
+    loop {
+        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid value");
+        match next.token {
+            Token::NewLine => {
+                if value.len() == 0 { return None; }
+                else { return Some(value); }
+            },
             _ => value.push_str(next.name.as_str()),
         }
     }

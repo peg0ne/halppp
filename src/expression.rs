@@ -38,8 +38,11 @@ pub fn construct(compiler: &mut Compiler, first: AstToken) -> Expression {
             Token::Doco => expression.push_str("\ncontinue"),
             Token::Doremi => expression.push_str("\nreturn"),
             Token::Let => expression.push_str("auto"),
-            _ => {
+            Token::Id => {
                 expression.push_str(" ");
+                expression.push_str(x.name.as_str());
+            }
+            _ => {
                 expression.push_str(x.name.as_str());
             }
         }

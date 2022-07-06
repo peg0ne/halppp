@@ -8,6 +8,7 @@ struct Option<T>
     pub fn is_some => bool doremi !is_none()
     pub fn value_or T value => T  doremi is_some() ? _value : value
     Option => 
+        _forced_none = true
     ;
     Option T val =>
         _value = val
