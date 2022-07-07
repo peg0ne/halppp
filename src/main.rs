@@ -56,20 +56,14 @@ fn main() {
     let (output, arguments) = compile(file_name.to_owned(), folder_path.to_owned(), p, true);
     write_program(output, file_name.to_owned(), folder_path.to_owned());
     let mut base_cmd = format!("{} -o {}", file_path.replace(".ha",".cpp"), file_path.replace(".ha", ""));
-    if arguments.len() > 0 {
-        base_cmd = format!("{} {}", base_cmd, arguments.join(" "));
-    }
+    if arguments.len() > 0 { base_cmd = format!("{} {}", base_cmd, arguments.join(" ")); }
     let cmd: Vec<&str> = base_cmd.split(" ").collect();
-    let cmd_output = Command::new("g++")
-                            .args(cmd)
-                            .output()
-                            .expect("Failed to compile!");
-    let s = match str::from_utf8(&cmd_output.stderr) {
-        Ok(v) => v,
+    let cmd_output = Command::new("g++").args(cmd).output().expect("Failed to compile!");
+    match str::from_utf8(&cmd_output.stderr) {
+        Ok(v) => println!("compilation completed\n\x1b[93m{}\x1b[0m", v),
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
-    println!("compilation completed\n\x1b[93m{}\x1b[0m", s);
-    fs::remove_file(file_path.replace(".ha", ".cpp"));
+    let _ = fs::remove_file(file_path.replace(".ha", ".cpp"));
 }
 
 fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) -> (String,Vec<String>) {

@@ -65,7 +65,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
         );
         match x.token {
             Token::For => function.expressions.push(foreach::construct(compiler)),
-            Token::Condition => function.expressions.push(condition::construct(compiler)),
+            Token::Condition => function.expressions.push(condition::construct(compiler, x.name)),
             Token::SemiColon => break,
             Token::Function => break,
             Token::EOF => break,

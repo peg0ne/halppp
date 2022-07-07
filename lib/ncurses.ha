@@ -20,10 +20,12 @@ class Ncurses
         ;
     ;
     fn box_char int y, int x, int pos =>
-        if pos == 0 dore add(y,x,"*")
-        if pos == 1 dore add(y,x,"|")
-        if pos == 2 dore add(y,x,"*")
-        if pos == 3 dore add(y,x," ")
+        switch pos
+            case 0: add(y,x,"*")
+            case 1: add(y,x,"|")
+            case 2: add(y,x,"*")
+            case 3: add(y,x," ")
+        ;
     ;
     fn stop_box_char int y, int x, int pos =>
         if pos == 0 dore add(y, x, "*")

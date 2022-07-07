@@ -10,9 +10,9 @@ pub struct Condition {
 }
 
 impl Condition {
-    pub fn new() -> Condition {
+    pub fn new(conditioner: String) -> Condition {
         Condition {
-            conditioner: String::from("if"),
+            conditioner: conditioner,
             value1: String::new(),
             value2: String::new(),
             operator: String::new(),

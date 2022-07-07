@@ -5,8 +5,8 @@ use crate::{
     utils::get_next_or_exit,
 };
 
-pub fn construct(compiler: &mut Compiler) -> Expression {
-    let mut condition_def = Condition::new();
+pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression {
+    let mut condition_def = Condition::new(condition_type);
     loop {
         let x = get_next_or_exit(compiler.next(), "[Condition] Condition is not closed");
         match x.token {
@@ -62,7 +62,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
         let x = get_next_or_exit(compiler.next(), "[Condition] Condition is not closed");
         match x.token {
             Token::Condition => {
-                condition_def.lines.push(construct(compiler));
+                condition_def.lines.push(construct(compiler, x.name));
                 continue;
             }
             Token::For => {

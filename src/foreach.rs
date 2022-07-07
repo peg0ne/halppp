@@ -15,7 +15,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
         let x = get_next_or_exit(compiler.next(), "[For] For loop is not closed");
         match x.token {
             Token::Condition => {
-                for_def.lines.push(condition::construct(compiler));
+                for_def.lines.push(condition::construct(compiler, x.name));
                 continue;
             }
             Token::For => {
