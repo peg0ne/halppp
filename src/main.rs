@@ -13,6 +13,7 @@ mod utils;
 mod variable;
 mod template;
 
+use std::{process::Command, fs, str};
 use crate::{
     enums::{Token, VariableState},
     fileutil::{get_content, get_file_path, write_program},
@@ -52,11 +53,26 @@ fn main() {
         includes: Vec::new(),
         usings: Vec::new(),
     };
-    let output = compile(file_name.to_owned(), folder_path.to_owned(), p, true);
-    write_program(output, file_name, folder_path);
+    let (output, arguments) = compile(file_name.to_owned(), folder_path.to_owned(), p, true);
+    write_program(output, file_name.to_owned(), folder_path.to_owned());
+    let mut base_cmd = format!("{} -o {}", file_path.replace(".ha",".cpp"), file_path.replace(".ha", ""));
+    if arguments.len() > 0 {
+        base_cmd = format!("{} {}", base_cmd, arguments.join(" "));
+    }
+    let cmd: Vec<&str> = base_cmd.split(" ").collect();
+    let cmd_output = Command::new("g++")
+                            .args(cmd)
+                            .output()
+                            .expect("Failed to compile!");
+    let s = match str::from_utf8(&cmd_output.stderr) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    println!("compilation completed\n\x1b[93m{}\x1b[0m", s);
+    fs::remove_file(file_path.replace(".ha", ".cpp"));
 }
 
-fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) -> String {
+fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) -> (String,Vec<String>) {
     println!("compiling: {}{}", folder_path,file_path);
     let content: String = get_content(&file_path, &folder_path);
     let ast = ast::create(&content);
@@ -72,6 +88,7 @@ fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) ->
             usings: p.usings,
         },
         ast: ast.iter().peekable(),
+        arguments: Vec::new()
     };
 
     loop {
@@ -141,7 +158,33 @@ fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) ->
                         reversed.push(file_name.pop().unwrap());
                     }
                     file_name = reversed;
-                    output.push_str(compile(file_name, folder_path.to_owned(), compiler.program.to_owned(), false).as_str());
+                    let (file_out, arguments) = compile(file_name, folder_path.to_owned(), compiler.program.to_owned(), false);
+                    output.push_str(file_out.as_str());
+                    for arg in arguments.iter() {
+                        compiler.arguments.push(arg.to_owned());
+                    }
+                }
+            }
+            Token::Compiler => {
+                match compiler.next() {
+                    None => display_err_message(format!("[Compiler] Missing start of compiler intent [=>]: {:?}", next.token).as_str()),
+                    Some(p) => {
+                        match p.token {
+                            Token::CoolArrow => {}
+                            _ => display_err_message(format!("[Compiler] Missing start of compiler intent [=>]: {:?}", next.token).as_str()),
+                        }
+                    }
+                }
+                match compiler.next() {
+                    None => {
+                        display_err_message(format!("[Compiler] Missing start of compiler intent [=>]: {:?}", next.token).as_str());
+                    }
+                    Some(p) => {
+                        match p.token {
+                            Token::Id => compiler.arguments.push(p.name.to_owned().replace("\"","")),
+                            _ => display_err_message(format!("[Compiler] Missing value of compiler intent [Token::Id]: {:?}", next.token).as_str()),
+                        }
+                    }
                 }
             }
             Token::NewLine => {}
@@ -152,7 +195,7 @@ fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) ->
         }
     }
     validate_compiled(&mut compiler, is_main);   
-    return output
+    return (output, compiler.arguments);
 }
 
 fn validate_compiled(compiler: &mut Compiler, is_main: bool) {

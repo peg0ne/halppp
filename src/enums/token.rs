@@ -46,6 +46,7 @@ pub enum Token {
     Use,
     False,
     True,
+    Compiler,
 }
 
 impl Token {
@@ -69,6 +70,7 @@ impl Token {
             "=" => Token::Equals,
             "==" => Token::Equality,
             "=>" => Token::CoolArrow,
+            "compiler" => Token::Compiler,
             ">" => Token::MoreThan,
             "0" => Token::Number,
             "1" => Token::Number,
@@ -126,6 +128,7 @@ impl Token {
             Token::SemiColon => true,
             Token::Struct => true,
             Token::Use => true,
+            Token::Compiler => true,
             _ => false,
         }
     }

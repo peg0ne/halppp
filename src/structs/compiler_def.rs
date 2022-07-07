@@ -4,6 +4,7 @@ use std::{iter::Peekable, slice::Iter};
 pub struct Compiler<'a> {
     pub program: Program,
     pub ast: Peekable<Iter<'a, AstToken>>,
+    pub arguments: Vec<String>,
 }
 
 impl<'a> Compiler<'a> {
