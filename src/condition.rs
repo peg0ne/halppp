@@ -9,48 +9,16 @@ pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression 
     let mut condition_def = Condition::new(condition_type);
     loop {
         let x = get_next_or_exit(compiler.next(), "[Condition] Condition is not closed");
+        if x.token.is_do() {
+            condition_def.lines.push(expression::construct(compiler, x));
+            return Expression {
+                e_condition: Some(condition_def),
+                e_for: None,
+                line: None,
+            }
+        }
         match x.token {
             Token::NewLine => break,
-            Token::Do => {
-                condition_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: Some(condition_def),
-                    e_for: None,
-                    line: None,
-                }
-            },
-            Token::Dobr => {
-                condition_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: Some(condition_def),
-                    e_for: None,
-                    line: None,
-                }
-            },
-            Token::Doco => {
-                condition_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: Some(condition_def),
-                    e_for: None,
-                    line: None,
-                }
-            },
-            Token::Dore => {
-                condition_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: Some(condition_def),
-                    e_for: None,
-                    line: None,
-                }
-            },
-            Token::Doremi => {
-                condition_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: Some(condition_def),
-                    e_for: None,
-                    line: None,
-                }
-            },
             _ => {
                 condition_def.value1.push_str(x.name.as_str());
                 condition_def.value1.push_str(" ");

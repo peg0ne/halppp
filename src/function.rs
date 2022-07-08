@@ -66,14 +66,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
             Token::NewLine => continue,
             _ => {
                 function.expressions.push(expression::construct(compiler, x.to_owned()));
-                match x.token {
-                    Token::Do => break,
-                    Token::Dore => break,
-                    Token::Doremi => break,
-                    Token::Doco => break,
-                    Token::Dobr => break,
-                    _ => {}
-                };
+                if x.token.is_do() { break; }
             }
         }
     }

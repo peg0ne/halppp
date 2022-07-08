@@ -135,4 +135,15 @@ impl Token {
             _ => false,
         }
     }
+
+    pub fn is_do(self: &Token) -> bool {
+        match self {
+            Token::Do => true,
+            Token::Dobr => true,
+            Token::Doco => true,
+            Token::Dore => true,
+            Token::Doremi => true,
+            _ => false
+        }
+    }
 }

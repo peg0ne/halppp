@@ -13,6 +13,14 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
     for_def.until = compiler.next().unwrap().name.to_owned();
     loop {
         let x = get_next_or_exit(compiler.next(), "[For] For loop is not closed");
+        if x.token.is_do() {
+            for_def.lines.push(expression::construct(compiler, x));
+            return Expression {
+                e_condition: None,
+                e_for: Some(for_def),
+                line: None,
+            }
+        }
         match x.token {
             Token::Condition => {
                 for_def.lines.push(condition::construct(compiler, x.name));
@@ -25,46 +33,6 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => continue,
-            Token::Do => {
-                for_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: None,
-                    e_for: Some(for_def),
-                    line: None,
-                }
-            },
-            Token::Dobr => {
-                for_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: None,
-                    e_for: Some(for_def),
-                    line: None,
-                }
-            },
-            Token::Doco => {
-                for_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: None,
-                    e_for: Some(for_def),
-                    line: None,
-                }
-            },
-            Token::Dore => {
-                for_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: None,
-                    e_for: Some(for_def),
-                    line: None,
-                }
-            },
-            Token::Doremi => {
-                for_def.lines.push(expression::construct(compiler, x));
-                return Expression {
-                    e_condition: None,
-                    e_for: Some(for_def),
-                    line: None,
-                }
-            },
             _ => {
                 for_def
                     .lines
