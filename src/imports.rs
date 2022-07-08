@@ -2,15 +2,15 @@ use crate::{
     enums::Token,
     message::{display_err_message, display_hint_message},
     structs::{AstToken, Compiler},
-    utils::{GetNextOrExit, GetOrExit},
+    utils::{get_next_or_exit, get_arrow_or_exit},
 };
 
 pub fn construct(compiler: &mut Compiler) -> Vec<String> {
     let mut imports: Vec<String> = Vec::new();
-    GetOrExit(compiler.next(), Token::CoolArrow, "[Import]: Missing [=>] in declaration");
+    get_arrow_or_exit(compiler.next(), "[Import]: Missing [=>] in declaration");
     let mut id = String::new();
     loop {
-        let next = GetNextOrExit(compiler.next(), "[Import]: Import declaration invalid");
+        let next = get_next_or_exit(compiler.next(), "[Import]: Import declaration invalid");
         match next.token {
             Token::NewLine => {
                 let mut found = false;

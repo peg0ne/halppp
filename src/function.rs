@@ -4,7 +4,7 @@ use crate::{
     expression, foreach,
     message::display_err_message,
     structs::{Compiler, Function, Variable, Expression},
-    utils::{GetOrExit, GetNextOrExit},
+    utils::{get_id_or_exit, get_next_or_exit},
     variable,
     template,
 };
@@ -12,7 +12,7 @@ use crate::{
 pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constructor: bool) -> Function {
     let mut function = Function::new(variable_state);
     if !constructor {
-        function.id = GetOrExit(compiler.next(), Token::Id, "[FunctionError]: No Function Id");
+        function.id = get_id_or_exit(compiler.next(), "[FunctionError]: No Function Id");
     }
     match compiler.peek() {
         Some(p) => {
@@ -53,7 +53,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
     }
     // Set Inner Function stuff
     loop {
-        let x = GetNextOrExit(
+        let x = get_next_or_exit(
             compiler.next(),
             format!("Function is not closed [{}]", function.id).as_str(),
         );

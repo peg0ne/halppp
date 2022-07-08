@@ -2,7 +2,7 @@ use crate::{
     enums::Token,
     message::display_err_message,
     structs::{Compiler, Variable},
-    utils::{GetNextOrExit, GetOrExit, TryGet},
+    utils::{get_next_or_exit, get_eq_or_exit, try_get},
 };
 
 pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Variable, bool) {
@@ -10,7 +10,7 @@ pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Va
     if type_name.is_some() {variable.v_type = type_name.unwrap()}
     let mut is_end = false;
     loop {
-        let mut next = GetNextOrExit(compiler.next(), "[Variable]: Invalid Declaration");
+        let mut next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
         match next.token {
             Token::CoolArrow => {
                 is_end = true;
@@ -49,7 +49,7 @@ pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Va
                 }
                 variable.v_type.push_str("<");
                 loop {
-                    next = GetNextOrExit(compiler.next(), "[Variable]: Invalid Declaration");
+                    next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
                     match next.token {
                         Token::MoreThan => {
                             variable.v_type.push_str(">");
@@ -92,9 +92,9 @@ pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Va
 pub fn get_value(compiler: &mut Compiler, found_setter: bool) -> Option<String> {
     let mut value = String::new();
     let mut next;
-    if !found_setter { GetOrExit(compiler.next(), Token::Equals, "[Variable]: Invalid value setter"); }
+    if !found_setter { get_eq_or_exit(compiler.next(), "[Variable]: Invalid value setter"); }
     loop {
-        next = GetNextOrExit(compiler.next(), "[Variable]: Invalid value");
+        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid value");
         match next.token {
             Token::NewLine => {
                 if value.len() == 0 { return None; }
@@ -106,7 +106,7 @@ pub fn get_value(compiler: &mut Compiler, found_setter: bool) -> Option<String> 
 }
 
 pub fn get_type(compiler: &mut Compiler) -> Variable {
-    let mut next = GetNextOrExit(compiler.next(), "[Variable]: Invalid Function Return Value");
+    let mut next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Function Return Value");
     let mut variable = Variable::return_void();
     match next.token {
         Token::Id => {
@@ -124,7 +124,7 @@ pub fn get_type(compiler: &mut Compiler) -> Variable {
             .as_str(),
         ),
     }
-    if TryGet(compiler.peek(), Token::LessThan) {
+    if try_get(compiler.peek(), Token::LessThan) {
         if !variable.has_id() {
             display_err_message(
                 format!(
@@ -134,10 +134,10 @@ pub fn get_type(compiler: &mut Compiler) -> Variable {
                 .as_str(),
             );
         }
-        next = GetNextOrExit(compiler.next(), "[Variable]: Invalid Declaration");
+        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
         variable.v_type.push_str(next.name.as_str());
         loop {
-            next = GetNextOrExit(compiler.next(), "[Variable]: Invalid Declaration");
+            next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
             match next.token {
                 Token::MoreThan => {
                     variable.v_type.push_str(next.name.as_str());
