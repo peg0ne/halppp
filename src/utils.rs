@@ -1,6 +1,6 @@
 use crate::{enums::Token, message::display_err_message, structs::AstToken};
 
-pub fn get_next_or_exit(next: Option<&AstToken>, s: &str) -> AstToken {
+pub fn GetNextOrExit(next: Option<&AstToken>, s: &str) -> AstToken {
     match next {
         None => {
             display_err_message(s);
@@ -10,51 +10,17 @@ pub fn get_next_or_exit(next: Option<&AstToken>, s: &str) -> AstToken {
     };
 }
 
-pub fn get_arrow_or_exit(next: Option<&AstToken>, s: &str) {
-    match next {
-        None => display_err_message(s),
-        Some(n) => match n.token {
-            Token::CoolArrow => {},
-            _ => display_err_message(s),
-        },
-    };
+pub fn TryGet(peek: Option<&&AstToken>, token: Token) -> bool {
+    if peek.is_none() {return false}
+    return peek.unwrap().token == token;
 }
 
-pub fn get_eq_or_exit(next: Option<&AstToken>, s: &str) {
-    match next {
-        None => display_err_message(s),
-        Some(n) => match n.token {
-            Token::Equals => {},
-            _ => display_err_message(s),
-        },
-    };
-}
-
-pub fn try_get_lessthan(peek: Option<&&AstToken>) -> bool {
-    match peek {
-        None => false,
-        Some(n) => match n.token {
-            Token::LessThan => true,
-            _ => false,
-        },
-    };
-    false
-}
-
-pub fn get_id_or_exit(next: Option<&AstToken>, s: &str) -> String {
-    match next {
-        None => {
-            display_err_message(s);
-            return String::new();
-        }
-        Some(n) => match n.token {
-            Token::Id => return n.name.to_owned(),
-            _ => {
-                display_err_message(s);
-                return String::new();
-            }
-        },
-    };
+pub fn GetOrExit(next: Option<&AstToken>, token: Token, s: &str) -> String {
+    if next.is_none() || next.unwrap().token != token {
+        display_err_message(s);
+        return String::new();
+    }
+    return next.unwrap().name.to_owned();
 }
 
 pub fn get_folder_and_name(file_path: &String) -> (String, String) {

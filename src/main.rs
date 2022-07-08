@@ -18,7 +18,7 @@ use crate::{
     fileutil::{get_content, get_file_path, write_program, compile_program},
     message::{display_err_message, display_hint_message},
     structs::{Compiler, Include, Program, Use, CompilerPath},
-    utils::{get_next_or_exit, get_arrow_or_exit, get_id_or_exit},
+    utils::{GetNextOrExit, GetOrExit},
 };
 
 fn main() {
@@ -43,7 +43,7 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> (String, Vec
     };
 
     loop {
-        let next = get_next_or_exit(compiler.next(), "Compiler failed to do unexpected EOF");
+        let next = GetNextOrExit(compiler.next(), "Compiler failed to do unexpected EOF");
         if !next.token.is_base() {
             display_err_message(
                 format!(
@@ -92,8 +92,8 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> (String, Vec
                 }
             }
             Token::Compiler => {
-                get_arrow_or_exit(compiler.next(), format!("[Compiler] Missing start of compiler intent [=>]: {:?}", next.token).as_str());
-                let arg = get_id_or_exit(compiler.next(), format!("[Compiler] Missing value of compiler intent [Token::Id]: {:?}", next.token).as_str());
+                GetOrExit(compiler.next(), Token::CoolArrow, format!("[Compiler] Missing start of compiler intent [=>]: {:?}", next.token).as_str());
+                let arg = GetOrExit(compiler.next(), Token::Id, format!("[Compiler] Missing value of compiler intent [Token::Id]: {:?}", next.token).as_str());
                 compiler.add_arg(&arg);
             }
             Token::NewLine => {}

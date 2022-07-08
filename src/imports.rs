@@ -2,15 +2,15 @@ use crate::{
     enums::Token,
     message::{display_err_message, display_hint_message},
     structs::{AstToken, Compiler},
-    utils::{get_next_or_exit, get_arrow_or_exit},
+    utils::{GetNextOrExit, GetOrExit},
 };
 
 pub fn construct(compiler: &mut Compiler) -> Vec<String> {
     let mut imports: Vec<String> = Vec::new();
-    get_arrow_or_exit(compiler.next(), "[Import]: Missing [=>] in declaration");
+    GetOrExit(compiler.next(), Token::CoolArrow, "[Import]: Missing [=>] in declaration");
     let mut id = String::new();
     loop {
-        let next = get_next_or_exit(compiler.next(), "[Import]: Import declaration invalid");
+        let next = GetNextOrExit(compiler.next(), "[Import]: Import declaration invalid");
         match next.token {
             Token::NewLine => {
                 let mut found = false;
@@ -93,9 +93,7 @@ pub fn imports_creation(compiler: &mut Compiler, next: AstToken) -> Vec<String> 
                     found = true;
                 }
             }
-            Token::Get => {
-
-            }
+            Token::Get => {}
             _ => display_err_message(format!("[{:?}]: Unhandled import", next.token).as_str()),
         }
     }
