@@ -1,13 +1,32 @@
-get => ../lib/conditional
+get => ../lib/conditional, ../lib/ncurses
+compiler => "-lncursesw"
 
 class Square
     vector<char> sq = {'0', '1', '2', '3', '4', '5', '6', '7', '8'}
-
+    Ncurses n = Ncurses()
 pub 
+    fn get_turn int player => int
+        string p = player == 1 ? "1" : "2"
+        n.add(0,0, "Player " + p + " Enter the box!")
+        while true
+            switch n.key()
+                case '0': return 0
+                case '1': return 1
+                case '2': return 2
+                case '3': return 3
+                case '4': return 4
+                case '5': return 5
+                case '6': return 6
+                case '7': return 7
+                case '8': return 8
+            ;
+        ;
+    ;
     fn display =>
-        foreach i until sq.len()
-            cout << sq[i] << "\t"
-            if any(i, {2,5,8}) do cout << "\n"
+        let y = 1
+        foreach i until sq.size()
+            n.add(y, (i % 3) * 4, sq[i])
+            if any(i, {2, 5, 8}) do y++
         ;
     ;
     fn checkwin => int
@@ -23,6 +42,17 @@ pub
         return 0
     ;
     fn mark int player, int box => void do sq[box] = player == 1 ? 'X' : 'Y'
+    fn end => void do n.stop()
+    fn draw => void
+        n.add(4,0,"Sorry, The game is a draw")
+        n.key()
+    ;
+    fn win int player =>
+        string p = player == 1 ? "1" : "2"
+        n.add(4,0,"Congratualtions! player " + p + " has Won")
+        n.key()
+        n.stop()
+    ;
 ;
 
 fn main =>
@@ -32,15 +62,15 @@ fn main =>
 
     foreach i until 9
         player = (i % 2) + 1
-        cout << "\nPlayer " << player << " Enter the Box "
-        cin >> box
+        box = square.get_turn(player)
         square.mark(player, box)
         square.display()
 
         if any(square.checkwin(), {1, 2})
-            cout << "\nCongratualtions! player " << result << " has Won\n"
-            dobr flag = 1
+            square.win(result)
+            return 0
         ;
     ;
-    if flag == 0 do cout << "\nSorry, The game is a draw\n"
+    square.draw()
+    square.end()
 ;
