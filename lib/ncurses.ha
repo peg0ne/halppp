@@ -44,9 +44,8 @@ class Ncurses
         ;
     ;
     pub fn box int y, int x, int h, int w =>
-        let height = h-2
         box_line(y, x, w, 0)
-        foreach i until height do box_line(y + i + 1, x, w, 1)
+        foreach i until h-2 do box_line(y + i + 1, x, w, 1)
         box_line(y + h - 1, x, w, 2)
     ;
     pub fn use_arrows => void do keypad(win, true)
@@ -70,8 +69,7 @@ class Ncurses
     ;
     pub fn add int y, int x, char c => void do add(y, x, c, false)
     pub fn add int y, int x, string s, bool is_bold =>
-        let len = s.size()
-        for i until len do add(y, x + i, s[i], is_bold)
+        for i until s.size() do add(y, x + i, s[i], is_bold)
     ;
     pub fn add int y, int x, string s => void do add(y, x, s, false)
     pub fn add int y, int x, int s => void do add(y, x, to_string(s), false)
@@ -94,4 +92,3 @@ class Ncurses
         curs_set(0)
     ;
 ;
-

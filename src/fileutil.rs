@@ -57,6 +57,7 @@ pub fn compile_program(paths: &CompilerPath, arguments: Vec<String>, should_remo
         Ok(v) => v,
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
+    println!("{}", base_cmd);
     println!("compilation completed\n\x1b[93m{}\x1b[0m", result);
     if !should_remove_cpp { return }
     let _ = remove_file(paths.main_path_cpp.to_owned());

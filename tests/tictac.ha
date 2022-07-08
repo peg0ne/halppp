@@ -5,7 +5,7 @@ class Square
 
 pub 
     fn display =>
-        foreach i until 9
+        foreach i until sq.len()
             cout << sq[i] << "\t"
             if any(i, {2,5,8}) do cout << "\n"
         ;
