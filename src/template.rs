@@ -10,17 +10,11 @@ pub fn construct(compiler: &mut Compiler) -> Vec<String> {
     loop {
         let next = get_next_or_exit(compiler.next(), "[Template]: Template declaration invalid");
         match next.token {
-            Token::Id => {
-                templates.push(next.name);
-            },
+            Token::Id => templates.push(next.name),
             Token::Comma => continue,
             Token::LessThan => continue,
             Token::MoreThan => break,
-            _ => {
-                display_err_message(
-                    format!("[Template]: Token not allowed: [{}]", next.name).as_str(),
-                );
-            }
+            _ => display_err_message(format!("[Template]: Token not allowed: [{}]", next.name).as_str())
         }
     }
     return templates;
