@@ -32,7 +32,7 @@ impl Function {
             while i < self.template.len() {
                 function.push_str(self.template[i].as_str());
                 if i + 1 < self.template.len() {
-                    function.push_str(", ");
+                    function.push_str(", typename");
                 }
                 i += 1;
             }

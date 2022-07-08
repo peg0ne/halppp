@@ -32,7 +32,7 @@ impl Class {
             while i < self.template.len() {
                 class.push_str(self.template[i].as_str());
                 if i + 1 < self.template.len() {
-                    class.push_str(", ");
+                    class.push_str(", typename ");
                 }
                 i += 1;
             }

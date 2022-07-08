@@ -13,6 +13,7 @@ pub fn construct(compiler: &mut Compiler) -> Vec<String> {
             Token::Id => {
                 templates.push(next.name);
             },
+            Token::Comma => continue,
             Token::LessThan => continue,
             Token::MoreThan => break,
             _ => {

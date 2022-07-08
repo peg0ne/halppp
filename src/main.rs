@@ -63,7 +63,7 @@ fn main() {
         Ok(v) => println!("compilation completed\n\x1b[93m{}\x1b[0m", v),
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
     };
-    let _ = fs::remove_file(file_path.replace(".ha", ".cpp"));
+    // let _ = fs::remove_file(file_path.replace(".ha", ".cpp"));
 }
 
 fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) -> (String,Vec<String>) {
@@ -74,12 +74,12 @@ fn compile(file_path: String, folder_path: String, p: Program, is_main: bool) ->
 
     let mut compiler = Compiler {
         program: Program {
-            global: p.global,
-            structs: p.structs,
-            functions: p.functions,
-            classes: p.classes,
-            includes: p.includes,
-            usings: p.usings,
+            global: p.global.to_owned(),
+            structs: p.structs.to_owned(),
+            functions: p.functions.to_owned(),
+            classes: p.classes.to_owned(),
+            includes: p.includes.to_owned(),
+            usings: p.usings.to_owned(),
         },
         ast: ast.iter().peekable(),
         arguments: Vec::new()

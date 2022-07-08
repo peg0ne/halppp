@@ -1,4 +1,5 @@
 struct Vector
+pub
     int x = 0
     int y = 0
     int z = 0
@@ -13,12 +14,12 @@ struct Vector
         y = y
         z = z
     ;
-    pub fn add Vector other =>
+    fn add Vector other =>
         x += other.x
         y += other.y
         z += other.z
     ;
-    pub fn sub Vector other =>
+    fn sub Vector other =>
         x -= other.x
         y -= other.y
         z -= other.z
