@@ -1,3 +1,4 @@
+use std::{iter::Peekable,str::Chars};
 use crate::{enums::Token, structs::AstToken};
 
 pub fn create(content: &String) -> Vec<AstToken> {
@@ -9,30 +10,10 @@ pub fn create(content: &String) -> Vec<AstToken> {
             None => break,
             Some(c) => c,
         };
-        if c == '"' {
+        if c == '"' || c == '\'' {
+            let matched = get_matching(&mut peekable, c, c);
             id = try_add_token(id, &mut ast);
-            id.push(c);
-            loop {
-                let c = match peekable.next() {
-                    None => break,
-                    Some(c) => c,
-                };
-                id.push(c);
-                if c == '"' { break; }
-            }
-            continue;
-        }
-        if c == '\'' {
-            id = try_add_token(id, &mut ast);
-            id.push(c);
-            loop {
-                let c = match peekable.next() {
-                    None => break,
-                    Some(c) => c,
-                };
-                id.push(c);
-                if c == '\'' { break; }
-            }
+            try_add_token(matched, &mut ast);
             continue;
         }
         if is_char_number(c) {
@@ -56,34 +37,17 @@ pub fn create(content: &String) -> Vec<AstToken> {
                 }
             }
         }
-        if is_char_token(c) && id != "<" && c == '<' {
-            let next = peekable.peek().unwrap_or(&' '); 
-            let is_dbl = next == &'<';
-            if is_dbl {
-                id = try_add_token(id, &mut ast);
-                id.push(c);
-                c = match peekable.next() {
-                    None => break,
-                    Some(c) => c,
-                };
-                id.push(c);
-                id = try_add_token(id, &mut ast);
-                continue;
-            }
-        }
-        if is_char_token(c) && id != ">" && c == '>' {
-            let next = peekable.peek().unwrap_or(&' '); 
-            let is_dbl = next == &'>';
-            if is_dbl {
-                id = try_add_token(id, &mut ast);
-                id.push(c);
-                c = match peekable.next() {
-                    None => break,
-                    Some(c) => c,
-                };
-                id.push(c);
-                id = try_add_token(id, &mut ast);
-                continue;
+        if is_char_token(c) {
+            let dbl_less = id != "<" && c == '<';
+            let dbl_more = id != ">" && c == '>';
+            if dbl_less || dbl_more {
+                match try_get_dbl(&mut peekable, c) {
+                    Some(s) => {
+                        id = try_add_token(id, &mut ast);
+                        try_add_token(s, &mut ast);
+                    }
+                    None => {}
+                }
             }
         }
         if is_char_token(c) && id != "=" {
@@ -135,4 +99,27 @@ fn is_char_number(c: char) -> bool {
         Token::Number => true,
         _ => false,
     }
+}
+
+fn try_get_dbl(peekable: &mut Peekable<Chars>, c: char) -> Option<String> {
+    let peek = peekable.peek().unwrap_or(&' '); 
+    if peek == &c {
+        let mut dbl = String::from(c);
+        dbl.push(c);
+        Some(dbl);
+    }
+    None
+}
+
+fn get_matching(peekable: &mut Peekable<Chars>, c: char, m1: char) -> String {
+    let mut matching = String::from(c);
+    loop {
+        let c = match peekable.next() {
+            None => return matching,
+            Some(c) => c,
+        };
+        matching.push(c);
+        if c == m1 { break; }
+    }
+    matching
 }
