@@ -20,12 +20,10 @@ class Ncurses
         ;
     ;
     fn box_char int y, int x, int pos =>
-        switch pos
-            case 0: add(y,x,"*")
-            case 1: add(y,x,"|")
-            case 2: add(y,x,"*")
-            case 3: add(y,x," ")
-        ;
+        if pos == 0 dore add(y,x,"*")
+        if pos == 1 dore add(y,x,"|")
+        if pos == 2 dore add(y,x,"*")
+        if pos == 3 dore add(y,x," ")
     ;
     fn stop_box_char int y, int x, int pos =>
         if pos == 0 dore add(y, x, "*")
@@ -46,10 +44,9 @@ class Ncurses
         ;
     ;
     pub fn box int y, int x, int h, int w =>
+        let height = h-2
         box_line(y, x, w, 0)
-        foreach i until h-2
-            box_line(y + i + 1, x, w, 1)
-        ;
+        foreach i until height do box_line(y + i + 1, x, w, 1)
         box_line(y + h - 1, x, w, 2)
     ;
     pub fn use_arrows => void do keypad(win, true)
@@ -60,14 +57,10 @@ class Ncurses
     pub fn col short c => void do col(c, true)
     pub fn bold bool on => void do on ? attron(A_BOLD) : attroff(A_BOLD)
     pub fn clear int y, int len =>
-        for i until len
-            add(y, i, ' ')
-        ;
+        for i until len do add(y, i, ' ')
     ;
     pub fn clearScr => void
-        for i until LINES
-            clear(i, COLS)
-        ;
+        for i until LINES do clear(i, COLS)
     ;
     pub fn clearLn int y => void do clear(y, COLS)
     pub fn add int y, int x, char c, bool is_bold =>
@@ -78,9 +71,7 @@ class Ncurses
     pub fn add int y, int x, char c => void do add(y, x, c, false)
     pub fn add int y, int x, string s, bool is_bold =>
         let len = s.size()
-        for i until len
-            add(y, x + i, s[i], is_bold)
-        ;
+        for i until len do add(y, x + i, s[i], is_bold)
     ;
     pub fn add int y, int x, string s => void do add(y, x, s, false)
     pub fn add int y, int x, int s => void do add(y, x, to_string(s), false)
@@ -88,16 +79,11 @@ class Ncurses
     pub fn add int y, int x, float s => void do add(y, x, to_string(s), false)
     pub fn add int y, int x, double s => void do add(y, x, to_string(s), false)
     pub fn v_line int y, int x, int len =>
-        for i until len
-            add(y + i, x, "|")
-        ;
+        for i until len do add(y + i, x, "|")
     ;
     pub fn h_line int y, int x, int len =>
-        for i until len
-            add(y, x + i, "-")
-        ;
+        for i until len do add(y, x + i, "-")
     ;
-    
     pub fn key => char doremi getch()
     pub fn stop =>
         curs_set(1)

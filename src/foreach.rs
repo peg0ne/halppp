@@ -25,6 +25,46 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => continue,
+            Token::Do => {
+                for_def.lines.push(expression::construct(compiler, x));
+                return Expression {
+                    e_condition: None,
+                    e_for: Some(for_def),
+                    line: None,
+                }
+            },
+            Token::Dobr => {
+                for_def.lines.push(expression::construct(compiler, x));
+                return Expression {
+                    e_condition: None,
+                    e_for: Some(for_def),
+                    line: None,
+                }
+            },
+            Token::Doco => {
+                for_def.lines.push(expression::construct(compiler, x));
+                return Expression {
+                    e_condition: None,
+                    e_for: Some(for_def),
+                    line: None,
+                }
+            },
+            Token::Dore => {
+                for_def.lines.push(expression::construct(compiler, x));
+                return Expression {
+                    e_condition: None,
+                    e_for: Some(for_def),
+                    line: None,
+                }
+            },
+            Token::Doremi => {
+                for_def.lines.push(expression::construct(compiler, x));
+                return Expression {
+                    e_condition: None,
+                    e_for: Some(for_def),
+                    line: None,
+                }
+            },
             _ => {
                 for_def
                     .lines
