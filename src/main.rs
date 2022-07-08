@@ -55,20 +55,16 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> (String, Vec
         }
         match next.token {
             Token::Struct => {
-                let mut class = class::construct(&mut compiler);
-                class.is_struct = true;
+                let class = class::construct(&mut compiler, true);
                 output.push_str(class.to_cpp().as_str());
-                compiler.add_class(class);
             }
             Token::Class => {
-                let class = class::construct(&mut compiler);
+                let class = class::construct(&mut compiler, false);
                 output.push_str(class.to_cpp().as_str());
-                compiler.add_class(class);
             }
             Token::Function => {
                 let function = function::construct(&mut compiler, VariableState::Public, false);
                 output.push_str(function.to_cpp(false).as_str());
-                compiler.add_fn(function);
             }
             Token::Include => {
                 let incs = imports::imports_creation(&mut compiler, next);

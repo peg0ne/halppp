@@ -8,8 +8,9 @@ use crate::{
     template,
 };
 
-pub fn construct(compiler: &mut Compiler) -> Class {
+pub fn construct(compiler: &mut Compiler, is_struct: bool) -> Class {
     let mut class = Class::new();
+    class.is_struct = is_struct;
     class.id = get_id_or_exit(compiler.next(), "[ClassError] Invalid Class Declaration");
     // Set Inheritance Or Template
     let mut next = get_next_or_exit(
@@ -89,6 +90,7 @@ pub fn construct(compiler: &mut Compiler) -> Class {
         }
     }
     validate(&class, compiler);
+    compiler.add_class(class.to_owned());
     return class;
 }
 

@@ -78,6 +78,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
         });
     }
     validate(&function, compiler);
+    compiler.add_fn(function.to_owned());
     return function;
 }
 
