@@ -6,7 +6,7 @@ pub fn create(content: &String) -> Vec<AstToken> {
     let mut id = String::from("");
     let mut ast: Vec<AstToken> = Vec::new();
     loop {
-        let mut c = match peekable.next() {
+        let c = match peekable.next() {
             None => break,
             Some(c) => c,
         };
@@ -17,46 +17,37 @@ pub fn create(content: &String) -> Vec<AstToken> {
             continue;
         }
         if is_char_number(c) {
-            let part_of_num = match peekable.peek() {
-                Some(p) => p.to_owned() == '.' || is_char_number(p.to_owned()),
-                None => false,
-            };
-            if part_of_num {
-                id.push(c);
-                loop {
-                    let num = match peekable.next() {
-                        None => break,
-                        Some(c) => c,
-                    };
-                    if !is_char_number(num) && num != '.' {
-                        c = num;
-                        id = try_add_token(id, &mut ast);
-                        break;
-                    }
-                    id.push(num)
-                }
-            }
+            let num = collect_num(&mut peekable, c);
+            id = try_add_token(id, &mut ast);
+            try_add_token(num, &mut ast);
+            continue;
         }
         if is_char_token(c) {
             let dbl_less = id != "<" && c == '<';
             let dbl_more = id != ">" && c == '>';
-            if dbl_less || dbl_more {
+            let dbl_eq = id != "=" && c == '=';
+            if dbl_less || dbl_more || dbl_eq {
                 match try_get_dbl(&mut peekable, c) {
                     Some(s) => {
                         id = try_add_token(id, &mut ast);
                         try_add_token(s, &mut ast);
+                        continue;
                     }
                     None => {}
                 }
             }
         }
-        if is_char_token(c) && id != "=" {
+        if is_char_token(c) {
+            id = try_add_token(id, &mut ast);
             let next = peekable.peek().unwrap_or(&' ');
             let is_cool = c == '=' && next == &'>';
-            let is_equality = c == '=' && next == &'=';
-            if !is_cool && !is_equality {
-                id = try_add_token(id, &mut ast);
+            if !is_cool {
                 ast.push(AstToken::from_char(c));
+                continue;
+            }
+            else {
+                peekable.next();
+                ast.push(AstToken::from_id(String::from("=>")));
                 continue;
             }
         }
@@ -76,6 +67,9 @@ pub fn create(content: &String) -> Vec<AstToken> {
     ast.push(AstToken::eof());
     ast.push(AstToken::eof());
     ast.push(AstToken::eof());
+    for i in ast.iter() {
+        println!("{:?}",i);
+    }
     return ast;
 }
 
@@ -102,11 +96,12 @@ fn is_char_number(c: char) -> bool {
 }
 
 fn try_get_dbl(peekable: &mut Peekable<Chars>, c: char) -> Option<String> {
-    let peek = peekable.peek().unwrap_or(&' '); 
-    if peek == &c {
+    let peek = peekable.peek(); 
+    if peek.is_some() && peek.unwrap_or(&' ') == &c {
         let mut dbl = String::from(c);
         dbl.push(c);
-        Some(dbl);
+        peekable.next();
+        return Some(dbl);
     }
     None
 }
@@ -122,4 +117,24 @@ fn get_matching(peekable: &mut Peekable<Chars>, c: char, m1: char) -> String {
         if c == m1 { break; }
     }
     matching
+}
+
+fn collect_num(peekable: &mut Peekable<Chars>, c: char) -> String {
+    let mut num = String::from(c);
+    loop {
+        let part_of_num = match peekable.peek() {
+            Some(p) => p == &'.' || is_char_number(p.to_owned()),
+            None => return num,
+        };
+        if part_of_num {
+            let next = match peekable.next() {
+                None => return num,
+                Some(n_c) => n_c,
+            };
+            num.push(next);
+            continue;
+        }
+        break;
+    }
+    num
 }

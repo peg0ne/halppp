@@ -85,6 +85,18 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
 fn validate(function: &Function, compiler: &Compiler) {
     // Check Duplicate Functions
     if compiler.contains_function(&function.id) {
+        for f in compiler.program.functions.iter() {
+            if f.arguments.len() != function.arguments.len() {
+                return;
+            }
+            let mut i = 0;
+            while i < f.arguments.len() {
+                if f.arguments[i].v_type != function.arguments[i].v_type {
+                    return;
+                }
+                i += 1;
+            }
+        }
         display_err_message(format!("Duplicate instances Function of: {}", function.id).as_str());
     }
 }
