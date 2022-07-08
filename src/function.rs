@@ -21,19 +21,13 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
                 _ => {}
             }
         }
-        None => {
-            display_err_message(format!("Error when trying to parse function: {}", function.id).as_str());
-        }
+        None => display_err_message(format!("Error when trying to parse function: {}", function.id).as_str()),
     }
     loop {
         let (variable, is_end) = variable::construct_args(compiler, None);
-        if !variable.has_minimum() {
-            break;
-        }
+        if !variable.has_minimum() { break; }
         function.arguments.push(variable.to_owned());
-        if is_end {
-            break;
-        }
+        if is_end { break; }
     }
     if function.id == String::from("main") {
         function.arguments.push(Variable::from(

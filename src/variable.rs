@@ -2,7 +2,7 @@ use crate::{
     enums::Token,
     message::display_err_message,
     structs::{Compiler, Variable},
-    utils::get_next_or_exit,
+    utils::{get_next_or_exit, get_eq_or_exit, try_get_lessthan},
 };
 
 pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Variable, bool) {
@@ -92,13 +92,7 @@ pub fn construct_args(compiler: &mut Compiler, type_name: Option<String>) -> (Va
 pub fn get_value(compiler: &mut Compiler, found_setter: bool) -> Option<String> {
     let mut value = String::new();
     let mut next;
-    if !found_setter {
-        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid value setter");
-        match next.token {
-            Token::Equals => {}
-            _ => return None,
-        }
-    }
+    if !found_setter { get_eq_or_exit(compiler.next(), "[Variable]: Invalid value setter"); }
     loop {
         next = get_next_or_exit(compiler.next(), "[Variable]: Invalid value");
         match next.token {
@@ -130,36 +124,28 @@ pub fn get_type(compiler: &mut Compiler) -> Variable {
             .as_str(),
         ),
     }
-    match compiler.peek() {
-        Some(p) => {
-            match p.token {
-                Token::LessThan =>  {
-                    next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
-                    if !variable.has_id() {
-                        display_err_message(
-                            format!(
-                                "[Variable]: Variable declaration cannot have template without id:\n{:?}",
-                                variable
-                            )
-                            .as_str(),
-                        );
-                    }
+    if try_get_lessthan(compiler.peek()) {
+        if !variable.has_id() {
+            display_err_message(
+                format!(
+                    "[Variable]: Variable declaration cannot have template without id:\n{:?}",
+                    variable
+                )
+                .as_str(),
+            );
+        }
+        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
+        variable.v_type.push_str(next.name.as_str());
+        loop {
+            next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
+            match next.token {
+                Token::MoreThan => {
                     variable.v_type.push_str(next.name.as_str());
-                    loop {
-                        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
-                        match next.token {
-                            Token::MoreThan => {
-                                variable.v_type.push_str(next.name.as_str());
-                                break;
-                            }
-                            _ => variable.v_type.push_str(next.name.as_str()),
-                        }
-                    }
+                    break;
                 }
-                _ => {}
+                _ => variable.v_type.push_str(next.name.as_str()),
             }
         }
-        _ => {}
     }
     return variable;
 }

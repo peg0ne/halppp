@@ -10,6 +10,7 @@ mod imports;
 mod program_def;
 mod struct_def;
 mod variable_def;
+mod path_def;
 
 pub use crate::structs::{
     ast_token_def::AstToken,
@@ -24,4 +25,5 @@ pub use crate::structs::{
     program_def::Program,
     struct_def::Struct,
     variable_def::Variable,
+    path_def::CompilerPath,
 };

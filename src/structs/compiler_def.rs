@@ -2,7 +2,7 @@ use crate::structs::{AstToken, Class, Function, Include, Program, Use};
 use std::{iter::Peekable, slice::Iter};
 
 pub struct Compiler<'a> {
-    pub program: Program,
+    pub program: &'a mut Program,
     pub ast: Peekable<Iter<'a, AstToken>>,
     pub arguments: Vec<String>,
 }
@@ -29,6 +29,14 @@ impl<'a> Compiler<'a> {
         for i in usings.iter() {
             self.program.usings.push(Use::from(i.to_owned()));
         }
+    }
+    pub fn add_args(self: &mut Compiler<'a>, args: Vec<String>) {
+        for i in args.iter() {
+            self.arguments.push(i.to_owned());
+        }
+    }
+    pub fn add_arg(self: &mut Compiler<'a>, arg: &String) {
+        self.arguments.push(arg.to_owned().replace("\"",""));
     }
     pub fn contains_class(self: &Compiler<'a>, id: &String) -> bool {
         for c in self.program.classes.iter() {

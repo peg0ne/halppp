@@ -11,14 +11,15 @@ pub struct Program {
 }
 
 impl Program {
-    pub fn to_owned(self: &Program) -> Program {
+    pub fn new() -> Program {
         Program {
-            global: self.global.to_owned(),
-            structs: self.structs.to_owned(),
-            functions: self.functions.to_owned(),
-            classes: self.classes.to_owned(),
-            includes: self.includes.to_owned(),
-            usings: self.usings.to_owned(),
+                global: Vec::new(),
+                structs: Vec::new(),
+                functions: Vec::new(),
+                classes: Vec::new(),
+                includes: Vec::new(),
+                usings: Vec::new(),
+            
         }
     }
 }

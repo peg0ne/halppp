@@ -1,11 +1,13 @@
 use std::{
     env,
-    fs::File,
+    str::from_utf8,
+    fs::{File, remove_file},
     io::{Read, Write},
     path::Path,
+    process::Command
 };
 
-use crate::message::display_err_message;
+use crate::{message::display_err_message, structs::CompilerPath};
 
 pub fn get_file_path() -> String {
     let args: Vec<String> = env::args().collect();
@@ -15,9 +17,8 @@ pub fn get_file_path() -> String {
     return args[1].to_owned();
 }
 
-pub fn get_content(fp: &String, folder_path: &String) -> String {
-    let full_fp = format!("{}{}", folder_path, &fp);
-    let path = Path::new(&full_fp);
+pub fn get_content(paths: &CompilerPath) -> String {
+    let path = Path::new(&paths.current);
     let display = path.display();
 
     let mut file = match File::open(&path) {
@@ -40,8 +41,23 @@ pub fn get_content(fp: &String, folder_path: &String) -> String {
     return s;
 }
 
-pub fn write_program(program: String, file_name: String, folder_path: String) {
-    let f_name = format!("{}{}.cpp", folder_path, file_name.replace(".ha", ""));
-    let mut file = std::fs::File::create(f_name).expect("create failed");
+pub fn write_program(program: String, paths: &CompilerPath) {
+    let mut file = File::create(paths.main_path_cpp.to_owned()).expect("create failed");
     file.write_all(program.as_bytes()).expect("write failed");
+}
+
+pub fn compile_program(paths: &CompilerPath, arguments: Vec<String>, should_remove_cpp: bool) {
+    let mut base_cmd = paths.output.to_owned();
+    if arguments.len() > 0 { 
+        base_cmd = format!("{} {}", base_cmd, arguments.join(" ")); 
+    }
+    let cmd: Vec<&str> = base_cmd.split(" ").collect();
+    let cmd_output = Command::new("g++").args(cmd).output().expect("Failed to compile!");
+    let result = match from_utf8(&cmd_output.stderr) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+    println!("compilation completed\n\x1b[93m{}\x1b[0m", result);
+    if !should_remove_cpp { return }
+    let _ = remove_file(paths.main_path_cpp.to_owned());
 }
