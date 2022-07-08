@@ -75,7 +75,7 @@ class Ncurses
         mvaddch(y,x,c)
         if is_bold do bold(false)
     ;
-    pub fn add int y, int x, char c => void do add(y, x, c)
+    pub fn add int y, int x, char c => void do add(y, x, c, false)
     pub fn add int y, int x, string s, bool is_bold =>
         let len = s.size()
         for i until len
