@@ -16,7 +16,7 @@ pub use crate::structs::{
     ast_token_def::AstToken,
     class_def::Class,
     compiler_def::Compiler,
-    condition_def::Condition,
+    condition_def::{Condition,ConditionalExpression},
     expression_def::Expression,
     for_def::For,
     function_def::Function,

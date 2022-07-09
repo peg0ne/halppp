@@ -4,6 +4,7 @@ pub enum Token {
     Class,
     Comma,
     Comment,
+    Compiler,
     Condition,
     CoolArrow,
     DblLessThan,
@@ -17,6 +18,7 @@ pub enum Token {
     Equality,
     Equals,
     Extend,
+    False,
     For,
     ForwardSlash,
     Function,
@@ -26,11 +28,16 @@ pub enum Token {
     Include,
     LBrack,
     LessThan,
+    LessThanOrEquals,
     Let,
+    And,
+    Or,
     LParen,
     MacroDefinition,
     MoreThan,
+    MoreThanOrEquals,
     NewLine,
+    NonEquality,
     Number,
     Private,
     Protected,
@@ -41,13 +48,11 @@ pub enum Token {
     SemiColon,
     Struct,
     Sub,
-    Until,
     Sum,
-    Type,
-    Use,
-    False,
     True,
-    Compiler,
+    Type,
+    Until,
+    Use,
 }
 
 impl Token {
@@ -56,6 +61,9 @@ impl Token {
             "-" => Token::Sub,
             "," => Token::Comma,
             ";" => Token::SemiColon,
+            "!=" => Token::NonEquality,
+            "||" => Token::Or,
+            "&&" => Token::And,
             "(" => Token::LParen,
             ")" => Token::RParen,
             "[" => Token::LBrack,
@@ -67,12 +75,13 @@ impl Token {
             "+" => Token::Sum,
             "<" => Token::LessThan,
             "<<" => Token::DblLessThan,
-            ">>" => Token::DblMoreThan,
+            "<=" => Token::LessThanOrEquals,
             "=" => Token::Equals,
             "==" => Token::Equality,
             "=>" => Token::CoolArrow,
-            "compiler" => Token::Compiler,
             ">" => Token::MoreThan,
+            ">=" => Token::MoreThanOrEquals,
+            ">>" => Token::DblMoreThan,
             "0" => Token::Number,
             "1" => Token::Number,
             "2" => Token::Number,
@@ -85,6 +94,7 @@ impl Token {
             "9" => Token::Number,
             "char" => Token::Type,
             "class" => Token::Class,
+            "compiler" => Token::Compiler,
             "def" => Token::MacroDefinition,
             "do" => Token::Do,
             "dobr" => Token::Dobr,
@@ -93,11 +103,9 @@ impl Token {
             "doremi" => Token::Doremi,
             "elif" => Token::Condition,
             "else" => Token::Condition,
-            "while" => Token::Condition,
-            "switch" => Token::Condition,
             "extend" => Token::Extend,
+            "false" => Token::False,
             "fn" => Token::Function,
-            "until" => Token::Until,
             "for" => Token::For,
             "foreach" => Token::For,
             "get" => Token::Get,
@@ -113,9 +121,11 @@ impl Token {
             "str" => Token::Type,
             "string" => Token::Type,
             "struct" => Token::Struct,
-            "use" => Token::Use,
+            "switch" => Token::Condition,
             "true" => Token::True,
-            "false" => Token::False,
+            "until" => Token::Until,
+            "use" => Token::Use,
+            "while" => Token::Condition,
             _ => Token::Id,
         }
     }
@@ -146,6 +156,26 @@ impl Token {
             Token::Dore => true,
             Token::Doremi => true,
             _ => false
+        }
+    }
+
+    pub fn is_conditional(self: &Token) -> bool {
+        match self {
+            Token::Equality => true,
+            Token::NonEquality => true,
+            Token::MoreThanOrEquals => true,
+            Token::LessThanOrEquals => true,
+            Token::LessThan => true,
+            Token::MoreThan => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_conditional_sep(self: &Token) -> bool {
+        match self {
+            Token::And => true,
+            Token::Or => true,
+            _ => false,
         }
     }
 }
