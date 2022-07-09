@@ -11,7 +11,7 @@ struct Clap
     ;
     pub fn peek string check => Option<string>
         foreach i until _argc
-            if !(_argv[i] == check) do continue
+            if _argv[i] != check do continue
             if i > _argc-2 do break
             return (string)_argv[i+1]
         ;
