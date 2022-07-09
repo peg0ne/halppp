@@ -29,15 +29,14 @@ pub
             if any(i, {2, 5, 8}) do y++
         ;
     ;
+    fn marked int i => int doremi sq[i] == 'X' ? 1 : 2
     fn checkwin => int
         foreach i until 4
-            if all(sq[4], {sq[i], sq[8 - i]}) doremi sq[i] == 'X' ? 1 : 2
+            if all(sq[4], {sq[i], sq[8 - i]}) doremi marked(i)
         ;
         foreach i until 3
-            if all(sq[(i * 3) + 1], {sq[(i * 3)], sq[(i * 3) + 2]}) doremi sq[(i * 3)] == 'X' ? 1 : 2
-        ;
-        foreach i until 3
-            if all(sq[i + 3], {sq[i], sq[i + 6]}) doremi sq[i] == 'X' ? 1 : 2
+            if all(sq[(i * 3) + 1], {sq[(i * 3)], sq[(i * 3) + 2]}) doremi marked(i * 3)
+            if all(sq[i + 3], {sq[i], sq[i + 6]}) doremi marked(i)
         ;
         return 0
     ;
