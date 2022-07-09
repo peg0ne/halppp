@@ -33,9 +33,18 @@ pub fn construct(compiler: &mut Compiler, first: AstToken) -> Expression {
             Token::EOF => break,
             Token::NewLine => break,
             Token::Do => expression.push_str("\n"),
-            Token::Dore => expression.push_str("\nreturn"),
-            Token::Dobr => expression.push_str("\nbreak"),
-            Token::Doco => expression.push_str("\ncontinue"),
+            Token::Dore => {
+                expression.push_str("\n");
+                doing = String::from(";\nreturn");
+            },
+            Token::Dobr => {
+                expression.push_str("\n");
+                doing = String::from(";\nbreak");
+            },
+            Token::Doco => {
+                expression.push_str("\n");
+                doing = String::from(";\ncontinue");
+            },
             Token::Doremi => expression.push_str("\nreturn"),
             Token::Let => expression.push_str("auto"),
             Token::Number => {

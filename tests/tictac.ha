@@ -31,7 +31,7 @@ pub
     ;
     fn checkwin => int
         foreach i until 4
-            if all(sq[4], {sq[i], sq[8 - 1]}) doremi sq[i] == 'X' ? 1 : 2
+            if all(sq[4], {sq[i], sq[8 - i]}) doremi sq[i] == 'X' ? 1 : 2
         ;
         foreach i until 3
             if all(sq[(i * 3) + 1], {sq[(i * 3)], sq[(i * 3) + 2]}) doremi sq[(i * 3)] == 'X' ? 1 : 2
@@ -42,20 +42,26 @@ pub
         return 0
     ;
     fn mark int player, int box => void do sq[box] = player == 1 ? 'X' : 'Y'
-    fn end => void do n.stop()
-    fn draw => void
+    fn end => bool
+        if n.key() == 'q'
+            n.stop()
+            return true
+        ;
+        return false
+    ;
+    fn draw =>
         n.add(4,0,"Sorry, The game is a draw")
         n.key()
     ;
     fn win int player =>
         string p = player == 1 ? "1" : "2"
-        n.add(4,0,"Congratualtions! player " + p + " has Won")
+        n.add(4,0,"Congratultions! player " + p + " has Won")
         n.key()
         n.stop()
     ;
 ;
 
-fn main =>
+fn run =>
     Square square
     int player, box, result, flag = 0
     square.display()
@@ -65,12 +71,16 @@ fn main =>
         box = square.get_turn(player)
         square.mark(player, box)
         square.display()
-
-        if any(square.checkwin(), {1, 2})
+        result = square.checkwin()
+        if any(result, {1, 2})
             square.win(result)
             return 0
         ;
     ;
     square.draw()
-    square.end()
+    if !square.end() do run()
+;
+
+fn main =>
+    run()
 ;
