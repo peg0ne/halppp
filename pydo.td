@@ -9,13 +9,29 @@
         },
         {
             "task": "Fix return should push a space after it",
-            "completed": false
+            "completed": true
         },
         {
             "task": "Add Complex conditionals such as =!=",
             "completed": false
+        },
+        {
+            "task": "Edit how let works (convert to auto if not able to discern type)",
+            "completed": false
+        },
+        {
+            "task": "Fix else adding parenthesis",
+            "completed": false
+        },
+        {
+            "task": "Add namespaces",
+            "completed": false
+        },
+        {
+            "task": "handle switch cases correctly",
+            "completed": false
         }
     ],
-    "completed-tasks": 0,
-    "unfinished-tasks": 3
+    "completed-tasks": 1,
+    "unfinished-tasks": 7
 }
