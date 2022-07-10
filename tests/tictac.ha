@@ -44,9 +44,9 @@ pub
     fn end => bool
         if n.key() == 'q'
             n.stop()
-            return true
+            return 1
         ;
-        return false
+        return 0
     ;
     fn draw =>
         n.add(4,0,"Sorry, The game is a draw")
@@ -73,7 +73,8 @@ fn run =>
         result = square.checkwin()
         if any(result, {1, 2})
             square.win(result)
-            return 0
+            if !square.end() do run()
+            return    
         ;
     ;
     square.draw()
