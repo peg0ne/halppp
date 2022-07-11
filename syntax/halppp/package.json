@@ -1,0 +1,25 @@
+{
+    "name": "ha",
+    "displayName": "HALP",
+    "description": "HALP",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.64.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "halp",
+            "aliases": ["Halp", "halp"],
+            "extensions": [".ha"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "halp",
+            "scopeName": "source.ha",
+            "path": "./syntaxes/halp.tmLanguage.json"
+        }]
+    }
+}

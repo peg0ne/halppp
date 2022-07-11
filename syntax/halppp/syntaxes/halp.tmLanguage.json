@@ -1,0 +1,161 @@
+{
+    "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+    "name": "Halp",
+    "patterns": [
+        {
+            "include": "#mlcomments"
+        },
+        {
+            "include": "#comments"
+        },
+        {
+            "include": "#keywords"
+        },
+        {
+            "include": "#keycontrol"
+        },
+        {
+            "include": "#fluff"
+        },
+        {
+            "include": "#variables"
+        },
+        {
+            "include": "#strings"
+        },
+        {
+            "include": "#chars"
+        },
+        {
+            "include": "#numbers"
+        }
+    ],
+    "repository": {
+        "mlcomments": {
+            "name": "comment",
+            "begin": "\\/\\*",
+            "end": "\\*\\/",
+            "patterns": [
+                {
+                    "name": "comment",
+                    "match": "\\\\."
+                }
+            ]
+        },
+        "comments": {
+            "patterns": [
+                {
+                    "name": "comment",
+                    "match": "//.*"
+                },
+                {
+                    "begin": "\\$",
+                    "name": "support.type",
+                    "match": "\"[^\"]*\""
+                }
+            ]
+        },
+        "numbers": {
+            "patterns": [
+                {
+                    "name": "constant",
+                    "match": "([0-9].{0})"
+                }
+            ]
+        },
+        "keywords": {
+            "patterns": [
+                {
+                    "name": "keyword.control.halp",
+                    "match": "\\b(let|private|pub|protected|new|break|continue|switch|else|elif|if|while|for|select|return|foreach)\\b"
+                },
+                {
+                    "name": "keyword.control.halp",
+                    "match": "(\\;\\%)"
+                }
+            ]
+        },
+        "keycontrol": {
+            "patterns": [
+                {
+                    "name": "support.type",
+                    "match": "\\b(until|as|in|case|default|do|dore|doremi|doco|dobr)\\b"
+                }
+            ]
+        },
+        "fluff": {
+            "patterns": [
+                {
+                    "name": "entity.name.function",
+                    "match": "\\b(compiler|mac|fn|class|struct|glob|def|get|use|enum|inc)\\b"
+                },
+                {
+                    "name": "variable",
+                    "match": "\\b(\\$|$|string|str|short|long|bool|char|int|struct|void)\\b"
+                },
+                {
+                    "name": "entity.name.tag",
+                    "match": "(\\:|\\?|\\.|\\$|/|\\,|\\&\\&|\\&|\\(|\\[|\\]|\\)|\\*|\\=\\>|\\;|\\=\\=|\\!|\\|\\>|\\<|\\<\\=|\\>\\=|\\-\\>|\\<\\-|\\=|\\+|\\-|\\>|\\%|\\|\\|\\||\\|\\|)"
+                }
+            ]
+        },
+        "variables": {
+            "name": "entity.name.function",
+            "patterns": [
+                {
+                    "name": "constant.rgb-value",
+                    "match": "([^\\(\\s]*)(?=\\()"
+                },
+                {
+                    "name": "entity.other.attribute-name",
+                    "match": "(\\s(\\S*)\\s*(?=\\-\\>))"
+                },
+                {
+                    "name": "entity.other.attribute-name",
+                    "match": "(?<=struct)\\s*(\\w*)"
+                },
+                {
+                    "name": "keyword.other.unit",
+                    "match": "(?<=fn)\\s*(\\w*)"
+                }
+            ]
+        },
+        "strings": {
+            "name": "string.quoted.double.halp",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.halp",
+                    "match": "\\\\."
+                },
+                {
+                    "name": "constant.language",
+                    "match": "$\"[^{]*{([^}]*)"
+                }
+            ]
+        },
+        "chars": {
+            "name": "string.quoted.double.halp",
+            "patterns": [
+                {
+                    "name": "constant.language",
+                    "match": "'.'"
+                },
+                {
+                    "name": "constant.language",
+                    "match": "\\b(true|false)\\b"
+                },
+                {
+                    "name": "variable.name",
+                    "match": "(\\s[A-Z]+\\s?[a-z]+[^0-9\\W])"
+                },
+                {
+                    "name": "constant.language",
+                    "match": "([A-Z]\\s?[A-Z]+[^a-z0-9\\W])"
+                }
+            ]
+        }
+    },
+    "scopeName": "source.ha"
+}
