@@ -6,8 +6,8 @@ enum VariableState =>
 
 fn variable_state_to_str VariableState self => string
     switch v.variable_state
-        case Private: doremi " private:\n"
-        case Protected: doremi " protected:\n"
-        case Public: doremi " public:\n"
+        case Private: doremi PRIVATE_STATE
+        case Protected: doremi PROTECTED_STATE
+        case Public: doremi PUBLIC_STATE
     ;
 ;

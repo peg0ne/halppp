@@ -18,8 +18,8 @@ impl Expression {
         match self.e_for.as_ref() {
             Some(for_e) => {
                 let formatted = format!(
-                    "{}for(int {} = 0; {} < {}; i++) {{\n",
-                    spacing, for_e.iterator, for_e.iterator, for_e.until
+                    "{}for(int {} = 0; {} < {}; {}++) {{\n",
+                    spacing, for_e.iterator, for_e.iterator, for_e.until, for_e.iterator
                 );
                 expression.push_str(formatted.as_str());
                 for line in for_e.lines.iter() {

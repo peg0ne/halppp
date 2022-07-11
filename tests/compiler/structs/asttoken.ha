@@ -1,5 +1,5 @@
 struct AstToken
-    string name = ""
+    string name = EMPTY
     Token t = Id
     AstToken =>
     ;
