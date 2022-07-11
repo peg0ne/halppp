@@ -8,7 +8,7 @@ fn any<T> T value, vector<T> values => bool
 ;
 fn all<T> T value, vector<T> values => bool
     for i until values.size()
-        if !(value == values.at(i)) doremi false
+        if value != values.at(i) doremi false
     ;
     return true
 ;

@@ -41,13 +41,17 @@ pub fn create(content: &String) -> Vec<AstToken> {
             id = try_add_token(id, &mut ast);
             let next = peekable.peek().unwrap_or(&' ');
             let is_cool = c == '=' && next == &'>';
-            if !is_cool {
-                ast.push(AstToken::from_char(c));
-                continue;
-            }
-            else {
+            let is_non_eq = c == '!' && next == &'=';
+            if is_cool {
                 peekable.next();
                 ast.push(AstToken::from_id(String::from("=>")));
+                continue;
+            } else if is_non_eq {
+                peekable.next();
+                ast.push(AstToken::from_id(String::from("!=")));
+                continue;
+            } else {
+                ast.push(AstToken::from_char(c));
                 continue;
             }
         }

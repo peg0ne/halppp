@@ -22,4 +22,11 @@ fn main =>
     case Saturday: dobr cout << "s\n"
     case Sunday: dobr cout << "s\n"
     ;
+    if a != Monday doremi 1
+    else doremi 0
+
+    if a != Tuesday doremi 0
+    else
+        return 0
+    ;
 ;

@@ -24,7 +24,11 @@ impl Condition {
         }
     }
     pub fn to_cpp(self: &Condition, indentation: i32) -> String {
-        let mut condition = format!("    {}(", self.conditioner);
+        let mut condition = if self.conditioner == "else" { 
+            String::from("    else {\n")
+        } else {
+            format!("    {}(", self.conditioner)
+        };
         for i in self.expressions.iter() {
             condition.push_str(format!("{} {} {} {}",
             i.value1,
@@ -32,7 +36,9 @@ impl Condition {
             i.value2,
             i.continuation).as_str());
         }
-        condition.push_str(") {\n");
+        if self.conditioner != "else" {
+            condition.push_str(") {\n");
+        }
         for line in self.lines.iter() {
             condition.push_str(line.to_cpp(indentation + 1).as_str());
         }
