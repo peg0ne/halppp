@@ -26,7 +26,7 @@ impl Enum {
                 None => enum_str.push_str(",\n"),
             }
         }
-        enum_str.push_str("};");
+        enum_str.push_str("};\n");
         enum_str
     }
 }

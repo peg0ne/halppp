@@ -49,7 +49,7 @@ pub fn construct(compiler: &mut Compiler, is_struct: bool) -> Class {
         _ => {}
     }
     //Construct inner Class values
-    let mut variable_state = VariableState::Private;
+    let mut variable_state = if !is_struct { VariableState::Private } else { VariableState::Public };
     loop {
         let next = get_next_or_exit(
             compiler.next(),
