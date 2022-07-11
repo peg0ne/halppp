@@ -1,4 +1,4 @@
-use crate::structs::{AstToken, Class, Function, Include, Program, Use};
+use crate::structs::{AstToken, Class, Function, Include, Program, Use, Enum};
 use std::{iter::Peekable, slice::Iter};
 
 pub struct Compiler<'a> {
@@ -29,6 +29,9 @@ impl<'a> Compiler<'a> {
         for i in usings.iter() {
             self.program.usings.push(Use::from(i.to_owned()));
         }
+    }
+    pub fn add_enum(self: &mut Compiler<'a>, enum_def: Enum) {
+        self.program.enums.push(enum_def.to_owned())
     }
     pub fn add_args(self: &mut Compiler<'a>, args: Vec<String>) {
         for i in args.iter() {
@@ -65,6 +68,14 @@ impl<'a> Compiler<'a> {
     pub fn contains_use(self: &Compiler<'a>, id: &String) -> bool {
         for f in self.program.usings.iter() {
             if f.using == id.to_owned() {
+                return true;
+            }
+        }
+        false
+    }
+    pub fn contains_enum(self: &Compiler<'a>, id: &String) -> bool {
+        for e in self.program.enums.iter() {
+            if e.name == id.to_owned() {
                 return true;
             }
         }

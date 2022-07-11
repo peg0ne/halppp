@@ -12,6 +12,7 @@ mod structs;
 mod utils;
 mod variable;
 mod template;
+mod enumerator;
 
 use crate::{
     enums::{Token, VariableState},
@@ -65,6 +66,10 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> (String, Vec
             Token::Function => {
                 let function = function::construct(&mut compiler, VariableState::Public, false);
                 output.push_str(function.to_cpp(false).as_str());
+            }
+            Token::Enum => {
+                let enum_def = enumerator::construct(&mut compiler);
+                output.push_str(enum_def.to_cpp().as_str());
             }
             Token::Include => {
                 let incs = imports::imports_creation(&mut compiler, next);

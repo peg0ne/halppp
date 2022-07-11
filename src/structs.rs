@@ -11,12 +11,13 @@ mod program_def;
 mod struct_def;
 mod variable_def;
 mod path_def;
+mod enum_def;
 
 pub use crate::structs::{
     ast_token_def::AstToken,
     class_def::Class,
     compiler_def::Compiler,
-    condition_def::{Condition,ConditionalExpression},
+    condition_def::{Condition, ConditionalExpression},
     expression_def::Expression,
     for_def::For,
     function_def::Function,
@@ -26,4 +27,5 @@ pub use crate::structs::{
     struct_def::Struct,
     variable_def::Variable,
     path_def::CompilerPath,
+    enum_def::{Enum, EnumValue},
 };

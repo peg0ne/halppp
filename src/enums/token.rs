@@ -10,6 +10,7 @@ pub enum Token {
     AnyEquals,
     Asterix,
     Class,
+    Colon,
     Comma,
     Comment,
     Compiler,
@@ -60,6 +61,7 @@ pub enum Token {
     Type,
     Until,
     Use,
+    Enum,
 }
 
 impl Token {
@@ -67,6 +69,7 @@ impl Token {
         match s.as_str() {
             "-" => Token::Sub,
             "," => Token::Comma,
+            ":" => Token::Colon,
             ";" => Token::SemiColon,
             "!=" => Token::NonEquality,
             "(" => Token::LParen,
@@ -115,6 +118,7 @@ impl Token {
             "doco" => Token::Doco,
             "dore" => Token::Dore,
             "doremi" => Token::Doremi,
+            "enum" => Token::Enum,
             "elif" => Token::Condition,
             "else" => Token::Condition,
             "extend" => Token::Extend,
@@ -158,6 +162,7 @@ impl Token {
             Token::Struct => true,
             Token::Use => true,
             Token::Compiler => true,
+            Token::Enum => true,
             _ => false,
         }
     }

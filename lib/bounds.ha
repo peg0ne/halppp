@@ -1,7 +1,6 @@
 get => vector
 
 struct Bounds
-pub
     Vector min = Vector()
     Vector max = Vector()
     Bounds =>
