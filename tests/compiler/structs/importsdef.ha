@@ -4,18 +4,18 @@ struct Include
         include = include
     ;
     fn to_cpp => string
-        let include_str = INCLUDE
-        include_str += include.starts_with(QUOTE) ? include : RARROW + include + LARROW
+        string include_str = INCLUDE
+        include_str += starts_with(include, QUOTE) ? include : RARROW + include + LARROW
         include_str += NEWLINE
         return include_str
     ;
 ;
-struct Use
-    string using = EMPTY
-    Use =>
-        using = using
+struct Uses
+    string usings = EMPTY
+    Uses string usings =>
+        usings = usings
     ;
-    fn to_cpp => string doremi NAMESPACE + using + LINE_END
+    fn to_cpp => string doremi NAMESPACE + usings + LINE_END
 ;
 struct Get
     string get = EMPTY

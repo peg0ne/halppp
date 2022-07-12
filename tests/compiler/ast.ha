@@ -1,20 +1,79 @@
-fn create string content => vector<AstToken>
-    let peekable = Peekable<char>(content)
-    let id = EMPTY
+fn try_add_token string id, vector<AstToken> ast => string
+    if id.size() > 0
+        ast.push_back(AstToken(id))
+        return EMPTY
+    ;
+    return id
+;
+
+fn is_char_token char ch => bool
+    switch Token(ch)
+        case TId: doremi false
+        default: doremi true
+    ;
+;
+
+fn is_char_number char ch => bool
+    switch Token(ch)
+        case TNumber: doremi true
+        default: doremi false
+    ;
+;
+
+fn try_get_dbl Peekable<char> peekable, char ch => Option<string>
+    let peek = peekable.peek()
+    if peek.is_some() && peek.value_or(' ') == ch
+        string dbl = to_string(ch) + to_string(ch)
+        peekable.next()
+        return Some(dbl)
+    ;
+    return None<string>()
+;
+
+fn get_matching Peekable<char> peekable, char ch => string
+    let matching = to_string(ch)
+    while true
+        let c = peekable.next()
+        if c.is_none() doremi matching
+        matching += c.value_or(' ')
+        if c.value_or(' ') == ch do break
+    ;
+    return matching
+;
+
+fn collect_num Peekable<char> peekable, char ch => string
+    let num = to_string(ch)
+    while true
+        let peeked = peekable.peek().value_or(' ')
+        if !is_char_number(peeked) && peeked != '.' doremi num
+        peekable.next()
+        num += peeked
+    ;
+;
+
+fn ast_create string content => vector<AstToken>
+    vector<char> vec = {}
+    for i until content.size()
+        vec.push_back(content[i])
+    ;
+    let peekable = Peekable<char>(vec)
+    string id = EMPTY
     vector<AstToken> ast = {}
     while true
         let c_opt = peekable.next()
-        if c.is_none() do break
+        if c_opt.is_none() do break
         let c = c_opt.value_or(' ')
-        if any(c, {'"', '\''})
+        if any(c, {CHAR_QUOTE, CHAR_SINGLE})
             let matched = get_matching(peekable, c)
             id = try_add_token(id, ast)
-            doco try_add_token(matched, ast)
+            try_add_token(matched, ast)
+            continue
         ;
         if is_char_number(c)
             let num = collect_num(peekable, c)
             id = try_add_token(id, ast)
-            doco try_add_token(num, ast)
+            try_add_token(num, ast)
+            continue
         ;
         if is_char_token(c)
             let dbl_less = id != "<" && c == '<'
@@ -24,7 +83,8 @@ fn create string content => vector<AstToken>
                 let dbl = try_get_dbl(peekable, c)
                 if dbl.is_some()
                     id = try_add_token(id, ast)
-                    doco try_add_token(dbl.value_or(EMPTY), ast)
+                    try_add_token(dbl.value_or(EMPTY), ast)
+                    continue
                 ;
             ;
         ;
@@ -35,16 +95,19 @@ fn create string content => vector<AstToken>
             let is_non_eq = c == '!' && next == '='
             if is_cool
                 peekable.next()
-                doco ast.push_back(AstToken("=>"))
+                ast.push_back(AstToken("=>"))
+                continue
             ;
             elif is_non_eq
                 peekable.next()
-                doco ast.push_back(AstToken("!="))
+                ast.push_back(AstToken("!="))
+                continue
             ;
-            doco ast.push_back(AstToken(c))
+            ast.push_back(AstToken(c))
+            continue
         ;
         if any(c, {' ', '\t', '\n'})
-            id = try_add_token(id, &ast);
+            id = try_add_token(id, ast)
             if c == '\n' do ast.push_back(AstToken("\n"))
             continue
         ;
@@ -58,57 +121,4 @@ fn create string content => vector<AstToken>
     ast.push_back(AstToken("EOF"))
     ast.push_back(AstToken("EOF"))
     return ast
-;
-
-fn try_add_token string id, vector<AstToken> ast => string
-    if id.size() > 0
-        ast.push(AstToken(id))
-        return EMPTY
-    ;
-    return id
-;
-
-fn is_char_token char ch => bool
-    switch Token(ch)
-        case Id: doremi false
-        default: doremi true
-    ;
-;
-
-fn is_char_number char ch => bool
-    switch Token(ch)
-        case Number: doremi true
-        default: doremi false
-    ;
-;
-
-fn try_get_dbl Peekable<char> peekable, char ch => Option<string>
-    let peek = peekable.peek()
-    if peek.is_some() && peek.value_or(' ') == ch
-        let dbl = c + c
-        peekable.next()
-        return Some(dbl)
-    ;
-    None<string>()
-;
-
-fn get_matching Peekable<char> peekable, char ch => string
-    let matching = to_string(ch)
-    while true
-        let c = peekable.next()
-        if c.is_none() doremi matching
-        matching += c.value_or(' ')
-        if c == ch do break
-    ;
-    return matching
-;
-
-fn collect_num Peekable<char> peekable, char ch => string
-    let num = to_string(ch)
-    while true
-        let peeked = peekable.peek().value_or(' ')
-        if !is_char_number(peeked) && peeked != '.' doremi num
-        peekable.next()
-        num += peeked
-    ;
 ;

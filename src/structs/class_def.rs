@@ -27,16 +27,25 @@ impl Class {
     pub fn to_cpp(self: &Class) -> String {
         let mut class = String::new();
         if self.template.len() > 0 {
-            class.push_str("template <typename ");
+            class.push_str("template <");
+            if self.template[0].as_str().starts_with("C") {
+                class.push_str("class ");
+            } else {
+                class.push_str("typename ");
+            }
             let mut i = 0;
             while i < self.template.len() {
                 class.push_str(self.template[i].as_str());
                 if i + 1 < self.template.len() {
-                    class.push_str(", typename ");
+                    if self.template[i].as_str().starts_with("C") {
+                        class.push_str(", class ");
+                    } else {
+                        class.push_str(", typename ");
+                    }
                 }
                 i += 1;
             }
-            class.push_str(">\n")
+            class.push_str(">\n");
         }
         if self.is_struct {
             class.push_str(format!("struct {}", self.id).as_str())

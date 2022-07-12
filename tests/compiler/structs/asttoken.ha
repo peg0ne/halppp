@@ -1,14 +1,17 @@
 struct AstToken
     string name = EMPTY
-    Token t = Id
+    Token token = TId
+    Token_t t = Token_t("\n")
     AstToken =>
     ;
     AstToken string id =>
         name = id
-        token = Token(name)
+        t = Token_t(name)
+        token = t.t
     ;
     AstToken char ch =>
         name = to_string(ch)
-        token = Token(name)
+        t = Token_t(name)
+        token = t.t
     ;
 ;

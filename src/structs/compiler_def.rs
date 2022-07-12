@@ -1,4 +1,4 @@
-use crate::structs::{AstToken, Class, Function, Include, Program, Use, Enum};
+use crate::structs::{AstToken, Class, Enum, Function, Include, Program, Use};
 use std::{iter::Peekable, slice::Iter};
 
 pub struct Compiler<'a> {
@@ -39,7 +39,7 @@ impl<'a> Compiler<'a> {
         }
     }
     pub fn add_arg(self: &mut Compiler<'a>, arg: &String) {
-        self.arguments.push(arg.to_owned().replace("\"",""));
+        self.arguments.push(arg.to_owned().replace("\"", ""));
     }
     pub fn contains_class(self: &Compiler<'a>, id: &String) -> bool {
         for c in self.program.classes.iter() {

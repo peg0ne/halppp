@@ -6,10 +6,9 @@ struct CompilerPath
     string main_path_bin = EMPTY
     string output = EMPTY
     string current = EMPTY
-    CompilerPath string main =>
-        let (f_p, f_n) = get_folder_and_name(&main);
-        let cpp = main.replace(HA_SUFFIX, CPP_SUFFIX);
-        let bin = main.replace(HA_SUFFIX, EMPTY);
+    CompilerPath string main, string f_p, string f_n =>
+        string cpp = replace_string(main, HA_SUFFIX, CPP_SUFFIX)
+        string bin = replace_string(main, HA_SUFFIX, EMPTY)
         folder_path = f_p
         file_path = f_n
         main_path = main

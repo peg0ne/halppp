@@ -3,9 +3,9 @@ use crate::{
     function,
     message::display_err_message,
     structs::{Class, Compiler, Variable},
+    template,
     utils::{get_id_or_exit, get_next_or_exit},
     variable,
-    template,
 };
 
 pub fn construct(compiler: &mut Compiler, is_struct: bool) -> Class {
@@ -49,7 +49,11 @@ pub fn construct(compiler: &mut Compiler, is_struct: bool) -> Class {
         _ => {}
     }
     //Construct inner Class values
-    let mut variable_state = if !is_struct { VariableState::Private } else { VariableState::Public };
+    let mut variable_state = if !is_struct {
+        VariableState::Private
+    } else {
+        VariableState::Public
+    };
     loop {
         let next = get_next_or_exit(
             compiler.next(),
@@ -68,15 +72,15 @@ pub fn construct(compiler: &mut Compiler, is_struct: bool) -> Class {
             Token::Id => {
                 if next.name == class.id {
                     let mut function = function::construct(compiler, VariableState::Public, true);
-                    function.return_value = Some(
-                        Variable::from(String::from(""),
+                    function.return_value = Some(Variable::from(
+                        String::from(""),
                         class.id.to_owned(),
                         None,
-                        VariableState::Private
+                        VariableState::Private,
                     ));
                     class.functions.push(function);
                     continue;
-                } 
+                }
                 let (mut variable, _) = variable::construct_args(compiler, Some(next.name));
                 variable.variable_state = variable_state;
                 class.variables.push(variable)
@@ -85,7 +89,7 @@ pub fn construct(compiler: &mut Compiler, is_struct: bool) -> Class {
                 let (mut variable, _) = variable::construct_args(compiler, Some(next.name));
                 variable.variable_state = variable_state;
                 class.variables.push(variable)
-            },
+            }
             _ => {}
         }
     }

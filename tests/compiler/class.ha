@@ -19,23 +19,23 @@ fn construct Compiler compiler, bool is_struct => Class
             break
     ;
     //Construct inner Class values
-    let variable_state = !is_struct ? Private : Public
+    let variable_state = !is_struct ? Private_State : Public_State
     let can_continue = true
     while can_continue
         let next = get_next_or_exit(compiler.next(), "[ClassError] Class is not closed " + class_def.id)
         switch next.token
             case SemiColon: dobr can_continue = false
             case Class: dobr can_continue = false
-            case Private: dobr variable_state = Private
-            case Protected: dobr variable_state = Protected
-            case Public: dobr variable_state = Public
+            case Private: dobr variable_state = Private_State
+            case Protected: dobr variable_state = Protected_State
+            case Public: dobr variable_state = Public_State
             case Function:
                 let function = function::construct(compiler, variable_state, false)
                 dobr class_def.functions.push_back(function)
             case Id:
                 if next.name == class_def.id
                     let function = function::construct(compiler, VariableState::Public, true)
-                    function.return_value = Some(Variable(EMPTY, class_def.id, None<string>(), Private))
+                    function.return_value = Some(Variable(EMPTY, class_def.id, None<string>(), Private_State))
                     class_def.functions.push_back(function);
                     continue;
                 ;

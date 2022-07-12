@@ -4,7 +4,7 @@ struct Program
     vector<Function> functions = {}
     vector<Class> classes = {}
     vector<Include> includes = {}
-    vector<Use> usings = {}
+    vector<Uses> usings = {}
     vector<Enum> enums = {}
     Program =>
     ;

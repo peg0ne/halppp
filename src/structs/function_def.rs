@@ -27,16 +27,25 @@ impl Function {
     pub fn to_cpp(self: &Function, in_class: bool) -> String {
         let mut function = String::new();
         if self.template.len() > 0 {
-            function.push_str("template <typename ");
+            function.push_str("template <");
+            if self.template[0].as_str().starts_with("C") {
+                function.push_str("class ");
+            } else {
+                function.push_str("typename ");
+            }
             let mut i = 0;
             while i < self.template.len() {
                 function.push_str(self.template[i].as_str());
                 if i + 1 < self.template.len() {
-                    function.push_str(", typename");
+                    if self.template[i].as_str().starts_with("C") {
+                        function.push_str(", class ");
+                    } else {
+                        function.push_str(", typename ");
+                    }
                 }
                 i += 1;
             }
-            function.push_str(">\n")
+            function.push_str(">\n");
         }
         let spacing = if in_class { "    " } else { "" };
         match &self.return_value {
