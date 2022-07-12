@@ -9,12 +9,12 @@ struct CompilerPath
     CompilerPath string main, string f_p, string f_n =>
         string cpp = replace_string(main, HA_SUFFIX, CPP_SUFFIX)
         string bin = replace_string(main, HA_SUFFIX, EMPTY)
-        folder_path = f_p
-        file_path = f_n
-        main_path = main
-        main_path_cpp = cpp
-        main_path_bin = bin
-        output = cpp + COMPILER_OUT + bin
-        current = f_p + f_n
+        this->folder_path = f_p
+        this->file_path = f_n
+        this->main_path = main
+        this->main_path_cpp = cpp
+        this->main_path_bin = bin
+        this->output = cpp + COMPILER_OUT + bin
+        this->current = f_p + f_n
     ;
 ;

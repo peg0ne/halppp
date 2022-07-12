@@ -9,7 +9,7 @@ struct Enum
     string name = EMPTY
     vector<EnumValue> enums = {}
     Enum string enum_name =>
-        name = enum_name
+        this->name = enum_name
     ;
     fn to_cpp => string
         string enum_str = ENUM + name + BLOCK_START

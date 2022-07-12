@@ -1,13 +1,14 @@
 struct Compiler
     Program program = Program()
-    ClassPeekable<AstToken> ast
+    Peekable<AstToken> ast
     vector<string> arguments = {}
     Compiler Program p, Peekable<AstToken> ast =>
-        program = p
-        ast = ast
+        this->program = p
+        this->ast = ast
     ;
-    fn next => ClassOption<AstToken> doremi ast.next()
-    fn peek => ClassOption<AstToken> doremi ast.peek()
+    fn size => int doremi ast.size()
+    fn next => Option<AstToken> doremi ast.next()
+    fn peek => Option<AstToken> doremi ast.peek()
     fn add_fn Function function => void do program.functions.push_back(function)
     fn add_class Class class_obj => void do program.classes.push_back(class_obj)
     fn add_enum Enum enum_def => void do program.enums.push_back(enum_def)

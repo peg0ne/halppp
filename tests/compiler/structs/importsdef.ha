@@ -1,7 +1,7 @@
 struct Include
     string include = EMPTY
     Include string include =>
-        include = include
+        this->include = include
     ;
     fn to_cpp => string
         string include_str = INCLUDE
@@ -13,7 +13,7 @@ struct Include
 struct Uses
     string usings = EMPTY
     Uses string usings =>
-        usings = usings
+        this->usings = usings
     ;
     fn to_cpp => string doremi NAMESPACE + usings + LINE_END
 ;

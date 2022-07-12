@@ -1,5 +1,5 @@
-use std::{iter::Peekable,str::Chars};
 use crate::{enums::Token, structs::AstToken};
+use std::{iter::Peekable, str::Chars};
 
 pub fn create(content: &String) -> Vec<AstToken> {
     let mut peekable = content.chars().peekable();
@@ -97,7 +97,7 @@ fn is_char_number(c: char) -> bool {
 }
 
 fn try_get_dbl(peekable: &mut Peekable<Chars>, c: char) -> Option<String> {
-    let peek = peekable.peek(); 
+    let peek = peekable.peek();
     if peek.is_some() && peek.unwrap_or(&' ') == &c {
         let mut dbl = String::from(c);
         dbl.push(c);
@@ -115,7 +115,9 @@ fn get_matching(peekable: &mut Peekable<Chars>, c: char, m1: char) -> String {
             Some(c) => c,
         };
         matching.push(c);
-        if c == m1 { break; }
+        if c == m1 {
+            break;
+        }
     }
     matching
 }

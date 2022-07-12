@@ -1,7 +1,7 @@
 struct Expressioner
-    ClassOption<Conditions> e_condition = ClassNone<Conditions>()
-    ClassOption<For> e_for = ClassNone<For>()
-    ClassOption<string> line = ClassNone<string>()
+    Option<Conditions> e_condition = None<Conditions>()
+    Option<For> e_for = None<For>()
+    Option<string> line = None<string>()
     Expressioner =>
     ;
     fn to_cpp int indentation => string

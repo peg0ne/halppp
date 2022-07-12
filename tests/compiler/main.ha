@@ -43,10 +43,13 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
     let enum_def = Enum("NONE")
     vector<string> incs = {}
     string args = EMPTY
+    for i until ast.size()
+        println(ast.at(i).name)
+    ;
     while can_continue
         let next = get_next_or_exit(compiler_t.next(), "Compiler failed to do unexpected EOF")
         if !next.t.is_base()
-            display_err_message("Token not allowed in base: " + next.name + ", Type: " + to_string(next.token))
+            display_err_message("Token not allowed in base: " + next.name + ", Type: " + token_to_string(next.token))
         ;
         switch next.token
             case TStruct: do a = 0

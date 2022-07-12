@@ -5,13 +5,14 @@ struct AstToken
     AstToken =>
     ;
     AstToken string id =>
-        name = id
-        t = Token_t(name)
-        token = t.t
+        this->name = id
+        this->t = Token_t(name)
+        this->token = t.t
     ;
     AstToken char ch =>
-        name = to_string(ch)
-        t = Token_t(name)
-        token = t.t
+        string buf(1,ch)
+        this->name = buf
+        this->t = Token_t(name)
+        this->token = t.t
     ;
 ;

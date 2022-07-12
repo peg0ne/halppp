@@ -1,12 +1,12 @@
 struct Function
     string id = EMPTY
     VariableState variable_state = Public_State
-    ClassOption<Variable> return_value = ClassNone<Variable>()
+    Option<Variable> return_value = None<Variable>()
     vector<Variable> arguments = {}
     vector<Expressioner> expressions = {}
     vector<string> templates = {}
     Function VariableState state =>
-        variable_state = state
+        this->variable_state = state
     ;
     fn to_cpp bool in_class => string
         string fun_str = templates.size() > 0 ? TEMPLATE : EMPTY

@@ -20,7 +20,7 @@ struct Conditions
     Conditions =>
     ;
     Conditions string conditioner =>
-        conditioner = conditioner
+        this->conditioner = conditioner
     ;
     fn to_cpp int indentation => string
         string condition_str = EMPTY
