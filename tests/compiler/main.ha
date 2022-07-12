@@ -15,8 +15,8 @@ struct CompileOutput
     string output = EMPTY
     vector<string> arguments = {}
     CompileOutput string output, vector<string> arguments =>
-        output = output
-        arguments = arguments
+        this->output = output
+        this->arguments = arguments
     ;
 ;
 

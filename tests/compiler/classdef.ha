@@ -5,8 +5,8 @@ fn class_validate Class class_def, Compiler *compiler_t =>
         display_err_message("Duplicate instances of: " + class_def.id)
     ;
     // Check Inheritance
-    contains = !compiler_t->contains_class(class_def.inherit.value_or(EMPTY))
-    if !contains
+    contains = compiler_t->contains_class(class_def.inherit.value_or(EMPTY))
+    if class_def.inherit.is_some() && !contains
         display_err_message("Invalid Inheritance of: " + class_def.id + ", Inherits: " + class_def.inherit.value_or(EMPTY))
     ;
 ;
@@ -35,7 +35,6 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
     let function = Function(variable_state)
     while can_continue
         let next = get_next_or_exit(compiler_t->next(), "[ClassError] Class is not closed " + class_def.id)
-        println("")
         switch next.token
             case TEof: dobr can_continue = false
             case TSemiColon: dobr can_continue = false
@@ -44,17 +43,14 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
             case TProtected: dobr variable_state = Protected_State
             case TPublic: dobr variable_state = Public_State
             case TFunction: do function = function_construct(compiler_t, variable_state, false)
-                println("FN: " + next.name)
-                println("FN: " + function.id)
                 class_def.functions.push_back(function)
                 break
             case TId: do can_continue = true
-                println("TID:" + next.name)
                 if next.name == class_def.id
                     let function = function_construct(compiler_t, Public_State, true)
                     function.return_value = Some(Variable(EMPTY, class_def.id, None<string>(), Private_State))
                     class_def.functions.push_back(function)
-                    continue
+                    break
                 ;
                 vnb = construct_args(compiler_t, Some(next.name))
                 vnb.variable.variable_state = variable_state

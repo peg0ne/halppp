@@ -1627,7 +1627,7 @@ return  ast.size();
     }
   public:
     Option<AstToken> next() {
-println( ast.peek() .value_or( AstToken( "NONE")) .name);
+// println( ast.peek() .value_or( AstToken( "NONE")) .name);
 return  ast.next();
     }
   public:
@@ -2452,8 +2452,8 @@ auto contains= compiler_t-> contains_class( class_def.id);
 display_err_message( "Duplicate instances of: "+ class_def.id);
     }
 // Check Inheritance;
-contains=! compiler_t-> contains_class( class_def.inherit.value_or( EMPTY));
-    if(! contains    ) {
+contains= compiler_t-> contains_class( class_def.inherit.value_or( EMPTY));
+    if(class_def.inherit.is_some ( )    &&! contains    ) {
 display_err_message( "Invalid Inheritance of: "+ class_def.id+ ", Inherits: "+ class_def.inherit.value_or( EMPTY));
     }
 }
@@ -2484,7 +2484,6 @@ auto vnb= VariableNBool( Variable(true),false);
 auto function= Function( variable_state);
     while(can_continue    ) {
 auto next= get_next_or_exit( compiler_t-> next(), "[ClassError] Class is not closed "+ class_def.id);
-println( "");
     switch(next.token    ) {
 case TEof:
  can_continue=false;
@@ -2506,18 +2505,15 @@ case TPublic:
 break ;
 case TFunction:
  function= function_construct( compiler_t, variable_state,false);
-println( "FN: "+ next.name);
-println( "FN: "+ function.id);
 class_def.functions.push_back( function);
 break;
 case TId:
  can_continue=true;
-println( "TID:"+ next.name);
     if(next.name  == class_def.id  ) {
 auto function= function_construct( compiler_t, Public_State,true);
 function.return_value= Some( Variable( EMPTY, class_def.id, None<string>(), Private_State));
 class_def.functions.push_back( function);
-continue;
+break;
     }
 vnb= construct_args( compiler_t, Some( next.name));
 vnb.variable.variable_state= variable_state;
@@ -2543,8 +2539,8 @@ struct CompileOutput {
     vector<string> arguments = {};
   public:
     CompileOutput (string output, vector<string> arguments) {
-output= output;
-arguments= arguments;
+this-> output= output;
+this-> arguments= arguments;
     }
 };
 void validate_compiled(Compiler compiler, bool is_main) {
