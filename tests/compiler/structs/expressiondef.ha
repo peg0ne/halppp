@@ -4,6 +4,11 @@ struct Expressioner
     Option<string> line = None<string>()
     Expressioner =>
     ;
+    Expressioner Option<Conditions> conditions, Option<For> fors, Option<string> line =>
+        this->e_condition = conditions
+        this->e_for = fors
+        this->line = line
+    ;
     fn to_cpp int indentation => string
         if e_condition.is_some() doremi e_condition.value_or(Conditions(EMPTY)).to_cpp(indentation + 1)
         if e_for.is_some() doremi e_for.value_or(For()).to_cpp(indentation + 1)

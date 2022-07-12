@@ -42,4 +42,8 @@
 
 struct FpFn;
 struct Expressioner;
+struct Compiler;
+struct AstToken;
 FpFn get_folder_and_name(string main);
+Expressioner expression_construct(Compiler *compiler_t, AstToken first);
+Expressioner condition_construct(Compiler *compiler_t, string condition_type);

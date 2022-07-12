@@ -146,6 +146,7 @@ struct Token_t
         elif s == TOKEN_UNTIL dore t = TUntil
         elif s == TOKEN_USE dore t = TUse
         elif s == TOKEN_WHILE dore t = TCondition
+        elif s == TOKEN_EOF dore t = TEof
         t = TId
     ;
     fn is_base => bool

@@ -9,7 +9,7 @@ get => structs/importsdef, structs/globaldef, structs/structdef
 get => structs/fordef, structs/conditiondef, structs/expressiondef
 get => structs/functiondef, structs/classdef
 get => structs/programdef, structs/compilerdef
-get => ast, imports, enums, functions, classdef
+get => ast, imports, enums, foreacher, expressions, conditions, variable, template, functions, classdef
 
 struct CompileOutput
     string output = EMPTY
@@ -43,37 +43,27 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
     let enum_def = Enum("NONE")
     vector<string> incs = {}
     string args = EMPTY
-    for i until ast.size()
-        println(ast.at(i).name)
-    ;
     while can_continue
         let next = get_next_or_exit(compiler_t.next(), "Compiler failed to do unexpected EOF")
         if !next.t.is_base()
             display_err_message("Token not allowed in base: " + next.name + ", Type: " + token_to_string(next.token))
         ;
         switch next.token
-            case TStruct: do a = 0
-                class_def = classdef_construct(compiler_t, true)
+            case TStruct: do class_def = class_construct(&compiler_t, true)
                 dobr output += class_def.to_cpp()
-            case TClass: do a = 0
-                class_def = classdef_construct(compiler_t, false)
+            case TClass: do class_def = class_construct(&compiler_t, false)
                 dobr output += class_def.to_cpp()
-            case TFunction: do a = 0
-                function = functions_construct(compiler_t, Public_State, false)
+            case TFunction: do function = function_construct(&compiler_t, Public_State, false)
                 dobr output += function.to_cpp(false)
-            case TEnum: do a = 0
-                enum_def = enums_construct(compiler_t)
+            case TEnum: do enum_def = enums_construct(&compiler_t)
                 dobr output += enum_def.to_cpp()
-            case TInclude: do a = 0
-                incs = imports_creation(compiler_t, next)
+            case TInclude: do incs = imports_creation(&compiler_t, next)
                 for i until incs.size() do output += Include(incs.at(i)).to_cpp()
                 break
-            case TUse: do a = 0
-                incs = imports_creation(compiler_t, next)
+            case TUse: do incs = imports_creation(&compiler_t, next)
                 for i until incs.size() do output += Uses(incs.at(i)).to_cpp()
                 break
-            case TGet: do a = 0
-                incs = imports_creation(compiler_t, next)
+            case TGet: do incs = imports_creation(&compiler_t, next)
                 for i until incs.size()
                     FpFn fpfn = get_folder_and_name(paths.folder_path + incs.at(i) + HA_SUFFIX)
                     let get_path = CompilerPath(paths.folder_path + incs.at(i) + HA_SUFFIX, fpfn.f_p, fpfn.f_n)

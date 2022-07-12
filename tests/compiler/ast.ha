@@ -111,7 +111,6 @@ fn ast_create string content => vector<AstToken>
             ast.push_back(AstToken(c))
             continue
         ;
-        print(c)
         if any(c, {' ', '\t', '\n'})
             id = try_add_token(id, &ast)
             if c == '\n' do ast.push_back(AstToken("\n"))
