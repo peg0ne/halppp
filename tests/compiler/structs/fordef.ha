@@ -11,8 +11,7 @@ struct For
         for_str += FOR_MID + iterator
         for_str += FOR_UNTIL + until
         for_str += FOR_AFTER_UNTIL + iterator + FOR_END
-        
-        for i until indentation do for_str += TAB
+        for i until lines.size() do for_str += expr_to_cpp(&lines.at(i), indentation + 1)
         for_str += BLOCK_END
         return for_str
     ;

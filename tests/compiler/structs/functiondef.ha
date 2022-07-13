@@ -20,8 +20,9 @@ struct Function
         for i until arguments.size()
             let a = arguments.at(i)
             fun_str += a.to_cpp(EMPTY, EMPTY)
-            fun_str += i + 1 < arguments.size() ? ARG_SEP : ARG_END
+            fun_str += i + 1 < arguments.size() ? ARG_SEP : EMPTY
         ;
+        fun_str += ARG_END
         for i until expressions.size() do fun_str += expressions.at(i).to_cpp(1 + in_class)
         if in_class do fun_str += TAB
         fun_str += BLOCK_END

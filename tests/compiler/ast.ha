@@ -119,7 +119,7 @@ fn ast_create string content => vector<AstToken>
         string ch(1, c)
         id += ch
     ;
-    //Push extra sets of EOF to ensure it wont break badly
+    // "Push extra sets of EOF to ensure it wont break badly"
     ast.push_back(AstToken("EOF"))
     ast.push_back(AstToken("EOF"))
     ast.push_back(AstToken("EOF"))

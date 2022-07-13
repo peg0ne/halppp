@@ -19,7 +19,9 @@ fn get_content CompilerPath paths => string
     return content
 ;
 fn write_program string program, CompilerPath paths =>
-    return
+    ofstream file("ha" + paths.main_path_cpp)
+    file << program
+    file.close()
 ;
 fn compile_program CompilerPath paths, vector<string> arguments, bool should_remove_cpp =>
     return

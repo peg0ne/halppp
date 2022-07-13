@@ -32,7 +32,7 @@ struct Conditions
             condition_str += RPAREN
         ;
         condition_str += BLOCK_START
-        for i until indentation do condition_str += TAB
+        for i until lines.size() do condition_str += expr_to_cpp(&lines.at(i), indentation + 1)
         condition_str += BLOCK_END
         return condition_str
     ;

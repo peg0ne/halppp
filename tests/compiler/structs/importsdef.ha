@@ -5,7 +5,7 @@ struct Include
     ;
     fn to_cpp => string
         string include_str = INCLUDE
-        include_str += starts_with(include, QUOTE) ? include : RARROW + include + LARROW
+        include_str += starts_with(include, QUOTE) ? include : LARROW + include + RARROW
         include_str += NEWLINE
         return include_str
     ;
