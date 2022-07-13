@@ -1,9 +1,7 @@
 fn class_validate Class class_def, Compiler *compiler_t =>
     // Check Duplicate Classes
     let contains = compiler_t->contains_class(class_def.id) 
-    if contains
-        display_err_message("Duplicate instances of: " + class_def.id)
-    ;
+    if contains do display_err_message("Duplicate instances of: " + class_def.id)
     // Check Inheritance
     contains = compiler_t->contains_class(class_def.inherit.value_or(EMPTY))
     if class_def.inherit.is_some() && !contains
@@ -30,33 +28,28 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
     ;
     //Construct inner Class values
     let variable_state = !is_struct ? Private_State : Public_State
-    let can_continue = true
     let vnb = VariableNBool(Variable(true), false)
     let function = Function(variable_state)
-    while can_continue
+    let a = 0
+    while true
         let next = get_next_or_exit(compiler_t->next(), "[ClassError] Class is not closed " + class_def.id)
+        if any(next.token, {TEof, TSemiColon, TClass}) do break
         switch next.token
-            case TEof: dobr can_continue = false
-            case TSemiColon: dobr can_continue = false
-            case TClass: dobr can_continue = false
             case TPrivate: dobr variable_state = Private_State
             case TProtected: dobr variable_state = Protected_State
             case TPublic: dobr variable_state = Public_State
             case TFunction: do function = function_construct(compiler_t, variable_state, false)
-                class_def.functions.push_back(function)
-                break
-            case TId: do can_continue = true
+                dobr class_def.functions.push_back(function)
+            case TId: do a = 0
                 if next.name == class_def.id
                     let function = function_construct(compiler_t, Public_State, true)
                     function.return_value = Some(Variable(EMPTY, class_def.id, None<string>(), Private_State))
-                    class_def.functions.push_back(function)
-                    break
+                    dobr class_def.functions.push_back(function)
                 ;
                 vnb = construct_args(compiler_t, Some(next.name))
                 vnb.variable.variable_state = variable_state
                 dobr class_def.variables.push_back(vnb.variable)
-            case TType:
-                vnb = construct_args(compiler_t, Some(next.name))
+            case TType: do vnb = construct_args(compiler_t, Some(next.name))
                 vnb.variable.variable_state = variable_state
                 dobr class_def.variables.push_back(vnb.variable)
         ;

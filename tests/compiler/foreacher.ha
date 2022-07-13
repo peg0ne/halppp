@@ -12,15 +12,13 @@ fn for_construct Compiler *compiler_t => Expressioner
         if x.token == TNewLine do break
         for_def.until += x.name
     ;
-    let can_continue = true
-    while can_continue
+    while true
         let x = get_next_or_exit(compiler_t->next(), "[For] For loop is not closed")
+        if any(x.token, {TSemiColon, TEof}) do break
+        if x.token == TNewLine do continue
         switch x.token
             case TCondition: dobr for_def.lines.push_back(condition_construct(compiler_t, x.name))
             case TFor: dobr for_def.lines.push_back(for_construct(compiler_t))
-            case TSemiColon: dobr can_continue = false
-            case TEof: dobr can_continue = false
-            case TNewLine: dobr can_continue = true
             default: dobr for_def.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;

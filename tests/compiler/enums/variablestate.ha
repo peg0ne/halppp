@@ -5,10 +5,8 @@ enum VariableState =>
 ;
 
 fn variable_state_to_cpp VariableState self => string
-    switch self
-        case Private_State: doremi PRIVATE_STATE
-        case Protected_State: doremi PROTECTED_STATE
-        case Public_State: doremi PUBLIC_STATE
-    ;
+    if self == Private_State doremi PRIVATE_STATE
+    if self == Protected_State doremi PROTECTED_STATE
+    if self == Public_State doremi PUBLIC_STATE
     return PRIVATE_STATE
 ;

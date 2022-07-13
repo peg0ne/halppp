@@ -26,16 +26,15 @@ fn get_arrow_or_exit Option<AstToken> next, string s => string doremi get_or_exi
 fn get_eq_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, TEquals, s)
 fn get_folder_and_name string file_path => FpFn
     string file_name = EMPTY
+    string reversed = EMPTY
     string folder_path = file_path
     while true
-        let i = folder_path.size()
-        if i == 0 do break
+        if folder_path.size() == 0 do break
         let ch = folder_path.back()
         folder_path.pop_back()
         if ch == '/' dobr folder_path.push_back('/')
         file_name.push_back(ch)
     ;
-    string reversed = EMPTY
     while file_name.size() > 0
         reversed.push_back(file_name.back())
         file_name.pop_back()

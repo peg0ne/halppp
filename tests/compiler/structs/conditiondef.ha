@@ -22,6 +22,7 @@ struct Conditions
     Conditions string conditioner =>
         this->conditioner = conditioner
     ;
+    fn add_expr ConditionalExpression cexpr => void do expressions.push_back(cexpr)
     fn to_cpp int indentation => string
         string condition_str = EMPTY
         for i until indentation do condition_str += TAB

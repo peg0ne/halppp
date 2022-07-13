@@ -1,36 +1,22 @@
 fn try_add_token string id, vector<AstToken> *ast => string
-    if id.size() > 0
-        ast->push_back(AstToken(id))
-        return EMPTY
-    ;
-    return id
+    if id.size() == 0 doremi id
+    ast->push_back(AstToken(id))
+    return EMPTY
 ;
-
 fn is_char_token char ch => bool
     string s(1,ch)
-    switch Token_t(s).t
-        case TId: doremi false
-        default: doremi true
-    ;
+    return Token_t(s).t != TId
 ;
-
 fn is_char_number char ch => bool
     string s(1,ch)
-    switch Token_t(s).t
-        case TNumber: doremi true
-        default: doremi false
-    ;
+    return Token_t(s).t == TNumber
 ;
-
 fn try_get_dbl Peekable<char> *peekable, char ch => Option<string>
     let peek = peekable->peek()
-    if peek.is_some() && peek.value_or(' ') == ch
-        string dbl(1, ch)
-        dbl += dbl
-        peekable->next()
-        return Some(dbl)
-    ;
-    return None<string>()
+    if peek.is_none() || peek.value_or(' ') != ch doremi None<string>()
+    peekable->next()
+    string dbl(1, ch)
+    return Some(dbl + dbl)
 ;
 
 fn get_matching Peekable<char> *peekable, char ch => string
@@ -40,9 +26,8 @@ fn get_matching Peekable<char> *peekable, char ch => string
         if c.is_none() doremi matching
         string matchbuf(1, c.value_or(' '))
         matching += matchbuf
-        if c.value_or(' ') == ch do break
+        if c.value_or(' ') == ch doremi matching
     ;
-    return matching
 ;
 
 fn collect_num Peekable<char> *peekable, char ch => string
@@ -58,9 +43,7 @@ fn collect_num Peekable<char> *peekable, char ch => string
 
 fn ast_create string content => vector<AstToken>
     vector<char> vec = {}
-    for i until content.size()
-        vec.push_back(content[i])
-    ;
+    for i until content.size() do vec.push_back(content[i])
     let peekable = Peekable<char>(vec)
     string id = EMPTY
     vector<AstToken> ast = {}
@@ -71,14 +54,12 @@ fn ast_create string content => vector<AstToken>
         if any(c, {CHAR_QUOTE, CHAR_SINGLE})
             let matched = get_matching(&peekable, c)
             id = try_add_token(id, &ast)
-            try_add_token(matched, &ast)
-            continue
+            doco try_add_token(matched, &ast)
         ;
         if is_char_number(c)
             let num = collect_num(&peekable, c)
             id = try_add_token(id, &ast)
-            try_add_token(num, &ast)
-            continue
+            doco try_add_token(num, &ast)
         ;
         if is_char_token(c)
             let dbl_less = id != "<" && c == '<'
@@ -88,8 +69,7 @@ fn ast_create string content => vector<AstToken>
                 let dbl = try_get_dbl(&peekable, c)
                 if dbl.is_some()
                     id = try_add_token(id, &ast)
-                    try_add_token(dbl.value_or(EMPTY), &ast)
-                    continue
+                    doco try_add_token(dbl.value_or(EMPTY), &ast)
                 ;
             ;
         ;
@@ -98,16 +78,9 @@ fn ast_create string content => vector<AstToken>
             let next = peekable.peek().value_or(' ')
             let is_cool = c == '=' && next == '>'
             let is_non_eq = c == '!' && next == '='
-            if is_cool
-                peekable.next()
-                ast.push_back(AstToken("=>"))
-                continue
-            ;
-            elif is_non_eq
-                peekable.next()
-                ast.push_back(AstToken("!="))
-                continue
-            ;
+            if is_cool || is_non_eq do peekable.next()
+            if is_cool doco ast.push_back(AstToken("=>"))
+            if is_non_eq doco ast.push_back(AstToken("!="))
             ast.push_back(AstToken(c))
             continue
         ;

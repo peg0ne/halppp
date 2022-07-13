@@ -8,6 +8,8 @@ struct Function
     Function VariableState state =>
         this->variable_state = state
     ;
+    fn add_args Variable var => void do arguments.push_back(var)
+    fn add_expr Expressioner expr => void do expressions.push_back(expr)
     fn to_cpp bool in_class => string
         string fun_str = templates.size() > 0 ? TEMPLATE : EMPTY
         for i until templates.size()
@@ -18,8 +20,7 @@ struct Function
         fun_str += return_value.value_or(Variable(true)).v_type
         fun_str += SPACE + id + LPAREN
         for i until arguments.size()
-            let a = arguments.at(i)
-            fun_str += a.to_cpp(EMPTY, EMPTY)
+            fun_str += arguments.at(i).to_cpp(EMPTY, EMPTY)
             fun_str += i + 1 < arguments.size() ? ARG_SEP : EMPTY
         ;
         fun_str += ARG_END

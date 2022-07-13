@@ -114,13 +114,14 @@ void println(T s) {
  cout<< s<< "\n";;
 }
 string replace_string(string str, string from, string to) {
-   size_t start_pos= str.find( from);
-      if(start_pos  == - 1  ) {
-         
+      while(true    ) {
+         size_t start_pos= str.find( from);
+            if(start_pos  == - 1  ) {
+               
 return str;
 }
-   str.replace( start_pos, from.length(), to);
-   return str;
+         str.replace( start_pos, from.length(), to);
+}
 }
 bool starts_with(string str, string start) {
    
@@ -425,59 +426,19 @@ return ;
  t= TOr;
 return ;
 }
-         else if(s  == TOKEN_ZERO  ) {
+         else if(any ( s , {TOKEN_ZERO , TOKEN_ONE , TOKEN_TWO} )    ) {
             
  t= TNumber;
 return ;
 }
-         else if(s  == TOKEN_ONE  ) {
+         else if(any ( s , {TOKEN_THREE , TOKEN_FOUR , TOKEN_FIVE} )    ) {
             
  t= TNumber;
 return ;
 }
-         else if(s  == TOKEN_TWO  ) {
+         else if(any ( s , {TOKEN_SIX , TOKEN_SEVEN , TOKEN_EIGHT , TOKEN_NINE} )    ) {
             
  t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_THREE  ) {
-            
- t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_FOUR  ) {
-            
- t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_FIVE  ) {
-            
- t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_SIX  ) {
-            
- t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_SEVEN  ) {
-            
- t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_EIGHT  ) {
-            
- t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_NINE  ) {
-            
- t= TNumber;
-return ;
-}
-         else if(s  == TOKEN_TYPE  ) {
-            
- t= TType;
 return ;
 }
          else if(s  == TOKEN_CLASS  ) {
@@ -525,12 +486,12 @@ return ;
  t= TEnum;
 return ;
 }
-         else if(s  == TOKEN_ELIF  ) {
+         else if(any ( s , {TOKEN_SWITCH , TOKEN_WHILE} )    ) {
             
  t= TCondition;
 return ;
 }
-         else if(s  == TOKEN_ELSE  ) {
+         else if(any ( s , {TOKEN_IFS , TOKEN_ELIF , TOKEN_ELSE} )    ) {
             
  t= TCondition;
 return ;
@@ -550,12 +511,7 @@ return ;
  t= TFunction;
 return ;
 }
-         else if(s  == TOKEN_FOR  ) {
-            
- t= TFor;
-return ;
-}
-         else if(s  == TOKEN_FOREACH  ) {
+         else if(any ( s , {TOKEN_FOR , TOKEN_FOREACH} )    ) {
             
  t= TFor;
 return ;
@@ -570,17 +526,12 @@ return ;
  t= TGlobal;
 return ;
 }
-         else if(s  == TOKEN_IFS  ) {
-            
- t= TCondition;
-return ;
-}
          else if(s  == TOKEN_INCLUDE  ) {
             
  t= TInclude;
 return ;
 }
-         else if(s  == TOKEN_INT  ) {
+         else if(any ( s , {TOKEN_INT , TOKEN_STR , TOKEN_STRING} )    ) {
             
  t= TType;
 return ;
@@ -610,24 +561,9 @@ return ;
  t= TReturn;
 return ;
 }
-         else if(s  == TOKEN_STR  ) {
-            
- t= TType;
-return ;
-}
-         else if(s  == TOKEN_STRING  ) {
-            
- t= TType;
-return ;
-}
          else if(s  == TOKEN_STRUCT  ) {
             
  t= TStruct;
-return ;
-}
-         else if(s  == TOKEN_SWITCH  ) {
-            
- t= TCondition;
 return ;
 }
          else if(s  == TOKEN_TRUE  ) {
@@ -645,11 +581,6 @@ return ;
  t= TUse;
 return ;
 }
-         else if(s  == TOKEN_WHILE  ) {
-            
- t= TCondition;
-return ;
-}
          else if(s  == TOKEN_EOF  ) {
             
  t= TEof;
@@ -659,97 +590,57 @@ return ;
    }
  public:
    bool is_base() {
-         switch(t    ) {
-            case TClass:
+         if(any ( t , {TClass , TEof , TFunction , TGet , TGlobal} )    ) {
+            
 return true;
-            case TEof:
-return true;
-            case TFunction:
-return true;
-            case TGet:
-return true;
-            case TGlobal:
-return true;
-            case TInclude:
-return true;
-            case TMacroDefinition:
-return true;
-            case TNewLine:
-return true;
-            case TSemiColon:
-return true;
-            case TStruct:
-return true;
-            case TUse:
-return true;
-            case TCompiler:
-return true;
-            case TEnum:
-return true;
-            default:
-return false;
 }
+         if(any ( t , {TInclude , TMacroDefinition , TNewLine} )    ) {
+            
+return true;
+}
+         if(any ( t , {TSemiColon , TStruct , TUse} )    ) {
+            
+return true;
+}
+         if(any ( t , {TCompiler , TEnum} )    ) {
+            
+return true;
+}
+      return false;
    }
  public:
    bool is_do() {
-         switch(t    ) {
-            case TDo:
-return true;
-            case TDobr:
-return true;
-            case TDoco:
-return true;
-            case TDore:
-return true;
-            case TDoremi:
-return true;
-            default:
-return false;
-}
+      
+return  any( t, {TDo, TDobr, TDoco, TDore, TDoremi});
    }
  public:
    bool is_conditional() {
-         switch(t    ) {
-            case TEquality:
+         if(any ( t , {TEquality , TNonEquality , TMoreThanOrEquals} )    ) {
+            
 return true;
-            case TNonEquality:
-return true;
-            case TMoreThanOrEquals:
-return true;
-            case TLessThanOrEquals:
-return true;
-            case TLessThan:
-return true;
-            case TMoreThan:
-return true;
-            case TAnyEquals:
-return true;
-            case TAllEquals:
-return true;
-            case TAllNotEquals:
-return true;
-            case TAllLessThan:
-return true;
-            case TAllMoreThan:
-return true;
-            case TAllLessOrEquals:
-return true;
-            case TAllMoreOrEquals:
-return true;
-            default:
-return false;
 }
+         if(any ( t , {TLessThanOrEquals , TLessThan , TMoreThan} )    ) {
+            
+return true;
+}
+         if(any ( t , {TAnyEquals , TAllEquals , TAllNotEquals} )    ) {
+            
+return true;
+}
+         if(any ( t , {TAllLessThan , TAllMoreThan} )    ) {
+            
+return true;
+}
+         if(any ( t , {TAllLessOrEquals , TAllMoreOrEquals} )    ) {
+            
+return true;
+}
+      return false;
    }
  public:
    bool is_conditional_sep() {
-         switch(t    ) {
-            case TAnd:
-return true;
-            case TOr:
-return true;
-            default:
-return false;
-}
+      
+return  any( t, {TAnd, TOr});
    }
 };
 string token_to_string(Token t) {
@@ -889,46 +780,6 @@ return  "TOr";
          
 return  "TNumber";
 }
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TNumber  ) {
-         
-return  "TNumber";
-}
-      else if(t  == TType  ) {
-         
-return  "TType";
-}
       else if(t  == TClass  ) {
          
 return  "TClass";
@@ -965,14 +816,6 @@ return  "TDoremi";
          
 return  "TEnum";
 }
-      else if(t  == TCondition  ) {
-         
-return  "TCondition";
-}
-      else if(t  == TCondition  ) {
-         
-return  "TCondition";
-}
       else if(t  == TExtend  ) {
          
 return  "TExtend";
@@ -989,10 +832,6 @@ return  "TFunction";
          
 return  "TFor";
 }
-      else if(t  == TFor  ) {
-         
-return  "TFor";
-}
       else if(t  == TGet  ) {
          
 return  "TGet";
@@ -1000,10 +839,6 @@ return  "TGet";
       else if(t  == TGlobal  ) {
          
 return  "TGlobal";
-}
-      else if(t  == TCondition  ) {
-         
-return  "TCondition";
 }
       else if(t  == TInclude  ) {
          
@@ -1033,21 +868,9 @@ return  "TPublic";
          
 return  "TReturn";
 }
-      else if(t  == TType  ) {
-         
-return  "TType";
-}
-      else if(t  == TType  ) {
-         
-return  "TType";
-}
       else if(t  == TStruct  ) {
          
 return  "TStruct";
-}
-      else if(t  == TCondition  ) {
-         
-return  "TCondition";
 }
       else if(t  == TTrue  ) {
          
@@ -1073,12 +896,16 @@ enum VariableState {
    Public_State,
 };
 string variable_state_to_cpp(VariableState self) {
-      switch(self    ) {
-         case Private_State:
+      if(self  == Private_State  ) {
+         
 return  PRIVATE_STATE;
-         case Protected_State:
+}
+      if(self  == Protected_State  ) {
+         
 return  PROTECTED_STATE;
-         case Public_State:
+}
+      if(self  == Public_State  ) {
+         
 return  PUBLIC_STATE;
 }
    return  PRIVATE_STATE;
@@ -1140,7 +967,8 @@ enum MessageSeverity {
    Error,
 };
 void display_message(MessageSeverity severity, string msg) {
-   println( to_string( severity)+ " "+ msg);
+   
+ println( to_string( severity)+ " "+ msg);
 }
 void display_hint_message(string msg) {
    
@@ -1199,10 +1027,10 @@ return  get_or_exit( next, TEquals, s);
 }
 FpFn get_folder_and_name(string file_path) {
    string file_name= EMPTY;
+   string reversed= EMPTY;
    string folder_path= file_path;
       while(true    ) {
-         auto i= folder_path.size();
-            if(i  == 0  ) {
+            if(folder_path.size ( )  == 0  ) {
                
  break;
 }
@@ -1214,7 +1042,6 @@ break ;
 }
          file_name.push_back( ch);
 }
-   string reversed= EMPTY;
       while(file_name.size ( )  > 0  ) {
          reversed.push_back( file_name.back());
          file_name.pop_back();
@@ -1237,8 +1064,7 @@ string get_file_path(int argc, char** argv) {
    return  fp;
 }
 string get_content(CompilerPath paths) {
-   string content= " ";
-   string linebuf;
+   string content, linebuf;
    ifstream reader( paths.current);
       if(! reader    ) {
          
@@ -1269,11 +1095,12 @@ void compile_program(CompilerPath paths, vector<string> arguments, bool should_r
    cmd[ base_cmd.size()]= '\0';
    println( "compiling: "+ base_cmd);
    system( cmd);
-   char cpp_path[ paths.main_path_cpp.size()];
+   char cpp_path[ paths.main_path_cpp.size()+ 1];
       for(int i = 0; i < paths.main_path_cpp.size(); i++) {
          
  cpp_path[ i]= paths.main_path_cpp.at( i);
 }
+   cpp_path[ paths.main_path_cpp.size()]= '\0';
       if(should_remove_cpp    ) {
          
  remove( cpp_path);
@@ -1467,6 +1294,11 @@ struct Conditions {
       this-> conditioner= conditioner;
    }
  public:
+   void add_expr(ConditionalExpression cexpr) {
+      
+ expressions.push_back( cexpr);
+   }
+ public:
    string to_cpp(int indentation) {
       string condition_str= EMPTY;
          for(int i = 0; i < indentation; i++) {
@@ -1552,6 +1384,16 @@ struct Function {
       this-> variable_state= state;
    }
  public:
+   void add_args(Variable var) {
+      
+ arguments.push_back( var);
+   }
+ public:
+   void add_expr(Expressioner expr) {
+      
+ expressions.push_back( expr);
+   }
+ public:
    string to_cpp(bool in_class) {
       string fun_str= templates.size()> 0 ? TEMPLATE: EMPTY;
          for(int i = 0; i < templates.size(); i++) {
@@ -1562,8 +1404,7 @@ struct Function {
       fun_str+= return_value.value_or( Variable(true)) .v_type;
       fun_str+= SPACE+ id+ LPAREN;
          for(int i = 0; i < arguments.size(); i++) {
-            auto a= arguments.at( i);
-            fun_str+= a.to_cpp( EMPTY, EMPTY);
+            fun_str+= arguments.at( i) .to_cpp( EMPTY, EMPTY);
             fun_str+= i+ 1< arguments.size() ? ARG_SEP: EMPTY;
 }
       fun_str+= ARG_END;
@@ -1657,7 +1498,7 @@ return  ast.size();
    }
  public:
    Option<AstToken> next() {
-      // println( ast.peek() .value_or( AstToken( "NONE")) .name);
+      // println( ast.peek() .value_or( AstToken()) .name);
       return  ast.next();
    }
  public:
@@ -1683,13 +1524,15 @@ return  ast.peek();
  public:
    void add_inc(vector<string> includes) {
          for(int i = 0; i < includes.size(); i++) {
-            program.includes.push_back( Include( includes.at( i)));
+            
+ program.includes.push_back( Include( includes.at( i)));
 }
    }
  public:
    void add_use(vector<string> usings) {
          for(int i = 0; i < usings.size(); i++) {
-            program.usings.push_back( Uses( usings.at( i)));
+            
+ program.usings.push_back( Uses( usings.at( i)));
 }
    }
  public:
@@ -1700,7 +1543,8 @@ return  ast.peek();
  public:
    void add_args(vector<string> args) {
          for(int i = 0; i < args.size(); i++) {
-            arguments.push_back( args.at( i));
+            
+ arguments.push_back( args.at( i));
 }
    }
  public:
@@ -1755,39 +1599,30 @@ return true;
    }
 };
 string try_add_token(string id, vector<AstToken>* ast) {
-      if(id.size ( )  > 0  ) {
-         ast-> push_back( AstToken( id));
-         return  EMPTY;
+      if(id.size ( )  == 0  ) {
+         
+return  id;
 }
-   return  id;
+   ast-> push_back( AstToken( id));
+   return  EMPTY;
 }
 bool is_char_token(char ch) {
    string s( 1, ch);
-      switch(Token_t ( s ) .t    ) {
-         case TId:
-return false;
-         default:
-return true;
-}
+   return  Token_t( s) .t!= TId;
 }
 bool is_char_number(char ch) {
    string s( 1, ch);
-      switch(Token_t ( s ) .t    ) {
-         case TNumber:
-return true;
-         default:
-return false;
-}
+   return  Token_t( s) .t== TNumber;
 }
 Option<string> try_get_dbl(Peekable<char>* peekable, char ch) {
    auto peek= peekable-> peek();
-      if(peek.is_some ( )    &&peek.value_or ( ' ' )  == ch  ) {
-         string dbl( 1, ch);
-         dbl+= dbl;
-         peekable-> next();
-         return  Some( dbl);
+      if(peek.is_none ( )    ||peek.value_or ( ' ' )  != ch  ) {
+         
+return  None<string>();
 }
-   return  None<string>();
+   peekable-> next();
+   string dbl( 1, ch);
+   return  Some( dbl+ dbl);
 }
 string get_matching(Peekable<char>* peekable, char ch) {
    string matching( 1, ch);
@@ -1801,10 +1636,9 @@ return  matching;
          matching+= matchbuf;
             if(c.value_or ( ' ' )  == ch  ) {
                
- break;
+return  matching;
 }
 }
-   return  matching;
 }
 string collect_num(Peekable<char>* peekable, char ch) {
    string num( 1, ch);
@@ -1820,11 +1654,12 @@ return  num;
 }
 }
 vector<AstToken> ast_create(string content) {
-   vector<char> vec= {};
+   vector< char> vec= {};
       for(int i = 0; i < content.size(); i++) {
-         vec.push_back( content[ i]);
+         
+ vec.push_back( content[ i]);
 }
-   auto peekable= Peekable<char>( vec);
+   auto peekable= Peekable< char>( vec);
    string id= EMPTY;
    vector< AstToken> ast= {};
       while(true    ) {
@@ -1837,14 +1672,14 @@ vector<AstToken> ast_create(string content) {
             if(any ( c , {CHAR_QUOTE , CHAR_SINGLE} )    ) {
                auto matched= get_matching( &peekable, c);
                id= try_add_token( id, &ast);
-               try_add_token( matched, &ast);
-               continue;
+                try_add_token( matched, &ast);
+continue ;
 }
             if(is_char_number ( c )    ) {
                auto num= collect_num( &peekable, c);
                id= try_add_token( id, &ast);
-               try_add_token( num, &ast);
-               continue;
+                try_add_token( num, &ast);
+continue ;
 }
             if(is_char_token ( c )    ) {
                auto dbl_less= id!= "<"&& c== '<';
@@ -1854,8 +1689,8 @@ vector<AstToken> ast_create(string content) {
                      auto dbl= try_get_dbl( &peekable, c);
                         if(dbl.is_some ( )    ) {
                            id= try_add_token( id, &ast);
-                           try_add_token( dbl.value_or( EMPTY), &ast);
-                           continue;
+                            try_add_token( dbl.value_or( EMPTY), &ast);
+continue ;
 }
 }
 }
@@ -1864,15 +1699,17 @@ vector<AstToken> ast_create(string content) {
                auto next= peekable.peek() .value_or( ' ');
                auto is_cool= c== '='&& next== '>';
                auto is_non_eq= c== '!'&& next== '=';
-                  if(is_cool    ) {
-                     peekable.next();
-                     ast.push_back( AstToken( "=>"));
-                     continue;
+                  if(is_cool    ||is_non_eq    ) {
+                     
+ peekable.next();
 }
-                  else if(is_non_eq    ) {
-                     peekable.next();
-                     ast.push_back( AstToken( "!="));
-                     continue;
+                  if(is_cool    ) {
+                      ast.push_back( AstToken( "=>"));
+continue ;
+}
+                  if(is_non_eq    ) {
+                      ast.push_back( AstToken( "!="));
+continue ;
 }
                ast.push_back( AstToken( c));
                continue;
@@ -1910,35 +1747,26 @@ vector<string> imports_construct(Compiler* compiler_t) {
    vector<string> imports= {};
    get_arrow_or_exit( compiler_t-> next(), "[Import]: Missing [=>] in declaration");
    string id= EMPTY;
-   auto can_continue=true;
-      while(can_continue    ) {
+      while(true    ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Import]: Import declaration invalid");
-            switch(next.token    ) {
-               case TEof:
- can_continue=false;
-               case TNewLine:
- can_continue=false;
-                  if(! imports_check_duplicate ( imports , id )    ) {
-                     
- imports.push_back( id);
-}
-               break;
-               case TComma:
- can_continue=true;
+            if(any ( next.token , {TEof , TNewLine , TComma} )    ) {
                   if(! imports_check_duplicate ( imports , id )    ) {
                      
  imports.push_back( id);
 }
                id= EMPTY;
-               break;;
-               default:
- can_continue=true;
-                  if(next.t.is_base ( )    ) {
-                     
+}
+            else if(next.t.is_base ( )    ) {
+               
  display_err_message( "[Import]: Token not allowed: "+ next.name);
 }
-               id+= next.name;
-               break;
+            else {
+               
+ id+= next.name;
+}
+            if(any ( next.token , {TEof , TNewLine} )    ) {
+               
+ break;
 }
 }
    return  imports;
@@ -1992,7 +1820,8 @@ break ;
 void validate_enum(Enum enumerator, Compiler* compiler_t) {
    auto contains= compiler_t-> contains_enum( enumerator.name);
       if(contains    ) {
-         display_err_message( "Duplicate instances Enum of: "+ enumerator.name);
+         
+ display_err_message( "Duplicate instances Enum of: "+ enumerator.name);
 }
 }
 Enum enums_construct(Compiler* compiler_t) {
@@ -2000,45 +1829,39 @@ Enum enums_construct(Compiler* compiler_t) {
    auto enumerator= Enum( id);
    get_arrow_or_exit( compiler_t-> next(), "[Enum] Requires [=>] after Id");
    auto enum_def= EnumValue();
-   auto can_continue=true;
-      while(can_continue    ) {
+      while(true    ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Enum] Ends without closing itself");
-            switch(next.token    ) {
-               case TId:
- can_continue=true;
-                  if(enum_def.name.size ( )  > 0  ) {
-                     display_err_message( "[Enum] Cannot assign id to EnumValue that already has id");;
-}
-                enum_def.name= next.name;
-break ;
-               case TNumber:
- can_continue=true;
-               case TEquals:
- can_continue=true;
-                  if(enum_def.name.size ( )  == 0  ) {
-                     display_err_message( "[Enum] Cannot assign value to EnumValue without id");
-}
-               break;
-               case TNewLine:
+            if(any ( next.token , {TSemiColon , TEof} )    ) {
+               
  break;
-               case TComma:
- can_continue=true;
+}
+            if(any ( next.token , {TNumber , TEquals} )    ) {
+                  if(enum_def.name.size ( )  != 0  ) {
+                     
+ break;
+}
+               display_err_message( "[Enum] Cannot assign value to EnumValue without id");
+}
+            if(next.token  == TId  ) {
                   if(enum_def.name.size ( )  == 0  ) {
-                     display_err_message( "[Enum] Missing enum before separator");
+                      enum_def.name= next.name;
+continue ;
+}
+               display_err_message( "[Enum] Cannot assign id to EnumValue that already has id");
+}
+            if(next.token  == TComma  ) {
+                  if(enum_def.name.size ( )  == 0  ) {
+                     
+ display_err_message( "[Enum] Missing enum before separator");
 }
                enumerator.enums.push_back( enum_def);
-                enum_def= EnumValue();
-break ;
-               case TSemiColon:
- can_continue=false;
-break ;
-               case TEof:
- can_continue=false;
-break ;
-               default:
- display_err_message( "[Enum] Invalid token inside Enum constructor");
-break ;
+               enum_def= EnumValue();
 }
+            if(any ( next.token , {TId , TNewLine , TComma} )    ) {
+               
+ continue;
+}
+         display_err_message( "[Enum] Invalid token inside Enum constructor");
 }
    validate_enum( enumerator, compiler_t);
    compiler_t-> add_enum( enumerator);
@@ -2061,24 +1884,22 @@ Expressioner for_construct(Compiler* compiler_t) {
 }
          for_def.until+= x.name;
 }
-   auto can_continue=true;
-      while(can_continue    ) {
+      while(true    ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[For] For loop is not closed");
+            if(any ( x.token , {TSemiColon , TEof} )    ) {
+               
+ break;
+}
+            if(x.token  == TNewLine  ) {
+               
+ continue;
+}
             switch(x.token    ) {
                case TCondition:
  for_def.lines.push_back( condition_construct( compiler_t, x.name));
 break ;
                case TFor:
  for_def.lines.push_back( for_construct( compiler_t));
-break ;
-               case TSemiColon:
- can_continue=false;
-break ;
-               case TEof:
- can_continue=false;
-break ;
-               case TNewLine:
- can_continue=true;
 break ;
                default:
  for_def.lines.push_back( expression_construct( compiler_t, x));
@@ -2115,42 +1936,37 @@ break ;
  expression= first.name;
 break ;
 }
-   auto can_continue=true;
-      while(can_continue    ) {
+      while(true    ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[Expression] Expression ended unexpectedly");
+            if(any ( x.token , {TEof , TNewLine} )    ) {
+                expression+= doing;
+break ;
+}
+            if(any ( x.token , {TNumber , TId} )    ) {
+               
+ expression+= " ";
+}
+            if(x.t.is_do ( )    ) {
+               
+ expression+= "\n";
+}
             switch(x.token    ) {
-               case TEof:
- can_continue=false;
-break ;
-               case TNewLine:
- can_continue=false;
-break ;
+               case TDo:
+ break;
                case TDore:
  doing= ";\nreturn ";
-                expression+= "\n";
 break ;
                case TDobr:
  doing= ";\nbreak ";
-                expression+= "\n";
 break ;
                case TDoco:
  doing= ";\ncontinue ";
-                expression+= "\n";
-break ;
-               case TDo:
- expression+= "\n";
 break ;
                case TDoremi:
- expression+= "\nreturn ";
+ expression+= "return ";
 break ;
                case TLet:
  expression+= "auto";
-break ;
-               case TNumber:
- expression+= " "+ x.name;
-break ;
-               case TId:
- expression+= " "+ x.name;
 break ;
                case TReturn:
  expression+= "return ";
@@ -2160,31 +1976,30 @@ break ;
 break ;
 }
 }
-   expression+= doing;
    return  Expressioner( None< Conditions>(), None< For>(), Some( expression));
 }
 Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
-   auto condition_def= condition_type!= "elif" ? Conditions( condition_type): Conditions( "else if");
+   auto cond= condition_type!= "elif" ? Conditions( condition_type): Conditions( "else if");
    auto expression= ConditionalExpression();
       while(true    ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[Condition] Condition is not closed");
             if(x.t.is_do ( )    ) {
-               condition_def.expressions.push_back( expression);
-               condition_def.lines.push_back( expression_construct( compiler_t, x));
-               return  Expressioner( Some( condition_def), None< For>(), None<string>());
+               cond.add_expr( expression);
+               cond.lines.push_back( expression_construct( compiler_t, x));
+               return  Expressioner( Some( cond), None< For>(), None<string>());
 }
             if(x.t.is_conditional_sep ( )    ) {
                expression.continuation= x.name;
-               condition_def.expressions.push_back( expression);
-               expression= ConditionalExpression();
-               continue;
+               cond.add_expr( expression);
+                expression= ConditionalExpression();
+continue ;
 }
             if(x.t.is_conditional ( )    ) {
                 expression.operator_value= x.name;
 continue ;
 }
             if(x.token  == TNewLine  ) {
-                condition_def.expressions.push_back( expression);
+                cond.add_expr( expression);
 break ;
 }
             if(expression.operator_value.size ( )  == 0  ) {
@@ -2193,30 +2008,29 @@ continue ;
 }
          expression.value_right+= x.name+ " ";
 }
-   auto can_continue=true;
-      while(can_continue    ) {
+      while(true    ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[Condition] Condition is not closed");
+            if(any ( x.token , {TSemiColon , TEof} )    ) {
+               
+ break;
+}
+            if(x.token  == TNewLine  ) {
+               
+ continue;;
+}
             switch(x.token    ) {
                case TCondition:
- condition_def.lines.push_back( condition_construct( compiler_t, x.name));
+ cond.lines.push_back( condition_construct( compiler_t, x.name));
 break ;
                case TFor:
- condition_def.lines.push_back( for_construct( compiler_t));
+ cond.lines.push_back( for_construct( compiler_t));
 break ;
-               case TSemiColon:
- can_continue=false;
-break ;
-               case TEof:
- can_continue=false;
-break ;
-               case TNewLine:
- break;
                default:
- condition_def.lines.push_back( expression_construct( compiler_t, x));
+ cond.lines.push_back( expression_construct( compiler_t, x));
 break ;
 }
 }
-   return  Expressioner( Some( condition_def), None< For>(), None<string>());
+   return  Expressioner( Some( cond), None< For>(), None<string>());
 }
 struct VariableNBool {
  public:
@@ -2231,63 +2045,52 @@ struct VariableNBool {
 };
 Option<string> get_value(Compiler* compiler_t, bool found_setter) {
    string value= EMPTY;
-   auto next= AstToken( "NONE");
-   auto can_continue=true;
       if(! found_setter    ) {
          
  get_eq_or_exit( compiler_t-> next(), "[Variable]: Invalid value setter");
 }
-      while(can_continue    ) {
-         next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid value");
-            switch(next.token    ) {
-               case TNewLine:
- can_continue=false;
-                  if(value.size ( )  == 0  ) {
-                     
-return  None<string>();
+      while(true    ) {
+         auto next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid value");
+            if(next.token  == TNewLine  ) {
+               
+ break;
 }
-               return  Some( value);
-               default:
- value+= next.name;
-break ;
+         value+= next.name;
 }
-}
-   return  None<string>();;
+   return  value.size()== 0 ? None<string>(): Some( value);
 }
 Variable get_type(Compiler* compiler_t) {
    auto next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Function Return Value");
    auto variable= Variable(true);
-      switch(next.token    ) {
-         case TId:
+      if(any ( next.token , {TId , TType} )    ) {
+         
  variable.v_type= next.name;
-break ;
-         case TType:
- variable.v_type= next.name;
-break ;
-         case TNewLine:
- break;
-         default:
+}
+      else if(next.token  != TNewLine  ) {
+         
  display_err_message( "[Variable]: Expected return value type got:\n"+ token_to_string( next.token));
-break ;
 }
    auto tried= try_get( compiler_t-> peek(), TLessThan);
       if(tried    ) {
             if(! variable.has_id ( )    ) {
-               display_err_message( "[Variable]: Variable declaration cannot have template without id:\n"+ variable.v_type);
+               
+ display_err_message( "[Variable]: Variable declaration cannot have template without id:\n"+ variable.v_type);
 }
          next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
          variable.v_type+= next.name;
-         auto can_continue=true;
-            while(can_continue    ) {
+            while(true    ) {
                next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
-                  switch(next.token    ) {
-                     case TMoreThan:
- can_continue=false;
-                     default:
- variable.v_type+= next.name;
-break ;
+               variable.v_type+= next.name;
+                  if(next.token  == TMoreThan  ) {
+                     
+ break;
 }
 }
+}
+   tried= try_get( compiler_t-> peek(), TAsterix);
+      if(tried    ) {
+         
+ variable.v_type+= get_or_exit( compiler_t-> next(), TAsterix, "[Variable] Unexpected error");
 }
    return  variable;
 }
@@ -2298,84 +2101,77 @@ VariableNBool construct_args(Compiler* compiler_t, Option<string> type_name) {
  variable.v_type= type_name.value_or( "void");
 }
    auto is_end=false;
-   auto can_continue=true;
-      while(can_continue    ) {
+      while(true    ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
-            switch(next.token    ) {
-               case TNewLine:
- can_continue=false;
-               case TCoolArrow:
- can_continue=false;
+            if(any ( next.token , {TNewLine , TCoolArrow} )    ) {
                 is_end=true;
 break ;
-               case TEquals:
- can_continue=false;
+}
+            if(next.token  == TEquals  ) {
                 variable.v_value= get_value( compiler_t,true);
 break ;
-               case TComma:
- can_continue=false;
-break ;
-               case TAsterix:
- can_continue=true;
+}
+            else if(next.token  == TComma  ) {
+               
+ break;
+}
+            else if(next.token  == TAsterix  ) {
                   if(! variable.has_type ( )    ) {
-                     display_err_message( "[Variable]: Pointer infront of type not allowed:\n"+ variable.v_type);
+                     
+ display_err_message( "[Variable]: Pointer infront of type not allowed:\n"+ variable.v_type);
 }
-                variable.v_type+= next.name;
-break ;
-               case TLessThan:
- can_continue=true;
+               variable.v_type+= next.name;
+}
+            else if(next.token  == TLessThan  ) {
                   if(! variable.has_id ( )    &&! variable.has_type ( )    ) {
-                     display_err_message( "[Variable]: Variable declaration cannot have template without id and type:\n"+ variable.v_type);
+                     
+ display_err_message( "[Variable]: Variable declaration cannot have template without id and type:\n"+ variable.v_type);
 }
-               variable.v_type+= "<";
+               variable.v_type+= next.name;
                   while(true    ) {
                      next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
-                        if(next.token  == TMoreThan  ) {
-                           variable.v_type+= ">";
-                           break;
-}
                      variable.v_type+= next.name;
+                        if(next.token  == TMoreThan  ) {
+                           
+ break;
 }
-               break;
-               default:
- can_continue=true;
+}
+}
+            else {
                   if(! variable.has_type ( )    ) {
                       variable.v_type= next.name;
-break ;
+continue ;
 }
                   if(! variable.has_id ( )    ) {
                       variable.id= next.name;
-break ;
+continue ;
 }
                display_err_message( "[Variable]: Variable declaration already complete:\n"+ variable.id);
-               break;
 }
 }
       if(! variable.has_minimum ( )    &&! is_end    ) {
-         display_err_message( "[Variable]: Variable declaration incomplete:\n"+ variable.id);
+         
+ display_err_message( "[Variable]: Variable declaration incomplete:\n"+ variable.id);
 }
    return  VariableNBool( variable, is_end);
 }
 vector<string> template_construct(Compiler* compiler_t) {
    vector<string> templates= {};
-   auto can_continue=true;
-      while(can_continue    ) {
+      while(true    ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Template]: Template declaration invalid");
-            switch(next.token    ) {
-               case TId:
- templates.push_back( next.name);
-break ;
-               case TComma:
+            if(next.token  == TMoreThan  ) {
+               
  break;
-               case TLessThan:
- break;
-               case TMoreThan:
- can_continue=false;
-break ;
-               default:
- display_err_message( "[Template]: Token not allowed: "+ next.name);
-break ;
 }
+            if(next.token  == TId  ) {
+               
+ templates.push_back( next.name);
+}
+            if(any ( next.token , {TComma , TLessThan , TId} )    ) {
+               
+ continue;
+}
+         display_err_message( "[Template]: Token not allowed: "+ next.name);
 }
    return  templates;
 }
@@ -2419,15 +2215,15 @@ Function function_construct(Compiler* compiler_t, VariableState variable_state, 
                
  break;
 }
-         function.arguments.push_back( vnb.variable);
+         function.add_args( vnb.variable);
             if(vnb.is_end    ) {
                
  break;
 }
 }
       if(function.id  == "main"  ) {
-         function.arguments.push_back( Variable( "argc", "int", None<string>(), Private_State));
-         function.arguments.push_back( Variable( "argv[]", "char*", None<string>(), Private_State));
+         function.add_args( Variable( "argc", "int", None<string>(), Private_State));
+         function.add_args( Variable( "argv[]", "char*", None<string>(), Private_State));
          function.return_value= Some( Variable( "", "int", None<string>(), Private_State));
 }
       else {
@@ -2437,35 +2233,33 @@ Function function_construct(Compiler* compiler_t, VariableState variable_state, 
    auto can_continue=true;
       while(can_continue    ) {
          auto x= get_next_or_exit( compiler_t-> next(), "Function is not closed "+ function.id);
+            if(any ( x.token , {TSemiColon , TFunction , TEof} )    ) {
+               
+ break;
+}
+            if(x.token  == TNewLine  ) {
+               
+ continue;
+}
             switch(x.token    ) {
                case TFor:
- function.expressions.push_back( for_construct( compiler_t));
+ function.add_expr( for_construct( compiler_t));
 break ;
                case TCondition:
- function.expressions.push_back( condition_construct( compiler_t, x.name));
+ function.add_expr( condition_construct( compiler_t, x.name));
 break ;
-               case TSemiColon:
- can_continue=false;
-break ;
-               case TFunction:
- can_continue=false;
-break ;
-               case TEof:
- can_continue=false;
-break ;
-               case TNewLine:
- break;
                default:
- function.expressions.push_back( expression_construct( compiler_t, x));
-                  if(x.t.is_do ( )    ) {
-                     
- can_continue=false;
+ function.add_expr( expression_construct( compiler_t, x));
+break ;
 }
-               break;
+            if(x.t.is_do ( )    ) {
+               
+ break;
 }
 }
       if(function.id  == "main"  ) {
-         function.expressions.push_back( Expressioner( None< Conditions>(), None< For>(), Some((string) "return 0")));
+         
+ function.add_expr( Expressioner( None< Conditions>(), None< For>(), Some((string) "return 0")));
 }
    // validate_function( function, compiler_t);
    compiler_t-> add_fn( function);
@@ -2475,7 +2269,8 @@ void class_validate(Class class_def, Compiler* compiler_t) {
    // Check Duplicate Classes;
    auto contains= compiler_t-> contains_class( class_def.id);
       if(contains    ) {
-         display_err_message( "Duplicate instances of: "+ class_def.id);
+         
+ display_err_message( "Duplicate instances of: "+ class_def.id);
 }
    // Check Inheritance;
    contains= compiler_t-> contains_class( class_def.inherit.value_or( EMPTY));
@@ -2505,21 +2300,16 @@ break ;
 }
    // Construct inner Class values;
    auto variable_state=! is_struct ? Private_State: Public_State;
-   auto can_continue=true;
    auto vnb= VariableNBool( Variable(true),false);
    auto function= Function( variable_state);
-      while(can_continue    ) {
+   auto a= 0;
+      while(true    ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[ClassError] Class is not closed "+ class_def.id);
+            if(any ( next.token , {TEof , TSemiColon , TClass} )    ) {
+               
+ break;
+}
             switch(next.token    ) {
-               case TEof:
- can_continue=false;
-break ;
-               case TSemiColon:
- can_continue=false;
-break ;
-               case TClass:
- can_continue=false;
-break ;
                case TPrivate:
  variable_state= Private_State;
 break ;
@@ -2531,22 +2321,22 @@ break ;
 break ;
                case TFunction:
  function= function_construct( compiler_t, variable_state,false);
-               class_def.functions.push_back( function);
-               break;
+                class_def.functions.push_back( function);
+break ;
                case TId:
- can_continue=true;
+ a= 0;
                   if(next.name  == class_def.id  ) {
                      auto function= function_construct( compiler_t, Public_State,true);
                      function.return_value= Some( Variable( EMPTY, class_def.id, None<string>(), Private_State));
-                     class_def.functions.push_back( function);
-                     break;
+                      class_def.functions.push_back( function);
+break ;
 }
                vnb= construct_args( compiler_t, Some( next.name));
                vnb.variable.variable_state= variable_state;
                 class_def.variables.push_back( vnb.variable);
 break ;
-               case TType:;
-               vnb= construct_args( compiler_t, Some( next.name));
+               case TType:
+ vnb= construct_args( compiler_t, Some( next.name));
                vnb.variable.variable_state= variable_state;
                 class_def.variables.push_back( vnb.variable);
 break ;
@@ -2591,51 +2381,54 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
    auto content= get_content( paths);
    auto ast= ast_create( content);
    auto compiler_t= Compiler( p, ast);
-   auto can_continue=true;
-   auto a= 0;
-   auto class_def= Class();
-   auto function= Function( Private_State);
-   auto enum_def= Enum( "NONE");
    vector<string> incs= {};
    string args= EMPTY;
-      while(can_continue    ) {
+      while(true    ) {
          auto next= get_next_or_exit( compiler_t.next(), "Compiler failed to do unexpected EOF");
             if(! next.t.is_base ( )    ) {
-               display_err_message( "Token not allowed in base: "+ next.name+ ", Type: "+ token_to_string( next.token));
+               
+ display_err_message( "Token not allowed in base: "+ next.name+ ", Type: "+ token_to_string( next.token));
 }
-            switch(next.token    ) {
-               case TStruct:
- class_def= class_construct( &compiler_t,true);
-                output+= class_def.to_cpp();
-break ;
-               case TClass:
- class_def= class_construct( &compiler_t,false);
-                output+= class_def.to_cpp();
-break ;
-               case TFunction:
- function= function_construct( &compiler_t, Public_State,false);
-                output+= function.to_cpp(false);
-break ;
-               case TEnum:
- enum_def= enums_construct( &compiler_t);
-                output+= enum_def.to_cpp();
-break ;
-               case TInclude:
- incs= imports_creation( &compiler_t, next);
+            if(next.token  == TEof  ) {
+               
+ break;
+}
+            else if(next.token  == TNewLine  ) {
+               
+ continue;
+}
+            else if(next.token  == TStruct  ) {
+               
+ output+= class_construct( &compiler_t,true) .to_cpp();
+}
+            else if(next.token  == TClass  ) {
+               
+ output+= class_construct( &compiler_t,false) .to_cpp();
+}
+            else if(next.token  == TFunction  ) {
+               
+ output+= function_construct( &compiler_t, Public_State,false) .to_cpp(false);
+}
+            else if(next.token  == TEnum  ) {
+               
+ output+= enums_construct( &compiler_t) .to_cpp();
+}
+            else if(next.token  == TInclude  ) {
+               incs= imports_creation( &compiler_t, next);
                   for(int i = 0; i < incs.size(); i++) {
                      
  output+= Include( incs.at( i)) .to_cpp();
 }
-               break;
-               case TUse:
- incs= imports_creation( &compiler_t, next);
+}
+            else if(next.token  == TUse  ) {
+               incs= imports_creation( &compiler_t, next);
                   for(int i = 0; i < incs.size(); i++) {
                      
  output+= Uses( incs.at( i)) .to_cpp();
 }
-               break;
-               case TGet:
- incs= imports_creation( &compiler_t, next);
+}
+            else if(next.token  == TGet  ) {
+               incs= imports_creation( &compiler_t, next);
                   for(int i = 0; i < incs.size(); i++) {
                      FpFn fpfn= get_folder_and_name( paths.folder_path+ incs.at( i)+ HA_SUFFIX);
                      auto get_path= CompilerPath( paths.folder_path+ incs.at( i)+ HA_SUFFIX, fpfn.f_p, fpfn.f_n);
@@ -2643,21 +2436,15 @@ break ;
                      output+= get_out.output;
                      compiler_t.add_args( get_out.arguments);
 }
-               break;
-               case TCompiler:
- a= 0;
+}
+            else if(next.token  == TCompiler  ) {
                get_arrow_or_exit( compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: "+ next.name);
                args= get_id_or_exit( compiler_t.next(), "[Compiler] Missing value of compiler intent [Token::Id]: "+ next.name);
-                compiler_t.add_arg( args);
-break ;
-               case TNewLine:
- break;
-               case TEof:
- can_continue=false;
-break ;
-               default:
+               compiler_t.add_arg( args);
+}
+            else {
+               
  display_err_message( "Token not handled: "+ next.name);
-break ;
 }
 }
    validate_compiled( compiler_t, is_main);

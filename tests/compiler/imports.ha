@@ -12,23 +12,15 @@ fn imports_construct Compiler *compiler_t => vector<string>
     vector<string> imports = {}
     get_arrow_or_exit(compiler_t->next(), "[Import]: Missing [=>] in declaration")
     string id = EMPTY
-    let can_continue = true
-    while can_continue
+    while true
         let next = get_next_or_exit(compiler_t->next(), "[Import]: Import declaration invalid")
-        switch next.token
-            case TEof: do can_continue = false
-            case TNewLine: do can_continue = false
-                if !imports_check_duplicate(imports, id) do imports.push_back(id)
-                break
-            case TComma: do can_continue = true
-                if !imports_check_duplicate(imports, id) do imports.push_back(id)
-                id = EMPTY
-                break;
-            default: do can_continue = true
-                if next.t.is_base() do display_err_message("[Import]: Token not allowed: " + next.name)
-                id += next.name
-                break
+        if any(next.token, {TEof, TNewLine, TComma})
+            if !imports_check_duplicate(imports, id) do imports.push_back(id)
+            id = EMPTY
         ;
+        elif next.t.is_base() do display_err_message("[Import]: Token not allowed: " + next.name)
+        else do id += next.name
+        if any(next.token, {TEof, TNewLine}) do break
     ;
     return imports
 ;

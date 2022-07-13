@@ -24,33 +24,28 @@ fn function_construct Compiler *compiler_t, VariableState variable_state, bool c
     while true
         let vnb = construct_args(compiler_t, None<string>())
         if !vnb.variable.has_minimum() do break
-        function.arguments.push_back(vnb.variable)
+        function.add_args(vnb.variable)
         if vnb.is_end do break
     ;
     if function.id == "main"
-        function.arguments.push_back(Variable("argc", "int", None<string>(), Private_State))
-        function.arguments.push_back(Variable("argv[]", "char*", None<string>(), Private_State))
+        function.add_args(Variable("argc", "int", None<string>(), Private_State))
+        function.add_args(Variable("argv[]", "char*", None<string>(), Private_State))
         function.return_value = Some(Variable("", "int", None<string>(), Private_State))
     ;
     else do function.return_value = Some(get_type(compiler_t))
     let can_continue = true
     while can_continue
         let x = get_next_or_exit(compiler_t->next(), "Function is not closed " + function.id)
+        if any(x.token, {TSemiColon, TFunction, TEof}) do break
+        if x.token == TNewLine do continue
         switch x.token 
-            case TFor: dobr function.expressions.push_back(for_construct(compiler_t))
-            case TCondition: dobr function.expressions.push_back(condition_construct(compiler_t, x.name))
-            case TSemiColon: dobr can_continue = false
-            case TFunction: dobr can_continue = false
-            case TEof: dobr can_continue = false
-            case TNewLine: do break
-            default: do function.expressions.push_back(expression_construct(compiler_t, x))
-                if x.t.is_do() do can_continue = false
-                break
+            case TFor: dobr function.add_expr(for_construct(compiler_t))
+            case TCondition: dobr function.add_expr(condition_construct(compiler_t, x.name))
+            default: dobr function.add_expr(expression_construct(compiler_t, x))
         ;
+        if x.t.is_do() do break
     ;
-    if function.id == "main"
-        function.expressions.push_back(Expressioner(None<Conditions>(), None<For>(), Some((string)"return 0")))
-    ;
+    if function.id == "main" do function.add_expr(Expressioner(None<Conditions>(), None<For>(), Some((string)"return 0")))
     // validate_function(function, compiler_t)
     compiler_t->add_fn(function)
     return function

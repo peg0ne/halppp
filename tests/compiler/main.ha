@@ -36,50 +36,41 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
     let content = get_content(paths)
     let ast = ast_create(content)
     let compiler_t = Compiler(p, ast)
-    let can_continue = true
-    let a = 0
-    let class_def = Class()
-    let function = Function(Private_State)
-    let enum_def = Enum("NONE")
     vector<string> incs = {}
     string args = EMPTY
-    while can_continue
+    while true
         let next = get_next_or_exit(compiler_t.next(), "Compiler failed to do unexpected EOF")
-        if !next.t.is_base()
-            display_err_message("Token not allowed in base: " + next.name + ", Type: " + token_to_string(next.token))
+        if !next.t.is_base() do display_err_message("Token not allowed in base: " + next.name + ", Type: " + token_to_string(next.token))
+        if next.token == TEof do break
+        elif next.token == TNewLine do continue
+        elif next.token == TStruct do output += class_construct(&compiler_t, true).to_cpp()
+        elif next.token == TClass do output += class_construct(&compiler_t, false).to_cpp()
+        elif next.token == TFunction do output += function_construct(&compiler_t, Public_State, false).to_cpp(false)
+        elif next.token == TEnum do output += enums_construct(&compiler_t).to_cpp()
+        elif next.token == TInclude
+            incs = imports_creation(&compiler_t, next)
+            for i until incs.size() do output += Include(incs.at(i)).to_cpp()
         ;
-        switch next.token
-            case TStruct: do class_def = class_construct(&compiler_t, true)
-                dobr output += class_def.to_cpp()
-            case TClass: do class_def = class_construct(&compiler_t, false)
-                dobr output += class_def.to_cpp()
-            case TFunction: do function = function_construct(&compiler_t, Public_State, false)
-                dobr output += function.to_cpp(false)
-            case TEnum: do enum_def = enums_construct(&compiler_t)
-                dobr output += enum_def.to_cpp()
-            case TInclude: do incs = imports_creation(&compiler_t, next)
-                for i until incs.size() do output += Include(incs.at(i)).to_cpp()
-                break
-            case TUse: do incs = imports_creation(&compiler_t, next)
-                for i until incs.size() do output += Uses(incs.at(i)).to_cpp()
-                break
-            case TGet: do incs = imports_creation(&compiler_t, next)
-                for i until incs.size()
-                    FpFn fpfn = get_folder_and_name(paths.folder_path + incs.at(i) + HA_SUFFIX)
-                    let get_path = CompilerPath(paths.folder_path + incs.at(i) + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
-                    let get_out = compile(get_path, compiler_t.program, false)
-                    output += get_out.output
-                    compiler_t.add_args(get_out.arguments)
-                ;
-                break
-            case TCompiler: do a = 0
-                get_arrow_or_exit(compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: " + next.name)
-                args = get_id_or_exit(compiler_t.next(), "[Compiler] Missing value of compiler intent [Token::Id]: " + next.name)
-                dobr compiler_t.add_arg(args)
-            case TNewLine: do break
-            case TEof: dobr can_continue = false
-            default: dobr display_err_message("Token not handled: " + next.name)
+        elif next.token == TUse
+            incs = imports_creation(&compiler_t, next)
+            for i until incs.size() do output += Uses(incs.at(i)).to_cpp()
         ;
+        elif next.token == TGet
+            incs = imports_creation(&compiler_t, next)
+            for i until incs.size()
+                FpFn fpfn = get_folder_and_name(paths.folder_path + incs.at(i) + HA_SUFFIX)
+                let get_path = CompilerPath(paths.folder_path + incs.at(i) + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
+                let get_out = compile(get_path, compiler_t.program, false)
+                output += get_out.output
+                compiler_t.add_args(get_out.arguments)
+            ;
+        ;
+        elif next.token == TCompiler
+            get_arrow_or_exit(compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: " + next.name)
+            args = get_id_or_exit(compiler_t.next(), "[Compiler] Missing value of compiler intent [Token::Id]: " + next.name)
+            compiler_t.add_arg(args)
+        ;
+        else do display_err_message("Token not handled: " + next.name)
     ;
     validate_compiled(compiler_t, is_main)
     return CompileOutput(output, compiler_t.arguments)
