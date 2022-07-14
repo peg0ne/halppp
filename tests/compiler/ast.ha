@@ -81,18 +81,6 @@ fn ast_create string content => vector<AstToken>
             if is_str_tokens(id + ch) doco id += ch
         ;
         if is_char_token(c)
-            let dbl_less = id != "<" && c == '<'
-            let dbl_more = id != ">" && c == '>'
-            let dbl_eq = id != "=" && c == '='
-            if dbl_less || dbl_more || dbl_eq
-                let dbl = try_get_dbl(&peekable, c)
-                if dbl.is_some()
-                    id = try_add_token(id, &ast)
-                    doco try_add_token(dbl.value_or(EMPTY), &ast)
-                ;
-            ;
-        ;
-        if is_char_token(c)
             id = try_add_token(id, &ast)
             let next = peekable.peek().value_or(' ')
             let is_cool = c == '=' && next == '>'

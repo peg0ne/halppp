@@ -65,13 +65,18 @@ enum Token =>
     TUntil,
     TUse,
     TEnum,
+    TString,
+    TChar,
     UNKNOWN,
 ;
 
 struct Token_t
     Token t = TId
     Token_t string s =>
-        if s == TOKEN_SUB dore t = TSub
+        let S = String(s)
+        if S.starts_with(QUOTE) dore t = TString
+        elif S.starts_with("'") dore t = TChar
+        elif s == TOKEN_SUB dore t = TSub
         elif s == TOKEN_COMMA dore t = TComma
         elif s == TOKEN_COLON dore t = TColon
         elif s == TOKEN_SEMICOLON dore t = TSemiColon
