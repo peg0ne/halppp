@@ -24,7 +24,7 @@ impl Function {
             template: vec![],
         }
     }
-    pub fn to_cpp(self: &Function, in_class: bool) -> String {
+    pub fn to_cpp_start(self: &Function, in_class: bool) -> String {
         let mut function = String::new();
         if self.template.len() > 0 {
             function.push_str("template <");
@@ -63,10 +63,20 @@ impl Function {
             }
             i += 1;
         }
+        function
+    }
+    pub fn to_cpp_h(self: &Function, in_class: bool) -> String {
+        let mut function = self.to_cpp_start(in_class);
+        function.push_str(");\n");
+        function
+    }
+    pub fn to_cpp(self: &Function, in_class: bool) -> String {
+        let mut function = self.to_cpp_start(in_class);
         function.push_str(") {\n");
         for expr in self.expressions.iter() {
             function.push_str(expr.to_cpp(1).as_str());
         }
+        let spacing = if in_class { "    " } else { "" };
         function.push_str(format!("{}}}\n", spacing).as_str());
         function
     }

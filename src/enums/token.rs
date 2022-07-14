@@ -146,6 +146,7 @@ impl Token {
             "until" => Token::Until,
             "use" => Token::Use,
             "while" => Token::Condition,
+            "loop" => Token::Condition,
             _ => Token::Id,
         }
     }

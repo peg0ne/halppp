@@ -1,6 +1,107 @@
 #include <string>
 #include <vector>
 using namespace std;
+#include <iostream>
+using namespace std;
+#include <vector>
+#include <iostream>
+using namespace std;
+#include "cpp/strings.h"
+#include "cpp/tokens.h"
+#include <fstream>
+template <typename T>
+struct Option;
+template <typename T>
+struct Peekable;
+enum Token: int;
+struct Token_t;
+enum VariableState: int;
+struct AstToken;
+struct CompilerPath;
+enum MessageSeverity: int;
+struct FpFn;
+struct Variable;
+struct EnumValue;
+struct Enum;
+struct Include;
+struct Uses;
+struct Get;
+struct Global;
+struct Struct;
+struct For;
+struct ConditionalExpression;
+struct Conditions;
+struct Expressioner;
+struct Function;
+struct Class;
+struct Program;
+struct Compiler;
+struct VariableNBool;
+struct CompileOutput;
+template <typename T>
+Option<T> Some(T value);
+template <typename T>
+Option<T> None();
+template <typename T>
+void print(T s);
+template <typename T>
+void println(T s);
+string replace_string(string str, string from, string to);
+bool starts_with(string str, string start);
+template <typename T>
+bool any(T value, vector<T> values);
+template <typename T>
+bool all(T value, vector<T> values);
+template <typename T>
+bool none(T value, vector<T> values);
+template <typename T>
+bool over(T value, vector<T> values);
+template <typename T>
+bool under(T value, vector<T> values);
+string token_to_string(Token t);
+string variable_state_to_cpp(VariableState self);
+void display_message(MessageSeverity severity, string msg);
+void display_hint_message(string msg);
+void display_err_message(string msg);
+AstToken get_next_or_exit(Option<AstToken> next, string s);
+bool try_get(Option<AstToken> peek, Token token);
+string get_or_exit(Option<AstToken> next, Token token, string s);
+string get_id_or_exit(Option<AstToken> next, string s);
+string get_arrow_or_exit(Option<AstToken> next, string s);
+string get_eq_or_exit(Option<AstToken> next, string s);
+FpFn get_folder_and_name(string file_path);
+string get_file_path(int argc, char** argv);
+string get_content(CompilerPath paths);
+void write_program(string program, CompilerPath paths);
+void compile_program(CompilerPath paths, vector<string> arguments, bool should_remove_cpp);
+string expr_to_cpp(Expressioner* self, int indentation);
+string try_add_token(string id, vector<AstToken>* ast);
+bool is_char_token(char ch);
+bool is_char_number(char ch);
+Option<string> try_get_dbl(Peekable<char>* peekable, char ch);
+string get_matching(Peekable<char>* peekable, char ch);
+string collect_num(Peekable<char>* peekable, char ch);
+vector<AstToken> ast_create(string content);
+bool imports_check_duplicate(vector<string> imports, string id);
+vector<string> imports_construct(Compiler* compiler_t);
+vector<string> imports_creation(Compiler* compiler_t, AstToken next);
+void validate_enum(Enum enumerator, Compiler* compiler_t);
+Enum enums_construct(Compiler* compiler_t);
+Expressioner for_construct(Compiler* compiler_t);
+Expressioner expression_construct(Compiler* compiler_t, AstToken first);
+Expressioner condition_construct(Compiler* compiler_t, string condition_type);
+Option<string> get_value(Compiler* compiler_t, bool found_setter);
+Variable get_type(Compiler* compiler_t);
+VariableNBool construct_args(Compiler* compiler_t, Option<string> type_name);
+vector<string> template_construct(Compiler* compiler_t);
+void validate_function(Function function, Compiler* compiler_t);
+Function function_construct(Compiler* compiler_t, VariableState variable_state, bool constructor);
+void class_validate(Class class_def, Compiler* compiler_t);
+Class class_construct(Compiler* compiler_t, bool is_struct);
+int main(int argc, char* argv[]);
+CompileOutput compile_main(CompilerPath paths, Program p);
+CompileOutput compile(CompilerPath paths, Program p, bool is_main);
+void validate_compiled(Compiler compiler, bool is_main);
 template <typename T>
 struct Option {
  private:
@@ -101,8 +202,6 @@ return ! is_end() ? at( _index++): None< T>();
 return ! is_end() ? at( _index): None< T>();
    }
 };
-#include <iostream>
-using namespace std;
 template <typename T>
 void print(T s) {
    
@@ -127,9 +226,6 @@ bool starts_with(string str, string start) {
    
 return  str.rfind( start, 0)== 0;
 }
-#include <vector>
-#include <iostream>
-using namespace std;
 template <typename T>
 bool any(T value, vector<T> values) {
       for(int i = 0; i < values.size(); i++) {
@@ -188,9 +284,7 @@ return false;
 }
    return true;
 }
-#include "cpp/strings.h"
-#include "cpp/tokens.h"
-enum Token {
+enum Token: int {
    TAllEquals,
    TAllLessOrEquals,
    TAllLessThan,
@@ -486,7 +580,7 @@ return ;
  t= TEnum;
 return ;
 }
-         else if(any ( s , {TOKEN_SWITCH , TOKEN_WHILE} )    ) {
+         else if(any ( s , {TOKEN_SWITCH , TOKEN_WHILE , TOKEN_LOOP} )    ) {
             
  t= TCondition;
 return ;
@@ -890,7 +984,7 @@ return  "TCondition";
 }
    return  "TId";
 }
-enum VariableState {
+enum VariableState: int {
    Private_State,
    Protected_State,
    Public_State,
@@ -962,7 +1056,7 @@ struct CompilerPath {
       this-> current= f_p+ f_n;
    }
 };
-enum MessageSeverity {
+enum MessageSeverity: int {
    Hint,
    Error,
 };
@@ -1049,7 +1143,6 @@ break ;
    file_name= reversed;
    return  FpFn( folder_path, file_name);
 }
-#include <fstream>
 string get_file_path(int argc, char** argv) {
       if(argc  < 2  ) {
          
@@ -1172,8 +1265,18 @@ struct Enum {
       this-> name= enum_name;
    }
  public:
+   string to_cpp_start() {
+      
+return  ENUM+ name+ ": int";
+   }
+ public:
+   string to_cpp_h() {
+      
+return  to_cpp_start()+ LINE_END;
+   }
+ public:
    string to_cpp() {
-      string enum_str= ENUM+ name+ BLOCK_START;
+      string enum_str= to_cpp_start()+ BLOCK_START;
          for(int i = 0; i < enums.size(); i++) {
             auto e= enums.at( i);
             enum_str+= TAB+ e.name;
@@ -1394,7 +1497,7 @@ struct Function {
  expressions.push_back( expr);
    }
  public:
-   string to_cpp(bool in_class) {
+   string to_cpp_start(bool in_class) {
       string fun_str= templates.size()> 0 ? TEMPLATE: EMPTY;
          for(int i = 0; i < templates.size(); i++) {
             fun_str+= templates.at( i);
@@ -1407,7 +1510,18 @@ struct Function {
             fun_str+= arguments.at( i) .to_cpp( EMPTY, EMPTY);
             fun_str+= i+ 1< arguments.size() ? ARG_SEP: EMPTY;
 }
-      fun_str+= ARG_END;
+      fun_str+= RPAREN;
+      return  fun_str;
+   }
+ public:
+   string to_cpp_h() {
+      
+return  to_cpp_start(false)+ LINE_END;
+   }
+ public:
+   string to_cpp(bool in_class) {
+      string fun_str= to_cpp_start( in_class);
+      fun_str+= BLOCK_START;
          for(int i = 0; i < expressions.size(); i++) {
             
  fun_str+= expressions.at( i) .to_cpp( 1+ in_class);
@@ -1434,7 +1548,7 @@ struct Class {
  public:
    vector<string> templates = {};
  public:
-   string to_cpp() {
+   string to_cpp_start() {
       string class_str= templates.size()> 0 ? TEMPLATE: EMPTY;
          for(int i = 0; i < templates.size(); i++) {
             class_str+= templates.at( i);
@@ -1444,6 +1558,16 @@ struct Class {
       class_str+= id;
       class_str+= inherit.is_some() ? INHERIT: EMPTY;
       class_str+= inherit.value_or( EMPTY);
+      return  class_str;
+   }
+ public:
+   string to_cpp_h() {
+      
+return  to_cpp_start()+ LINE_END;
+   }
+ public:
+   string to_cpp() {
+      string class_str= to_cpp_start();
       class_str+= BLOCK_START;
          for(int i = 0; i < variables.size(); i++) {
             auto v= variables.at( i);
@@ -1979,8 +2103,16 @@ break ;
    return  Expressioner( None< Conditions>(), None< For>(), Some( expression));
 }
 Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
-   auto cond= condition_type!= "elif" ? Conditions( condition_type): Conditions( "else if");
+   auto cond= Conditions( condition_type);
    auto expression= ConditionalExpression();
+      if(condition_type  == "elif"  ) {
+         
+ cond= Conditions( "else if");
+}
+      if(condition_type  == "loop"  ) {
+         cond= Conditions( "while");
+         expression.value_left= "true";
+}
       while(true    ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[Condition] Condition is not closed");
             if(x.t.is_do ( )    ) {
@@ -2350,13 +2482,121 @@ struct CompileOutput {
  public:
    string output = EMPTY;
  public:
+   string includes = EMPTY;
+ public:
+   string headers = EMPTY;
+ public:
+   string fnheaders = EMPTY;
+ public:
    vector<string> arguments = {};
  public:
-   CompileOutput (string output, vector<string> arguments) {
+   string content() {
+      
+return  includes+ headers+ fnheaders+ output;
+   }
+ public:
+   CompileOutput (string output, string includes, string headers, string fnheaders, vector<string> arguments) {
       this-> output= output;
+      this-> includes= includes;
+      this-> headers= headers;
+      this-> fnheaders= fnheaders;
       this-> arguments= arguments;
    }
 };
+int main(int argc, char* argv[]) {
+   auto should_remove_cpp=false;
+   FpFn fpfn= get_folder_and_name( get_file_path( argc, argv));
+   auto paths= CompilerPath( get_file_path( argc, argv), fpfn.f_p, fpfn.f_n);
+   auto p= Program();
+   auto output= compile_main( paths, p);
+   write_program( output.content(), paths);
+   compile_program( paths, output.arguments, should_remove_cpp);
+   return 0;
+}
+CompileOutput compile_main(CompilerPath paths, Program p) {
+   
+return  compile( paths, p,true);
+}
+CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
+   println( "compiling: "+ paths.current);
+   string output= EMPTY;
+   string includes= EMPTY;
+   string headers= EMPTY;
+   string fnheaders= EMPTY;
+   auto content= get_content( paths);
+   auto ast= ast_create( content);
+   auto compiler_t= Compiler( p, ast);
+   vector<string> incs= {};
+   string args= EMPTY;
+      while(true   ) {
+         auto next= get_next_or_exit( compiler_t.next(), "Compiler failed to do unexpected EOF");
+            if(! next.t.is_base ( )    ) {
+               
+ display_err_message( "Token not allowed in base: "+ next.name+ ", Type: "+ token_to_string( next.token));
+}
+            if(next.token  == TEof  ) {
+               
+ break;
+}
+            else if(next.token  == TNewLine  ) {
+               
+ continue;
+}
+            else if(any ( next.token , {TStruct , TClass} )    ) {
+               auto classdef= class_construct( &compiler_t, next.token== TStruct);
+               output+= classdef.to_cpp();
+               headers+= classdef.to_cpp_h();
+}
+            else if(next.token  == TFunction  ) {
+               auto fndef= function_construct( &compiler_t, Public_State,false);
+               output+= fndef.to_cpp(false);
+               fnheaders+= fndef.to_cpp_h();
+}
+            else if(next.token  == TEnum  ) {
+               auto enumdef= enums_construct( &compiler_t);
+               output+= enumdef.to_cpp();
+               headers+= enumdef.to_cpp_h();
+}
+            else if(next.token  == TInclude  ) {
+               incs= imports_creation( &compiler_t, next);
+                  for(int i = 0; i < incs.size(); i++) {
+                     
+ includes+= Include( incs.at( i)) .to_cpp();
+}
+}
+            else if(next.token  == TUse  ) {
+               incs= imports_creation( &compiler_t, next);
+                  for(int i = 0; i < incs.size(); i++) {
+                     
+ includes+= Uses( incs.at( i)) .to_cpp();
+}
+}
+            else if(next.token  == TGet  ) {
+               incs= imports_creation( &compiler_t, next);
+                  for(int i = 0; i < incs.size(); i++) {
+                     FpFn fpfn= get_folder_and_name( paths.folder_path+ incs.at( i)+ HA_SUFFIX);
+                     auto get_path= CompilerPath( paths.folder_path+ incs.at( i)+ HA_SUFFIX, fpfn.f_p, fpfn.f_n);
+                     auto get_out= compile( get_path, compiler_t.program,false);
+                     output+= get_out.output;
+                     includes+= get_out.includes;
+                     headers+= get_out.headers;
+                     fnheaders+= get_out.fnheaders;
+                     compiler_t.add_args( get_out.arguments);
+}
+}
+            else if(next.token  == TCompiler  ) {
+               get_arrow_or_exit( compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: "+ next.name);
+               args= get_id_or_exit( compiler_t.next(), "[Compiler] Missing value of compiler intent [Token::Id]: "+ next.name);
+               compiler_t.add_arg( args);
+}
+            else {
+               
+ display_err_message( "Token not handled: "+ next.name);
+}
+}
+   validate_compiled( compiler_t, is_main);
+   return  CompileOutput( output, includes, headers, fnheaders, compiler_t.arguments);
+}
 void validate_compiled(Compiler compiler, bool is_main) {
    auto has_main=false;
       for(int i = 0; i < compiler.program.functions.size(); i++) {
@@ -2374,93 +2614,4 @@ break ;
          
  display_hint_message( "Main function not in main file");
 }
-}
-CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
-   println( "compiling: "+ paths.current);
-   string output= EMPTY;
-   auto content= get_content( paths);
-   auto ast= ast_create( content);
-   auto compiler_t= Compiler( p, ast);
-   vector<string> incs= {};
-   string args= EMPTY;
-      while(true    ) {
-         auto next= get_next_or_exit( compiler_t.next(), "Compiler failed to do unexpected EOF");
-            if(! next.t.is_base ( )    ) {
-               
- display_err_message( "Token not allowed in base: "+ next.name+ ", Type: "+ token_to_string( next.token));
-}
-            if(next.token  == TEof  ) {
-               
- break;
-}
-            else if(next.token  == TNewLine  ) {
-               
- continue;
-}
-            else if(next.token  == TStruct  ) {
-               
- output+= class_construct( &compiler_t,true) .to_cpp();
-}
-            else if(next.token  == TClass  ) {
-               
- output+= class_construct( &compiler_t,false) .to_cpp();
-}
-            else if(next.token  == TFunction  ) {
-               
- output+= function_construct( &compiler_t, Public_State,false) .to_cpp(false);
-}
-            else if(next.token  == TEnum  ) {
-               
- output+= enums_construct( &compiler_t) .to_cpp();
-}
-            else if(next.token  == TInclude  ) {
-               incs= imports_creation( &compiler_t, next);
-                  for(int i = 0; i < incs.size(); i++) {
-                     
- output+= Include( incs.at( i)) .to_cpp();
-}
-}
-            else if(next.token  == TUse  ) {
-               incs= imports_creation( &compiler_t, next);
-                  for(int i = 0; i < incs.size(); i++) {
-                     
- output+= Uses( incs.at( i)) .to_cpp();
-}
-}
-            else if(next.token  == TGet  ) {
-               incs= imports_creation( &compiler_t, next);
-                  for(int i = 0; i < incs.size(); i++) {
-                     FpFn fpfn= get_folder_and_name( paths.folder_path+ incs.at( i)+ HA_SUFFIX);
-                     auto get_path= CompilerPath( paths.folder_path+ incs.at( i)+ HA_SUFFIX, fpfn.f_p, fpfn.f_n);
-                     auto get_out= compile( get_path, compiler_t.program,false);
-                     output+= get_out.output;
-                     compiler_t.add_args( get_out.arguments);
-}
-}
-            else if(next.token  == TCompiler  ) {
-               get_arrow_or_exit( compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: "+ next.name);
-               args= get_id_or_exit( compiler_t.next(), "[Compiler] Missing value of compiler intent [Token::Id]: "+ next.name);
-               compiler_t.add_arg( args);
-}
-            else {
-               
- display_err_message( "Token not handled: "+ next.name);
-}
-}
-   validate_compiled( compiler_t, is_main);
-   return  CompileOutput( output, compiler_t.arguments);
-}
-CompileOutput compile_main(CompilerPath paths, Program p) {
-   
-return  compile( paths, p,true);
-}
-int main(int argc, char* argv[]) {
-   auto should_remove_cpp=false;
-   FpFn fpfn= get_folder_and_name( get_file_path( argc, argv));
-   auto paths= CompilerPath( get_file_path( argc, argv), fpfn.f_p, fpfn.f_n);
-   auto p= Program();
-   auto output= compile_main( paths, p);
-   write_program( output.output, paths);
-   compile_program( paths, output.arguments, should_remove_cpp);
-   return 0;
 }

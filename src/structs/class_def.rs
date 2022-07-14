@@ -24,7 +24,7 @@ impl Class {
             template: Vec::new(),
         }
     }
-    pub fn to_cpp(self: &Class) -> String {
+    pub fn to_cpp_start(self: &Class) -> String {
         let mut class = String::new();
         if self.template.len() > 0 {
             class.push_str("template <");
@@ -56,6 +56,15 @@ impl Class {
             None => {}
             Some(a) => class.push_str(format!(": public {}", a).as_str()),
         }
+        class
+    }
+    pub fn to_cpp_h(self: &Class) -> String {
+        let mut class = self.to_cpp_start();
+        class.push_str(";");
+        class
+    }
+    pub fn to_cpp(self: &Class) -> String {
+        let mut class = self.to_cpp_start();
         class.push_str(" {\n");
         for v in self.variables.iter() {
             match v.variable_state {

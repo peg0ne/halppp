@@ -11,8 +11,10 @@ struct Enum
     Enum string enum_name =>
         this->name = enum_name
     ;
+    fn to_cpp_start => string doremi ENUM + name + ": int"
+    fn to_cpp_h => string doremi to_cpp_start() + LINE_END
     fn to_cpp => string
-        string enum_str = ENUM + name + BLOCK_START
+        string enum_str = to_cpp_start() + BLOCK_START
         for i until enums.size()
             let e = enums.at(i)
             enum_str += TAB + e.name

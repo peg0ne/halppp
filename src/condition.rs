@@ -6,12 +6,17 @@ use crate::{
 };
 
 pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression {
-    let mut condition_def = if condition_type != "elif" {
-        Condition::new(condition_type)
-    } else {
+    let mut condition_def = if condition_type == "elif" {
         Condition::new(String::from("else if"))
+    } else if condition_type == "loop" {
+        Condition::new(String::from("while"))
+    } else {
+        Condition::new(condition_type.to_owned())
     };
     let mut expression = ConditionalExpression::new();
+    if condition_type == "loop" {
+        expression.value1 = String::from("true");
+    }
     loop {
         let x = get_next_or_exit(compiler.next(), "[Condition] Condition is not closed");
         if x.token.is_do() {

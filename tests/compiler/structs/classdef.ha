@@ -5,7 +5,7 @@ struct Class
     vector<Function> functions = {}
     vector<Variable> variables = {}
     vector<string> templates = {}
-    fn to_cpp => string
+    fn to_cpp_start => string
         string class_str = templates.size() > 0 ? TEMPLATE : EMPTY
         for i until templates.size()
             class_str += templates.at(i)
@@ -15,6 +15,11 @@ struct Class
         class_str += id
         class_str += inherit.is_some() ? INHERIT : EMPTY 
         class_str += inherit.value_or(EMPTY)
+        return class_str
+    ;
+    fn to_cpp_h => string doremi to_cpp_start() + LINE_END
+    fn to_cpp => string
+        string class_str = to_cpp_start()
         class_str += BLOCK_START
         for i until variables.size()
             let v = variables.at(i)

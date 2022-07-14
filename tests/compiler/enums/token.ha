@@ -113,7 +113,7 @@ struct Token_t
         elif s == TOKEN_DORE dore t = TDore
         elif s == TOKEN_DOREMI dore t = TDoremi
         elif s == TOKEN_ENUM dore t = TEnum
-        elif any(s, {TOKEN_SWITCH, TOKEN_WHILE}) dore t = TCondition
+        elif any(s, {TOKEN_SWITCH, TOKEN_WHILE, TOKEN_LOOP}) dore t = TCondition
         elif any(s, {TOKEN_IFS, TOKEN_ELIF, TOKEN_ELSE}) dore t = TCondition
         elif s == TOKEN_EXTEND dore t = TExtend
         elif s == TOKEN_FALSE dore t = TFalse

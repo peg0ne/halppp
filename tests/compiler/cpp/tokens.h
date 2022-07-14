@@ -76,4 +76,5 @@
 #define TOKEN_UNTIL "until"
 #define TOKEN_USE "use"
 #define TOKEN_WHILE "while"
+#define TOKEN_LOOP "loop"
 #define TOKEN_EOF "EOF"

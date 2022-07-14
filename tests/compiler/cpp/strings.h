@@ -39,14 +39,3 @@
 #define HA_SUFFIX ".ha"
 #define COMPILER_OUT " -o "
 #define QUOTE "\""
-
-struct FpFn;
-struct For;
-struct Conditions;
-struct Expressioner;
-struct Compiler;
-struct AstToken;
-FpFn get_folder_and_name(string main);
-Expressioner expression_construct(Compiler *compiler_t, AstToken first);
-Expressioner condition_construct(Compiler *compiler_t, string condition_type);
-string expr_to_cpp(Expressioner *self, int indentation);

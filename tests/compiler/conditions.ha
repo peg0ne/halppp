@@ -1,6 +1,11 @@
 fn condition_construct Compiler *compiler_t, string condition_type => Expressioner
-    let cond = condition_type != "elif" ? Conditions(condition_type) : Conditions("else if")
+    let cond = Conditions(condition_type)
     let expression = ConditionalExpression()
+    if condition_type == "elif" do cond = Conditions("else if")
+    if condition_type == "loop"
+        cond = Conditions("while")
+        expression.value_left = "true"
+    ;
     while true
         let x = get_next_or_exit(compiler_t->next(), "[Condition] Condition is not closed")
         if x.t.is_do()

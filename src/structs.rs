@@ -12,6 +12,7 @@ mod struct_def;
 mod variable_def;
 mod path_def;
 mod enum_def;
+mod compiler_output;
 
 pub use crate::structs::{
     ast_token_def::AstToken,
@@ -28,4 +29,5 @@ pub use crate::structs::{
     variable_def::Variable,
     path_def::CompilerPath,
     enum_def::{Enum, EnumValue},
+    compiler_output::{CompilerOutput}
 };
