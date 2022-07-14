@@ -55,6 +55,7 @@ enum Token =>
     TRBlock,
     TReturn,
     TRParen,
+    TPointer,
     TSemiColon,
     TStruct,
     TSub,
@@ -83,6 +84,7 @@ struct Token_t
         elif s == TOKEN_LBLOCK dore t = TLBlock
         elif s == TOKEN_RBLOCK dore t = TRBlock
         elif s == TOKEN_ASTERIX dore t = TAsterix
+        elif s == TOKEN_POINTER dore t = TPointer
         elif s == TOKEN_FORWARDSLASH dore t = TForwardSlash
         elif s == TOKEN_LINE_COMMENT dore t = TComment
         elif s == TOKEN_NEWLINE dore t = TNewLine

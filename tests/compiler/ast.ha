@@ -3,6 +3,13 @@ fn try_add_token string id, vector<AstToken> *ast => string
     ast->push_back(AstToken(id))
     return EMPTY
 ;
+fn is_str_tokens string s => bool
+    for i until s.size()
+        if !is_char_token(s.at(i)) doremi false
+    ;
+    println("TOKEN: " + s + "IS: " + to_string(Token_t(s).t != TId))
+    return Token_t(s).t != TId
+;
 fn is_char_token char ch => bool
     string s(1,ch)
     return Token_t(s).t != TId
@@ -51,6 +58,7 @@ fn ast_create string content => vector<AstToken>
         let c_opt = peekable.next()
         if c_opt.is_none() do break
         let c = c_opt.value_or(' ')
+        string ch(1, c)
         if any(c, {CHAR_QUOTE, CHAR_SINGLE})
             let matched = get_matching(&peekable, c)
             id = try_add_token(id, &ast)
@@ -61,6 +69,11 @@ fn ast_create string content => vector<AstToken>
             id = try_add_token(id, &ast)
             doco try_add_token(num, &ast)
         ;
+        if !is_str_tokens(id) && is_char_token(c) && c != '\n'
+            id = try_add_token(id, &ast)
+            doco id += ch
+        ;
+        if is_str_tokens(id) && is_char_token(c) doco id += ch
         if is_char_token(c)
             let dbl_less = id != "<" && c == '<'
             let dbl_more = id != ">" && c == '>'
@@ -89,7 +102,6 @@ fn ast_create string content => vector<AstToken>
             if c == '\n' do ast.push_back(AstToken("\n"))
             continue
         ;
-        string ch(1, c)
         id += ch
     ;
     // "Push extra sets of EOF to ensure it wont break badly"

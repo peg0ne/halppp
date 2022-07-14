@@ -8,7 +8,7 @@ struct Compiler
     ;
     fn size => int doremi ast.size()
     fn next => Option<AstToken>
-        // println(ast.peek().value_or(AstToken()).name)
+        println("["+ast.peek().value_or(AstToken()).name+"]: Token" + token_to_string(ast.peek().value_or(AstToken()).token))
         return ast.next()
     ;
     fn peek => Option<AstToken> doremi ast.peek()

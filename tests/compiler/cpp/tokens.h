@@ -10,6 +10,7 @@
 #define TOKEN_RBRACK "]"
 #define TOKEN_LBLOCK "{"
 #define TOKEN_RBLOCK "}"
+#define TOKEN_POINTER "->"
 #define TOKEN_ASTERIX "*"
 #define TOKEN_FORWARDSLASH "/"
 #define TOKEN_LINE_COMMENT "//"
