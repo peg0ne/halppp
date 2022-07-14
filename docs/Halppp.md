@@ -40,6 +40,7 @@
 - else **->** used to define [Else](Else)
 - switch **->** used to define [Switch](Switch)
 - while **->** used to define [While](While)
+- loop **->** used to define [While](While) true loop
 - for **->** used to define [For](For)
 
 

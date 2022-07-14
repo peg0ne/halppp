@@ -7,7 +7,7 @@ pub
     fn get_turn int player => int
         string p = player == 1 ? "1" : "2"
         n.add(0,0, "Player " + p + " Enter the box!")
-        while true
+        loop
             switch n.key()
                 case '0': return 0
                 case '1': return 1

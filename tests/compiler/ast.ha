@@ -21,7 +21,7 @@ fn try_get_dbl Peekable<char> *peekable, char ch => Option<string>
 
 fn get_matching Peekable<char> *peekable, char ch => string
     string matching(1, ch)
-    while true
+    loop
         let c = peekable->next()
         if c.is_none() doremi matching
         string matchbuf(1, c.value_or(' '))
@@ -32,7 +32,7 @@ fn get_matching Peekable<char> *peekable, char ch => string
 
 fn collect_num Peekable<char> *peekable, char ch => string
     string num(1, ch)
-    while true
+    loop
         let peeked = peekable->peek().value_or(' ')
         if !is_char_number(peeked) && peeked != '.' doremi num
         peekable->next()
@@ -47,7 +47,7 @@ fn ast_create string content => vector<AstToken>
     let peekable = Peekable<char>(vec)
     string id = EMPTY
     vector<AstToken> ast = {}
-    while true
+    loop
         let c_opt = peekable.next()
         if c_opt.is_none() do break
         let c = c_opt.value_or(' ')

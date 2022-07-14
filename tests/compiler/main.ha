@@ -1,14 +1,14 @@
 inc => string
-get => ../../lib/peekable, ../../lib/print, ../../lib/stringextensions, ../../lib/conditional
+get => ../../lib/[peekable, print, stringextensions, conditional]
 inc => "cpp/strings.h", "cpp/tokens.h"
-get => enums/token, enums/variablestate
-get => structs/asttoken, structs/pathdef
+get => enums/[token, variablestate]
+get => structs/[asttoken, pathdef]
 get => message, utils, fileutil
-get => structs/variabledef, structs/enumdef
-get => structs/importsdef, structs/globaldef, structs/structdef
-get => structs/fordef, structs/conditiondef, structs/expressiondef
-get => structs/functiondef, structs/classdef
-get => structs/programdef, structs/compilerdef
+get => structs/[variabledef, enumdef]
+get => structs/[importsdef, globaldef, structdef]
+get => structs/[fordef, conditiondef, expressiondef]
+get => structs/[functiondef, classdef]
+get => structs/[programdef, compilerdef]
 get => ast, imports, enums, foreacher, expressions, conditions, variable, template, functions, classdef
 
 struct CompileOutput
@@ -92,7 +92,7 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
         ;
         elif next.token == TCompiler
             get_arrow_or_exit(compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: " + next.name)
-            args = get_id_or_exit(compiler_t.next(), "[Compiler] Missing value of compiler intent [Token::Id]: " + next.name)
+            args = get_id_or_exit(compiler_t.next(), "[Compiler] Missing value of compiler intent [Id]: " + next.name)
             compiler_t.add_arg(args)
         ;
         else do display_err_message("Token not handled: " + next.name)

@@ -4,8 +4,9 @@ struct Include
         this->include = include
     ;
     fn to_cpp => string
+        let is_quoted = String(include).starts_with(QUOTE)
         string include_str = INCLUDE
-        include_str += starts_with(include, QUOTE) ? include : LARROW + include + RARROW
+        include_str += is_quoted ? include : LARROW + include + RARROW
         include_str += NEWLINE
         return include_str
     ;

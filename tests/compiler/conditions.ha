@@ -6,7 +6,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         cond = Conditions("while")
         expression.value_left = "true"
     ;
-    while true
+    loop
         let x = get_next_or_exit(compiler_t->next(), "[Condition] Condition is not closed")
         if x.t.is_do()
             cond.add_expr(expression)
@@ -23,7 +23,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         if expression.operator_value.size() == 0 doco expression.value_left += x.name + " "
         expression.value_right += x.name + " "
     ;
-    while true
+    loop
         let x = get_next_or_exit(compiler_t->next(), "[Condition] Condition is not closed")
         if any(x.token, {TSemiColon, TEof}) do break
         if x.token == TNewLine do continue;

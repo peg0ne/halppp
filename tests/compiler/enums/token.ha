@@ -36,6 +36,7 @@ enum Token =>
     TId,
     TInclude,
     TLBrack,
+    TLBlock,
     TLessThan,
     TLessThanOrEquals,
     TLet,
@@ -51,6 +52,7 @@ enum Token =>
     TProtected,
     TPublic,
     TRBrack,
+    TRBlock,
     TReturn,
     TRParen,
     TSemiColon,
@@ -78,6 +80,8 @@ struct Token_t
         elif s == TOKEN_RPAREN dore t = TRParen
         elif s == TOKEN_LBRACK dore t = TLBrack
         elif s == TOKEN_RBRACK dore t = TRBrack
+        elif s == TOKEN_LBLOCK dore t = TLBlock
+        elif s == TOKEN_RBLOCK dore t = TRBlock
         elif s == TOKEN_ASTERIX dore t = TAsterix
         elif s == TOKEN_FORWARDSLASH dore t = TForwardSlash
         elif s == TOKEN_LINE_COMMENT dore t = TComment
@@ -165,6 +169,8 @@ fn token_to_string Token t => string
     elif t == TRParen doremi "TRParen"
     elif t == TLBrack doremi "TLBrack"
     elif t == TRBrack doremi "TRBrack"
+    elif t == TLBlock doremi "TLBlock"
+    elif t == TRBlock doremi "TRBlock"
     elif t == TAsterix doremi "TAsterix"
     elif t == TForwardSlash doremi "TForwardSlash"
     elif t == TComment doremi "TComment"

@@ -6,13 +6,42 @@ use crate::{
 };
 
 pub fn construct(compiler: &mut Compiler) -> Vec<String> {
-    let mut imports: Vec<String> = Vec::new();
     get_arrow_or_exit(compiler.next(), "[Import]: Missing [=>] in declaration");
+    construct_impl(compiler)
+}
+pub fn construct_impl(compiler: &mut Compiler) -> Vec<String> {
+    let mut imports: Vec<String> = Vec::new();
     let mut id = String::new();
     loop {
         let next = get_next_or_exit(compiler.next(), "[Import]: Import declaration invalid");
         match next.token {
+            Token::LBrack => {
+                let combined = construct_impl(compiler);
+                for i in combined.iter() {
+                    let mut base = id.to_owned();
+                    base.push_str(i.as_str());
+                    imports.push(base);
+                }
+                id = String::new();
+            }
+            Token::RBrack => {
+                if id.len() == 0 {break}
+                let mut found = false;
+                for i in imports.iter() {
+                    if i.to_owned() == id {
+                        display_hint_message(
+                            format!("[Import]: Token duplicate in entry {}", id).as_str(),
+                        );
+                        found = true;
+                    }
+                }
+                if !found {
+                    imports.push(id);
+                }
+                break;
+            }
             Token::NewLine => {
+                if id.len() == 0 {break}
                 let mut found = false;
                 for i in imports.iter() {
                     if i.to_owned() == id {
@@ -28,6 +57,7 @@ pub fn construct(compiler: &mut Compiler) -> Vec<String> {
                 break;
             },
             Token::EOF => {
+                if id.len() == 0 {break}
                 let mut found = false;
                 for i in imports.iter() {
                     if i.to_owned() == id {
@@ -43,6 +73,7 @@ pub fn construct(compiler: &mut Compiler) -> Vec<String> {
                 break;
             },
             Token::Comma => {
+                if id.len() == 0 {continue}
                 let mut found = false;
                 for i in imports.iter() {
                     if i.to_owned() == id {

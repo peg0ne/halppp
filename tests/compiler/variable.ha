@@ -10,7 +10,7 @@ struct VariableNBool
 fn get_value Compiler *compiler_t, bool found_setter => Option<string>
     string value = EMPTY
     if !found_setter do get_eq_or_exit(compiler_t->next(), "[Variable]: Invalid value setter")
-    while true
+    loop
         let next = get_next_or_exit(compiler_t->next(), "[Variable]: Invalid value")
         if next.token == TNewLine do break
         value += next.name
@@ -29,7 +29,7 @@ fn get_type Compiler *compiler_t => Variable
         if !variable.has_id() do display_err_message("[Variable]: Variable declaration cannot have template without id:\n" + variable.v_type)
         next = get_next_or_exit(compiler_t->next(), "[Variable]: Invalid Declaration")
         variable.v_type += next.name
-        while true
+        loop
             next = get_next_or_exit(compiler_t->next(), "[Variable]: Invalid Declaration")
             variable.v_type += next.name
             if next.token == TMoreThan do break
@@ -44,7 +44,7 @@ fn construct_args Compiler *compiler_t, Option<string> type_name => VariableNBoo
     let variable = Variable()
     if type_name.is_some() do variable.v_type = type_name.value_or("void")
     let is_end = false
-    while true
+    loop
         let next = get_next_or_exit(compiler_t->next(), "[Variable]: Invalid Declaration")
         if any(next.token, {TNewLine, TCoolArrow}) dobr is_end = true
         if next.token == TEquals dobr variable.v_value = get_value(compiler_t, true)
@@ -56,7 +56,7 @@ fn construct_args Compiler *compiler_t, Option<string> type_name => VariableNBoo
         elif next.token == TLessThan
             if !variable.has_id() && !variable.has_type() do display_err_message("[Variable]: Variable declaration cannot have template without id and type:\n" + variable.v_type)
             variable.v_type += next.name
-            while true
+            loop
                 next = get_next_or_exit(compiler_t->next(), "[Variable]: Invalid Declaration")
                 variable.v_type += next.name
                 if next.token == TMoreThan do break

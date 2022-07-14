@@ -13,6 +13,7 @@ template <typename T>
 struct Option;
 template <typename T>
 struct Peekable;
+class String;
 enum Token: int;
 struct Token_t;
 enum VariableState: int;
@@ -46,8 +47,6 @@ template <typename T>
 void print(T s);
 template <typename T>
 void println(T s);
-string replace_string(string str, string from, string to);
-bool starts_with(string str, string start);
 template <typename T>
 bool any(T value, vector<T> values);
 template <typename T>
@@ -82,9 +81,10 @@ Option<string> try_get_dbl(Peekable<char>* peekable, char ch);
 string get_matching(Peekable<char>* peekable, char ch);
 string collect_num(Peekable<char>* peekable, char ch);
 vector<AstToken> ast_create(string content);
-bool imports_check_duplicate(vector<string> imports, string id);
 vector<string> imports_construct(Compiler* compiler_t);
+vector<string> imports_construct_impl(Compiler* compiler_t);
 vector<string> imports_creation(Compiler* compiler_t, AstToken next);
+bool imports_check_duplicate(vector<string> imports, string id);
 void validate_enum(Enum enumerator, Compiler* compiler_t);
 Enum enums_construct(Compiler* compiler_t);
 Expressioner for_construct(Compiler* compiler_t);
@@ -210,22 +210,61 @@ void print(T s) {
 template <typename T>
 void println(T s) {
    
- cout<< s<< "\n";;
+ cout<< s<< "\n";
 }
-string replace_string(string str, string from, string to) {
-      while(true    ) {
-         size_t start_pos= str.find( from);
-            if(start_pos  == - 1  ) {
-               
-return str;
+class String {
+ private:
+   string _value;
+ public:
+   String (string value) {
+      this-> _value= value;
+   }
+ public:
+   long len() {
+      
+return  _value.size();
+   }
+ public:
+   char at(int at) {
+      
+return  _value.at( at);
+   }
+ public:
+   void append(string value) {
+      
+ _value+= value;
+   }
+ public:
+   string replace(string from, string to) {
+      string replaced= _value;
+         while(true   ) {
+            size_t start_pos= replaced.find( from);
+               if(start_pos  == - 1  ) {
+                  
+return  replaced;
 }
-         str.replace( start_pos, from.length(), to);
+            replaced.replace( start_pos, from.length(), to);
 }
+   }
+ public:
+   string replace(string from, string to, int amount) {
+      string replaced= _value;
+         for(int i = 0; i < amount; i++) {
+            size_t start_pos= replaced.find( from);
+               if(start_pos  == - 1  ) {
+                  
+return  replaced;
 }
-bool starts_with(string str, string start) {
-   
-return  str.rfind( start, 0)== 0;
+            replaced.replace( start_pos, from.length(), to);
 }
+      return  replaced;
+   }
+ public:
+   bool starts_with(string start) {
+      
+return  _value.rfind( start, 0)== 0;
+   }
+};
 template <typename T>
 bool any(T value, vector<T> values) {
       for(int i = 0; i < values.size(); i++) {
@@ -322,6 +361,7 @@ enum Token: int {
    TId,
    TInclude,
    TLBrack,
+   TLBlock,
    TLessThan,
    TLessThanOrEquals,
    TLet,
@@ -337,6 +377,7 @@ enum Token: int {
    TProtected,
    TPublic,
    TRBrack,
+   TRBlock,
    TReturn,
    TRParen,
    TSemiColon,
@@ -403,6 +444,16 @@ return ;
          else if(s  == TOKEN_RBRACK  ) {
             
  t= TRBrack;
+return ;
+}
+         else if(s  == TOKEN_LBLOCK  ) {
+            
+ t= TLBlock;
+return ;
+}
+         else if(s  == TOKEN_RBLOCK  ) {
+            
+ t= TRBlock;
 return ;
 }
          else if(s  == TOKEN_ASTERIX  ) {
@@ -520,17 +571,17 @@ return ;
  t= TOr;
 return ;
 }
-         else if(any ( s , {TOKEN_ZERO , TOKEN_ONE , TOKEN_TWO} )    ) {
+         else if(any ( s , { TOKEN_ZERO , TOKEN_ONE , TOKEN_TWO } )    ) {
             
  t= TNumber;
 return ;
 }
-         else if(any ( s , {TOKEN_THREE , TOKEN_FOUR , TOKEN_FIVE} )    ) {
+         else if(any ( s , { TOKEN_THREE , TOKEN_FOUR , TOKEN_FIVE } )    ) {
             
  t= TNumber;
 return ;
 }
-         else if(any ( s , {TOKEN_SIX , TOKEN_SEVEN , TOKEN_EIGHT , TOKEN_NINE} )    ) {
+         else if(any ( s , { TOKEN_SIX , TOKEN_SEVEN , TOKEN_EIGHT , TOKEN_NINE } )    ) {
             
  t= TNumber;
 return ;
@@ -580,12 +631,12 @@ return ;
  t= TEnum;
 return ;
 }
-         else if(any ( s , {TOKEN_SWITCH , TOKEN_WHILE , TOKEN_LOOP} )    ) {
+         else if(any ( s , { TOKEN_SWITCH , TOKEN_WHILE , TOKEN_LOOP } )    ) {
             
  t= TCondition;
 return ;
 }
-         else if(any ( s , {TOKEN_IFS , TOKEN_ELIF , TOKEN_ELSE} )    ) {
+         else if(any ( s , { TOKEN_IFS , TOKEN_ELIF , TOKEN_ELSE } )    ) {
             
  t= TCondition;
 return ;
@@ -605,7 +656,7 @@ return ;
  t= TFunction;
 return ;
 }
-         else if(any ( s , {TOKEN_FOR , TOKEN_FOREACH} )    ) {
+         else if(any ( s , { TOKEN_FOR , TOKEN_FOREACH } )    ) {
             
  t= TFor;
 return ;
@@ -625,7 +676,7 @@ return ;
  t= TInclude;
 return ;
 }
-         else if(any ( s , {TOKEN_INT , TOKEN_STR , TOKEN_STRING} )    ) {
+         else if(any ( s , { TOKEN_INT , TOKEN_STR , TOKEN_STRING } )    ) {
             
  t= TType;
 return ;
@@ -684,19 +735,19 @@ return ;
    }
  public:
    bool is_base() {
-         if(any ( t , {TClass , TEof , TFunction , TGet , TGlobal} )    ) {
+         if(any ( t , { TClass , TEof , TFunction , TGet , TGlobal } )    ) {
             
 return true;
 }
-         if(any ( t , {TInclude , TMacroDefinition , TNewLine} )    ) {
+         if(any ( t , { TInclude , TMacroDefinition , TNewLine } )    ) {
             
 return true;
 }
-         if(any ( t , {TSemiColon , TStruct , TUse} )    ) {
+         if(any ( t , { TSemiColon , TStruct , TUse } )    ) {
             
 return true;
 }
-         if(any ( t , {TCompiler , TEnum} )    ) {
+         if(any ( t , { TCompiler , TEnum } )    ) {
             
 return true;
 }
@@ -705,27 +756,27 @@ return true;
  public:
    bool is_do() {
       
-return  any( t, {TDo, TDobr, TDoco, TDore, TDoremi});
+return  any( t,{ TDo, TDobr, TDoco, TDore, TDoremi});
    }
  public:
    bool is_conditional() {
-         if(any ( t , {TEquality , TNonEquality , TMoreThanOrEquals} )    ) {
+         if(any ( t , { TEquality , TNonEquality , TMoreThanOrEquals } )    ) {
             
 return true;
 }
-         if(any ( t , {TLessThanOrEquals , TLessThan , TMoreThan} )    ) {
+         if(any ( t , { TLessThanOrEquals , TLessThan , TMoreThan } )    ) {
             
 return true;
 }
-         if(any ( t , {TAnyEquals , TAllEquals , TAllNotEquals} )    ) {
+         if(any ( t , { TAnyEquals , TAllEquals , TAllNotEquals } )    ) {
             
 return true;
 }
-         if(any ( t , {TAllLessThan , TAllMoreThan} )    ) {
+         if(any ( t , { TAllLessThan , TAllMoreThan } )    ) {
             
 return true;
 }
-         if(any ( t , {TAllLessOrEquals , TAllMoreOrEquals} )    ) {
+         if(any ( t , { TAllLessOrEquals , TAllMoreOrEquals } )    ) {
             
 return true;
 }
@@ -734,7 +785,7 @@ return true;
  public:
    bool is_conditional_sep() {
       
-return  any( t, {TAnd, TOr});
+return  any( t,{ TAnd, TOr});
    }
 };
 string token_to_string(Token t) {
@@ -777,6 +828,14 @@ return  "TLBrack";
       else if(t  == TRBrack  ) {
          
 return  "TRBrack";
+}
+      else if(t  == TLBlock  ) {
+         
+return  "TLBlock";
+}
+      else if(t  == TRBlock  ) {
+         
+return  "TRBlock";
 }
       else if(t  == TAsterix  ) {
          
@@ -1045,8 +1104,9 @@ struct CompilerPath {
    string current = EMPTY;
  public:
    CompilerPath (string main, string f_p, string f_n) {
-      string cpp= replace_string( main, HA_SUFFIX, CPP_SUFFIX);
-      string bin= replace_string( main, HA_SUFFIX, EMPTY);
+      auto main_str= String( main);
+      string cpp= main_str.replace( HA_SUFFIX, CPP_SUFFIX);
+      string bin= main_str.replace( HA_SUFFIX, EMPTY);
       this-> folder_path= f_p;
       this-> file_path= f_n;
       this-> main_path= main;
@@ -1123,7 +1183,7 @@ FpFn get_folder_and_name(string file_path) {
    string file_name= EMPTY;
    string reversed= EMPTY;
    string folder_path= file_path;
-      while(true    ) {
+      while(true   ) {
             if(folder_path.size ( )  == 0  ) {
                
  break;
@@ -1297,8 +1357,9 @@ struct Include {
    }
  public:
    string to_cpp() {
+      auto is_quoted= String( include) .starts_with( QUOTE);
       string include_str= INCLUDE;
-      include_str+= starts_with( include, QUOTE) ? include: LARROW+ include+ RARROW;
+      include_str+= is_quoted ? include: LARROW+ include+ RARROW;
       include_str+= NEWLINE;
       return  include_str;
    }
@@ -1662,7 +1723,7 @@ return  ast.peek();
  public:
    void add_arg(string arg) {
       
- arguments.push_back( replace_string( arg, QUOTE, EMPTY));
+ arguments.push_back( String( arg) .replace( QUOTE, EMPTY));
    }
  public:
    void add_args(vector<string> args) {
@@ -1750,7 +1811,7 @@ return  None<string>();
 }
 string get_matching(Peekable<char>* peekable, char ch) {
    string matching( 1, ch);
-      while(true    ) {
+      while(true   ) {
          auto c= peekable-> next();
             if(c.is_none ( )    ) {
                
@@ -1766,7 +1827,7 @@ return  matching;
 }
 string collect_num(Peekable<char>* peekable, char ch) {
    string num( 1, ch);
-      while(true    ) {
+      while(true   ) {
          auto peeked= peekable-> peek() .value_or( ' ');
             if(! is_char_number ( peeked )    &&peeked  != '.'  ) {
                
@@ -1778,22 +1839,22 @@ return  num;
 }
 }
 vector<AstToken> ast_create(string content) {
-   vector< char> vec= {};
+   vector< char> vec={};
       for(int i = 0; i < content.size(); i++) {
          
  vec.push_back( content[ i]);
 }
    auto peekable= Peekable< char>( vec);
    string id= EMPTY;
-   vector< AstToken> ast= {};
-      while(true    ) {
+   vector< AstToken> ast={};
+      while(true   ) {
          auto c_opt= peekable.next();
             if(c_opt.is_none ( )    ) {
                
  break;
 }
          auto c= c_opt.value_or( ' ');
-            if(any ( c , {CHAR_QUOTE , CHAR_SINGLE} )    ) {
+            if(any ( c , { CHAR_QUOTE , CHAR_SINGLE } )    ) {
                auto matched= get_matching( &peekable, c);
                id= try_add_token( id, &ast);
                 try_add_token( matched, &ast);
@@ -1858,25 +1919,28 @@ continue ;
    ast.push_back( AstToken( "EOF"));
    return  ast;
 }
-bool imports_check_duplicate(vector<string> imports, string id) {
-      for(int i = 0; i < imports.size(); i++) {
-            if(imports.at ( i )  == id  ) {
-               display_hint_message( "[Import]: Token duplicate in entry "+ id);
-               return true;
-}
-}
-   return false;
-}
 vector<string> imports_construct(Compiler* compiler_t) {
-   vector<string> imports= {};
    get_arrow_or_exit( compiler_t-> next(), "[Import]: Missing [=>] in declaration");
+   return  imports_construct_impl( compiler_t);
+}
+vector<string> imports_construct_impl(Compiler* compiler_t) {
+   vector<string> imports={};
    string id= EMPTY;
-      while(true    ) {
+      while(true   ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Import]: Import declaration invalid");
-            if(any ( next.token , {TEof , TNewLine , TComma} )    ) {
-                  if(! imports_check_duplicate ( imports , id )    ) {
+            if(any ( next.token , { TEof , TNewLine , TComma , TRBrack } )    ) {
+                  if(id.size ( )  > 0  &&! imports_check_duplicate ( imports , id )    ) {
                      
  imports.push_back( id);
+}
+               id= EMPTY;
+}
+            else if(next.token  == TLBrack  ) {
+               auto combined= imports_construct_impl( compiler_t);
+                  for(int i = 0; i < combined.size(); i++) {
+                     auto base= id;
+                     base+= combined.at( i);
+                     imports.push_back( base);
 }
                id= EMPTY;
 }
@@ -1888,7 +1952,7 @@ vector<string> imports_construct(Compiler* compiler_t) {
                
  id+= next.name;
 }
-            if(any ( next.token , {TEof , TNewLine} )    ) {
+            if(any ( next.token , { TEof , TNewLine , TRBrack } )    ) {
                
  break;
 }
@@ -1941,6 +2005,15 @@ break ;
 }
    return  import_return;
 }
+bool imports_check_duplicate(vector<string> imports, string id) {
+      for(int i = 0; i < imports.size(); i++) {
+            if(imports.at ( i )  == id  ) {
+               display_hint_message( "[Import]: Token duplicate in entry "+ id);
+               return true;
+}
+}
+   return false;
+}
 void validate_enum(Enum enumerator, Compiler* compiler_t) {
    auto contains= compiler_t-> contains_enum( enumerator.name);
       if(contains    ) {
@@ -1953,13 +2026,13 @@ Enum enums_construct(Compiler* compiler_t) {
    auto enumerator= Enum( id);
    get_arrow_or_exit( compiler_t-> next(), "[Enum] Requires [=>] after Id");
    auto enum_def= EnumValue();
-      while(true    ) {
+      while(true   ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Enum] Ends without closing itself");
-            if(any ( next.token , {TSemiColon , TEof} )    ) {
+            if(any ( next.token , { TSemiColon , TEof } )    ) {
                
  break;
 }
-            if(any ( next.token , {TNumber , TEquals} )    ) {
+            if(any ( next.token , { TNumber , TEquals } )    ) {
                   if(enum_def.name.size ( )  != 0  ) {
                      
  break;
@@ -1981,7 +2054,7 @@ continue ;
                enumerator.enums.push_back( enum_def);
                enum_def= EnumValue();
 }
-            if(any ( next.token , {TId , TNewLine , TComma} )    ) {
+            if(any ( next.token , { TId , TNewLine , TComma } )    ) {
                
  continue;
 }
@@ -1996,7 +2069,7 @@ Expressioner for_construct(Compiler* compiler_t) {
    for_def.iterator= get_id_or_exit( compiler_t-> next(), "[For] For loop is not closed");
    get_or_exit( compiler_t-> next(), TUntil, "[For] Missing until keyword");
    for_def.until= compiler_t-> next() .value_or( AstToken( "NONE")) .name;
-      while(true    ) {
+      while(true   ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[For] For loop is not closed");
             if(x.t.is_do ( )    ) {
                for_def.lines.push_back( expression_construct( compiler_t, x));
@@ -2008,9 +2081,9 @@ Expressioner for_construct(Compiler* compiler_t) {
 }
          for_def.until+= x.name;
 }
-      while(true    ) {
+      while(true   ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[For] For loop is not closed");
-            if(any ( x.token , {TSemiColon , TEof} )    ) {
+            if(any ( x.token , { TSemiColon , TEof } )    ) {
                
  break;
 }
@@ -2060,13 +2133,13 @@ break ;
  expression= first.name;
 break ;
 }
-      while(true    ) {
+      while(true   ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[Expression] Expression ended unexpectedly");
-            if(any ( x.token , {TEof , TNewLine} )    ) {
+            if(any ( x.token , { TEof , TNewLine } )    ) {
                 expression+= doing;
 break ;
 }
-            if(any ( x.token , {TNumber , TId} )    ) {
+            if(any ( x.token , { TNumber , TId } )    ) {
                
  expression+= " ";
 }
@@ -2113,7 +2186,7 @@ Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
          cond= Conditions( "while");
          expression.value_left= "true";
 }
-      while(true    ) {
+      while(true   ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[Condition] Condition is not closed");
             if(x.t.is_do ( )    ) {
                cond.add_expr( expression);
@@ -2140,9 +2213,9 @@ continue ;
 }
          expression.value_right+= x.name+ " ";
 }
-      while(true    ) {
+      while(true   ) {
          auto x= get_next_or_exit( compiler_t-> next(), "[Condition] Condition is not closed");
-            if(any ( x.token , {TSemiColon , TEof} )    ) {
+            if(any ( x.token , { TSemiColon , TEof } )    ) {
                
  break;
 }
@@ -2181,7 +2254,7 @@ Option<string> get_value(Compiler* compiler_t, bool found_setter) {
          
  get_eq_or_exit( compiler_t-> next(), "[Variable]: Invalid value setter");
 }
-      while(true    ) {
+      while(true   ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid value");
             if(next.token  == TNewLine  ) {
                
@@ -2194,7 +2267,7 @@ Option<string> get_value(Compiler* compiler_t, bool found_setter) {
 Variable get_type(Compiler* compiler_t) {
    auto next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Function Return Value");
    auto variable= Variable(true);
-      if(any ( next.token , {TId , TType} )    ) {
+      if(any ( next.token , { TId , TType } )    ) {
          
  variable.v_type= next.name;
 }
@@ -2210,7 +2283,7 @@ Variable get_type(Compiler* compiler_t) {
 }
          next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
          variable.v_type+= next.name;
-            while(true    ) {
+            while(true   ) {
                next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
                variable.v_type+= next.name;
                   if(next.token  == TMoreThan  ) {
@@ -2233,9 +2306,9 @@ VariableNBool construct_args(Compiler* compiler_t, Option<string> type_name) {
  variable.v_type= type_name.value_or( "void");
 }
    auto is_end=false;
-      while(true    ) {
+      while(true   ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
-            if(any ( next.token , {TNewLine , TCoolArrow} )    ) {
+            if(any ( next.token , { TNewLine , TCoolArrow } )    ) {
                 is_end=true;
 break ;
 }
@@ -2260,7 +2333,7 @@ break ;
  display_err_message( "[Variable]: Variable declaration cannot have template without id and type:\n"+ variable.v_type);
 }
                variable.v_type+= next.name;
-                  while(true    ) {
+                  while(true   ) {
                      next= get_next_or_exit( compiler_t-> next(), "[Variable]: Invalid Declaration");
                      variable.v_type+= next.name;
                         if(next.token  == TMoreThan  ) {
@@ -2288,8 +2361,8 @@ continue ;
    return  VariableNBool( variable, is_end);
 }
 vector<string> template_construct(Compiler* compiler_t) {
-   vector<string> templates= {};
-      while(true    ) {
+   vector<string> templates={};
+      while(true   ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[Template]: Template declaration invalid");
             if(next.token  == TMoreThan  ) {
                
@@ -2299,7 +2372,7 @@ vector<string> template_construct(Compiler* compiler_t) {
                
  templates.push_back( next.name);
 }
-            if(any ( next.token , {TComma , TLessThan , TId} )    ) {
+            if(any ( next.token , { TComma , TLessThan , TId } )    ) {
                
  continue;
 }
@@ -2341,7 +2414,7 @@ Function function_construct(Compiler* compiler_t, VariableState variable_state, 
          
  function.templates= template_construct( compiler_t);
 }
-      while(true    ) {
+      while(true   ) {
          auto vnb= construct_args( compiler_t, None<string>());
             if(! vnb.variable.has_minimum ( )    ) {
                
@@ -2365,7 +2438,7 @@ Function function_construct(Compiler* compiler_t, VariableState variable_state, 
    auto can_continue=true;
       while(can_continue    ) {
          auto x= get_next_or_exit( compiler_t-> next(), "Function is not closed "+ function.id);
-            if(any ( x.token , {TSemiColon , TFunction , TEof} )    ) {
+            if(any ( x.token , { TSemiColon , TFunction , TEof } )    ) {
                
  break;
 }
@@ -2435,9 +2508,9 @@ break ;
    auto vnb= VariableNBool( Variable(true),false);
    auto function= Function( variable_state);
    auto a= 0;
-      while(true    ) {
+      while(true   ) {
          auto next= get_next_or_exit( compiler_t-> next(), "[ClassError] Class is not closed "+ class_def.id);
-            if(any ( next.token , {TEof , TSemiColon , TClass} )    ) {
+            if(any ( next.token , { TEof , TSemiColon , TClass } )    ) {
                
  break;
 }
@@ -2526,7 +2599,7 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
    auto content= get_content( paths);
    auto ast= ast_create( content);
    auto compiler_t= Compiler( p, ast);
-   vector<string> incs= {};
+   vector<string> incs={};
    string args= EMPTY;
       while(true   ) {
          auto next= get_next_or_exit( compiler_t.next(), "Compiler failed to do unexpected EOF");
@@ -2542,7 +2615,7 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
                
  continue;
 }
-            else if(any ( next.token , {TStruct , TClass} )    ) {
+            else if(any ( next.token , { TStruct , TClass } )    ) {
                auto classdef= class_construct( &compiler_t, next.token== TStruct);
                output+= classdef.to_cpp();
                headers+= classdef.to_cpp_h();
@@ -2586,7 +2659,7 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
 }
             else if(next.token  == TCompiler  ) {
                get_arrow_or_exit( compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: "+ next.name);
-               args= get_id_or_exit( compiler_t.next(), "[Compiler] Missing value of compiler intent [Token::Id]: "+ next.name);
+               args= get_id_or_exit( compiler_t.next(), "[Compiler] Missing value of compiler intent [Id]: "+ next.name);
                compiler_t.add_arg( args);
 }
             else {

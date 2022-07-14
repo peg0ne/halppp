@@ -28,7 +28,7 @@ fn get_folder_and_name string file_path => FpFn
     string file_name = EMPTY
     string reversed = EMPTY
     string folder_path = file_path
-    while true
+    loop
         if folder_path.size() == 0 do break
         let ch = folder_path.back()
         folder_path.pop_back()

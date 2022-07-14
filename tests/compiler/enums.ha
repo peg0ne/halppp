@@ -8,7 +8,7 @@ fn enums_construct Compiler *compiler_t => Enum
     let enumerator = Enum(id)
     get_arrow_or_exit(compiler_t->next(), "[Enum] Requires [=>] after Id")
     let enum_def = EnumValue()
-    while true
+    loop
         let next = get_next_or_exit(compiler_t->next(), "[Enum] Ends without closing itself")
         if any(next.token, {TSemiColon, TEof}) do break
         if any(next.token, {TNumber, TEquals})

@@ -1,26 +1,28 @@
-fn imports_check_duplicate vector<string> imports, string id => bool
-    for i until imports.size()
-        if imports.at(i) == id
-            display_hint_message("[Import]: Token duplicate in entry " + id)
-            return true
-        ;
-    ;
-    return false
-;
-
 fn imports_construct Compiler *compiler_t => vector<string>
-    vector<string> imports = {}
     get_arrow_or_exit(compiler_t->next(), "[Import]: Missing [=>] in declaration")
+    return imports_construct_impl(compiler_t)
+;
+fn imports_construct_impl Compiler *compiler_t => vector<string>
+    vector<string> imports = {}
     string id = EMPTY
-    while true
+    loop
         let next = get_next_or_exit(compiler_t->next(), "[Import]: Import declaration invalid")
-        if any(next.token, {TEof, TNewLine, TComma})
-            if !imports_check_duplicate(imports, id) do imports.push_back(id)
+        if any(next.token, {TEof, TNewLine, TComma, TRBrack})
+            if id.size() > 0 && !imports_check_duplicate(imports, id) do imports.push_back(id)
+            id = EMPTY
+        ;
+        elif next.token == TLBrack
+            let combined = imports_construct_impl(compiler_t)
+            for i until combined.size()
+                let base = id
+                base += combined.at(i)
+                imports.push_back(base)
+            ;
             id = EMPTY
         ;
         elif next.t.is_base() do display_err_message("[Import]: Token not allowed: " + next.name)
         else do id += next.name
-        if any(next.token, {TEof, TNewLine}) do break
+        if any(next.token, {TEof, TNewLine, TRBrack}) do break
     ;
     return imports
 ;
@@ -58,4 +60,14 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
         ;
     ;
     return import_return
+;
+
+fn imports_check_duplicate vector<string> imports, string id => bool
+    for i until imports.size()
+        if imports.at(i) == id
+            display_hint_message("[Import]: Token duplicate in entry " + id)
+            return true
+        ;
+    ;
+    return false
 ;

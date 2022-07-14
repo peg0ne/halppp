@@ -1,6 +1,6 @@
 fn template_construct Compiler *compiler_t => vector<string>
     vector<string> templates = {}
-    while true
+    loop
         let next = get_next_or_exit(compiler_t->next(), "[Template]: Template declaration invalid")
         if next.token == TMoreThan do break
         if next.token == TId do templates.push_back(next.name)

@@ -11,7 +11,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expressioner
         case TReturn: dobr expression = "return "
         default: dobr expression = first.name
     ;
-    while true
+    loop
         let x = get_next_or_exit(compiler_t->next(), "[Expression] Expression ended unexpectedly")
         if any(x.token, {TEof, TNewLine}) dobr expression += doing
         if any(x.token, {TNumber, TId}) do expression += " "

@@ -31,7 +31,7 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
     let vnb = VariableNBool(Variable(true), false)
     let function = Function(variable_state)
     let a = 0
-    while true
+    loop
         let next = get_next_or_exit(compiler_t->next(), "[ClassError] Class is not closed " + class_def.id)
         if any(next.token, {TEof, TSemiColon, TClass}) do break
         switch next.token

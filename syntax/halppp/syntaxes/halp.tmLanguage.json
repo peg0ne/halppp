@@ -67,7 +67,7 @@
             "patterns": [
                 {
                     "name": "keyword.control.halp",
-                    "match": "\\b(let|private|pub|protected|new|break|continue|switch|else|elif|if|while|for|select|return|foreach)\\b"
+                    "match": "\\b(let|private|pub|protected|new|break|continue|switch|else|elif|if|while|loop|for|select|return|foreach)\\b"
                 },
                 {
                     "name": "keyword.control.halp",
@@ -91,7 +91,7 @@
                 },
                 {
                     "name": "variable",
-                    "match": "\\b(\\$|$|string|str|short|long|bool|char|int|struct|void)\\b"
+                    "match": "\\b(\\$|$|string|str|short|long|bool|char|int|struct|void|size_t)\\b"
                 },
                 {
                     "name": "entity.name.tag",

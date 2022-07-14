@@ -21,7 +21,7 @@ struct Compiler
     fn add_use vector<string> usings =>
         for i until usings.size() do program.usings.push_back(Uses(usings.at(i)))
     ;
-    fn add_arg string arg => void do arguments.push_back(replace_string(arg, QUOTE, EMPTY))
+    fn add_arg string arg => void do arguments.push_back(String(arg).replace(QUOTE, EMPTY))
     fn add_args vector<string> args =>
         for i until args.size() do arguments.push_back(args.at(i))
     ;

@@ -7,8 +7,9 @@ struct CompilerPath
     string output = EMPTY
     string current = EMPTY
     CompilerPath string main, string f_p, string f_n =>
-        string cpp = replace_string(main, HA_SUFFIX, CPP_SUFFIX)
-        string bin = replace_string(main, HA_SUFFIX, EMPTY)
+        let main_str = String(main)
+        string cpp = main_str.replace(HA_SUFFIX, CPP_SUFFIX)
+        string bin = main_str.replace(HA_SUFFIX, EMPTY)
         this->folder_path = f_p
         this->file_path = f_n
         this->main_path = main
