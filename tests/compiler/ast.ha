@@ -4,10 +4,10 @@ fn try_add_token string id, vector<AstToken> *ast => string
     return EMPTY
 ;
 fn is_str_tokens string s => bool
+    if s.size() == 0 doremi false
     for i until s.size()
         if !is_char_token(s.at(i)) doremi false
     ;
-    println("TOKEN: " + s + "IS: " + to_string(Token_t(s).t != TId))
     return Token_t(s).t != TId
 ;
 fn is_char_token char ch => bool
@@ -56,7 +56,7 @@ fn ast_create string content => vector<AstToken>
     vector<AstToken> ast = {}
     loop
         let c_opt = peekable.next()
-        if c_opt.is_none() do break
+        if c_opt.is_none() dobr try_add_token(id, &ast)
         let c = c_opt.value_or(' ')
         string ch(1, c)
         if any(c, {CHAR_QUOTE, CHAR_SINGLE})
@@ -69,11 +69,17 @@ fn ast_create string content => vector<AstToken>
             id = try_add_token(id, &ast)
             doco try_add_token(num, &ast)
         ;
-        if !is_str_tokens(id) && is_char_token(c) && c != '\n'
+        if !is_str_tokens(id) && is_char_token(c)
             id = try_add_token(id, &ast)
-            doco id += ch
+            if none(c, {'\n', ' ', '\t'}) doco id += ch
         ;
-        if is_str_tokens(id) && is_char_token(c) doco id += ch
+        if is_str_tokens(id) && !is_char_token(c)
+            id = try_add_token(id, &ast)
+            if none(c, {'\n', ' ', '\t'}) doco id += ch
+        ;
+        if is_str_tokens(id) && is_char_token(c)
+            if is_str_tokens(id + ch) doco id += ch
+        ;
         if is_char_token(c)
             let dbl_less = id != "<" && c == '<'
             let dbl_more = id != ">" && c == '>'
