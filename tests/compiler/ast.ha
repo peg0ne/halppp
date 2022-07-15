@@ -37,11 +37,20 @@ fn get_matching Peekable<char> *peekable, char ch => string
     ;
 ;
 
-fn collect_num Peekable<char> *peekable, char ch => string
+fn collect_num Peekable<char> *peekable, char ch => AstToken
     string num(1, ch)
+    let is_float = false
+    let token = AstToken()
     loop
         let peeked = peekable->peek().value_or(' ')
-        if !is_char_number(peeked) && peeked != '.' doremi num
+        if !is_char_number(peeked) && peeked != '.'
+            token.name = num
+            token.token = is_float ? TFloat : TNumber 
+            token.t = Token_t("0")
+            token.t.t = is_float ? TFloat : TNumber
+            return token
+        ;
+        if peeked == '.' do is_float = true
         peekable->next()
         string numbuf(1, peeked)
         num += numbuf
@@ -58,40 +67,29 @@ fn ast_create string content => vector<AstToken>
         let c_opt = peekable.next()
         if c_opt.is_none() dobr try_add_token(id, &ast)
         let c = c_opt.value_or(' ')
-        string ch(1, c)
         if any(c, {CHAR_QUOTE, CHAR_SINGLE})
             let matched = get_matching(&peekable, c)
             id = try_add_token(id, &ast)
             doco try_add_token(matched, &ast)
         ;
-        if is_char_number(c)
+        elif is_char_number(c)
             let num = collect_num(&peekable, c)
             id = try_add_token(id, &ast)
-            doco try_add_token(num, &ast)
+            doco ast.push_back(num)
         ;
-        if !is_str_tokens(id) && is_char_token(c)
+        string ch(1, c)
+        let is_white_space = any(c, {'\n', ' ', '\t'})
+        let is_both_token = is_str_tokens(id) == is_char_token(c)
+        if !is_both_token
             id = try_add_token(id, &ast)
-            if none(c, {'\n', ' ', '\t'}) doco id += ch
+            if !is_white_space doco id += ch
         ;
-        if is_str_tokens(id) && !is_char_token(c)
+        if is_both_token && is_str_tokens(id + ch) doco id += ch
+        elif is_char_token(c)
             id = try_add_token(id, &ast)
-            if none(c, {'\n', ' ', '\t'}) doco id += ch
+            doco ast.push_back(AstToken(c))
         ;
-        if is_str_tokens(id) && is_char_token(c)
-            if is_str_tokens(id + ch) doco id += ch
-        ;
-        if is_char_token(c)
-            id = try_add_token(id, &ast)
-            let next = peekable.peek().value_or(' ')
-            let is_cool = c == '=' && next == '>'
-            let is_non_eq = c == '!' && next == '='
-            if is_cool || is_non_eq do peekable.next()
-            if is_cool doco ast.push_back(AstToken("=>"))
-            if is_non_eq doco ast.push_back(AstToken("!="))
-            ast.push_back(AstToken(c))
-            continue
-        ;
-        if any(c, {' ', '\t', '\n'})
+        elif is_white_space
             id = try_add_token(id, &ast)
             if c == '\n' do ast.push_back(AstToken("\n"))
             continue

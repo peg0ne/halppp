@@ -67,6 +67,7 @@ enum Token =>
     TEnum,
     TString,
     TChar,
+    TFloat,
     UNKNOWN,
 ;
 
@@ -202,6 +203,7 @@ fn token_to_string Token t => string
     elif t == TAllMoreThan doremi "TAllMoreThan"
     elif t == TOr doremi "TOr"
     elif t == TNumber doremi "TNumber"
+    elif t == TFloat doremi "TFloat"
     elif t == TClass doremi "TClass"
     elif t == TCompiler doremi "TCompiler"
     elif t == TMacroDefinition doremi "TMacroDefinition"

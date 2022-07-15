@@ -34,30 +34,30 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
     let contains = false
     for i until import.size()
         let imp = import.at(i)
-        switch next.token
-            case TUse: do contains = compiler_t->contains_use(imp)
-                if contains
-                    display_hint_message("[Use]: Duplicate entry of: " + token_to_string(next.token))
-                    found = true
-                ;
-                break
-            case TInclude: do contains = compiler_t->contains_inc(imp)
-                if contains
-                    display_hint_message("[Include]: Duplicate entry of: " + token_to_string(next.token))
-                    found = true
-                ;
-                break
-            case TGet: do break
-            default: dobr display_err_message("[" + token_to_string(next.token) + "]: Unhandled import")
+        if next.token == TUse
+            contains = compiler_t->contains_use(imp)
+            if contains
+                display_hint_message("[Use]: Duplicate entry of: " + token_to_string(next.token))
+                found = true
+            ;
+            continue
         ;
+        elif next.token == TInclude
+            contains = compiler_t->contains_inc(imp)
+            if contains
+                display_hint_message("[Include]: Duplicate entry of: " + token_to_string(next.token))
+                found = true
+            ;
+            continue
+        ;
+        elif next.token == TGet do continue
+        display_err_message("[" + token_to_string(next.token) + "]: Unhandled import")
     ;
     if !found
-        switch next.token
-            case TUse: dobr compiler_t->add_use(import)
-            case TInclude: dobr compiler_t->add_inc(import)
-            case TGet: do break
-            default: dobr display_err_message("[" + token_to_string(next.token) + "]: Unhandled import")
-        ;
+        if next.token == TUse do compiler_t->add_use(import)
+        elif next.token == TInclude do compiler_t->add_inc(import)
+        elif next.token == TGet do return import_return
+        else do display_err_message("[" + token_to_string(next.token) + "]: Unhandled import")
     ;
     return import_return
 ;

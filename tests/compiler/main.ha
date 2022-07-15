@@ -92,7 +92,7 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
         ;
         elif next.token == TCompiler
             get_arrow_or_exit(compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: " + next.name)
-            args = get_id_or_exit(compiler_t.next(), "[Compiler] Missing value of compiler intent [Id]: " + next.name)
+            args = get_or_exit(compiler_t.next(), TString, "[Compiler] Missing value of compiler intent [TString]: " + next.name)
             compiler_t.add_arg(args)
         ;
         else do display_err_message("Token not handled: " + next.name)

@@ -22,16 +22,17 @@ fn write_program string program, CompilerPath paths =>
     file << program
     file.close()
 ;
+fn to_char_arr string s, char *buf => char*
+    for i until s.size() do buf[i] = s.at(i)
+    buf[s.size()] = '\0'
+    return buf
+;
 fn compile_program CompilerPath paths, vector<string> arguments, bool should_remove_cpp =>
     string base_cmd= "g++ " + paths.output
     for i until arguments.size() do base_cmd += " " + arguments.at(i)
-    char cmd[base_cmd.size() + 1]
-    for i until base_cmd.size() do cmd[i] = base_cmd.at(i)
-    cmd[base_cmd.size()] = '\0'
     println("compiling: " + base_cmd)
-    system(cmd)
+    char cmd[base_cmd.size() + 1]
     char cpp_path[paths.main_path_cpp.size() + 1]
-    for i until paths.main_path_cpp.size() do cpp_path[i] = paths.main_path_cpp.at(i)
-    cpp_path[paths.main_path_cpp.size()] = '\0'
-    if should_remove_cpp do remove(cpp_path)
+    system(to_char_arr(base_cmd, cmd))
+    if should_remove_cpp do remove(to_char_arr(paths.main_path_cpp, cpp_path))
 ;

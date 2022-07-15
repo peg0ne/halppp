@@ -147,5 +147,18 @@ pub fn get_type(compiler: &mut Compiler) -> Variable {
             }
         }
     }
+    if try_get(compiler.peek(), Token::Asterix) {
+        if !variable.has_id() {
+            display_err_message(
+                format!(
+                    "[Variable]: Variable declaration cannot have pointer without id:\n{:?}",
+                    variable
+                )
+                .as_str(),
+            );
+        }
+        next = get_next_or_exit(compiler.next(), "[Variable]: Invalid Declaration");
+        variable.v_type.push_str(next.name.as_str());
+    }
     return variable;
 }

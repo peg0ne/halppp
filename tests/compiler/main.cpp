@@ -72,6 +72,7 @@ FpFn get_folder_and_name(string file_path);
 string get_file_path(int argc, char** argv);
 string get_content(CompilerPath paths);
 void write_program(string program, CompilerPath paths);
+char* to_char_arr(string s, char* buf);
 void compile_program(CompilerPath paths, vector<string> arguments, bool should_remove_cpp);
 string expr_to_cpp(Expressioner* self, int indentation);
 string try_add_token(string id, vector<AstToken>* ast);
@@ -80,7 +81,7 @@ bool is_char_token(char ch);
 bool is_char_number(char ch);
 Option<string> try_get_dbl(Peekable<char>* peekable, char ch);
 string get_matching(Peekable<char>* peekable, char ch);
-string collect_num(Peekable<char>* peekable, char ch);
+AstToken collect_num(Peekable<char>* peekable, char ch);
 vector<AstToken> ast_create(string content);
 vector<string> imports_construct(Compiler* compiler_t);
 vector<string> imports_construct_impl(Compiler* compiler_t);
@@ -90,6 +91,7 @@ void validate_enum(Enum enumerator, Compiler* compiler_t);
 Enum enums_construct(Compiler* compiler_t);
 Expressioner for_construct(Compiler* compiler_t);
 Expressioner expression_construct(Compiler* compiler_t, AstToken first);
+Expressioner get_let_expr(Compiler* compiler_t);
 Expressioner condition_construct(Compiler* compiler_t, string condition_type);
 Option<string> get_value(Compiler* compiler_t, bool found_setter);
 Variable get_type(Compiler* compiler_t);
@@ -393,6 +395,7 @@ enum Token: int {
    TEnum,
    TString,
    TChar,
+   TFloat,
    UNKNOWN,
 };
 struct Token_t {
@@ -953,6 +956,10 @@ return "TOr";
          
 return "TNumber";
 }
+      else if(t  == TFloat  ) {
+         
+return "TFloat";
+}
       else if(t  == TClass  ) {
          
 return "TClass";
@@ -1259,29 +1266,27 @@ void write_program(string program, CompilerPath paths) {
    file<< program;
    file.close();
 }
+char* to_char_arr(string s, char* buf) {
+      for(int i = 0; i < s.size(); i++) {
+         
+ buf[ i]= s.at( i);
+}
+   buf[ s.size()]='\0';
+   return  buf;
+}
 void compile_program(CompilerPath paths, vector<string> arguments, bool should_remove_cpp) {
    string base_cmd="g++ "+ paths.output;
       for(int i = 0; i < arguments.size(); i++) {
          
  base_cmd+=" "+ arguments.at( i);
 }
-   char cmd[ base_cmd.size()+ 1];
-      for(int i = 0; i < base_cmd.size(); i++) {
-         
- cmd[ i]= base_cmd.at( i);
-}
-   cmd[ base_cmd.size()]='\0';
    println("compiling: "+ base_cmd);
-   system( cmd);
+   char cmd[ base_cmd.size()+ 1];
    char cpp_path[ paths.main_path_cpp.size()+ 1];
-      for(int i = 0; i < paths.main_path_cpp.size(); i++) {
-         
- cpp_path[ i]= paths.main_path_cpp.at( i);
-}
-   cpp_path[ paths.main_path_cpp.size()]='\0';
+   system( to_char_arr( base_cmd, cmd));
       if(should_remove_cpp    ) {
          
- remove( cpp_path);
+ remove( to_char_arr( paths.main_path_cpp, cpp_path));
 }
 }
 struct Variable {
@@ -1863,13 +1868,22 @@ return  matching;
 }
 }
 }
-string collect_num(Peekable<char>* peekable, char ch) {
+AstToken collect_num(Peekable<char>* peekable, char ch) {
    string num( 1, ch);
+   bool is_float = false;
+   auto token = AstToken();
       while(true   ) {
          auto peeked = peekable->peek().value_or(' ');
             if(! is_char_number ( peeked )    &&peeked  != '.'  ) {
+               token.name= num;
+               token.token= is_float ? TFloat: TNumber;
+               token.t= Token_t("0");
+               token.t.t= is_float ? TFloat: TNumber;
+               return  token;
+}
+            if(peeked  == '.'  ) {
                
-return  num;
+ is_float=true;
 }
          peekable-> next();
          string numbuf( 1, peeked);
@@ -1892,60 +1906,38 @@ vector<AstToken> ast_create(string content) {
 break ;
 }
          auto c = c_opt.value_or(' ');
-         string ch( 1, c);
             if(any ( c , { CHAR_QUOTE , CHAR_SINGLE } )    ) {
                auto matched = get_matching(&peekable,c);
                id= try_add_token( id, &ast);
                 try_add_token( matched, &ast);
 continue ;
 }
-            if(is_char_number ( c )    ) {
+            else if(is_char_number ( c )    ) {
                auto num = collect_num(&peekable,c);
                id= try_add_token( id, &ast);
-                try_add_token( num, &ast);
+                ast.push_back( num);
 continue ;
 }
-            if(! is_str_tokens ( id )    &&is_char_token ( c )    ) {
+         string ch( 1, c);
+         auto is_white_space = any(c,{'\n',' ','\t'});
+         auto is_both_token = is_str_tokens(id)==is_char_token(c);
+            if(! is_both_token    ) {
                id= try_add_token( id, &ast);
-                  if(none ( c , { '\n' , ' ' , '\t' } )    ) {
+                  if(! is_white_space    ) {
                       id+= ch;
 continue ;
 }
 }
-            if(is_str_tokens ( id )    &&! is_char_token ( c )    ) {
+            if(is_both_token    &&is_str_tokens ( id + ch )    ) {
+                id+= ch;
+continue ;
+}
+            else if(is_char_token ( c )    ) {
                id= try_add_token( id, &ast);
-                  if(none ( c , { '\n' , ' ' , '\t' } )    ) {
-                      id+= ch;
+                ast.push_back( AstToken( c));
 continue ;
 }
-}
-            if(is_str_tokens ( id )    &&is_char_token ( c )    ) {
-                  if(is_str_tokens ( id + ch )    ) {
-                      id+= ch;
-continue ;
-}
-}
-            if(is_char_token ( c )    ) {
-               id= try_add_token( id, &ast);
-               auto next = peekable.peek().value_or(' ');
-               auto is_cool = c=='='&&next=='>';
-               auto is_non_eq = c=='!'&&next=='=';
-                  if(is_cool    ||is_non_eq    ) {
-                     
- peekable.next();
-}
-                  if(is_cool    ) {
-                      ast.push_back( AstToken("=>"));
-continue ;
-}
-                  if(is_non_eq    ) {
-                      ast.push_back( AstToken("!="));
-continue ;
-}
-               ast.push_back( AstToken( c));
-               continue;
-}
-            if(any ( c , { ' ' , '\t' , '\n' } )    ) {
+            else if(is_white_space    ) {
                id= try_add_token( id, &ast);
                   if(c  == '\n'  ) {
                      
@@ -2011,41 +2003,44 @@ vector<string> imports_creation(Compiler* compiler_t, AstToken next) {
    bool contains = false;
       for(int i = 0; i < import.size(); i++) {
          auto imp = import.at(i);
-            switch(next.token    ) {
-               case TUse:
- contains= compiler_t-> contains_use( imp);
+            if(next.token  == TUse  ) {
+               contains= compiler_t-> contains_use( imp);
                   if(contains    ) {
                      display_hint_message("[Use]: Duplicate entry of: "+ token_to_string( next.token));
                      found=true;
 }
-               break;
-               case TInclude:
- contains= compiler_t-> contains_inc( imp);
+               continue;
+}
+            else if(next.token  == TInclude  ) {
+               contains= compiler_t-> contains_inc( imp);
                   if(contains    ) {
                      display_hint_message("[Include]: Duplicate entry of: "+ token_to_string( next.token));
                      found=true;
 }
-               break;
-               case TGet:
- break;
-               default:
- display_err_message("["+ token_to_string( next.token)+"]: Unhandled import");
-break ;
+               continue;
 }
+            else if(next.token  == TGet  ) {
+               
+ continue;
+}
+         display_err_message("["+ token_to_string( next.token)+"]: Unhandled import");
 }
       if(! found    ) {
-            switch(next.token    ) {
-               case TUse:
+            if(next.token  == TUse  ) {
+               
  compiler_t-> add_use( import);
-break ;
-               case TInclude:
+}
+            else if(next.token  == TInclude  ) {
+               
  compiler_t-> add_inc( import);
-break ;
-               case TGet:
- break;
-               default:
+}
+            else if(next.token  == TGet  ) {
+               
+return  import_return;
+}
+            else {
+               
  display_err_message("["+ token_to_string( next.token)+"]: Unhandled import");
-break ;
 }
 }
    return  import_return;
@@ -2073,17 +2068,6 @@ Enum enums_construct(Compiler* compiler_t) {
    auto enum_def = EnumValue();
       while(true   ) {
          auto next = get_next_or_exit(compiler_t->next(),"[Enum] Ends without closing itself");
-            if(any ( next.token , { TSemiColon , TEof } )    ) {
-               
- break;
-}
-            if(any ( next.token , { TNumber , TEquals } )    ) {
-                  if(enum_def.name.size ( )  != 0  ) {
-                     
- break;
-}
-               display_err_message("[Enum] Cannot assign value to EnumValue without id");
-}
             if(next.token  == TId  ) {
                   if(enum_def.name.size ( )  == 0  ) {
                       enum_def.name= next.name;
@@ -2091,13 +2075,24 @@ continue ;
 }
                display_err_message("[Enum] Cannot assign id to EnumValue that already has id");
 }
-            if(next.token  == TComma  ) {
+            else if(next.token  == TComma  ) {
                   if(enum_def.name.size ( )  == 0  ) {
                      
  display_err_message("[Enum] Missing enum before separator");
 }
                enumerator.enums.push_back( enum_def);
                enum_def= EnumValue();
+}
+            else if(any ( next.token , { TNumber , TEquals } )    ) {
+                  if(enum_def.name.size ( )  != 0  ) {
+                     
+ break;
+}
+               display_err_message("[Enum] Cannot assign value to EnumValue without id");
+}
+            if(any ( next.token , { TSemiColon , TEof } )    ) {
+               
+ break;
 }
             if(any ( next.token , { TId , TNewLine , TComma } )    ) {
                
@@ -2154,40 +2149,8 @@ Expressioner expression_construct(Compiler* compiler_t, AstToken first) {
    string doing= EMPTY;
    string expression= EMPTY;
       if(first.token  == TLet  ) {
-         auto id = get_id_or_exit(compiler_t->next(),"[Let] Required id after let");
-         get_or_exit( compiler_t-> next(), TEquals,"[Let] Required equals after id");
-         string value= EMPTY;
-            while(true   ) {
-               auto x = get_next_or_exit(compiler_t->next(),"LET exception");
-                  if(any ( x.token , { TEof , TNewLine } )    ) {
-                     
- break;
-}
-               value+= x.name;
-}
-         auto token = Token_t(value).t;
-            if(any ( token , { TFalse , TTrue } )    ) {
-               
- expression="bool ";
-}
-            else if(token  == TNumber  ) {
-               
- expression="int ";
-}
-            else if(token  == TChar  ) {
-               
- expression="char ";
-}
-            else if(token  == TString  ) {
-               
- expression="string ";
-}
-            else {
-               
- expression="auto ";
-}
-         expression+= id+" = "+ value;
-         return  Expressioner( None< Conditions>(), None< For>(), Some( expression));
+         
+return  get_let_expr( compiler_t);
 }
       switch(first.token    ) {
          case TDoco:
@@ -2251,6 +2214,47 @@ break ;
 break ;
 }
 }
+   return  Expressioner( None< Conditions>(), None< For>(), Some( expression));
+}
+Expressioner get_let_expr(Compiler* compiler_t) {
+   auto id = get_id_or_exit(compiler_t->next(),"[Let] Required id after let");
+   get_or_exit( compiler_t-> next(), TEquals,"[Let] Required equals after id");
+   string expression= EMPTY;
+   string value= EMPTY;
+      while(true   ) {
+         auto x = get_next_or_exit(compiler_t->next(),"LET exception");
+            if(any ( x.token , { TEof , TNewLine } )    ) {
+               
+ break;
+}
+         value+= x.name;
+}
+   auto token = Token_t(value).t;
+      if(any ( token , { TFalse , TTrue } )    ) {
+         
+ expression="bool ";
+}
+      else if(token  == TNumber  ) {
+         
+ expression="int ";
+}
+      else if(token  == TFloat  ) {
+         
+ expression="float ";
+}
+      else if(token  == TChar  ) {
+         
+ expression="char ";
+}
+      else if(token  == TString  ) {
+         
+ expression="string ";
+}
+      else {
+         
+ expression="auto ";
+}
+   expression+= id+" = "+ value;
    return  Expressioner( None< Conditions>(), None< For>(), Some( expression));
 }
 Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
@@ -2442,17 +2446,17 @@ vector<string> template_construct(Compiler* compiler_t) {
    vector<string> templates={};
       while(true   ) {
          auto next = get_next_or_exit(compiler_t->next(),"[Template]: Template declaration invalid");
-            if(next.token  == TMoreThan  ) {
-               
- break;
-}
             if(next.token  == TId  ) {
-               
- templates.push_back( next.name);
+                templates.push_back( next.name);
+continue ;
 }
-            if(any ( next.token , { TComma , TLessThan , TId } )    ) {
+            else if(any ( next.token , { TComma , TLessThan } )    ) {
                
  continue;
+}
+            else if(next.token  == TMoreThan  ) {
+               
+ break;
 }
          display_err_message("[Template]: Token not allowed: "+ next.name);
 }
@@ -2567,62 +2571,50 @@ Class class_construct(Compiler* compiler_t, bool is_struct) {
    class_def.id= get_id_or_exit( compiler_t-> next(),"[ClassError] Invalid Class Declaration");
    // Set Inheritance Or Template;
    auto next = get_next_or_exit(compiler_t->next(),"[ClassError] Invalid class definition of: "+class_def.id);
-      switch(next.token    ) {
-         case TLessThan:
- class_def.templates= template_construct( compiler_t);
+      if(next.token  == TLessThan  ) {
+         class_def.templates= template_construct( compiler_t);
          next= get_next_or_exit( compiler_t-> next(),"[ClassError] Invalid class definition of: "+ class_def.id);
-            switch(next.token    ) {
-               case TCoolArrow:;
-               class_def.inherit= Some( get_id_or_exit( compiler_t-> next(),"[ClassError] Invalid Inheritor Token\nExpected Id for inheritance for class: "+ class_def.id));
-               break;
 }
-         break;
-         case TCoolArrow:
+      if(next.token  == TCoolArrow  ) {
+         
  class_def.inherit= Some( get_id_or_exit( compiler_t-> next(),"[ClassError] Invalid Inheritor Token\nExpected Id for inheritance for class: "+ class_def.id));
-break ;
 }
    // Construct inner Class values;
    auto variable_state = !is_struct?Private_State:Public_State;
-   auto vnb = VariableNBool(Variable(true),false);
-   auto function = Function(variable_state);
-   int a = 0;
       while(true   ) {
          auto next = get_next_or_exit(compiler_t->next(),"[ClassError] Class is not closed "+class_def.id);
-            if(any ( next.token , { TEof , TSemiColon , TClass } )    ) {
-               
- break;
-}
-            switch(next.token    ) {
-               case TPrivate:
- variable_state= Private_State;
-break ;
-               case TProtected:
- variable_state= Protected_State;
-break ;
-               case TPublic:
- variable_state= Public_State;
-break ;
-               case TFunction:
- function= function_construct( compiler_t, variable_state,false);
+            if(next.token  == TFunction  ) {
+               auto function = function_construct(compiler_t,variable_state,false);
                 class_def.functions.push_back( function);
-break ;
-               case TId:
- a= 0;
+continue ;
+}
+            else if(any ( next.token , { TId , TType } )    ) {
                   if(next.name  == class_def.id  ) {
                      auto function = function_construct(compiler_t,Public_State,true);
                      function.return_value= Some( Variable( EMPTY, class_def.id, None<string>(), Private_State));
                       class_def.functions.push_back( function);
-break ;
+continue ;
 }
-               vnb= construct_args( compiler_t, Some( next.name));
+               auto vnb = construct_args(compiler_t,Some(next.name));
                vnb.variable.variable_state= variable_state;
                 class_def.variables.push_back( vnb.variable);
-break ;
-               case TType:
- vnb= construct_args( compiler_t, Some( next.name));
-               vnb.variable.variable_state= variable_state;
-                class_def.variables.push_back( vnb.variable);
-break ;
+continue ;
+}
+            else if(any ( next.token , { TEof , TSemiColon , TClass } )    ) {
+               
+ break;
+}
+            else if(next.token  == TPrivate  ) {
+                variable_state= Private_State;
+continue ;
+}
+            else if(next.token  == TProtected  ) {
+                variable_state= Protected_State;
+continue ;
+}
+            else if(next.token  == TPublic  ) {
+                variable_state= Public_State;
+continue ;
 }
 }
    class_validate( class_def, compiler_t);
@@ -2737,7 +2729,7 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
 }
             else if(next.token  == TCompiler  ) {
                get_arrow_or_exit( compiler_t.next(),"[Compiler] Missing start of compiler intent [=>]: "+ next.name);
-               args= get_id_or_exit( compiler_t.next(),"[Compiler] Missing value of compiler intent [Id]: "+ next.name);
+               args= get_or_exit( compiler_t.next(), TString,"[Compiler] Missing value of compiler intent [TString]: "+ next.name);
                compiler_t.add_arg( args);
 }
             else {

@@ -10,20 +10,20 @@ fn enums_construct Compiler *compiler_t => Enum
     let enum_def = EnumValue()
     loop
         let next = get_next_or_exit(compiler_t->next(), "[Enum] Ends without closing itself")
-        if any(next.token, {TSemiColon, TEof}) do break
-        if any(next.token, {TNumber, TEquals})
-            if enum_def.name.size() != 0 do break
-            display_err_message("[Enum] Cannot assign value to EnumValue without id")
-        ;
         if next.token == TId
             if enum_def.name.size() == 0 doco enum_def.name = next.name
             display_err_message("[Enum] Cannot assign id to EnumValue that already has id")
         ;
-        if next.token == TComma
+        elif next.token == TComma
             if enum_def.name.size() == 0 do display_err_message("[Enum] Missing enum before separator")
             enumerator.enums.push_back(enum_def)
             enum_def = EnumValue()
         ;
+        elif any(next.token, {TNumber, TEquals})
+            if enum_def.name.size() != 0 do break
+            display_err_message("[Enum] Cannot assign value to EnumValue without id")
+        ;
+        if any(next.token, {TSemiColon, TEof}) do break
         if any(next.token, {TId, TNewLine, TComma}) do continue
         display_err_message("[Enum] Invalid token inside Enum constructor")
     ;
