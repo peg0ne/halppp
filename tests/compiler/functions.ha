@@ -39,9 +39,9 @@ fn function_construct Compiler *compiler_t, VariableState variable_state, bool c
         if any(x.token, {TSemiColon, TFunction, TEof}) do break
         if x.token == TNewLine do continue
         switch x.token 
-            case TFor: dobr function.add_expr(for_construct(compiler_t))
-            case TCondition: dobr function.add_expr(condition_construct(compiler_t, x.name))
-            default: dobr function.add_expr(expression_construct(compiler_t, x))
+            case TFor dobr function.add_expr(for_construct(compiler_t))
+            case TCondition dobr function.add_expr(condition_construct(compiler_t, x.name))
+            default dobr function.add_expr(expression_construct(compiler_t, x))
         ;
         if x.t.is_do() do break
     ;

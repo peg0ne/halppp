@@ -2,6 +2,7 @@ use crate::{
     condition,
     enums::Token,
     expression,
+    switch,
     structs::{Compiler, Expression, For},
     utils::{get_id_or_exit, get_next_or_exit, get_or_exit},
 };
@@ -35,6 +36,10 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
             }
             Token::For => {
                 for_def.lines.push(construct(compiler));
+                continue;
+            }
+            Token::Switch => {
+                for_def.lines.push(switch::construct(compiler));
                 continue;
             }
             Token::SemiColon => break,

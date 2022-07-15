@@ -7,6 +7,7 @@ use crate::{
     utils::{get_id_or_exit, get_next_or_exit},
     variable,
     template,
+    switch,
 };
 
 pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constructor: bool) -> Function {
@@ -60,6 +61,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
         match x.token {
             Token::For => function.expressions.push(foreach::construct(compiler)),
             Token::Condition => function.expressions.push(condition::construct(compiler, x.name)),
+            Token::Switch => function.expressions.push(switch::construct(compiler)),
             Token::SemiColon => break,
             Token::Function => break,
             Token::EOF => break,

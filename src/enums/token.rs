@@ -63,6 +63,9 @@ pub enum Token {
     Until,
     Use,
     Enum,
+    Switch,
+    Default,
+    Case,
 }
 
 impl Token {
@@ -112,6 +115,8 @@ impl Token {
             "8" => Token::Number,
             "9" => Token::Number,
             "char" => Token::Type,
+            "case" => Token::Case,
+            "default" => Token::Default,
             "class" => Token::Class,
             "compiler" => Token::Compiler,
             "def" => Token::MacroDefinition,
@@ -141,7 +146,7 @@ impl Token {
             "str" => Token::Type,
             "string" => Token::Type,
             "struct" => Token::Struct,
-            "switch" => Token::Condition,
+            "switch" => Token::Switch,
             "true" => Token::True,
             "until" => Token::Until,
             "use" => Token::Use,

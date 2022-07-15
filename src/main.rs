@@ -13,6 +13,7 @@ mod utils;
 mod variable;
 mod template;
 mod enumerator;
+mod switch;
 
 use crate::{
     enums::{Token, VariableState},

@@ -17,9 +17,9 @@ fn for_construct Compiler *compiler_t => Expressioner
         if any(x.token, {TSemiColon, TEof}) do break
         if x.token == TNewLine do continue
         switch x.token
-            case TCondition: dobr for_def.lines.push_back(condition_construct(compiler_t, x.name))
-            case TFor: dobr for_def.lines.push_back(for_construct(compiler_t))
-            default: dobr for_def.lines.push_back(expression_construct(compiler_t, x))
+            case TCondition dobr for_def.lines.push_back(condition_construct(compiler_t, x.name))
+            case TFor dobr for_def.lines.push_back(for_construct(compiler_t))
+            default dobr for_def.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
     return Expressioner(None<Conditions>(), Some(for_def), None<string>())

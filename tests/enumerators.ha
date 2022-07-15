@@ -14,13 +14,13 @@ enum Day =>
 fn main =>
     let a = Monday
     switch a
-    case Monday: dobr cout << "m\n"
-    case Tuesday: dobr cout << "t\n"
-    case Wednesday: dobr cout << "w\n"
-    case Thursday: dobr cout << "t\n"
-    case Friday: dobr cout << "f\n"
-    case Saturday: dobr cout << "s\n"
-    case Sunday: dobr cout << "s\n"
+    case Monday dobr cout << "m\n"
+    case Tuesday dobr cout << "t\n"
+    case Wednesday dobr cout << "w\n"
+    case Thursday dobr cout << "t\n"
+    case Friday dobr cout << "f\n"
+    case Saturday dobr cout << "s\n"
+    case Sunday dobr cout << "s\n"
     ;
     if a != Monday doremi 1
     else doremi 0
