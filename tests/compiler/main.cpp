@@ -38,6 +38,7 @@ struct Class;
 struct Program;
 struct Compiler;
 struct VariableNBool;
+enum ClassError: int;
 struct CompileOutput;
 template <typename T>
 Option<T> Some(T value);
@@ -101,6 +102,9 @@ VariableNBool construct_args(Compiler* compiler_t, Option<string> type_name);
 vector<string> template_construct(Compiler* compiler_t);
 void validate_function(Function function, Compiler* compiler_t);
 Function function_construct(Compiler* compiler_t, VariableState variable_state, bool constructor);
+string c_err(ClassError err);
+string c_err(ClassError err, string opt);
+string c_err(ClassError err, string opt, bool display);
 void class_validate(Class class_def, Compiler* compiler_t);
 Class class_construct(Compiler* compiler_t, bool is_struct);
 int main(int argc, char* argv[]);
@@ -1751,7 +1755,7 @@ return  ast.prev();
 }
    }
  public:
-   bool contains_use(string id) {
+   bool has_use(string id) {
          for(int i = 0; i < program.usings.size(); i++) {
                if(program.usings.at ( i ) .usings  == id  ) {
                   
@@ -1761,7 +1765,7 @@ return true;
       return false;
    }
  public:
-   bool contains_function(string id) {
+   bool has_function(string id) {
          for(int i = 0; i < program.functions.size(); i++) {
                if(program.functions.at ( i ) .id  == id  ) {
                   
@@ -1771,7 +1775,7 @@ return true;
       return false;
    }
  public:
-   bool contains_class(string id) {
+   bool has_class(string id) {
          for(int i = 0; i < program.classes.size(); i++) {
                if(program.classes.at ( i ) .id  == id  ) {
                   
@@ -1781,7 +1785,7 @@ return true;
       return false;
    }
  public:
-   bool contains_inc(string id) {
+   bool has_inc(string id) {
          for(int i = 0; i < program.includes.size(); i++) {
                if(program.includes.at ( i ) .include  == id  ) {
                   
@@ -1791,7 +1795,7 @@ return true;
       return false;
    }
  public:
-   bool contains_enum(string id) {
+   bool has_enum(string id) {
          for(int i = 0; i < program.enums.size(); i++) {
                if(program.enums.at ( i ) .name  == id  ) {
                   
@@ -1992,7 +1996,7 @@ vector<string> imports_creation(Compiler* compiler_t, AstToken next) {
       for(int i = 0; i < import.size(); i++) {
          auto imp = import.at(i);
             if(next.token  == TUse  ) {
-               contains= compiler_t-> contains_use( imp);
+               contains= compiler_t-> has_use( imp);
                   if(contains    ) {
                      display_hint_message("[Use]: Duplicate entry of: "+ token_to_string( next.token));
                      found=true;
@@ -2000,7 +2004,7 @@ vector<string> imports_creation(Compiler* compiler_t, AstToken next) {
                continue;
 }
             else if(next.token  == TInclude  ) {
-               contains= compiler_t-> contains_inc( imp);
+               contains= compiler_t-> has_inc( imp);
                   if(contains    ) {
                      display_hint_message("[Include]: Duplicate entry of: "+ token_to_string( next.token));
                      found=true;
@@ -2043,7 +2047,7 @@ bool imports_check_duplicate(vector<string> imports, string id) {
    return false;
 }
 void validate_enum(Enum enumerator, Compiler* compiler_t) {
-   auto contains = compiler_t->contains_enum(enumerator.name);
+   auto contains = compiler_t->has_enum(enumerator.name);
       if(contains    ) {
          
  display_err_message("Duplicate instances Enum of: "+ enumerator.name);
@@ -2569,8 +2573,7 @@ continue ;
    return  templates;
 }
 void validate_function(Function function, Compiler* compiler_t) {
-   auto contains = compiler_t->contains_function(function.id);
-      if(contains    ) {
+      if(compiler_t -> has_function ( function.id )    ) {
             for(int i = 0; i < compiler_t->program.functions.size(); i++) {
                auto f = compiler_t->program.functions.at(i);
                   if(f.arguments.size ( )  != function.arguments.size ( )  ) {
@@ -2661,37 +2664,91 @@ break ;
    compiler_t-> add_fn( function);
    return  function;
 }
+enum ClassError: int {
+   CDuplicate,
+   CInheritance,
+   CNoId,
+   CDefinition,
+};
+string c_err(ClassError err) {
+   
+return  c_err( err, EMPTY,false);
+}
+string c_err(ClassError err, string opt) {
+   
+return  c_err( err, opt,false);
+}
+string c_err(ClassError err, string opt, bool display) {
+   string msg="[Class] ";
+      switch(err    ) {
+         case CNoId:
+          msg+="Invalid class declaration";
+break ;
+         case CDuplicate:
+          msg+="Duplicate instance of: ";
+break ;
+         case CDefinition:
+          msg+="Invalid class definition of: ";
+break ;
+         case CInheritance:
+          msg+="Invalid inheritance of: ";
+break ;
+         case CClosed:
+          msg+="Class is not closed ";
+break ;
+         case CNoInheritor:
+          msg+="Invalid Inheritor Token\nExpected Id for inheritance for class: ";
+break ;
+         default:
+;
+         
+ break;
+}
+   msg+= opt;
+      if(display    ) {
+         
+ display_err_message( msg);
+}
+   return  msg;
+}
 void class_validate(Class class_def, Compiler* compiler_t) {
    // Check Duplicate Classes;
-   auto contains = compiler_t->contains_class(class_def.id);
-      if(contains    ) {
-         
- display_err_message("Duplicate instances of: "+ class_def.id);
+      if(compiler_t -> has_class ( class_def.id )    ) {
+         c_err( CDuplicate, class_def.id,true);
 }
    // Check Inheritance;
-   contains= compiler_t-> contains_class( class_def.inherit.value_or( EMPTY));
+   auto inherit = class_def.inherit;
+      if(inherit.is_none ( )    ) {
+         
+return ;
+}
+      if(compiler_t -> has_class ( inherit.value_or ( EMPTY ) )    ) {
+         
+return ;
+}
+   auto contains = compiler_t->has_class(inherit.value_or(EMPTY));
       if(class_def.inherit.is_some ( )    &&! contains    ) {
-         display_err_message("Invalid Inheritance of: "+ class_def.id+", Inherits: "+ class_def.inherit.value_or( EMPTY));
+         c_err( CInheritance, class_def.id,true);
 }
 }
 Class class_construct(Compiler* compiler_t, bool is_struct) {
    auto class_def = Class();
    class_def.is_struct= is_struct;
-   class_def.id= get_id_or_exit( compiler_t-> next(),"[ClassError] Invalid Class Declaration");
+   class_def.id= get_id_or_exit( compiler_t-> next(), c_err( CNoId));
    // Set Inheritance Or Template;
-   auto next = get_next_or_exit(compiler_t->next(),"[ClassError] Invalid class definition of: "+class_def.id);
+   auto next = get_next_or_exit(compiler_t->next(),c_err(CDefinition,class_def.id));
       if(next.token  == TLessThan  ) {
          class_def.templates= template_construct( compiler_t);
-         next= get_next_or_exit( compiler_t-> next(),"[ClassError] Invalid class definition of: "+ class_def.id);
+         next= get_next_or_exit( compiler_t-> next(), c_err( CDefinition, class_def.id));
 }
       if(next.token  == TCoolArrow  ) {
          
- class_def.inherit= Some( get_id_or_exit( compiler_t-> next(),"[ClassError] Invalid Inheritor Token\nExpected Id for inheritance for class: "+ class_def.id));
+ class_def.inherit= Some( get_id_or_exit( compiler_t-> next(), c_err( CNoInheritor, class_def.id)));
 }
    // Construct inner Class values;
    auto variable_state = !is_struct?Private_State:Public_State;
       while(true   ) {
-         auto next = get_next_or_exit(compiler_t->next(),"[ClassError] Class is not closed "+class_def.id);
+         auto next = get_next_or_exit(compiler_t->next(),c_err(CClosed,class_def.id));
             if(next.token  == TFunction  ) {
                auto function = function_construct(compiler_t,variable_state,false);
                 class_def.functions.push_back( function);

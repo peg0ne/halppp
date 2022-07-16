@@ -1,6 +1,5 @@
 fn validate_function Function function, Compiler *compiler_t =>
-    let contains = compiler_t->contains_function(function.id)
-    if contains
+    if compiler_t->has_function(function.id)
         for i until compiler_t->program.functions.size()
             let f = compiler_t->program.functions.at(i)
             if f.arguments.size() != function.arguments.size() do return

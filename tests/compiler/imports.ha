@@ -35,7 +35,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
     for i until import.size()
         let imp = import.at(i)
         if next.token == TUse
-            contains = compiler_t->contains_use(imp)
+            contains = compiler_t->has_use(imp)
             if contains
                 display_hint_message("[Use]: Duplicate entry of: " + token_to_string(next.token))
                 found = true
@@ -43,7 +43,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
             continue
         ;
         elif next.token == TInclude
-            contains = compiler_t->contains_inc(imp)
+            contains = compiler_t->has_inc(imp)
             if contains
                 display_hint_message("[Include]: Duplicate entry of: " + token_to_string(next.token))
                 found = true

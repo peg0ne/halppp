@@ -26,31 +26,31 @@ struct Compiler
     fn add_args vector<string> args =>
         for i until args.size() do arguments.push_back(args.at(i))
     ;
-    fn contains_use string id => bool
+    fn has_use string id => bool
         for i until program.usings.size()
             if program.usings.at(i).usings == id doremi true
         ;
         return false
     ;
-    fn contains_function string id => bool
+    fn has_function string id => bool
         for i until program.functions.size()
             if program.functions.at(i).id == id doremi true
         ;
         return false
     ;
-    fn contains_class string id => bool
+    fn has_class string id => bool
         for i until program.classes.size()
             if program.classes.at(i).id == id doremi true
         ;
         return false
     ;
-    fn contains_inc string id => bool
+    fn has_inc string id => bool
         for i until program.includes.size()
             if program.includes.at(i).include == id doremi true
         ;
         return false
     ;
-    fn contains_enum string id => bool
+    fn has_enum string id => bool
         for i until program.enums.size()
             if program.enums.at(i).name == id doremi true
         ;

@@ -42,18 +42,20 @@ pub fn create(content: &String) -> Vec<AstToken> {
             let next = peekable.peek().unwrap_or(&' ');
             let is_cool = c == '=' && next == &'>';
             let is_non_eq = c == '!' && next == &'=';
+            let is_pointer = c == '-' && next == &'>';
+            if is_cool || is_non_eq || is_pointer {
+                peekable.next();
+            }
             if is_cool {
-                peekable.next();
                 ast.push(AstToken::from_id(String::from("=>")));
-                continue;
             } else if is_non_eq {
-                peekable.next();
                 ast.push(AstToken::from_id(String::from("!=")));
-                continue;
+            } else if is_pointer {
+                ast.push(AstToken::from_id(String::from("->")));
             } else {
                 ast.push(AstToken::from_char(c));
-                continue;
             }
+            continue;
         }
         if c == ' ' || c == '\t' || c == '\n' {
             id = try_add_token(id, &mut ast);

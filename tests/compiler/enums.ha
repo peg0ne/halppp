@@ -1,5 +1,5 @@
 fn validate_enum Enum enumerator, Compiler *compiler_t =>
-    let contains = compiler_t->contains_enum(enumerator.name)
+    let contains = compiler_t->has_enum(enumerator.name)
     if contains do display_err_message("Duplicate instances Enum of: " + enumerator.name)
 ;
 
