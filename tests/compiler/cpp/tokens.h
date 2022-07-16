@@ -81,3 +81,5 @@
 #define TOKEN_WHILE "while"
 #define TOKEN_LOOP "loop"
 #define TOKEN_EOF "EOF"
+#define TOKEN_CASE "case"
+#define TOKEN_DEFAULT "default"

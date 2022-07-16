@@ -26,10 +26,11 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
     loop
         let x = get_next_or_exit(compiler_t->next(), "[Condition] Condition is not closed")
         if any(x.token, {TSemiColon, TEof}) do break
-        if x.token == TNewLine do continue;
+        if x.token == TNewLine do continue
         switch x.token
             case TCondition dobr cond.lines.push_back(condition_construct(compiler_t, x.name))
             case TFor dobr cond.lines.push_back(for_construct(compiler_t))
+            case TSwitch dobr cond.lines.push_back(switch_construct(compiler_t))
             default dobr cond.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;

@@ -34,8 +34,11 @@ impl Expression {
             let line = self.line.as_ref().unwrap();
             if line.len() != 0 {
                 expression.push_str(line);
-                expression.push_str(";\n");
+                if !line.starts_with("case") {
+                    expression.push_str(";");
+                }
             }
+            expression.push_str("\n")
         }
         expression
     }

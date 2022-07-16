@@ -1,5 +1,5 @@
 use crate::{
-    expression,
+    expression, condition, foreach,
     enums::Token,
     structs::{Compiler, Condition, Expression, ConditionalExpression},
     utils::{get_next_or_exit, get_id_or_exit},
@@ -90,6 +90,9 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
                 return lines;
             },
             Token::SemiColon => return lines,
+            Token::NewLine => {},
+            Token::For => lines.push(foreach::construct(compiler)),
+            Token::Condition => lines.push(condition::construct(compiler, x.name)),
             _ => lines.push(expression::construct(compiler, x)),
         }
     }

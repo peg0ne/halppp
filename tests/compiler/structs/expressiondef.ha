@@ -21,6 +21,10 @@ fn expr_to_cpp Expressioner *self, int indentation => string
     string expression = EMPTY
     for i until indentation do expression += TAB
     let line_value = line.value_or(EMPTY)
-    expression += line_value.size() == 0 ? EMPTY : line_value + LINE_END
+    let line_str = String(line_value)
+    if line_value.size() != 0
+        expression += line_value
+        expression += line_str.starts_with("case ") ? EMPTY : LINE_END
+    ;
     return expression
 ;

@@ -33,14 +33,14 @@ fn function_construct Compiler *compiler_t, VariableState variable_state, bool c
         function.return_value = Some(Variable("", "int", None<string>(), Private_State))
     ;
     else do function.return_value = Some(get_type(compiler_t))
-    let can_continue = true
-    while can_continue
+    loop
         let x = get_next_or_exit(compiler_t->next(), "Function is not closed " + function.id)
         if any(x.token, {TSemiColon, TFunction, TEof}) do break
         if x.token == TNewLine do continue
         switch x.token 
             case TFor dobr function.add_expr(for_construct(compiler_t))
             case TCondition dobr function.add_expr(condition_construct(compiler_t, x.name))
+            case TSwitch dobr function.add_expr(switch_construct(compiler_t))
             default dobr function.add_expr(expression_construct(compiler_t, x))
         ;
         if x.t.is_do() do break

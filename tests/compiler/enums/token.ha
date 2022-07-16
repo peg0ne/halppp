@@ -68,6 +68,9 @@ enum Token =>
     TString,
     TChar,
     TFloat,
+    TDefault,
+    TCase,
+    TSwitch,
     UNKNOWN,
 ;
 
@@ -125,7 +128,7 @@ struct Token_t
         elif s == TOKEN_DORE dore t = TDore
         elif s == TOKEN_DOREMI dore t = TDoremi
         elif s == TOKEN_ENUM dore t = TEnum
-        elif any(s, {TOKEN_SWITCH, TOKEN_WHILE, TOKEN_LOOP}) dore t = TCondition
+        elif any(s, {TOKEN_WHILE, TOKEN_LOOP}) dore t = TCondition
         elif any(s, {TOKEN_IFS, TOKEN_ELIF, TOKEN_ELSE}) dore t = TCondition
         elif s == TOKEN_EXTEND dore t = TExtend
         elif s == TOKEN_FALSE dore t = TFalse
@@ -145,6 +148,9 @@ struct Token_t
         elif s == TOKEN_UNTIL dore t = TUntil
         elif s == TOKEN_USE dore t = TUse
         elif s == TOKEN_EOF dore t = TEof
+        elif s == TOKEN_CASE dore t = TCase
+        elif s == TOKEN_DEFAULT dore t = TDefault
+        elif s == TOKEN_SWITCH dore t = TSwitch
         t = TId
     ;
     fn is_base => bool
@@ -231,5 +237,8 @@ fn token_to_string Token t => string
     elif t == TUntil doremi "TUntil"
     elif t == TUse doremi "TUse"
     elif t == TCondition doremi "TCondition"
+    elif t == TDefault doremi "TDefault"
+    elif t == TCase doremi "TCase"
+    elif t == TSwitch doremi "TSwitch"
     return "TId"
 ;

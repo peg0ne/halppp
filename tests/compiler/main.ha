@@ -9,7 +9,8 @@ get => structs/[importsdef, globaldef, structdef]
 get => structs/[fordef, conditiondef, expressiondef]
 get => structs/[functiondef, classdef]
 get => structs/[programdef, compilerdef]
-get => ast, imports, enums, foreacher, expressions, conditions, variable, template, functions, classdef
+get => ast, imports, enums, foreacher, expressions
+get => switch, conditions, variable, template, functions, classdef
 
 struct CompileOutput
     string output = EMPTY

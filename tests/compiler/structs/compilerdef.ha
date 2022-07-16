@@ -12,6 +12,7 @@ struct Compiler
         return ast.next()
     ;
     fn peek => Option<AstToken> doremi ast.peek()
+    fn prev => Option<AstToken> doremi ast.prev()
     fn add_fn Function function => void do program.functions.push_back(function)
     fn add_class Class class_obj => void do program.classes.push_back(class_obj)
     fn add_enum Enum enum_def => void do program.enums.push_back(enum_def)

@@ -19,6 +19,7 @@ fn for_construct Compiler *compiler_t => Expressioner
         switch x.token
             case TCondition dobr for_def.lines.push_back(condition_construct(compiler_t, x.name))
             case TFor dobr for_def.lines.push_back(for_construct(compiler_t))
+            case TSwitch dobr for_def.lines.push_back(switch_construct(compiler_t))
             default dobr for_def.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
