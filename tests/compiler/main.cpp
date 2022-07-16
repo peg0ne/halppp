@@ -778,23 +778,27 @@ return ;
    }
  public:
    bool is_base() {
-         if(any ( t , { TClass , TEof , TFunction , TGet , TGlobal } )    ) {
+         switch(t    ) {
+            case TClass:
+            case TEof:
+            case TFunction:
+            case TGet:
+            case TGlobal:
+            case TInclude:
+            case TMacroDefinition:
+            case TNewLine:
+            case TSemiColon:
+            case TStruct:
+            case TUse:
+            case TCompiler:
+            case TEnum:
             
 return true;
-}
-         if(any ( t , { TInclude , TMacroDefinition , TNewLine } )    ) {
+            default:
+;
             
-return true;
+return false;
 }
-         if(any ( t , { TSemiColon , TStruct , TUse } )    ) {
-            
-return true;
-}
-         if(any ( t , { TCompiler , TEnum } )    ) {
-            
-return true;
-}
-      return false;
    }
  public:
    bool is_do() {
@@ -803,27 +807,27 @@ return  any( t,{ TDo, TDobr, TDoco, TDore, TDoremi});
    }
  public:
    bool is_conditional() {
-         if(any ( t , { TEquality , TNonEquality , TMoreThanOrEquals } )    ) {
+         switch(t    ) {
+            case TEquality:
+            case TNonEquality:
+            case TMoreThanOrEquals:
+            case TLessThanOrEquals:
+            case TLessThan:
+            case TMoreThan:
+            case TAnyEquals:
+            case TAllEquals:
+            case TAllNotEquals:
+            case TAllLessThan:
+            case TAllMoreThan:
+            case TAllLessOrEquals:
+            case TAllMoreOrEquals:
             
 return true;
-}
-         if(any ( t , { TLessThanOrEquals , TLessThan , TMoreThan } )    ) {
+            default:
+;
             
-return true;
+return false;
 }
-         if(any ( t , { TAnyEquals , TAllEquals , TAllNotEquals } )    ) {
-            
-return true;
-}
-         if(any ( t , { TAllLessThan , TAllMoreThan } )    ) {
-            
-return true;
-}
-         if(any ( t , { TAllLessOrEquals , TAllMoreOrEquals } )    ) {
-            
-return true;
-}
-      return false;
    }
  public:
    bool is_conditional_sep() {
@@ -832,275 +836,213 @@ return  any( t,{ TAnd, TOr});
    }
 };
 string token_to_string(Token t) {
-      if(t  == TSub  ) {
+      switch(t    ) {
+         case TSub:
          
 return "TSub";
-}
-      else if(t  == TComma  ) {
+         case TComma:
          
 return "TComma";
-}
-      else if(t  == TColon  ) {
+         case TColon:
          
 return "TColon";
-}
-      else if(t  == TSemiColon  ) {
+         case TSemiColon:
          
 return "TSemiColon";
-}
-      else if(t  == TNonEquality  ) {
+         case TNonEquality:
          
 return "TNonEquality";
-}
-      else if(t  == TLParen  ) {
+         case TLParen:
          
 return "TLParen";
-}
-      else if(t  == TBang  ) {
+         case TBang:
          
 return "TBang";
-}
-      else if(t  == TRParen  ) {
+         case TRParen:
          
 return "TRParen";
-}
-      else if(t  == TLBrack  ) {
+         case TLBrack:
          
 return "TLBrack";
-}
-      else if(t  == TRBrack  ) {
+         case TRBrack:
          
 return "TRBrack";
-}
-      else if(t  == TLBlock  ) {
+         case TLBlock:
          
 return "TLBlock";
-}
-      else if(t  == TRBlock  ) {
+         case TRBlock:
          
 return "TRBlock";
-}
-      else if(t  == TAsterix  ) {
+         case TAsterix:
          
 return "TAsterix";
-}
-      else if(t  == TForwardSlash  ) {
+         case TForwardSlash:
          
 return "TForwardSlash";
-}
-      else if(t  == TComment  ) {
+         case TComment:
          
 return "TComment";
-}
-      else if(t  == TNewLine  ) {
+         case TNewLine:
          
 return "TNewLine";
-}
-      else if(t  == TAnd  ) {
+         case TAnd:
          
 return "TAnd";
-}
-      else if(t  == TSum  ) {
+         case TSum:
          
 return "TSum";
-}
-      else if(t  == TLessThan  ) {
+         case TLessThan:
          
 return "TLessThan";
-}
-      else if(t  == TDblLessThan  ) {
+         case TDblLessThan:
          
 return "TDblLessThan";
-}
-      else if(t  == TAllLessThan  ) {
+         case TAllLessThan:
          
 return "TAllLessThan";
-}
-      else if(t  == TLessThanOrEquals  ) {
+         case TLessThanOrEquals:
          
 return "TLessThanOrEquals";
-}
-      else if(t  == TAllNotEquals  ) {
+         case TAllNotEquals:
          
 return "TAllNotEquals";
-}
-      else if(t  == TEquals  ) {
+         case TEquals:
          
 return "TEquals";
-}
-      else if(t  == TAllEquals  ) {
+         case TAllEquals:
          
 return "TAllEquals";
-}
-      else if(t  == TAllLessOrEquals  ) {
+         case TAllLessOrEquals:
          
 return "TAllLessOrEquals";
-}
-      else if(t  == TEquality  ) {
+         case TEquality:
          
 return "TEquality";
-}
-      else if(t  == TCoolArrow  ) {
+         case TCoolArrow:
          
 return "TCoolArrow";
-}
-      else if(t  == TAllMoreOrEquals  ) {
+         case TAllMoreOrEquals:
          
 return "TAllMoreOrEquals";
-}
-      else if(t  == TAnyEquals  ) {
+         case TAnyEquals:
          
 return "TAnyEquals";
-}
-      else if(t  == TMoreThan  ) {
+         case TMoreThan:
          
 return "TMoreThan";
-}
-      else if(t  == TMoreThanOrEquals  ) {
+         case TMoreThanOrEquals:
          
 return "TMoreThanOrEquals";
-}
-      else if(t  == TDblMoreThan  ) {
+         case TDblMoreThan:
          
 return "TDblMoreThan";
-}
-      else if(t  == TAllMoreThan  ) {
+         case TAllMoreThan:
          
 return "TAllMoreThan";
-}
-      else if(t  == TOr  ) {
+         case TOr:
          
 return "TOr";
-}
-      else if(t  == TNumber  ) {
+         case TNumber:
          
 return "TNumber";
-}
-      else if(t  == TFloat  ) {
+         case TFloat:
          
 return "TFloat";
-}
-      else if(t  == TClass  ) {
+         case TClass:
          
 return "TClass";
-}
-      else if(t  == TCompiler  ) {
+         case TCompiler:
          
 return "TCompiler";
-}
-      else if(t  == TMacroDefinition  ) {
+         case TMacroDefinition:
          
 return "TMacroDefinition";
-}
-      else if(t  == TDo  ) {
+         case TDo:
          
 return "TDo";
-}
-      else if(t  == TDobr  ) {
+         case TDobr:
          
 return "TDobr";
-}
-      else if(t  == TDoco  ) {
+         case TDoco:
          
 return "TDoco";
-}
-      else if(t  == TDore  ) {
+         case TDore:
          
 return "TDore";
-}
-      else if(t  == TDoremi  ) {
+         case TDoremi:
          
 return "TDoremi";
-}
-      else if(t  == TEnum  ) {
+         case TEnum:
          
 return "TEnum";
-}
-      else if(t  == TExtend  ) {
+         case TExtend:
          
 return "TExtend";
-}
-      else if(t  == TFalse  ) {
+         case TFalse:
          
 return "TFalse";
-}
-      else if(t  == TFunction  ) {
+         case TFunction:
          
 return "TFunction";
-}
-      else if(t  == TFor  ) {
+         case TFor:
          
 return "TFor";
-}
-      else if(t  == TGet  ) {
+         case TGet:
          
 return "TGet";
-}
-      else if(t  == TGlobal  ) {
+         case TGlobal:
          
 return "TGlobal";
-}
-      else if(t  == TInclude  ) {
+         case TInclude:
          
 return "TInclude";
-}
-      else if(t  == TType  ) {
+         case TType:
          
 return "TType";
-}
-      else if(t  == TLet  ) {
+         case TLet:
          
 return "TLet";
-}
-      else if(t  == TPrivate  ) {
+         case TPrivate:
          
 return "TPrivate";
-}
-      else if(t  == TProtected  ) {
+         case TProtected:
          
 return "TProtected";
-}
-      else if(t  == TPublic  ) {
+         case TPublic:
          
 return "TPublic";
-}
-      else if(t  == TReturn  ) {
+         case TReturn:
          
 return "TReturn";
-}
-      else if(t  == TStruct  ) {
+         case TStruct:
          
 return "TStruct";
-}
-      else if(t  == TTrue  ) {
+         case TTrue:
          
 return "TTrue";
-}
-      else if(t  == TUntil  ) {
+         case TUntil:
          
 return "TUntil";
-}
-      else if(t  == TUse  ) {
+         case TUse:
          
 return "TUse";
-}
-      else if(t  == TCondition  ) {
+         case TCondition:
          
 return "TCondition";
-}
-      else if(t  == TDefault  ) {
+         case TDefault:
          
 return "TDefault";
-}
-      else if(t  == TCase  ) {
+         case TCase:
          
 return "TCase";
-}
-      else if(t  == TSwitch  ) {
+         case TSwitch:
          
 return "TSwitch";
+         default:
+;
+         
+return "TId";
 }
-   return "TId";
 }
 enum VariableState: int {
    Private_State,
@@ -1108,19 +1050,21 @@ enum VariableState: int {
    Public_State,
 };
 string variable_state_to_cpp(VariableState self) {
-      if(self  == Private_State  ) {
+      switch(self    ) {
+         case Private_State:
+         
+return  PRIVATE_STATE;
+         case Protected_State:
+         
+return  PROTECTED_STATE;
+         case Public_State:
+         
+return  PUBLIC_STATE;
+         default:
+;
          
 return  PRIVATE_STATE;
 }
-      if(self  == Protected_State  ) {
-         
-return  PROTECTED_STATE;
-}
-      if(self  == Public_State  ) {
-         
-return  PUBLIC_STATE;
-}
-   return  PRIVATE_STATE;
 }
 struct AstToken {
  public:
@@ -1592,7 +1536,10 @@ return  foreacher.value_or( For()) .to_cpp( indentation+ 1);
    auto line_str = String(line_value);
       if(line_value.size ( )  != 0  ) {
          expression+= line_value;
-         expression+= line_str.starts_with("case ") ? EMPTY: LINE_END;
+            if(! line_str.starts_with ( "case " )    ) {
+               
+ expression+= LINE_END;
+}
 }
    return  expression;
 }
@@ -2766,17 +2713,20 @@ continue ;
                
  break;
 }
-            else if(next.token  == TPrivate  ) {
+            switch(next.token    ) {
+               case TPrivate:
                 variable_state= Private_State;
-continue ;
-}
-            else if(next.token  == TProtected  ) {
+break ;
+               case TProtected:
                 variable_state= Protected_State;
-continue ;
-}
-            else if(next.token  == TPublic  ) {
+break ;
+               case TPublic:
                 variable_state= Public_State;
-continue ;
+break ;
+               default:
+;
+               
+ break;
 }
 }
    class_validate( class_def, compiler_t);

@@ -154,91 +154,114 @@ struct Token_t
         t = TId
     ;
     fn is_base => bool
-        if any(t, {TClass, TEof, TFunction, TGet, TGlobal}) doremi true
-        if any(t, {TInclude, TMacroDefinition, TNewLine}) doremi true
-        if any(t, {TSemiColon, TStruct, TUse}) doremi true
-        if any(t, {TCompiler, TEnum}) doremi true
-        return false
+        switch t
+        case TClass
+        case TEof
+        case TFunction
+        case TGet
+        case TGlobal
+        case TInclude
+        case TMacroDefinition
+        case TNewLine
+        case TSemiColon
+        case TStruct
+        case TUse
+        case TCompiler
+        case TEnum doremi true
+        default doremi false
+        ;
     ;
     fn is_do => bool doremi any(t, {TDo, TDobr, TDoco, TDore, TDoremi})
     fn is_conditional => bool
-        if any(t, {TEquality, TNonEquality, TMoreThanOrEquals}) doremi true
-        if any(t, {TLessThanOrEquals, TLessThan, TMoreThan}) doremi true
-        if any(t, {TAnyEquals, TAllEquals, TAllNotEquals}) doremi true
-        if any(t, {TAllLessThan, TAllMoreThan}) doremi true
-        if any(t, {TAllLessOrEquals, TAllMoreOrEquals}) doremi true
-        return false
+        switch t
+        case TEquality
+        case TNonEquality
+        case TMoreThanOrEquals
+        case TLessThanOrEquals
+        case TLessThan
+        case TMoreThan
+        case TAnyEquals
+        case TAllEquals
+        case TAllNotEquals
+        case TAllLessThan
+        case TAllMoreThan
+        case TAllLessOrEquals
+        case TAllMoreOrEquals doremi true
+        default doremi false
+        ;
     ;
     fn is_conditional_sep => bool doremi any(t, {TAnd, TOr})
 ;
 
 fn token_to_string Token t => string
-    if t == TSub doremi "TSub"
-    elif t == TComma doremi "TComma"
-    elif t == TColon doremi "TColon"
-    elif t == TSemiColon doremi "TSemiColon"
-    elif t == TNonEquality doremi "TNonEquality"
-    elif t == TLParen doremi "TLParen"
-    elif t == TBang doremi "TBang"
-    elif t == TRParen doremi "TRParen"
-    elif t == TLBrack doremi "TLBrack"
-    elif t == TRBrack doremi "TRBrack"
-    elif t == TLBlock doremi "TLBlock"
-    elif t == TRBlock doremi "TRBlock"
-    elif t == TAsterix doremi "TAsterix"
-    elif t == TForwardSlash doremi "TForwardSlash"
-    elif t == TComment doremi "TComment"
-    elif t == TNewLine doremi "TNewLine"
-    elif t == TAnd doremi "TAnd"
-    elif t == TSum doremi "TSum"
-    elif t == TLessThan doremi "TLessThan"
-    elif t == TDblLessThan doremi "TDblLessThan"
-    elif t == TAllLessThan doremi "TAllLessThan"
-    elif t == TLessThanOrEquals doremi "TLessThanOrEquals"
-    elif t == TAllNotEquals doremi "TAllNotEquals"
-    elif t == TEquals doremi "TEquals"
-    elif t == TAllEquals doremi "TAllEquals"
-    elif t == TAllLessOrEquals doremi "TAllLessOrEquals"
-    elif t == TEquality doremi "TEquality"
-    elif t == TCoolArrow doremi "TCoolArrow"
-    elif t == TAllMoreOrEquals doremi "TAllMoreOrEquals"
-    elif t == TAnyEquals doremi "TAnyEquals"
-    elif t == TMoreThan doremi "TMoreThan"
-    elif t == TMoreThanOrEquals doremi "TMoreThanOrEquals"
-    elif t == TDblMoreThan doremi "TDblMoreThan"
-    elif t == TAllMoreThan doremi "TAllMoreThan"
-    elif t == TOr doremi "TOr"
-    elif t == TNumber doremi "TNumber"
-    elif t == TFloat doremi "TFloat"
-    elif t == TClass doremi "TClass"
-    elif t == TCompiler doremi "TCompiler"
-    elif t == TMacroDefinition doremi "TMacroDefinition"
-    elif t == TDo doremi "TDo"
-    elif t == TDobr doremi "TDobr"
-    elif t == TDoco doremi "TDoco"
-    elif t == TDore doremi "TDore"
-    elif t == TDoremi doremi "TDoremi"
-    elif t == TEnum doremi "TEnum"
-    elif t == TExtend doremi "TExtend"
-    elif t == TFalse doremi "TFalse"
-    elif t == TFunction doremi "TFunction"
-    elif t == TFor doremi "TFor"
-    elif t == TGet doremi "TGet"
-    elif t == TGlobal doremi "TGlobal"
-    elif t == TInclude doremi "TInclude"
-    elif t == TType doremi "TType"
-    elif t == TLet doremi "TLet"
-    elif t == TPrivate doremi "TPrivate"
-    elif t == TProtected doremi "TProtected"
-    elif t == TPublic doremi "TPublic"
-    elif t == TReturn doremi "TReturn"
-    elif t == TStruct doremi "TStruct"
-    elif t == TTrue doremi "TTrue"
-    elif t == TUntil doremi "TUntil"
-    elif t == TUse doremi "TUse"
-    elif t == TCondition doremi "TCondition"
-    elif t == TDefault doremi "TDefault"
-    elif t == TCase doremi "TCase"
-    elif t == TSwitch doremi "TSwitch"
-    return "TId"
+    switch t
+    case TSub doremi "TSub"
+    case TComma doremi "TComma"
+    case TColon doremi "TColon"
+    case TSemiColon doremi "TSemiColon"
+    case TNonEquality doremi "TNonEquality"
+    case TLParen doremi "TLParen"
+    case TBang doremi "TBang"
+    case TRParen doremi "TRParen"
+    case TLBrack doremi "TLBrack"
+    case TRBrack doremi "TRBrack"
+    case TLBlock doremi "TLBlock"
+    case TRBlock doremi "TRBlock"
+    case TAsterix doremi "TAsterix"
+    case TForwardSlash doremi "TForwardSlash"
+    case TComment doremi "TComment"
+    case TNewLine doremi "TNewLine"
+    case TAnd doremi "TAnd"
+    case TSum doremi "TSum"
+    case TLessThan doremi "TLessThan"
+    case TDblLessThan doremi "TDblLessThan"
+    case TAllLessThan doremi "TAllLessThan"
+    case TLessThanOrEquals doremi "TLessThanOrEquals"
+    case TAllNotEquals doremi "TAllNotEquals"
+    case TEquals doremi "TEquals"
+    case TAllEquals doremi "TAllEquals"
+    case TAllLessOrEquals doremi "TAllLessOrEquals"
+    case TEquality doremi "TEquality"
+    case TCoolArrow doremi "TCoolArrow"
+    case TAllMoreOrEquals doremi "TAllMoreOrEquals"
+    case TAnyEquals doremi "TAnyEquals"
+    case TMoreThan doremi "TMoreThan"
+    case TMoreThanOrEquals doremi "TMoreThanOrEquals"
+    case TDblMoreThan doremi "TDblMoreThan"
+    case TAllMoreThan doremi "TAllMoreThan"
+    case TOr doremi "TOr"
+    case TNumber doremi "TNumber"
+    case TFloat doremi "TFloat"
+    case TClass doremi "TClass"
+    case TCompiler doremi "TCompiler"
+    case TMacroDefinition doremi "TMacroDefinition"
+    case TDo doremi "TDo"
+    case TDobr doremi "TDobr"
+    case TDoco doremi "TDoco"
+    case TDore doremi "TDore"
+    case TDoremi doremi "TDoremi"
+    case TEnum doremi "TEnum"
+    case TExtend doremi "TExtend"
+    case TFalse doremi "TFalse"
+    case TFunction doremi "TFunction"
+    case TFor doremi "TFor"
+    case TGet doremi "TGet"
+    case TGlobal doremi "TGlobal"
+    case TInclude doremi "TInclude"
+    case TType doremi "TType"
+    case TLet doremi "TLet"
+    case TPrivate doremi "TPrivate"
+    case TProtected doremi "TProtected"
+    case TPublic doremi "TPublic"
+    case TReturn doremi "TReturn"
+    case TStruct doremi "TStruct"
+    case TTrue doremi "TTrue"
+    case TUntil doremi "TUntil"
+    case TUse doremi "TUse"
+    case TCondition doremi "TCondition"
+    case TDefault doremi "TDefault"
+    case TCase doremi "TCase"
+    case TSwitch doremi "TSwitch"
+    default doremi "TId"
+    ;
 ;

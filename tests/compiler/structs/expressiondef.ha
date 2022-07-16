@@ -24,7 +24,7 @@ fn expr_to_cpp Expressioner *self, int indentation => string
     let line_str = String(line_value)
     if line_value.size() != 0
         expression += line_value
-        expression += line_str.starts_with("case ") ? EMPTY : LINE_END
+        if !line_str.starts_with("case ") do expression += LINE_END
     ;
     return expression
 ;

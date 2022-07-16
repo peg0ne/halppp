@@ -39,9 +39,12 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
             doco class_def.variables.push_back(vnb.variable)
         ;
         elif any(next.token, {TEof, TSemiColon, TClass}) do break
-        elif next.token == TPrivate doco variable_state = Private_State
-        elif next.token == TProtected doco variable_state = Protected_State
-        elif next.token == TPublic doco variable_state = Public_State
+        switch next.token
+            case TPrivate dobr variable_state = Private_State
+            case TProtected dobr variable_state = Protected_State
+            case TPublic dobr variable_state = Public_State
+            default do break
+        ;
     ;
     class_validate(class_def, compiler_t)
     compiler_t->add_class(class_def)
