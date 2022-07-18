@@ -8,6 +8,7 @@ using namespace std;
 using namespace std;
 #include "cpp/strings.h"
 #include "cpp/tokens.h"
+#include "cpp/errors.h"
 #include <fstream>
 template <typename T>
 struct Option;
@@ -75,7 +76,8 @@ string get_content(CompilerPath paths);
 void write_program(string program, CompilerPath paths);
 char* to_char_arr(string s, char* buf);
 void compile_program(CompilerPath paths, vector<string> arguments, bool should_remove_cpp);
-string expr_to_cpp(Expressioner* self, int indentation);
+string expr_to_cpp(Expressioner* self, int indent);
+vector<AstToken> ast_create(string content);
 string try_add_token(string id, vector<AstToken>* ast);
 bool is_str_tokens(string s);
 bool is_char_token(char ch);
@@ -83,7 +85,6 @@ bool is_char_number(char ch);
 Option<string> try_get_dbl(Peekable<char>* peekable, char ch);
 string get_matching(Peekable<char>* peekable, char ch);
 AstToken collect_num(Peekable<char>* peekable, char ch);
-vector<AstToken> ast_create(string content);
 vector<string> imports_construct(Compiler* compiler_t);
 vector<string> imports_construct_impl(Compiler* compiler_t);
 vector<string> imports_creation(Compiler* compiler_t, AstToken next);
@@ -101,7 +102,7 @@ Variable get_type(Compiler* compiler_t);
 VariableNBool construct_args(Compiler* compiler_t, Option<string> type_name);
 vector<string> template_construct(Compiler* compiler_t);
 void validate_function(Function function, Compiler* compiler_t);
-Function function_construct(Compiler* compiler_t, VariableState variable_state, bool constructor);
+Function function_construct(Compiler* compiler_t, VariableState state, bool constr);
 string c_err(ClassError err);
 string c_err(ClassError err, string opt);
 string c_err(ClassError err, string opt, bool display);
@@ -423,131 +424,6 @@ return ;
  t= TChar;
 return ;
 }
-         else if(s  == TOKEN_SUB  ) {
-            
- t= TSub;
-return ;
-}
-         else if(s  == TOKEN_COMMA  ) {
-            
- t= TComma;
-return ;
-}
-         else if(s  == TOKEN_COLON  ) {
-            
- t= TColon;
-return ;
-}
-         else if(s  == TOKEN_SEMICOLON  ) {
-            
- t= TSemiColon;
-return ;
-}
-         else if(s  == TOKEN_NONEQUALITY  ) {
-            
- t= TNonEquality;
-return ;
-}
-         else if(s  == TOKEN_LPAREN  ) {
-            
- t= TLParen;
-return ;
-}
-         else if(s  == TOKEN_BANG  ) {
-            
- t= TBang;
-return ;
-}
-         else if(s  == TOKEN_RPAREN  ) {
-            
- t= TRParen;
-return ;
-}
-         else if(s  == TOKEN_LBRACK  ) {
-            
- t= TLBrack;
-return ;
-}
-         else if(s  == TOKEN_RBRACK  ) {
-            
- t= TRBrack;
-return ;
-}
-         else if(s  == TOKEN_LBLOCK  ) {
-            
- t= TLBlock;
-return ;
-}
-         else if(s  == TOKEN_RBLOCK  ) {
-            
- t= TRBlock;
-return ;
-}
-         else if(s  == TOKEN_ASTERIX  ) {
-            
- t= TAsterix;
-return ;
-}
-         else if(s  == TOKEN_POINTER  ) {
-            
- t= TPointer;
-return ;
-}
-         else if(s  == TOKEN_FORWARDSLASH  ) {
-            
- t= TForwardSlash;
-return ;
-}
-         else if(s  == TOKEN_LINE_COMMENT  ) {
-            
- t= TComment;
-return ;
-}
-         else if(s  == TOKEN_NEWLINE  ) {
-            
- t= TNewLine;
-return ;
-}
-         else if(s  == TOKEN_AND  ) {
-            
- t= TAnd;
-return ;
-}
-         else if(s  == TOKEN_SUM  ) {
-            
- t= TSum;
-return ;
-}
-         else if(s  == TOKEN_LESSTHAN  ) {
-            
- t= TLessThan;
-return ;
-}
-         else if(s  == TOKEN_DBLLESSTHAN  ) {
-            
- t= TDblLessThan;
-return ;
-}
-         else if(s  == TOKEN_ALLLESSTHAN  ) {
-            
- t= TAllLessThan;
-return ;
-}
-         else if(s  == TOKEN_LESSTHANOREQUALS  ) {
-            
- t= TLessThanOrEquals;
-return ;
-}
-         else if(s  == TOKEN_ALLNOTEQUALS  ) {
-            
- t= TAllNotEquals;
-return ;
-}
-         else if(s  == TOKEN_EQUALS  ) {
-            
- t= TEquals;
-return ;
-}
          else if(s  == TOKEN_ALLEQUALS  ) {
             
  t= TAllEquals;
@@ -558,14 +434,9 @@ return ;
  t= TAllLessOrEquals;
 return ;
 }
-         else if(s  == TOKEN_EQUALITY  ) {
+         else if(s  == TOKEN_ALLLESSTHAN  ) {
             
- t= TEquality;
-return ;
-}
-         else if(s  == TOKEN_COOLARROW  ) {
-            
- t= TCoolArrow;
+ t= TAllLessThan;
 return ;
 }
          else if(s  == TOKEN_ALLMOREOREQUALS  ) {
@@ -573,49 +444,39 @@ return ;
  t= TAllMoreOrEquals;
 return ;
 }
-         else if(s  == TOKEN_ANYEQUALS  ) {
-            
- t= TAnyEquals;
-return ;
-}
-         else if(s  == TOKEN_MORETHAN  ) {
-            
- t= TMoreThan;
-return ;
-}
-         else if(s  == TOKEN_MORETHANOREQUALS  ) {
-            
- t= TMoreThanOrEquals;
-return ;
-}
-         else if(s  == TOKEN_DBLMORETHAN  ) {
-            
- t= TDblMoreThan;
-return ;
-}
          else if(s  == TOKEN_ALLMORETHAN  ) {
             
  t= TAllMoreThan;
 return ;
 }
-         else if(s  == TOKEN_OR  ) {
+         else if(s  == TOKEN_ALLNOTEQUALS  ) {
             
- t= TOr;
+ t= TAllNotEquals;
 return ;
 }
-         else if(any ( s , { TOKEN_ZERO , TOKEN_ONE , TOKEN_TWO } )    ) {
+         else if(s  == TOKEN_AND  ) {
             
- t= TNumber;
+ t= TAnd;
 return ;
 }
-         else if(any ( s , { TOKEN_THREE , TOKEN_FOUR , TOKEN_FIVE } )    ) {
+         else if(s  == TOKEN_ANYEQUALS  ) {
             
- t= TNumber;
+ t= TAnyEquals;
 return ;
 }
-         else if(any ( s , { TOKEN_SIX , TOKEN_SEVEN , TOKEN_EIGHT , TOKEN_NINE } )    ) {
+         else if(s  == TOKEN_ASTERIX  ) {
             
- t= TNumber;
+ t= TAsterix;
+return ;
+}
+         else if(s  == TOKEN_BANG  ) {
+            
+ t= TBang;
+return ;
+}
+         else if(s  == TOKEN_CASE  ) {
+            
+ t= TCase;
 return ;
 }
          else if(s  == TOKEN_CLASS  ) {
@@ -623,14 +484,39 @@ return ;
  t= TClass;
 return ;
 }
+         else if(s  == TOKEN_COLON  ) {
+            
+ t= TColon;
+return ;
+}
+         else if(s  == TOKEN_COMMA  ) {
+            
+ t= TComma;
+return ;
+}
          else if(s  == TOKEN_COMPILER  ) {
             
  t= TCompiler;
 return ;
 }
-         else if(s  == TOKEN_MACRODEFINITION  ) {
+         else if(s  == TOKEN_COOLARROW  ) {
             
- t= TMacroDefinition;
+ t= TCoolArrow;
+return ;
+}
+         else if(s  == TOKEN_DBLLESSTHAN  ) {
+            
+ t= TDblLessThan;
+return ;
+}
+         else if(s  == TOKEN_DBLMORETHAN  ) {
+            
+ t= TDblMoreThan;
+return ;
+}
+         else if(s  == TOKEN_DEFAULT  ) {
+            
+ t= TDefault;
 return ;
 }
          else if(s  == TOKEN_DO  ) {
@@ -663,14 +549,19 @@ return ;
  t= TEnum;
 return ;
 }
-         else if(any ( s , { TOKEN_WHILE , TOKEN_LOOP } )    ) {
+         else if(s  == TOKEN_EOF  ) {
             
- t= TCondition;
+ t= TEof;
 return ;
 }
-         else if(any ( s , { TOKEN_IFS , TOKEN_ELIF , TOKEN_ELSE } )    ) {
+         else if(s  == TOKEN_EQUALITY  ) {
             
- t= TCondition;
+ t= TEquality;
+return ;
+}
+         else if(s  == TOKEN_EQUALS  ) {
+            
+ t= TEquals;
 return ;
 }
          else if(s  == TOKEN_EXTEND  ) {
@@ -683,14 +574,14 @@ return ;
  t= TFalse;
 return ;
 }
+         else if(s  == TOKEN_FORWARDSLASH  ) {
+            
+ t= TForwardSlash;
+return ;
+}
          else if(s  == TOKEN_FUNCTION  ) {
             
  t= TFunction;
-return ;
-}
-         else if(any ( s , { TOKEN_FOR , TOKEN_FOREACH } )    ) {
-            
- t= TFor;
 return ;
 }
          else if(s  == TOKEN_GET  ) {
@@ -708,14 +599,74 @@ return ;
  t= TInclude;
 return ;
 }
-         else if(any ( s , { TOKEN_INT , TOKEN_STR , TOKEN_STRING } )    ) {
+         else if(s  == TOKEN_LBLOCK  ) {
             
- t= TType;
+ t= TLBlock;
+return ;
+}
+         else if(s  == TOKEN_LBRACK  ) {
+            
+ t= TLBrack;
+return ;
+}
+         else if(s  == TOKEN_LESSTHAN  ) {
+            
+ t= TLessThan;
+return ;
+}
+         else if(s  == TOKEN_LESSTHANOREQUALS  ) {
+            
+ t= TLessThanOrEquals;
 return ;
 }
          else if(s  == TOKEN_LET  ) {
             
  t= TLet;
+return ;
+}
+         else if(s  == TOKEN_LINE_COMMENT  ) {
+            
+ t= TComment;
+return ;
+}
+         else if(s  == TOKEN_LPAREN  ) {
+            
+ t= TLParen;
+return ;
+}
+         else if(s  == TOKEN_MACRODEFINITION  ) {
+            
+ t= TMacroDefinition;
+return ;
+}
+         else if(s  == TOKEN_MORETHAN  ) {
+            
+ t= TMoreThan;
+return ;
+}
+         else if(s  == TOKEN_MORETHANOREQUALS  ) {
+            
+ t= TMoreThanOrEquals;
+return ;
+}
+         else if(s  == TOKEN_NEWLINE  ) {
+            
+ t= TNewLine;
+return ;
+}
+         else if(s  == TOKEN_NONEQUALITY  ) {
+            
+ t= TNonEquality;
+return ;
+}
+         else if(s  == TOKEN_OR  ) {
+            
+ t= TOr;
+return ;
+}
+         else if(s  == TOKEN_POINTER  ) {
+            
+ t= TPointer;
 return ;
 }
          else if(s  == TOKEN_PRIVATE  ) {
@@ -733,14 +684,49 @@ return ;
  t= TPublic;
 return ;
 }
+         else if(s  == TOKEN_RBLOCK  ) {
+            
+ t= TRBlock;
+return ;
+}
+         else if(s  == TOKEN_RBRACK  ) {
+            
+ t= TRBrack;
+return ;
+}
          else if(s  == TOKEN_RETURN  ) {
             
  t= TReturn;
 return ;
 }
+         else if(s  == TOKEN_RPAREN  ) {
+            
+ t= TRParen;
+return ;
+}
+         else if(s  == TOKEN_SEMICOLON  ) {
+            
+ t= TSemiColon;
+return ;
+}
          else if(s  == TOKEN_STRUCT  ) {
             
  t= TStruct;
+return ;
+}
+         else if(s  == TOKEN_SUB  ) {
+            
+ t= TSub;
+return ;
+}
+         else if(s  == TOKEN_SUM  ) {
+            
+ t= TSum;
+return ;
+}
+         else if(s  == TOKEN_SWITCH  ) {
+            
+ t= TSwitch;
 return ;
 }
          else if(s  == TOKEN_TRUE  ) {
@@ -758,24 +744,39 @@ return ;
  t= TUse;
 return ;
 }
-         else if(s  == TOKEN_EOF  ) {
+         else if(any ( s , { TOKEN_WHILE , TOKEN_LOOP } )    ) {
             
- t= TEof;
+ t= TCondition;
 return ;
 }
-         else if(s  == TOKEN_CASE  ) {
+         else if(any ( s , { TOKEN_IFS , TOKEN_ELIF , TOKEN_ELSE } )    ) {
             
- t= TCase;
+ t= TCondition;
 return ;
 }
-         else if(s  == TOKEN_DEFAULT  ) {
+         else if(any ( s , { TOKEN_ZERO , TOKEN_ONE , TOKEN_TWO } )    ) {
             
- t= TDefault;
+ t= TNumber;
 return ;
 }
-         else if(s  == TOKEN_SWITCH  ) {
+         else if(any ( s , { TOKEN_THREE , TOKEN_FOUR , TOKEN_FIVE } )    ) {
             
- t= TSwitch;
+ t= TNumber;
+return ;
+}
+         else if(any ( s , { TOKEN_SIX , TOKEN_SEVEN , TOKEN_EIGHT , TOKEN_NINE } )    ) {
+            
+ t= TNumber;
+return ;
+}
+         else if(any ( s , { TOKEN_FOR , TOKEN_FOREACH } )    ) {
+            
+ t= TFor;
+return ;
+}
+         else if(any ( s , { TOKEN_INT , TOKEN_STR , TOKEN_STRING } )    ) {
+            
+ t= TType;
 return ;
 }
       t= TId;
@@ -784,6 +785,8 @@ return ;
    bool is_base() {
          switch(t    ) {
             case TClass:
+            case TCompiler:
+            case TEnum:
             case TEof:
             case TFunction:
             case TGet:
@@ -794,8 +797,6 @@ return ;
             case TSemiColon:
             case TStruct:
             case TUse:
-            case TCompiler:
-            case TEnum:
             
 return true;
             default:
@@ -812,19 +813,19 @@ return  any( t,{ TDo, TDobr, TDoco, TDore, TDoremi});
  public:
    bool is_conditional() {
          switch(t    ) {
-            case TEquality:
-            case TNonEquality:
-            case TMoreThanOrEquals:
-            case TLessThanOrEquals:
-            case TLessThan:
-            case TMoreThan:
-            case TAnyEquals:
             case TAllEquals:
-            case TAllNotEquals:
-            case TAllLessThan:
-            case TAllMoreThan:
             case TAllLessOrEquals:
+            case TAllLessThan:
             case TAllMoreOrEquals:
+            case TAllMoreThan:
+            case TAllNotEquals:
+            case TAnyEquals:
+            case TEquality:
+            case TLessThan:
+            case TLessThanOrEquals:
+            case TMoreThan:
+            case TMoreThanOrEquals:
+            case TNonEquality:
             
 return true;
             default:
@@ -834,6 +835,11 @@ return false;
 }
    }
  public:
+   string as_str() {
+      
+return  token_to_string( t);
+   }
+ public:
    bool is_conditional_sep() {
       
 return  any( t,{ TAnd, TOr});
@@ -841,126 +847,69 @@ return  any( t,{ TAnd, TOr});
 };
 string token_to_string(Token t) {
       switch(t    ) {
-         case TSub:
-         
-return "TSub";
-         case TComma:
-         
-return "TComma";
-         case TColon:
-         
-return "TColon";
-         case TSemiColon:
-         
-return "TSemiColon";
-         case TNonEquality:
-         
-return "TNonEquality";
-         case TLParen:
-         
-return "TLParen";
-         case TBang:
-         
-return "TBang";
-         case TRParen:
-         
-return "TRParen";
-         case TLBrack:
-         
-return "TLBrack";
-         case TRBrack:
-         
-return "TRBrack";
-         case TLBlock:
-         
-return "TLBlock";
-         case TRBlock:
-         
-return "TRBlock";
-         case TAsterix:
-         
-return "TAsterix";
-         case TForwardSlash:
-         
-return "TForwardSlash";
-         case TComment:
-         
-return "TComment";
-         case TNewLine:
-         
-return "TNewLine";
-         case TAnd:
-         
-return "TAnd";
-         case TSum:
-         
-return "TSum";
-         case TLessThan:
-         
-return "TLessThan";
-         case TDblLessThan:
-         
-return "TDblLessThan";
-         case TAllLessThan:
-         
-return "TAllLessThan";
-         case TLessThanOrEquals:
-         
-return "TLessThanOrEquals";
-         case TAllNotEquals:
-         
-return "TAllNotEquals";
-         case TEquals:
-         
-return "TEquals";
          case TAllEquals:
          
 return "TAllEquals";
          case TAllLessOrEquals:
          
 return "TAllLessOrEquals";
-         case TEquality:
+         case TAllLessThan:
          
-return "TEquality";
-         case TCoolArrow:
-         
-return "TCoolArrow";
+return "TAllLessThan";
          case TAllMoreOrEquals:
          
 return "TAllMoreOrEquals";
-         case TAnyEquals:
-         
-return "TAnyEquals";
-         case TMoreThan:
-         
-return "TMoreThan";
-         case TMoreThanOrEquals:
-         
-return "TMoreThanOrEquals";
-         case TDblMoreThan:
-         
-return "TDblMoreThan";
          case TAllMoreThan:
          
 return "TAllMoreThan";
-         case TOr:
+         case TAllNotEquals:
          
-return "TOr";
-         case TNumber:
+return "TAllNotEquals";
+         case TAnd:
          
-return "TNumber";
-         case TFloat:
+return "TAnd";
+         case TAnyEquals:
          
-return "TFloat";
+return "TAnyEquals";
+         case TAsterix:
+         
+return "TAsterix";
+         case TBang:
+         
+return "TBang";
+         case TCase:
+         
+return "TCase";
          case TClass:
          
 return "TClass";
+         case TColon:
+         
+return "TColon";
+         case TComma:
+         
+return "TComma";
+         case TComment:
+         
+return "TComment";
          case TCompiler:
          
 return "TCompiler";
-         case TMacroDefinition:
+         case TCondition:
          
-return "TMacroDefinition";
+return "TCondition";
+         case TCoolArrow:
+         
+return "TCoolArrow";
+         case TDblLessThan:
+         
+return "TDblLessThan";
+         case TDblMoreThan:
+         
+return "TDblMoreThan";
+         case TDefault:
+         
+return "TDefault";
          case TDo:
          
 return "TDo";
@@ -979,18 +928,30 @@ return "TDoremi";
          case TEnum:
          
 return "TEnum";
+         case TEquality:
+         
+return "TEquality";
+         case TEquals:
+         
+return "TEquals";
          case TExtend:
          
 return "TExtend";
          case TFalse:
          
 return "TFalse";
-         case TFunction:
+         case TFloat:
          
-return "TFunction";
+return "TFloat";
          case TFor:
          
 return "TFor";
+         case TForwardSlash:
+         
+return "TForwardSlash";
+         case TFunction:
+         
+return "TFunction";
          case TGet:
          
 return "TGet";
@@ -1000,12 +961,45 @@ return "TGlobal";
          case TInclude:
          
 return "TInclude";
-         case TType:
+         case TLBlock:
          
-return "TType";
+return "TLBlock";
+         case TLBrack:
+         
+return "TLBrack";
+         case TLessThan:
+         
+return "TLessThan";
+         case TLessThanOrEquals:
+         
+return "TLessThanOrEquals";
          case TLet:
          
 return "TLet";
+         case TLParen:
+         
+return "TLParen";
+         case TMacroDefinition:
+         
+return "TMacroDefinition";
+         case TMoreThan:
+         
+return "TMoreThan";
+         case TMoreThanOrEquals:
+         
+return "TMoreThanOrEquals";
+         case TNewLine:
+         
+return "TNewLine";
+         case TNonEquality:
+         
+return "TNonEquality";
+         case TNumber:
+         
+return "TNumber";
+         case TOr:
+         
+return "TOr";
          case TPrivate:
          
 return "TPrivate";
@@ -1015,33 +1009,45 @@ return "TProtected";
          case TPublic:
          
 return "TPublic";
+         case TRBlock:
+         
+return "TRBlock";
+         case TRBrack:
+         
+return "TRBrack";
          case TReturn:
          
 return "TReturn";
+         case TRParen:
+         
+return "TRParen";
+         case TSemiColon:
+         
+return "TSemiColon";
          case TStruct:
          
 return "TStruct";
+         case TSub:
+         
+return "TSub";
+         case TSum:
+         
+return "TSum";
+         case TSwitch:
+         
+return "TSwitch";
          case TTrue:
          
 return "TTrue";
+         case TType:
+         
+return "TType";
          case TUntil:
          
 return "TUntil";
          case TUse:
          
 return "TUse";
-         case TCondition:
-         
-return "TCondition";
-         case TDefault:
-         
-return "TDefault";
-         case TCase:
-         
-return "TCase";
-         case TSwitch:
-         
-return "TSwitch";
          default:
 ;
          
@@ -1096,7 +1102,7 @@ struct AstToken {
  public:
    string to_string() {
       
-return "["+ name+"]: Token: "+ token_to_string( token);
+return "["+ name+"]: Token: "+ t.as_str();
    }
 };
 struct CompilerPath {
@@ -1415,9 +1421,9 @@ struct For {
    For () {
    }
  public:
-   string to_cpp(int indentation) {
+   string to_cpp(int indent) {
       string for_str= EMPTY;
-         for(int i = 0; i < indentation; i++) {
+         for(int i = 0; i < indent; i++) {
             
  for_str+= TAB;
 }
@@ -1427,7 +1433,7 @@ struct For {
       for_str+= FOR_AFTER_UNTIL+ iterator+ FOR_END;
          for(int i = 0; i < lines.size(); i++) {
             
- for_str+= expr_to_cpp( &lines.at( i), indentation+ 1);
+ for_str+= expr_to_cpp( &lines.at( i), indent+ 1);
 }
       for_str+= BLOCK_END;
       return  for_str;
@@ -1519,20 +1525,20 @@ struct Expressioner {
 return  expr_to_cpp( this, indentation);
    }
 };
-string expr_to_cpp(Expressioner* self, int indentation) {
+string expr_to_cpp(Expressioner* self, int indent) {
    auto condition = self->e_condition;
    auto foreacher = self->e_for;
    auto line = self->line;
+   string expression= EMPTY;
       if(condition.is_some ( )    ) {
          
-return  condition.value_or( Conditions( EMPTY)) .to_cpp( indentation+ 1);
+return  condition.value_or( Conditions()) .to_cpp( indent+ 1);
 }
       if(foreacher.is_some ( )    ) {
          
-return  foreacher.value_or( For()) .to_cpp( indentation+ 1);
+return  foreacher.value_or( For()) .to_cpp( indent+ 1);
 }
-   string expression= EMPTY;
-      for(int i = 0; i < indentation; i++) {
+      for(int i = 0; i < indent; i++) {
          
  expression+= TAB;
 }
@@ -1601,8 +1607,7 @@ return  to_cpp_start(false)+ LINE_END;
       string fun_str= to_cpp_start( in_class);
       fun_str+= BLOCK_START;
          for(int i = 0; i < expressions.size(); i++) {
-            
- fun_str+= expressions.at( i) .to_cpp( 1+ in_class);
+            fun_str+= expressions.at( i) .to_cpp( 1+ in_class);
 }
          if(in_class    ) {
             
@@ -1805,6 +1810,72 @@ return true;
       return false;
    }
 };
+vector<AstToken> ast_create(string content) {
+   vector< char> vec={};
+      for(int i = 0; i < content.size(); i++) {
+         
+ vec.push_back( content[ i]);
+}
+   auto peekable = Peekable<char>(vec);
+   string id= EMPTY;
+   vector< AstToken> ast={};
+      while(true   ) {
+         auto c_opt = peekable.next();
+            if(c_opt.is_none ( )    ) {
+                try_add_token( id, &ast);
+break ;
+}
+         auto c = c_opt.value_or(' ');
+            if(any ( c , { CHAR_QUOTE , CHAR_SINGLE } )    ) {
+               auto matched = get_matching(&peekable,c);
+               id= try_add_token( id, &ast);
+                try_add_token( matched, &ast);
+continue ;
+}
+            else if(is_char_number ( c )    ) {
+               auto num = collect_num(&peekable,c);
+               id= try_add_token( id, &ast);
+                ast.push_back( num);
+continue ;
+}
+         string ch( 1, c);
+         auto is_white_space = any(c,{'\n',' ','\t'});
+         auto is_both_token = is_str_tokens(id)==is_char_token(c);
+            if(! is_both_token    ) {
+               id= try_add_token( id, &ast);
+                  if(! is_white_space    ) {
+                      id+= ch;
+continue ;
+}
+}
+            if(is_both_token    &&is_str_tokens ( id + ch )    ) {
+                id+= ch;
+continue ;
+}
+            else if(is_char_token ( c )    ) {
+               id= try_add_token( id, &ast);
+                ast.push_back( AstToken( c));
+continue ;
+}
+            else if(is_white_space    ) {
+               id= try_add_token( id, &ast);
+                  if(c  == '\n'  ) {
+                     
+ ast.push_back( AstToken("\n"));
+}
+               continue;
+}
+         id+= ch;
+}
+   //"Push extra sets of EOF to ensure it wont break badly";
+   ast.push_back( AstToken("EOF"));
+   ast.push_back( AstToken("EOF"));
+   ast.push_back( AstToken("EOF"));
+   ast.push_back( AstToken("EOF"));
+   ast.push_back( AstToken("EOF"));
+   ast.push_back( AstToken("EOF"));
+   return  ast;
+}
 string try_add_token(string id, vector<AstToken>* ast) {
       if(id.size ( )  == 0  ) {
          
@@ -1881,72 +1952,6 @@ AstToken collect_num(Peekable<char>* peekable, char ch) {
          string numbuf( 1, peeked);
          num+= numbuf;
 }
-}
-vector<AstToken> ast_create(string content) {
-   vector< char> vec={};
-      for(int i = 0; i < content.size(); i++) {
-         
- vec.push_back( content[ i]);
-}
-   auto peekable = Peekable<char>(vec);
-   string id= EMPTY;
-   vector< AstToken> ast={};
-      while(true   ) {
-         auto c_opt = peekable.next();
-            if(c_opt.is_none ( )    ) {
-                try_add_token( id, &ast);
-break ;
-}
-         auto c = c_opt.value_or(' ');
-            if(any ( c , { CHAR_QUOTE , CHAR_SINGLE } )    ) {
-               auto matched = get_matching(&peekable,c);
-               id= try_add_token( id, &ast);
-                try_add_token( matched, &ast);
-continue ;
-}
-            else if(is_char_number ( c )    ) {
-               auto num = collect_num(&peekable,c);
-               id= try_add_token( id, &ast);
-                ast.push_back( num);
-continue ;
-}
-         string ch( 1, c);
-         auto is_white_space = any(c,{'\n',' ','\t'});
-         auto is_both_token = is_str_tokens(id)==is_char_token(c);
-            if(! is_both_token    ) {
-               id= try_add_token( id, &ast);
-                  if(! is_white_space    ) {
-                      id+= ch;
-continue ;
-}
-}
-            if(is_both_token    &&is_str_tokens ( id + ch )    ) {
-                id+= ch;
-continue ;
-}
-            else if(is_char_token ( c )    ) {
-               id= try_add_token( id, &ast);
-                ast.push_back( AstToken( c));
-continue ;
-}
-            else if(is_white_space    ) {
-               id= try_add_token( id, &ast);
-                  if(c  == '\n'  ) {
-                     
- ast.push_back( AstToken("\n"));
-}
-               continue;
-}
-         id+= ch;
-}
-   //"Push extra sets of EOF to ensure it wont break badly";
-   ast.push_back( AstToken("EOF"));
-   ast.push_back( AstToken("EOF"));
-   ast.push_back( AstToken("EOF"));
-   ast.push_back( AstToken("EOF"));
-   ast.push_back( AstToken("EOF"));
-   ast.push_back( AstToken("EOF"));
-   return  ast;
 }
 vector<string> imports_construct(Compiler* compiler_t) {
    get_arrow_or_exit( compiler_t-> next(),"[Import]: Missing [=>] in declaration");
@@ -2444,10 +2449,10 @@ Option<string> get_value(Compiler* compiler_t, bool found_setter) {
    string value= EMPTY;
       if(! found_setter    ) {
          
- get_eq_or_exit( compiler_t-> next(),"[Variable]: Invalid value setter");
+ get_eq_or_exit( compiler_t-> next(), VAR_ERR_SET);
 }
       while(true   ) {
-         auto next = get_next_or_exit(compiler_t->next(),"[Variable]: Invalid value");
+         auto next = get_next_or_exit(compiler_t->next(),VAR_ERR_VAL);
             if(next.token  == TNewLine  ) {
                
  break;
@@ -2457,7 +2462,7 @@ Option<string> get_value(Compiler* compiler_t, bool found_setter) {
    return  value.size()== 0 ? None<string>(): Some( value);
 }
 Variable get_type(Compiler* compiler_t) {
-   auto next = get_next_or_exit(compiler_t->next(),"[Variable]: Invalid Function Return Value");
+   auto next = get_next_or_exit(compiler_t->next(),VAR_ERR_NON);
    auto variable = Variable(true);
       if(any ( next.token , { TId , TType } )    ) {
          
@@ -2465,18 +2470,17 @@ Variable get_type(Compiler* compiler_t) {
 }
       else if(next.token  != TNewLine  ) {
          
- display_err_message("[Variable]: Expected return value type got:\n"+ token_to_string( next.token));
+ display_err_message( VAR_ERR_TYP+ token_to_string( next.token));
 }
    auto tried = try_get(compiler_t->peek(),TLessThan);
       if(tried    ) {
             if(! variable.has_id ( )    ) {
-               
- display_err_message("[Variable]: Variable declaration cannot have template without id:\n"+ variable.v_type);
+               display_err_message( VAR_ERR_TEM+ variable.v_type);
 }
-         next= get_next_or_exit( compiler_t-> next(),"[Variable]: Invalid Declaration");
+         next= get_next_or_exit( compiler_t-> next(), VAR_ERR_INV);
          variable.v_type+= next.name;
             while(true   ) {
-               next= get_next_or_exit( compiler_t-> next(),"[Variable]: Invalid Declaration");
+               next= get_next_or_exit( compiler_t-> next(), VAR_ERR_INV);
                variable.v_type+= next.name;
                   if(next.token  == TMoreThan  ) {
                      
@@ -2487,7 +2491,7 @@ Variable get_type(Compiler* compiler_t) {
    tried= try_get( compiler_t-> peek(), TAsterix);
       if(tried    ) {
          
- variable.v_type+= get_or_exit( compiler_t-> next(), TAsterix,"[Variable] Unexpected error");
+ variable.v_type+= get_or_exit( compiler_t-> next(), TAsterix, VAR_ERR_NON);
 }
    return  variable;
 }
@@ -2495,11 +2499,11 @@ VariableNBool construct_args(Compiler* compiler_t, Option<string> type_name) {
    auto variable = Variable();
       if(type_name.is_some ( )    ) {
          
- variable.v_type= type_name.value_or("void");
+ variable.v_type= type_name.value_or( VOID);
 }
    bool is_end = false;
       while(true   ) {
-         auto next = get_next_or_exit(compiler_t->next(),"[Variable]: Invalid Declaration");
+         auto next = get_next_or_exit(compiler_t->next(),VAR_ERR_INV);
             if(any ( next.token , { TNewLine , TCoolArrow } )    ) {
                 is_end=true;
 break ;
@@ -2515,18 +2519,18 @@ break ;
             else if(next.token  == TAsterix  ) {
                   if(! variable.has_type ( )    ) {
                      
- display_err_message("[Variable]: Pointer infront of type not allowed:\n"+ variable.v_type);
+ display_err_message( VAR_ERR_POI+ variable.v_type);
 }
                variable.v_type+= next.name;
 }
             else if(next.token  == TLessThan  ) {
                   if(! variable.has_id ( )    &&! variable.has_type ( )    ) {
                      
- display_err_message("[Variable]: Variable declaration cannot have template without id and type:\n"+ variable.v_type);
+ display_err_message( VAR_ERR_TEM+ variable.v_type);
 }
                variable.v_type+= next.name;
                   while(true   ) {
-                     next= get_next_or_exit( compiler_t-> next(),"[Variable]: Invalid Declaration");
+                     next= get_next_or_exit( compiler_t-> next(), VAR_ERR_INV);
                      variable.v_type+= next.name;
                         if(next.token  == TMoreThan  ) {
                            
@@ -2543,12 +2547,12 @@ continue ;
                       variable.id= next.name;
 continue ;
 }
-               display_err_message("[Variable]: Variable declaration already complete:\n"+ variable.id);
+               display_err_message( VAR_ERR_COM+ variable.id);
 }
 }
       if(! variable.has_minimum ( )    &&! is_end    ) {
          
- display_err_message("[Variable]: Variable declaration incomplete:\n"+ variable.id);
+ display_err_message( VAR_ERR_INC+ variable.id);
 }
    return  VariableNBool( variable, is_end);
 }
@@ -2591,9 +2595,9 @@ return ;
          display_err_message("Duplicate instances Function of: "+ function.id);
 }
 }
-Function function_construct(Compiler* compiler_t, VariableState variable_state, bool constructor) {
-   auto function = Function(variable_state);
-      if(! constructor    ) {
+Function function_construct(Compiler* compiler_t, VariableState state, bool constr) {
+   auto function = Function(state);
+      if(! constr    ) {
          function.id= get_id_or_exit( compiler_t-> next(),"[FunctionError]: No Function Id");
 }
    auto peeked_opt = compiler_t->peek();
@@ -2602,8 +2606,7 @@ Function function_construct(Compiler* compiler_t, VariableState variable_state, 
  display_err_message("Error when trying to parse function: "+ function.id);
 }
       if(peeked_opt.value_or ( AstToken ( "NONE" ) ) .token  == TLessThan  ) {
-         
- function.templates= template_construct( compiler_t);
+         function.templates= template_construct( compiler_t);
 }
       while(true   ) {
          auto vnb = construct_args(compiler_t,None<string>());
@@ -2657,18 +2660,19 @@ break ;
 }
 }
       if(function.id  == "main"  ) {
-         
- function.add_expr( Expressioner( None< Conditions>(), None< For>(), Some((string)"return 0")));
+         function.add_expr( Expressioner( None< Conditions>(), None< For>(), Some((string)"return 0")));
 }
    // validate_function( function, compiler_t);
    compiler_t-> add_fn( function);
    return  function;
 }
 enum ClassError: int {
+   CClosed,
+   CDefinition,
    CDuplicate,
    CInheritance,
    CNoId,
-   CDefinition,
+   CNoInheritor,
 };
 string c_err(ClassError err) {
    
@@ -2681,20 +2685,20 @@ return  c_err( err, opt,false);
 string c_err(ClassError err, string opt, bool display) {
    string msg="[Class] ";
       switch(err    ) {
-         case CNoId:
-          msg+="Invalid class declaration";
-break ;
-         case CDuplicate:
-          msg+="Duplicate instance of: ";
+         case CClosed:
+          msg+="Class is not closed ";
 break ;
          case CDefinition:
           msg+="Invalid class definition of: ";
 break ;
+         case CDuplicate:
+          msg+="Duplicate instance of: ";
+break ;
          case CInheritance:
           msg+="Invalid inheritance of: ";
 break ;
-         case CClosed:
-          msg+="Class is not closed ";
+         case CNoId:
+          msg+="Invalid class declaration";
 break ;
          case CNoInheritor:
           msg+="Invalid Inheritor Token\nExpected Id for inheritance for class: ";
@@ -2742,8 +2746,7 @@ Class class_construct(Compiler* compiler_t, bool is_struct) {
          next= get_next_or_exit( compiler_t-> next(), c_err( CDefinition, class_def.id));
 }
       if(next.token  == TCoolArrow  ) {
-         
- class_def.inherit= Some( get_id_or_exit( compiler_t-> next(), c_err( CNoInheritor, class_def.id)));
+         class_def.inherit= Some( get_id_or_exit( compiler_t-> next(), c_err( CNoInheritor, class_def.id)));
 }
    // Construct inner Class values;
    auto variable_state = !is_struct?Private_State:Public_State;
@@ -2807,12 +2810,12 @@ struct CompileOutput {
 return  includes+ headers+ fnheaders+ output;
    }
  public:
-   CompileOutput (string output, string includes, string headers, string fnheaders, vector<string> arguments) {
+   CompileOutput (string output, string includes, string headers, string fnheaders, vector<string> args) {
       this-> output= output;
       this-> includes= includes;
       this-> headers= headers;
       this-> fnheaders= fnheaders;
-      this-> arguments= arguments;
+      this-> arguments= args;
    }
 };
 int main(int argc, char* argv[]) {
@@ -2843,8 +2846,7 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
       while(true   ) {
          auto next = get_next_or_exit(compiler_t.next(),"Compiler failed to do unexpected EOF");
             if(! next.t.is_base ( )    ) {
-               
- display_err_message("Token not allowed in base: "+ next.name+", Type: "+ token_to_string( next.token));
+               display_err_message("Token not allowed in base: "+ token_to_string( next.token));
 }
             if(next.token  == TEof  ) {
                

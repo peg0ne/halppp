@@ -12,14 +12,16 @@ struct Expressioner
     fn to_cpp int indentation => string doremi expr_to_cpp(this, indentation)
 ;
 
-fn expr_to_cpp Expressioner *self, int indentation => string
+fn expr_to_cpp Expressioner *self, int indent => string
     let condition = self->e_condition
     let foreacher = self->e_for
     let line = self->line
-    if condition.is_some() doremi condition.value_or(Conditions(EMPTY)).to_cpp(indentation + 1)
-    if foreacher.is_some() doremi foreacher.value_or(For()).to_cpp(indentation + 1)
     string expression = EMPTY
-    for i until indentation do expression += TAB
+
+    if condition.is_some() doremi condition.value_or(Conditions()).to_cpp(indent + 1)
+    if foreacher.is_some() doremi foreacher.value_or(For()).to_cpp(indent + 1)
+
+    for i until indent do expression += TAB
     let line_value = line.value_or(EMPTY)
     let line_str = String(line_value)
     if line_value.size() != 0

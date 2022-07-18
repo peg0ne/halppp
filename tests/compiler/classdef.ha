@@ -51,7 +51,9 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
         class_def.templates = template_construct(compiler_t)
         next = get_next_or_exit(compiler_t->next(), c_err(CDefinition, class_def.id))
     ;
-    if next.token == TCoolArrow do class_def.inherit = Some(get_id_or_exit(compiler_t->next(), c_err(CNoInheritor, class_def.id)))
+    if next.token == TCoolArrow
+        class_def.inherit = Some(get_id_or_exit(compiler_t->next(), c_err(CNoInheritor, class_def.id)))
+    ;
     //Construct inner Class values
     let variable_state = !is_struct ? Private_State : Public_State
     loop

@@ -15,5 +15,5 @@ struct AstToken
         this->t = Token_t(name)
         this->token = t.t
     ;
-    fn to_string => string doremi "[" + name + "]: Token: " + token_to_string(token)
+    fn to_string => string doremi "[" + name + "]: Token: " + t.as_str()
 ;

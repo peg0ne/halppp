@@ -12,14 +12,16 @@ fn validate_function Function function, Compiler *compiler_t =>
     ;
 ;
 
-fn function_construct Compiler *compiler_t, VariableState variable_state, bool constructor => Function
-    let function = Function(variable_state)
-    if !constructor 
+fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function
+    let function = Function(state)
+    if !constr
         function.id = get_id_or_exit(compiler_t->next(), "[FunctionError]: No Function Id")
     ;
     let peeked_opt = compiler_t->peek()
     if peeked_opt.is_none() do display_err_message("Error when trying to parse function: " + function.id)
-    if peeked_opt.value_or(AstToken("NONE")).token == TLessThan do function.templates = template_construct(compiler_t)
+    if peeked_opt.value_or(AstToken("NONE")).token == TLessThan
+        function.templates = template_construct(compiler_t)
+    ;
     loop
         let vnb = construct_args(compiler_t, None<string>())
         if !vnb.variable.has_minimum() do break
@@ -44,7 +46,9 @@ fn function_construct Compiler *compiler_t, VariableState variable_state, bool c
         ;
         if x.t.is_do() do break
     ;
-    if function.id == "main" do function.add_expr(Expressioner(None<Conditions>(), None<For>(), Some((string)"return 0")))
+    if function.id == "main"
+        function.add_expr(Expressioner(None<Conditions>(), None<For>(), Some((string)"return 0")))
+    ;
     // validate_function(function, compiler_t)
     compiler_t->add_fn(function)
     return function

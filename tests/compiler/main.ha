@@ -1,6 +1,6 @@
 inc => string
 get => ../../lib/[peekable, print, stringextensions, conditional]
-inc => "cpp/strings.h", "cpp/tokens.h"
+inc => "cpp/strings.h", "cpp/tokens.h", "cpp/errors.h"
 get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
 get => message, utils, fileutil
@@ -19,12 +19,12 @@ struct CompileOutput
     string fnheaders = EMPTY
     vector<string> arguments = {}
     fn content => string doremi includes + headers + fnheaders + output
-    CompileOutput string output, string includes, string headers, string fnheaders, vector<string> arguments =>
+    CompileOutput string output, string includes, string headers, string fnheaders, vector<string> args =>
         this->output = output
         this->includes = includes
         this->headers = headers
         this->fnheaders =fnheaders
-        this->arguments = arguments
+        this->arguments = args
     ;
 ;
 
@@ -52,7 +52,9 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
     string args = EMPTY
     loop
         let next = get_next_or_exit(compiler_t.next(), "Compiler failed to do unexpected EOF")
-        if !next.t.is_base() do display_err_message("Token not allowed in base: " + next.name + ", Type: " + token_to_string(next.token))
+        if !next.t.is_base()
+            display_err_message("Token not allowed in base: " + token_to_string(next.token))
+        ;
         if next.token == TEof do break
         elif next.token == TNewLine do continue
         elif any(next.token, {TStruct, TClass})

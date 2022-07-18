@@ -1,8 +1,58 @@
+fn ast_create string content => vector<AstToken>
+    vector<char> vec = {}
+    for i until content.size() do vec.push_back(content[i])
+    let peekable = Peekable<char>(vec)
+    string id = EMPTY
+    vector<AstToken> ast = {}
+    loop
+        let c_opt = peekable.next()
+        if c_opt.is_none() dobr try_add_token(id, &ast)
+        let c = c_opt.value_or(' ')
+        if any(c, {CHAR_QUOTE, CHAR_SINGLE})
+            let matched = get_matching(&peekable, c)
+            id = try_add_token(id, &ast)
+            doco try_add_token(matched, &ast)
+        ;
+        elif is_char_number(c)
+            let num = collect_num(&peekable, c)
+            id = try_add_token(id, &ast)
+            doco ast.push_back(num)
+        ;
+        string ch(1, c)
+        let is_white_space = any(c, {'\n', ' ', '\t'})
+        let is_both_token = is_str_tokens(id) == is_char_token(c)
+        if !is_both_token
+            id = try_add_token(id, &ast)
+            if !is_white_space doco id += ch
+        ;
+        if is_both_token && is_str_tokens(id + ch) doco id += ch
+        elif is_char_token(c)
+            id = try_add_token(id, &ast)
+            doco ast.push_back(AstToken(c))
+        ;
+        elif is_white_space
+            id = try_add_token(id, &ast)
+            if c == '\n' do ast.push_back(AstToken("\n"))
+            continue
+        ;
+        id += ch
+    ;
+    // "Push extra sets of EOF to ensure it wont break badly"
+    ast.push_back(AstToken("EOF"))
+    ast.push_back(AstToken("EOF"))
+    ast.push_back(AstToken("EOF"))
+    ast.push_back(AstToken("EOF"))
+    ast.push_back(AstToken("EOF"))
+    ast.push_back(AstToken("EOF"))
+    return ast
+;
+
 fn try_add_token string id, vector<AstToken> *ast => string
     if id.size() == 0 doremi id
     ast->push_back(AstToken(id))
     return EMPTY
 ;
+
 fn is_str_tokens string s => bool
     if s.size() == 0 doremi false
     for i until s.size()
@@ -55,53 +105,4 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
         string numbuf(1, peeked)
         num += numbuf
     ;
-;
-
-fn ast_create string content => vector<AstToken>
-    vector<char> vec = {}
-    for i until content.size() do vec.push_back(content[i])
-    let peekable = Peekable<char>(vec)
-    string id = EMPTY
-    vector<AstToken> ast = {}
-    loop
-        let c_opt = peekable.next()
-        if c_opt.is_none() dobr try_add_token(id, &ast)
-        let c = c_opt.value_or(' ')
-        if any(c, {CHAR_QUOTE, CHAR_SINGLE})
-            let matched = get_matching(&peekable, c)
-            id = try_add_token(id, &ast)
-            doco try_add_token(matched, &ast)
-        ;
-        elif is_char_number(c)
-            let num = collect_num(&peekable, c)
-            id = try_add_token(id, &ast)
-            doco ast.push_back(num)
-        ;
-        string ch(1, c)
-        let is_white_space = any(c, {'\n', ' ', '\t'})
-        let is_both_token = is_str_tokens(id) == is_char_token(c)
-        if !is_both_token
-            id = try_add_token(id, &ast)
-            if !is_white_space doco id += ch
-        ;
-        if is_both_token && is_str_tokens(id + ch) doco id += ch
-        elif is_char_token(c)
-            id = try_add_token(id, &ast)
-            doco ast.push_back(AstToken(c))
-        ;
-        elif is_white_space
-            id = try_add_token(id, &ast)
-            if c == '\n' do ast.push_back(AstToken("\n"))
-            continue
-        ;
-        id += ch
-    ;
-    // "Push extra sets of EOF to ensure it wont break badly"
-    ast.push_back(AstToken("EOF"))
-    ast.push_back(AstToken("EOF"))
-    ast.push_back(AstToken("EOF"))
-    ast.push_back(AstToken("EOF"))
-    ast.push_back(AstToken("EOF"))
-    ast.push_back(AstToken("EOF"))
-    return ast
 ;
