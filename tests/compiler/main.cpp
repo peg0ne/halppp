@@ -309,6 +309,8 @@ struct Function;
 struct Class;
 struct Program;
 struct Compiler;
+enum EnumError: int;
+enum ConditionError: int;
 struct VariableNBool;
 enum ClassError: int;
 struct CompileOutput;
@@ -360,6 +362,9 @@ vector<string> imports_construct(Compiler* compiler_t);
 vector<string> imports_construct_impl(Compiler* compiler_t);
 vector<string> imports_creation(Compiler* compiler_t, AstToken next);
 bool imports_check_duplicate(vector<string> imports, string id);
+string e_err(EnumError err);
+string e_err(EnumError err, string opt);
+string e_err(EnumError err, string opt, bool display);
 void validate_enum(Enum enumerator, Compiler* compiler_t);
 Enum enums_construct(Compiler* compiler_t);
 Expressioner for_construct(Compiler* compiler_t);
@@ -367,6 +372,9 @@ Expressioner expression_construct(Compiler* compiler_t, AstToken first);
 Expressioner get_let_expr(Compiler* compiler_t);
 Expressioner switch_construct(Compiler* compiler_t);
 vector<Expressioner> create_case(Compiler* compiler_t, bool is_default);
+string co_err(ConditionError err);
+string co_err(ConditionError err, string opt);
+string co_err(ConditionError err, string opt, bool display);
 Expressioner condition_construct(Compiler* compiler_t, string condition_type);
 Option<string> get_value(Compiler* compiler_t, bool found_setter);
 Variable get_type(Compiler* compiler_t);
@@ -2357,31 +2365,88 @@ bool imports_check_duplicate(vector<string> imports, string id) {
 }
    return false;
 }
+enum EnumError: int {
+   EDuplicate,
+   ENoId,
+   ENoArrow,
+   EClosed,
+   EIdExists,
+   ECommaNoId,
+   EValueNoId,
+   EUnexpected,
+};
+string e_err(EnumError err) {
+   
+return  e_err( err, EMPTY,false);
+}
+string e_err(EnumError err, string opt) {
+   
+return  e_err( err, opt,false);
+}
+string e_err(EnumError err, string opt, bool display) {
+   string msg="[Enum] ";
+      switch(err    ) {
+         case EDuplicate:
+          msg+="Duplicate instances Enum of: ";
+break ;
+         case ENoId:
+          msg+="Requires Id in initialization";
+break ;
+         case ENoArrow:
+          msg+="Requires [=>] after Id";
+break ;
+         case EClosed:
+          msg+="Ends without closing itself";
+break ;
+         case EIdExists:
+          msg+="Cannot assign id to EnumValue that already has id";
+break ;
+         case ECommaNoId:
+          msg+="Missing enum before separator";
+break ;
+         case EValueNoId:
+          msg+="Cannot assign value to EnumValue without id";
+break ;
+         case EUnexpected:
+          msg+="Invalid token inside Enum constructor";
+break ;
+         default:
+;
+         
+ break;
+}
+   msg+= opt;
+      if(display    ) {
+         
+ display_err_message( msg);
+}
+   return  msg;
+}
 void validate_enum(Enum enumerator, Compiler* compiler_t) {
    auto contains = compiler_t->has_enum(enumerator.name);
       if(contains    ) {
          
- display_err_message("Duplicate instances Enum of: "+ enumerator.name);
+ e_err( EDuplicate, enumerator.name,true);
 }
 }
 Enum enums_construct(Compiler* compiler_t) {
-   auto id = get_id_or_exit(compiler_t->next(),"[Enum] Requires Id in initialization");
+   auto id = get_id_or_exit(compiler_t->next(),e_err(ENoId));
    auto enumerator = Enum(id);
-   get_arrow_or_exit( compiler_t-> next(),"[Enum] Requires [=>] after Id");
+   get_arrow_or_exit( compiler_t-> next(), e_err( ENoArrow));
    auto enum_def = EnumValue();
       while(true   ) {
-         auto next = get_next_or_exit(compiler_t->next(),"[Enum] Ends without closing itself");
+         auto next = get_next_or_exit(compiler_t->next(),e_err(EClosed));
             if(next.token  == TId  ) {
                   if(enum_def.name.size ( )  == 0  ) {
                       enum_def.name= next.name;
 continue ;
 }
-               display_err_message("[Enum] Cannot assign id to EnumValue that already has id");
+               e_err( EIdExists, EMPTY,true);
 }
             else if(next.token  == TComma  ) {
                   if(enum_def.name.size ( )  == 0  ) {
                      
- display_err_message("[Enum] Missing enum before separator");
+ e_err( ECommaNoId, EMPTY,true);
 }
                enumerator.enums.push_back( enum_def);
                enum_def= EnumValue();
@@ -2391,7 +2456,7 @@ continue ;
                      
  break;
 }
-               display_err_message("[Enum] Cannot assign value to EnumValue without id");
+               e_err( EValueNoId, EMPTY,true);
 }
             if(any ( next.token , { TSemiColon , TEof } )    ) {
                
@@ -2401,7 +2466,7 @@ continue ;
                
  continue;
 }
-         display_err_message("[Enum] Invalid token inside Enum constructor");
+         e_err( EUnexpected, EMPTY,true);
 }
    validate_enum( enumerator, compiler_t);
    compiler_t-> add_enum( enumerator);
@@ -2674,6 +2739,35 @@ break ;
 }
 }
 }
+enum ConditionError: int {
+   CoClosed,
+};
+string co_err(ConditionError err) {
+   
+return  co_err( err, EMPTY,false);
+}
+string co_err(ConditionError err, string opt) {
+   
+return  co_err( err, opt,false);
+}
+string co_err(ConditionError err, string opt, bool display) {
+   string msg="[Condition] ";
+      switch(err    ) {
+         case CoClosed:
+          msg+="Condition is not closed ";
+break ;
+         default:
+;
+         
+ break;
+}
+   msg+= opt;
+      if(display    ) {
+         
+ display_err_message( msg);
+}
+   return  msg;
+}
 Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
    auto cond = Conditions(condition_type);
    auto expression = ConditionalExpression();
@@ -2686,7 +2780,7 @@ Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
          expression.value_left="true";
 }
       while(true   ) {
-         auto x = get_next_or_exit(compiler_t->next(),"[Condition] Condition is not closed");
+         auto x = get_next_or_exit(compiler_t->next(),co_err(CoClosed));
             if(x.t.is_do ( )    ) {
                cond.add_expr( expression);
                cond.lines.push_back( expression_construct( compiler_t, x));
@@ -2713,7 +2807,7 @@ continue ;
          expression.value_right+= x.name+" ";
 }
       while(true   ) {
-         auto x = get_next_or_exit(compiler_t->next(),"[Condition] Condition is not closed");
+         auto x = get_next_or_exit(compiler_t->next(),co_err(CoClosed));
             if(any ( x.token , { TSemiColon , TEof } )    ) {
                
  break;

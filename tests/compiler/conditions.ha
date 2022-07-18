@@ -1,3 +1,20 @@
+enum ConditionError =>
+    CoClosed,
+;
+
+fn co_err ConditionError err => string doremi co_err(err, EMPTY, false)
+fn co_err ConditionError err, string opt => string doremi co_err(err, opt, false)
+fn co_err ConditionError err, string opt, bool display => string
+    string msg = "[Condition] "
+    switch err
+    case CoClosed dobr msg += "Condition is not closed "
+    default do break
+    ;
+    msg += opt
+    if display do display_err_message(msg)
+    return msg
+;
+
 fn condition_construct Compiler *compiler_t, string condition_type => Expressioner
     let cond = Conditions(condition_type)
     let expression = ConditionalExpression()
@@ -7,7 +24,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_left = "true"
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[Condition] Condition is not closed")
+        let x = get_next_or_exit(compiler_t->next(), co_err(CoClosed))
         if x.t.is_do()
             cond.add_expr(expression)
             cond.lines.push_back(expression_construct(compiler_t, x))
@@ -24,7 +41,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_right += x.name + " "
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[Condition] Condition is not closed")
+        let x = get_next_or_exit(compiler_t->next(), co_err(CoClosed))
         if any(x.token, {TSemiColon, TEof}) do break
         if x.token == TNewLine do continue
         switch x.token
