@@ -34,13 +34,13 @@ fn main =>
     FpFn fpfn = get_folder_and_name(get_file_path(argc, argv))
     let paths = CompilerPath(get_file_path(argc, argv), fpfn.f_p, fpfn.f_n)
     let p = Program()
-    let output = compile_main(paths, p)
+    let output = compile_main(paths, &p)
     write_program(output.content(), paths)
     compile_program(paths, output.arguments, should_remove_cpp)
 ;
 
-fn compile_main CompilerPath paths, Program p => CompileOutput doremi compile(paths, p, true)
-fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
+fn compile_main CompilerPath paths, Program *p => CompileOutput doremi compile(paths, p, true)
+fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     println("compiling: " + paths.current)
     string output = EMPTY
     string includes = EMPTY
@@ -53,12 +53,12 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
     string args = EMPTY
     loop
         let next = get_next_or_exit(compiler_t.next(), "Compiler failed to do unexpected EOF")
-        if !next.t.is_base()
+        if !next.is_base()
             display_err_message("Token not allowed in base: " + to_string(next.token))
         ;
-        if next.token == Token::Eof do break
-        elif next.token == Token::NewLine do continue
-        elif any(next.token, {Token::Struct, Token::Class})
+        if next.is_terminator() do break
+        elif next.is_nl() do continue
+        elif next.is_classy()
             let classdef = class_construct(&compiler_t, next.token == Token::Struct)
             output += classdef.to_cpp()
             headers += classdef.to_cpp_h()
@@ -90,7 +90,7 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
             for i until incs.size()
                 FpFn fpfn = get_folder_and_name(paths.folder_path + incs.at(i) + HA_SUFFIX)
                 let get_path = CompilerPath(paths.folder_path + incs.at(i) + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
-                let get_out = compile(get_path, compiler_t.program, false)
+                let get_out = compile(get_path, p, false)
                 output += get_out.output
                 includes += get_out.includes
                 headers += get_out.headers
@@ -111,8 +111,8 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
 
 fn validate_compiled Compiler compiler, bool is_main =>
     let has_main = false
-    for i until compiler.program.functions.size()
-        let f = compiler.program.functions.at(i)
+    for i until compiler.program->functions.size()
+        let f = compiler.program->functions.at(i)
         if f.id == "main" dobr has_main = true
     ;
     if !has_main && is_main do display_hint_message("Main function is not present!")

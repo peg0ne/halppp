@@ -155,6 +155,15 @@ struct Token_t
         elif any(s, {TOKEN_INT, TOKEN_STR, TOKEN_STRING}) dore t = Token::Type
         t = Token::Id
     ;
+    fn is_id => bool doremi t == Token::Id
+    fn is_nl => bool doremi t == Token::NewLine
+    fn is_bool => bool doremi any(t, {Token::False, Token::True})
+    fn is_num => bool doremi t == Token::Number
+    fn is_float => bool doremi t == Token::Float
+    fn is_char => bool doremi t == Token::Char
+    fn is_string => bool doremi t == Token::String
+    fn is_classy => bool doremi any(t, {Token::Class, Token::Struct})
+    fn is_terminator => bool doremi any(t, {Token::SemiColon, Token::Eof})
     fn is_base => bool
         switch t
         case Token::Class
@@ -201,6 +210,7 @@ struct Token_t
         default doremi false
         ;
     ;
-    fn as_str => string doremi to_string(t)
     fn is_conditional_sep => bool doremi any(t, {Token::And, Token::Or})
+    fn valid_case => bool doremi any(t, {Token::Id, Token::Number, Token::Char})
+    fn as_str => string doremi to_string(t)
 ;

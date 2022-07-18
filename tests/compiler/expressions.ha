@@ -15,7 +15,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expressioner
         let x = get_next_or_exit(compiler_t->next(), "[Expression] Expression ended unexpectedly")
         if any(x.token, {Token::Eof, Token::NewLine}) dobr expression += doing
         if any(x.token, {Token::Number, Token::Id}) do expression += " "
-        if x.t.is_do() do expression += "\n"
+        if x.is_do() do expression += "\n"
         switch x.token
             case Token::Do do break
             case Token::Dore dobr doing = ";\nreturn "
@@ -40,12 +40,12 @@ fn get_let_expr Compiler *compiler_t => Expressioner
         if any(x.token, {Token::Eof, Token::NewLine}) do break
         value += x.name
     ;
-    let token = Token_t(value).t
-    if any(token, {Token::False, Token::True}) do expression = "bool "
-    elif token == Token::Number do expression = "int "
-    elif token == Token::Float do expression = "float "
-    elif token == Token::Char do expression = "char "
-    elif token == Token::String do expression = "string "
+    let token = Token_t(value)
+    if token.is_bool() do expression = "bool "
+    elif token.is_num() do expression = "int "
+    elif token.is_float() do expression = "float "
+    elif token.is_char() do expression = "char "
+    elif token.is_string() do expression = "string "
     else do expression = "auto "
     expression += id + " = " + value
     return Expressioner(expression)

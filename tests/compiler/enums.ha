@@ -1,13 +1,14 @@
 enum EnumError =>
-    Duplicate,
-    NoId,
-    NoArrow,
-    NoValue,
     Closed,
-    IdExists,
     CommaNoId,
-    ValueNoId,
+    Duplicate,
+    IdExists,
+    Member,
+    NoArrow,
+    NoId,
+    NoValue,
     Unexpected,
+    ValueNoId,
 ;
 
 fn e_err EnumError err => string doremi e_err(err, EMPTY, false)
@@ -15,15 +16,16 @@ fn e_err EnumError err, string opt => string doremi e_err(err, opt, false)
 fn e_err EnumError err, string opt, bool display => string
     string msg = "[Enum] "
     switch err
-    case EnumError::Duplicate   dobr msg += "Duplicate instances Enum of: "
-    case EnumError::NoId        dobr msg += "Requires Id in initialization"
-    case EnumError::NoArrow     dobr msg += "Requires [=>] after Id"
-    case EnumError::NoValue     dobr msg += "No Value found after assignment"
     case EnumError::Closed      dobr msg += "Ends without closing itself"
-    case EnumError::IdExists    dobr msg += "Cannot assign id to EnumValue that already has id"
     case EnumError::CommaNoId   dobr msg += "Missing enum before separator"
-    case EnumError::ValueNoId   dobr msg += "Cannot assign value to EnumValue without id"
+    case EnumError::Duplicate   dobr msg += "Duplicate instances Enum of: "
+    case EnumError::IdExists    dobr msg += "Cannot assign id to EnumValue that already has id"
+    case EnumError::Member      dobr msg += "Duplicate enum members: "
+    case EnumError::NoArrow     dobr msg += "Requires [=>] after Id"
+    case EnumError::NoId        dobr msg += "Requires Id in initialization"
+    case EnumError::NoValue     dobr msg += "No Value found after assignment"
     case EnumError::Unexpected  dobr msg += "Invalid token inside Enum constructor"
+    case EnumError::ValueNoId   dobr msg += "Cannot assign value to EnumValue without id"
     default do break
     ;
     msg += opt
@@ -43,12 +45,17 @@ fn enums_construct Compiler *compiler_t => Enum
     let enum_def = EnumValue()
     loop
         let next = get_next_or_exit(compiler_t->next(), e_err(EnumError::Closed))
-        if next.token == Token::Id
+        if next.is_id()
             if enum_def.name.size() == 0 doco enum_def.name = next.name
             e_err(EnumError::IdExists, EMPTY ,true)
         ;
         elif next.token == Token::Comma
             if enum_def.name.size() == 0 do e_err(EnumError::CommaNoId, EMPTY, true)
+            for i until enumerator.enums.size()
+                if enumerator.enums.at(i).name == enum_def.name
+                    e_err(EnumError::Member, enum_def.name, true)
+                ;
+            ;
             enumerator.enums.push_back(enum_def)
             enum_def = EnumValue()
         ;

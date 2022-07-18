@@ -20,7 +20,7 @@ fn imports_construct_impl Compiler *compiler_t => vector<string>
             ;
             id = EMPTY
         ;
-        elif next.t.is_base() do display_err_message("[Import]: Token not allowed: " + next.name)
+        elif next.is_base() do display_err_message("[Import]: Token not allowed: " + next.name)
         else do id += next.name
         if any(next.token, {Token::Eof, Token::NewLine, Token::RBrack}) do break
     ;

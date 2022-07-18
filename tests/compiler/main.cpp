@@ -341,6 +341,7 @@ bool over(T value, vector<T> values);
 template <typename T>
 bool under(T value, vector<T> values);
 string variable_state_to_cpp(VariableState self);
+void colored(MessageSeverity severity, string msg);
 void display_message(MessageSeverity severity, string msg);
 void display_hint_message(string msg);
 void display_err_message(string msg);
@@ -399,8 +400,8 @@ Global global_construct(Compiler* compiler_t);
 vector<Variable> get_variables(Compiler* compiler_t);
 void try_add_variable(Compiler* compiler_t, Global* global, Variable variable);
 int main(int argc, char* argv[]);
-CompileOutput compile_main(CompilerPath paths, Program p);
-CompileOutput compile(CompilerPath paths, Program p, bool is_main);
+CompileOutput compile_main(CompilerPath paths, Program* p);
+CompileOutput compile(CompilerPath paths, Program* p, bool is_main);
 void validate_compiled(Compiler compiler, bool is_main);
 template <typename T>
 struct Option {
@@ -1156,6 +1157,51 @@ return ;
       t= Token:: Id;
    }
  public:
+   bool is_id() {
+      
+return  t== Token:: Id;
+   }
+ public:
+   bool is_nl() {
+      
+return  t== Token:: NewLine;
+   }
+ public:
+   bool is_bool() {
+      
+return  any( t,{ Token:: False, Token:: True});
+   }
+ public:
+   bool is_num() {
+      
+return  t== Token:: Number;
+   }
+ public:
+   bool is_float() {
+      
+return  t== Token:: Float;
+   }
+ public:
+   bool is_char() {
+      
+return  t== Token:: Char;
+   }
+ public:
+   bool is_string() {
+      
+return  t== Token:: String;
+   }
+ public:
+   bool is_classy() {
+      
+return  any( t,{ Token:: Class, Token:: Struct});
+   }
+ public:
+   bool is_terminator() {
+      
+return  any( t,{ Token:: SemiColon, Token:: Eof});
+   }
+ public:
    bool is_base() {
          switch(t    ) {
             case Token::Class:
@@ -1220,14 +1266,19 @@ return false;
 }
    }
  public:
-   string as_str() {
-      
-return  to_string( t);
-   }
- public:
    bool is_conditional_sep() {
       
 return  any( t,{ Token:: And, Token:: Or});
+   }
+ public:
+   bool valid_case() {
+      
+return  any( t,{ Token:: Id, Token:: Number, Token:: Char});
+   }
+ public:
+   string as_str() {
+      
+return  to_string( t);
    }
 };
 enum class VariableState: int {
@@ -1287,6 +1338,76 @@ struct AstToken {
       
 return "["+ name+"]: Token: "+ t.as_str();
    }
+ public:
+   bool is_classy() {
+      
+return  t.is_classy();
+   }
+ public:
+   bool is_id() {
+      
+return  t.is_id();
+   }
+ public:
+   bool is_nl() {
+      
+return  t.is_nl();
+   }
+ public:
+   bool is_bool() {
+      
+return  t.is_bool();
+   }
+ public:
+   bool is_num() {
+      
+return  t.is_num();
+   }
+ public:
+   bool is_float() {
+      
+return  t.is_float();
+   }
+ public:
+   bool is_char() {
+      
+return  t.is_char();
+   }
+ public:
+   bool is_string() {
+      
+return  t.is_string();
+   }
+ public:
+   bool is_terminator() {
+      
+return  t.is_terminator();
+   }
+ public:
+   bool is_base() {
+      
+return  t.is_base();
+   }
+ public:
+   bool is_do() {
+      
+return  t.is_do();
+   }
+ public:
+   bool is_conditional() {
+      
+return  t.is_conditional();
+   }
+ public:
+   bool is_conditional_sep() {
+      
+return  t.is_conditional_sep();
+   }
+ public:
+   bool valid_case() {
+      
+return  t.valid_case();
+   }
 };
 struct CompilerPath {
  public:
@@ -1327,9 +1448,21 @@ case MessageSeverity::Hint: return "Hint";
 case MessageSeverity::Error: return "Error";
 default: return "UNKNOWN TYPE";
 }};
+void colored(MessageSeverity severity, string msg) {
+   string color= EMPTY;
+      switch(severity    ) {
+         case MessageSeverity::Hint:
+          color="\033[34m";
+break ;
+         case MessageSeverity::Error:
+          color="\033[31m";
+break ;
+}
+   println( color+"["+ to_string( severity)+"] >> "+ msg+"\033[0m");
+}
 void display_message(MessageSeverity severity, string msg) {
    
- println( to_string( severity)+" "+ msg);
+ colored( severity, msg);
 }
 void display_hint_message(string msg) {
    
@@ -1920,13 +2053,13 @@ struct Program {
 };
 struct Compiler {
  public:
-   Program program = Program();
+   Program* program;
  public:
    Peekable<AstToken> ast;
  public:
    vector<string> arguments = {};
  public:
-   Compiler (Program p, Peekable<AstToken> ast) {
+   Compiler (Program* p, Peekable<AstToken> ast) {
       this-> program= p;
       this-> ast= ast;
    }
@@ -1953,35 +2086,35 @@ return  ast.prev();
  public:
    void add_fn(Function function) {
       
- program.functions.push_back( function);
+ program-> functions.push_back( function);
    }
  public:
    void add_class(Class class_obj) {
       
- program.classes.push_back( class_obj);
+ program-> classes.push_back( class_obj);
    }
  public:
    void add_enum(Enum enum_def) {
       
- program.enums.push_back( enum_def);
+ program-> enums.push_back( enum_def);
    }
  public:
    void add_glob(Global global) {
       
- program.global.push_back( global);
+ program-> global.push_back( global);
    }
  public:
    void add_inc(vector<string> includes) {
          for(int i = 0; i < includes.size(); i++) {
             
- program.includes.push_back( Include( includes.at( i)));
+ program-> includes.push_back( Include( includes.at( i)));
 }
    }
  public:
    void add_use(vector<string> usings) {
          for(int i = 0; i < usings.size(); i++) {
             
- program.usings.push_back( Uses( usings.at( i)));
+ program-> usings.push_back( Uses( usings.at( i)));
 }
    }
  public:
@@ -1998,8 +2131,8 @@ return  ast.prev();
    }
  public:
    bool has_use(string id) {
-         for(int i = 0; i < program.usings.size(); i++) {
-               if(program.usings.at ( i ) .usings  == id  ) {
+         for(int i = 0; i < program->usings.size(); i++) {
+               if(program -> usings.at ( i ) .usings  == id  ) {
                   
 return true;
 }
@@ -2008,8 +2141,8 @@ return true;
    }
  public:
    bool has_function(string id) {
-         for(int i = 0; i < program.functions.size(); i++) {
-               if(program.functions.at ( i ) .id  == id  ) {
+         for(int i = 0; i < program->functions.size(); i++) {
+               if(program -> functions.at ( i ) .id  == id  ) {
                   
 return true;
 }
@@ -2018,8 +2151,8 @@ return true;
    }
  public:
    bool has_class(string id) {
-         for(int i = 0; i < program.classes.size(); i++) {
-               if(program.classes.at ( i ) .id  == id  ) {
+         for(int i = 0; i < program->classes.size(); i++) {
+               if(program -> classes.at ( i ) .id  == id  ) {
                   
 return true;
 }
@@ -2028,8 +2161,8 @@ return true;
    }
  public:
    bool has_inc(string id) {
-         for(int i = 0; i < program.includes.size(); i++) {
-               if(program.includes.at ( i ) .include  == id  ) {
+         for(int i = 0; i < program->includes.size(); i++) {
+               if(program -> includes.at ( i ) .include  == id  ) {
                   
 return true;
 }
@@ -2038,8 +2171,8 @@ return true;
    }
  public:
    bool has_enum(string id) {
-         for(int i = 0; i < program.enums.size(); i++) {
-               if(program.enums.at ( i ) .name  == id  ) {
+         for(int i = 0; i < program->enums.size(); i++) {
+               if(program -> enums.at ( i ) .name  == id  ) {
                   
 return true;
 }
@@ -2048,10 +2181,23 @@ return true;
    }
  public:
    bool has_glob(string id) {
-         for(int i = 0; i < program.global.size(); i++) {
-            auto g = program.global.at(i);
+         for(int i = 0; i < program->global.size(); i++) {
+            auto g = program->global.at(i);
                for(int j = 0; j < g.variables.size(); j++) {
                      if(g.variables.at ( j ) .v_type  == id  ) {
+                        
+return true;
+}
+}
+}
+      return false;
+   }
+ public:
+   bool has_enum_name(string id) {
+         for(int i = 0; i < program->enums.size(); i++) {
+            auto e = program->enums.at(i);
+               for(int j = 0; j < e.enums.size(); j++) {
+                     if(e.enums.at ( j ) .name  == id  ) {
                         
 return true;
 }
@@ -2145,15 +2291,15 @@ return false;
 return false;
 }
 }
-   return  Token_t( s) .t!= Token:: Id;
+   return ! Token_t( s) .is_id();
 }
 bool is_char_token(char ch) {
    string s( 1, ch);
-   return  Token_t( s) .t!= Token:: Id;
+   return ! Token_t( s) .is_id();
 }
 bool is_char_number(char ch) {
    string s( 1, ch);
-   return  Token_t( s) .t== Token:: Number;
+   return  Token_t( s) .is_num();
 }
 Option<string> try_get_dbl(Peekable<char>* peekable, char ch) {
    auto peek = peekable->peek();
@@ -2231,7 +2377,7 @@ vector<string> imports_construct_impl(Compiler* compiler_t) {
 }
                id= EMPTY;
 }
-            else if(next.t.is_base ( )    ) {
+            else if(next.is_base ( )    ) {
                
  display_err_message("[Import]: Token not allowed: "+ next.name);
 }
@@ -2305,27 +2451,29 @@ bool imports_check_duplicate(vector<string> imports, string id) {
    return false;
 }
 enum class EnumError: int {
-   Duplicate,
-   NoId,
-   NoArrow,
-   NoValue,
    Closed,
-   IdExists,
    CommaNoId,
-   ValueNoId,
+   Duplicate,
+   IdExists,
+   Member,
+   NoArrow,
+   NoId,
+   NoValue,
    Unexpected,
+   ValueNoId,
 };
 string to_string(EnumError enumerator) {
 switch (enumerator) {
-case EnumError::Duplicate: return "Duplicate";
-case EnumError::NoId: return "NoId";
-case EnumError::NoArrow: return "NoArrow";
-case EnumError::NoValue: return "NoValue";
 case EnumError::Closed: return "Closed";
-case EnumError::IdExists: return "IdExists";
 case EnumError::CommaNoId: return "CommaNoId";
-case EnumError::ValueNoId: return "ValueNoId";
+case EnumError::Duplicate: return "Duplicate";
+case EnumError::IdExists: return "IdExists";
+case EnumError::Member: return "Member";
+case EnumError::NoArrow: return "NoArrow";
+case EnumError::NoId: return "NoId";
+case EnumError::NoValue: return "NoValue";
 case EnumError::Unexpected: return "Unexpected";
+case EnumError::ValueNoId: return "ValueNoId";
 default: return "UNKNOWN TYPE";
 }};
 string e_err(EnumError err) {
@@ -2339,32 +2487,35 @@ return  e_err( err, opt,false);
 string e_err(EnumError err, string opt, bool display) {
    string msg="[Enum] ";
       switch(err    ) {
-         case EnumError::Duplicate:
-          msg+="Duplicate instances Enum of: ";
-break ;
-         case EnumError::NoId:
-          msg+="Requires Id in initialization";
-break ;
-         case EnumError::NoArrow:
-          msg+="Requires [=>] after Id";
-break ;
-         case EnumError::NoValue:
-          msg+="No Value found after assignment";
-break ;
          case EnumError::Closed:
           msg+="Ends without closing itself";
-break ;
-         case EnumError::IdExists:
-          msg+="Cannot assign id to EnumValue that already has id";
 break ;
          case EnumError::CommaNoId:
           msg+="Missing enum before separator";
 break ;
-         case EnumError::ValueNoId:
-          msg+="Cannot assign value to EnumValue without id";
+         case EnumError::Duplicate:
+          msg+="Duplicate instances Enum of: ";
+break ;
+         case EnumError::IdExists:
+          msg+="Cannot assign id to EnumValue that already has id";
+break ;
+         case EnumError::Member:
+          msg+="Duplicate enum members: ";
+break ;
+         case EnumError::NoArrow:
+          msg+="Requires [=>] after Id";
+break ;
+         case EnumError::NoId:
+          msg+="Requires Id in initialization";
+break ;
+         case EnumError::NoValue:
+          msg+="No Value found after assignment";
 break ;
          case EnumError::Unexpected:
           msg+="Invalid token inside Enum constructor";
+break ;
+         case EnumError::ValueNoId:
+          msg+="Cannot assign value to EnumValue without id";
 break ;
          default:
 ;
@@ -2392,7 +2543,7 @@ Enum enums_construct(Compiler* compiler_t) {
    auto enum_def = EnumValue();
       while(true   ) {
          auto next = get_next_or_exit(compiler_t->next(),e_err(EnumError::Closed));
-            if(next.token  == Token :: Id  ) {
+            if(next.is_id ( )    ) {
                   if(enum_def.name.size ( )  == 0  ) {
                       enum_def.name= next.name;
 continue ;
@@ -2403,6 +2554,11 @@ continue ;
                   if(enum_def.name.size ( )  == 0  ) {
                      
  e_err( EnumError:: CommaNoId, EMPTY,true);
+}
+                  for(int i = 0; i < enumerator.enums.size(); i++) {
+                        if(enumerator.enums.at ( i ) .name  == enum_def.name  ) {
+                           e_err( EnumError:: Member, enum_def.name,true);
+}
 }
                enumerator.enums.push_back( enum_def);
                enum_def= EnumValue();
@@ -2436,11 +2592,11 @@ Expressioner for_construct(Compiler* compiler_t) {
    for_def.until= compiler_t-> next() .value_or( AstToken("NONE")) .name;
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),"[For] For loop is not closed");
-            if(x.t.is_do ( )    ) {
+            if(x.is_do ( )    ) {
                for_def.lines.push_back( expression_construct( compiler_t, x));
                return  Expressioner( for_def);
 }
-            if(x.token  == Token :: NewLine  ) {
+            if(x.is_nl ( )    ) {
                
  break;
 }
@@ -2448,11 +2604,11 @@ Expressioner for_construct(Compiler* compiler_t) {
 }
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),"[For] For loop is not closed");
-            if(any ( x.token , { Token :: SemiColon , Token :: Eof } )    ) {
+            if(x.is_terminator ( )    ) {
                
  break;
 }
-            if(x.token  == Token :: NewLine  ) {
+            if(x.is_nl ( )    ) {
                
  continue;
 }
@@ -2515,7 +2671,7 @@ break ;
                
  expression+=" ";
 }
-            if(x.t.is_do ( )    ) {
+            if(x.is_do ( )    ) {
                
  expression+="\n";
 }
@@ -2562,24 +2718,24 @@ Expressioner get_let_expr(Compiler* compiler_t) {
 }
          value+= x.name;
 }
-   auto token = Token_t(value).t;
-      if(any ( token , { Token :: False , Token :: True } )    ) {
+   auto token = Token_t(value);
+      if(token.is_bool ( )    ) {
          
  expression="bool ";
 }
-      else if(token  == Token :: Number  ) {
+      else if(token.is_num ( )    ) {
          
  expression="int ";
 }
-      else if(token  == Token :: Float  ) {
+      else if(token.is_float ( )    ) {
          
  expression="float ";
 }
-      else if(token  == Token :: Char  ) {
+      else if(token.is_char ( )    ) {
          
  expression="char ";
 }
-      else if(token  == Token :: String  ) {
+      else if(token.is_string ( )    ) {
          
  expression="string ";
 }
@@ -2595,11 +2751,11 @@ Expressioner switch_construct(Compiler* compiler_t) {
    auto expression = ConditionalExpression();
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),"[Switch] Switch is not closed");
-            if(x.t.is_do ( )    ) {
+            if(x.is_do ( )    ) {
                
  display_err_message("[Switch] Switch statements cannot have a do parameter");
 }
-            if(x.token  == Token :: NewLine  ) {
+            if(x.is_nl ( )    ) {
                 cond.expressions.push_back( expression);
 break ;
 }
@@ -2650,15 +2806,23 @@ vector<Expressioner> create_case(Compiler* compiler_t, bool is_default) {
    string label= EMPTY;
       if(! is_default    ) {
          auto next = get_next_or_exit(compiler_t->next(),"[Switch] Case unfinished");
-            if(none ( next.token , { Token :: Id , Token :: Number , Token :: Char } )    ) {
+         label="case "+ next.name;
+            if(next.is_id ( )    &&! compiler_t -> has_enum ( next.name )    ) {
+               
+ display_err_message("[Switch] Enum member doesn't exist:"+ next.name);
+}
+            if(! next.valid_case ( )    ) {
                
  display_err_message("Token not allowed in switch: ");
 }
-         label="case "+ next.name;
-            if(try_get ( compiler_t -> peek ( ) , Token :: DblColon )    ) {
+            if(next.is_id ( )    &&try_get ( compiler_t -> peek ( ) , Token :: DblColon )    ) {
                label+="::";
                compiler_t-> next();
                auto enum_name = get_next_or_exit(compiler_t->next(),"[Switch] Unexpected end");
+                  if(! compiler_t -> has_enum_name ( enum_name.name )    ) {
+                     
+ display_err_message("[Switch] Enum member doesn't exist: "+ enum_name.name);
+}
                label+= enum_name.name+":\n";
 }
 }
@@ -2743,22 +2907,22 @@ Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
 }
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),co_err(ConditionError::Closed));
-            if(x.t.is_do ( )    ) {
+            if(x.is_do ( )    ) {
                cond.add_expr( expression);
                cond.lines.push_back( expression_construct( compiler_t, x));
                return  Expressioner( cond);
 }
-            if(x.t.is_conditional_sep ( )    ) {
+            if(x.is_conditional_sep ( )    ) {
                expression.continuation= x.name;
                cond.add_expr( expression);
                 expression= ConditionalExpression();
 continue ;
 }
-            if(x.t.is_conditional ( )    ) {
+            if(x.is_conditional ( )    ) {
                 expression.operator_value= x.name;
 continue ;
 }
-            if(x.token  == Token :: NewLine  ) {
+            if(x.is_nl ( )    ) {
                 cond.add_expr( expression);
 break ;
 }
@@ -2770,11 +2934,11 @@ continue ;
 }
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),co_err(ConditionError::Closed));
-            if(any ( x.token , { Token :: SemiColon , Token :: Eof } )    ) {
+            if(x.is_terminator ( )    ) {
                
  break;
 }
-            if(x.token  == Token :: NewLine  ) {
+            if(x.is_nl ( )    ) {
                
  continue;
 }
@@ -2815,7 +2979,7 @@ Option<string> get_value(Compiler* compiler_t, bool found_setter) {
 }
       while(true   ) {
          auto next = get_next_or_exit(compiler_t->next(),VAR_ERR_VAL);
-            if(next.token  == Token :: NewLine  ) {
+            if(next.is_nl ( )    ) {
                
  break;
 }
@@ -2926,7 +3090,7 @@ vector<string> template_construct(Compiler* compiler_t) {
    vector<string> templates={};
       while(true   ) {
          auto next = get_next_or_exit(compiler_t->next(),"[Template]: Template declaration invalid");
-            if(next.token  == Token :: Id  ) {
+            if(next.is_id ( )    ) {
                 templates.push_back( next.name);
 continue ;
 }
@@ -2944,8 +3108,8 @@ continue ;
 }
 void validate_function(Function function, Compiler* compiler_t) {
       if(compiler_t -> has_function ( function.id )    ) {
-            for(int i = 0; i < compiler_t->program.functions.size(); i++) {
-               auto f = compiler_t->program.functions.at(i);
+            for(int i = 0; i < compiler_t->program->functions.size(); i++) {
+               auto f = compiler_t->program->functions.at(i);
                   if(f.arguments.size ( )  != function.arguments.size ( )  ) {
                      
 return ;
@@ -3001,7 +3165,7 @@ Function function_construct(Compiler* compiler_t, VariableState state, bool cons
                
  break;
 }
-            if(x.token  == Token :: NewLine  ) {
+            if(x.is_nl ( )    ) {
                
  continue;
 }
@@ -3020,7 +3184,7 @@ break ;
                 function.add_expr( expression_construct( compiler_t, x));
 break ;
 }
-            if(x.t.is_do ( )    ) {
+            if(x.is_do ( )    ) {
                
  break;
 }
@@ -3254,16 +3418,16 @@ int main(int argc, char* argv[]) {
    FpFn fpfn= get_folder_and_name( get_file_path( argc, argv));
    auto paths = CompilerPath(get_file_path(argc,argv),fpfn.f_p,fpfn.f_n);
    auto p = Program();
-   auto output = compile_main(paths,p);
+   auto output = compile_main(paths,&p);
    write_program( output.content(), paths);
    compile_program( paths, output.arguments, should_remove_cpp);
    return 0;
 }
-CompileOutput compile_main(CompilerPath paths, Program p) {
+CompileOutput compile_main(CompilerPath paths, Program* p) {
    
 return  compile( paths, p,true);
 }
-CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
+CompileOutput compile(CompilerPath paths, Program* p, bool is_main) {
    println("compiling: "+ paths.current);
    string output= EMPTY;
    string includes= EMPTY;
@@ -3276,18 +3440,18 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
    string args= EMPTY;
       while(true   ) {
          auto next = get_next_or_exit(compiler_t.next(),"Compiler failed to do unexpected EOF");
-            if(! next.t.is_base ( )    ) {
+            if(! next.is_base ( )    ) {
                display_err_message("Token not allowed in base: "+ to_string( next.token));
 }
-            if(next.token  == Token :: Eof  ) {
+            if(next.is_terminator ( )    ) {
                
  break;
 }
-            else if(next.token  == Token :: NewLine  ) {
+            else if(next.is_nl ( )    ) {
                
  continue;
 }
-            else if(any ( next.token , { Token :: Struct , Token :: Class } )    ) {
+            else if(next.is_classy ( )    ) {
                auto classdef = class_construct(&compiler_t,next.token==Token::Struct);
                output+= classdef.to_cpp();
                headers+= classdef.to_cpp_h();
@@ -3325,7 +3489,7 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
                   for(int i = 0; i < incs.size(); i++) {
                      FpFn fpfn= get_folder_and_name( paths.folder_path+ incs.at( i)+ HA_SUFFIX);
                      auto get_path = CompilerPath(paths.folder_path+incs.at(i)+HA_SUFFIX,fpfn.f_p,fpfn.f_n);
-                     auto get_out = compile(get_path,compiler_t.program,false);
+                     auto get_out = compile(get_path,p,false);
                      output+= get_out.output;
                      includes+= get_out.includes;
                      headers+= get_out.headers;
@@ -3348,8 +3512,8 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
 }
 void validate_compiled(Compiler compiler, bool is_main) {
    bool has_main = false;
-      for(int i = 0; i < compiler.program.functions.size(); i++) {
-         auto f = compiler.program.functions.at(i);
+      for(int i = 0; i < compiler.program->functions.size(); i++) {
+         auto f = compiler.program->functions.at(i);
             if(f.id  == "main"  ) {
                 has_main=true;
 break ;

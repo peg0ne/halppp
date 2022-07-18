@@ -59,6 +59,9 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
     let mut lines: Vec<Expression> = Vec::new();
     if !is_default {
         let mut id = get_id_or_exit(compiler.next(), "[Switch] Case has to be followed by an Id");
+        if !compiler.contains_enum(&id) {
+            display_err_message("[Switch] Enum member doesn't exist")
+        }
         if try_get(compiler.peek(), Token::DblColon) {
             id.push_str("::");
             compiler.next();

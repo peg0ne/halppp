@@ -58,15 +58,15 @@ fn is_str_tokens string s => bool
     for i until s.size()
         if !is_char_token(s.at(i)) doremi false
     ;
-    return Token_t(s).t != Token::Id
+    return !Token_t(s).is_id()
 ;
 fn is_char_token char ch => bool
     string s(1,ch)
-    return Token_t(s).t != Token::Id
+    return !Token_t(s).is_id()
 ;
 fn is_char_number char ch => bool
     string s(1,ch)
-    return Token_t(s).t == Token::Number
+    return Token_t(s).is_num()
 ;
 fn try_get_dbl Peekable<char> *peekable, char ch => Option<string>
     let peek = peekable->peek()

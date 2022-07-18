@@ -12,7 +12,7 @@ fn get_value Compiler *compiler_t, bool found_setter => Option<string>
     if !found_setter do get_eq_or_exit(compiler_t->next(), VAR_ERR_SET)
     loop
         let next = get_next_or_exit(compiler_t->next(), VAR_ERR_VAL)
-        if next.token == Token::NewLine do break
+        if next.is_nl() do break
         value += next.name
     ;
     return value.size() == 0 ? None<string>() : Some(value)

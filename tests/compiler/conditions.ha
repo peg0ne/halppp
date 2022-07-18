@@ -25,25 +25,25 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
     ;
     loop
         let x = get_next_or_exit(compiler_t->next(), co_err(ConditionError::Closed))
-        if x.t.is_do()
+        if x.is_do()
             cond.add_expr(expression)
             cond.lines.push_back(expression_construct(compiler_t, x))
             return Expressioner(cond)
         ;
-        if x.t.is_conditional_sep()
+        if x.is_conditional_sep()
             expression.continuation = x.name
             cond.add_expr(expression)
             doco expression = ConditionalExpression()
         ;
-        if x.t.is_conditional() doco expression.operator_value = x.name
-        if x.token == Token::NewLine dobr cond.add_expr(expression)
+        if x.is_conditional() doco expression.operator_value = x.name
+        if x.is_nl() dobr cond.add_expr(expression)
         if expression.operator_value.size() == 0 doco expression.value_left += x.name + " "
         expression.value_right += x.name + " "
     ;
     loop
         let x = get_next_or_exit(compiler_t->next(), co_err(ConditionError::Closed))
-        if any(x.token, {Token::SemiColon, Token::Eof}) do break
-        if x.token == Token::NewLine do continue
+        if x.is_terminator() do break
+        if x.is_nl() do continue
         switch x.token
             case Token::Condition dobr cond.lines.push_back(condition_construct(compiler_t, x.name))
             case Token::For dobr cond.lines.push_back(for_construct(compiler_t))
