@@ -58,15 +58,15 @@ fn is_str_tokens string s => bool
     for i until s.size()
         if !is_char_token(s.at(i)) doremi false
     ;
-    return Token_t(s).t != TId
+    return Token_t(s).t != Token::Id
 ;
 fn is_char_token char ch => bool
     string s(1,ch)
-    return Token_t(s).t != TId
+    return Token_t(s).t != Token::Id
 ;
 fn is_char_number char ch => bool
     string s(1,ch)
-    return Token_t(s).t == TNumber
+    return Token_t(s).t == Token::Number
 ;
 fn try_get_dbl Peekable<char> *peekable, char ch => Option<string>
     let peek = peekable->peek()
@@ -98,9 +98,9 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
         let peeked = peekable->peek().value_or(' ')
         if !is_char_number(peeked) && peeked != '.'
             token.name = num
-            token.token = is_float ? TFloat : TNumber 
+            token.token = is_float ? Token::Float : Token::Number 
             token.t = Token_t("0")
-            token.t.t = is_float ? TFloat : TNumber
+            token.t.t = is_float ? Token::Float : Token::Number
             return token
         ;
         if peeked == '.' do is_float = true

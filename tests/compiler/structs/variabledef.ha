@@ -2,8 +2,12 @@ struct Variable
     string id = EMPTY
     string v_type = EMPTY
     Option<string> v_value = None<string>()
-    VariableState variable_state = Private_State
+    VariableState variable_state = VariableState::Private
     Variable =>
+    ;
+    Variable string id, string type =>
+        this->id = id
+        this->v_type = type
     ;
     Variable string id, string type, Option<string> value, VariableState state =>
         this->id = id

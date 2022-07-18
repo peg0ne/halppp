@@ -1,6 +1,6 @@
 struct AstToken
     string name = EMPTY
-    Token token = TId
+    Token token = Token::Id
     Token_t t = Token_t("\n")
     AstToken =>
     ;

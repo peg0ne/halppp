@@ -1,5 +1,5 @@
 enum ConditionError =>
-    CoClosed,
+    Closed,
 ;
 
 fn co_err ConditionError err => string doremi co_err(err, EMPTY, false)
@@ -7,7 +7,7 @@ fn co_err ConditionError err, string opt => string doremi co_err(err, opt, false
 fn co_err ConditionError err, string opt, bool display => string
     string msg = "[Condition] "
     switch err
-    case CoClosed dobr msg += "Condition is not closed "
+    case ConditionError::Closed dobr msg += "Condition is not closed "
     default do break
     ;
     msg += opt
@@ -24,11 +24,11 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_left = "true"
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), co_err(CoClosed))
+        let x = get_next_or_exit(compiler_t->next(), co_err(ConditionError::Closed))
         if x.t.is_do()
             cond.add_expr(expression)
             cond.lines.push_back(expression_construct(compiler_t, x))
-            return Expressioner(Some(cond), None<For>(), None<string>())
+            return Expressioner(cond)
         ;
         if x.t.is_conditional_sep()
             expression.continuation = x.name
@@ -36,20 +36,20 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
             doco expression = ConditionalExpression()
         ;
         if x.t.is_conditional() doco expression.operator_value = x.name
-        if x.token == TNewLine dobr cond.add_expr(expression)
+        if x.token == Token::NewLine dobr cond.add_expr(expression)
         if expression.operator_value.size() == 0 doco expression.value_left += x.name + " "
         expression.value_right += x.name + " "
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), co_err(CoClosed))
-        if any(x.token, {TSemiColon, TEof}) do break
-        if x.token == TNewLine do continue
+        let x = get_next_or_exit(compiler_t->next(), co_err(ConditionError::Closed))
+        if any(x.token, {Token::SemiColon, Token::Eof}) do break
+        if x.token == Token::NewLine do continue
         switch x.token
-            case TCondition dobr cond.lines.push_back(condition_construct(compiler_t, x.name))
-            case TFor dobr cond.lines.push_back(for_construct(compiler_t))
-            case TSwitch dobr cond.lines.push_back(switch_construct(compiler_t))
+            case Token::Condition dobr cond.lines.push_back(condition_construct(compiler_t, x.name))
+            case Token::For dobr cond.lines.push_back(for_construct(compiler_t))
+            case Token::Switch dobr cond.lines.push_back(switch_construct(compiler_t))
             default dobr cond.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
-    return Expressioner(Some(cond), None<For>(), None<string>())
+    return Expressioner(cond)
 ;

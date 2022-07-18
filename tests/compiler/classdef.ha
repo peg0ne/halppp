@@ -1,10 +1,10 @@
 enum ClassError =>
-    CClosed,
-    CDefinition,
-    CDuplicate,
-    CInheritance,
-    CNoId,
-    CNoInheritor,
+    Closed,
+    Definition,
+    Duplicate,
+    Inheritance,
+    NoId,
+    NoInheritor,
 ;
 
 fn c_err ClassError err => string doremi c_err(err, EMPTY, false)
@@ -12,12 +12,12 @@ fn c_err ClassError err, string opt => string doremi c_err(err, opt, false)
 fn c_err ClassError err, string opt, bool display => string
     string msg = "[Class] "
     switch err
-    case CClosed      dobr msg += "Class is not closed "
-    case CDefinition  dobr msg += "Invalid class definition of: "
-    case CDuplicate   dobr msg += "Duplicate instance of: "
-    case CInheritance dobr msg += "Invalid inheritance of: "
-    case CNoId        dobr msg += "Invalid class declaration"
-    case CNoInheritor dobr msg += "Invalid Inheritor Token\nExpected Id for inheritance for class: "
+    case ClassError::Closed      dobr msg += "Class is not closed "
+    case ClassError::Definition  dobr msg += "Invalid class definition of: "
+    case ClassError::Duplicate   dobr msg += "Duplicate instance of: "
+    case ClassError::Inheritance dobr msg += "Invalid inheritance of: "
+    case ClassError::NoId        dobr msg += "Invalid class declaration"
+    case ClassError::NoInheritor dobr msg += "Invalid Inheritor Token\nExpected Id for inheritance for class: "
     default do break
     ;
     msg += opt
@@ -28,7 +28,7 @@ fn c_err ClassError err, string opt, bool display => string
 fn class_validate Class class_def, Compiler *compiler_t =>
     // Check Duplicate Classes
     if compiler_t->has_class(class_def.id)
-        c_err(CDuplicate, class_def.id, true)
+        c_err(ClassError::Duplicate, class_def.id, true)
     ;
     // Check Inheritance
     let inherit = class_def.inherit
@@ -36,7 +36,7 @@ fn class_validate Class class_def, Compiler *compiler_t =>
     if compiler_t->has_class(inherit.value_or(EMPTY)) do return
     let contains = compiler_t->has_class(inherit.value_or(EMPTY))
     if class_def.inherit.is_some() && !contains
-        c_err(CInheritance, class_def.id, true)
+        c_err(ClassError::Inheritance, class_def.id, true)
     ;
 ;
 
@@ -44,39 +44,39 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
     let class_def = Class()
     class_def.is_struct = is_struct
     
-    class_def.id = get_id_or_exit(compiler_t->next(), c_err(CNoId))
+    class_def.id = get_id_or_exit(compiler_t->next(), c_err(ClassError::NoId))
     // Set Inheritance Or Template
-    let next = get_next_or_exit(compiler_t->next(), c_err(CDefinition, class_def.id))
-    if next.token == TLessThan
+    let next = get_next_or_exit(compiler_t->next(), c_err(ClassError::Definition, class_def.id))
+    if next.token == Token::LessThan
         class_def.templates = template_construct(compiler_t)
-        next = get_next_or_exit(compiler_t->next(), c_err(CDefinition, class_def.id))
+        next = get_next_or_exit(compiler_t->next(), c_err(ClassError::Definition, class_def.id))
     ;
-    if next.token == TCoolArrow
-        class_def.inherit = Some(get_id_or_exit(compiler_t->next(), c_err(CNoInheritor, class_def.id)))
+    if next.token == Token::CoolArrow
+        class_def.inherit = Some(get_id_or_exit(compiler_t->next(), c_err(ClassError::NoInheritor, class_def.id)))
     ;
     //Construct inner Class values
-    let variable_state = !is_struct ? Private_State : Public_State
+    let variable_state = !is_struct ? VariableState::Private : VariableState::Public
     loop
-        let next = get_next_or_exit(compiler_t->next(), c_err(CClosed, class_def.id))
-        if next.token == TFunction
+        let next = get_next_or_exit(compiler_t->next(), c_err(ClassError::Closed, class_def.id))
+        if next.token == Token::Function
             let function = function_construct(compiler_t, variable_state, false)
             doco class_def.functions.push_back(function)
         ;
-        elif any(next.token, {TId, TType})
+        elif any(next.token, {Token::Id, Token::Type})
             if next.name == class_def.id
-                let function = function_construct(compiler_t, Public_State, true)
-                function.return_value = Some(Variable(EMPTY, class_def.id, None<string>(), Private_State))
+                let function = function_construct(compiler_t, VariableState::Public, true)
+                function.return_value = Some(Variable(EMPTY, class_def.id))
                 doco class_def.functions.push_back(function)
             ;
             let vnb = construct_args(compiler_t, Some(next.name))
             vnb.variable.variable_state = variable_state
             doco class_def.variables.push_back(vnb.variable)
         ;
-        elif any(next.token, {TEof, TSemiColon, TClass}) do break
+        elif any(next.token, {Token::Eof, Token::SemiColon, Token::Class}) do break
         switch next.token
-        case TPrivate dobr variable_state = Private_State
-        case TProtected dobr variable_state = Protected_State
-        case TPublic dobr variable_state = Public_State
+        case Token::Private dobr variable_state = VariableState::Private
+        case Token::Protected dobr variable_state = VariableState::Protected
+        case Token::Public dobr variable_state = VariableState::Public
         default do break
         ;
     ;

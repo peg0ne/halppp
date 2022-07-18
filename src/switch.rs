@@ -2,7 +2,7 @@ use crate::{
     expression, condition, foreach,
     enums::Token,
     structs::{Compiler, Condition, Expression, ConditionalExpression},
-    utils::{get_next_or_exit, get_id_or_exit},
+    utils::{get_next_or_exit, get_id_or_exit, try_get},
     message::display_err_message,
 };
 
@@ -58,7 +58,13 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
 fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
     let mut lines: Vec<Expression> = Vec::new();
     if !is_default {
-        let id = get_id_or_exit(compiler.next(), "[Switch] Case has to be followed by an Id");
+        let mut id = get_id_or_exit(compiler.next(), "[Switch] Case has to be followed by an Id");
+        if try_get(compiler.peek(), Token::DblColon) {
+            id.push_str("::");
+            compiler.next();
+            let enum_name = get_next_or_exit(compiler.next(), "[Switch] Unexpected end");
+            id.push_str(enum_name.name.as_str());
+        }
         lines.push(Expression {
             e_condition: None,
             e_for: None,

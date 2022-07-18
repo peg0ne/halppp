@@ -21,9 +21,9 @@ fn get_or_exit Option<AstToken> next, Token token, string s => string
     if next.is_none() || next.value_or(AstToken()).token != token do display_err_message(s)
     return next.value_or(AstToken()).name
 ;
-fn get_id_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, TId, s)
-fn get_arrow_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, TCoolArrow, s)
-fn get_eq_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, TEquals, s)
+fn get_id_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, Token::Id, s)
+fn get_arrow_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, Token::CoolArrow, s)
+fn get_eq_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, Token::Equals, s)
 fn get_folder_and_name string file_path => FpFn
     string file_name = EMPTY
     string reversed = EMPTY

@@ -54,38 +54,38 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
     loop
         let next = get_next_or_exit(compiler_t.next(), "Compiler failed to do unexpected EOF")
         if !next.t.is_base()
-            display_err_message("Token not allowed in base: " + token_to_string(next.token))
+            display_err_message("Token not allowed in base: " + to_string(next.token))
         ;
-        if next.token == TEof do break
-        elif next.token == TNewLine do continue
-        elif any(next.token, {TStruct, TClass})
-            let classdef = class_construct(&compiler_t, next.token == TStruct)
+        if next.token == Token::Eof do break
+        elif next.token == Token::NewLine do continue
+        elif any(next.token, {Token::Struct, Token::Class})
+            let classdef = class_construct(&compiler_t, next.token == Token::Struct)
             output += classdef.to_cpp()
             headers += classdef.to_cpp_h()
         ;
-        elif next.token == TFunction
-            let fndef = function_construct(&compiler_t, Public_State, false)
+        elif next.token == Token::Function
+            let fndef = function_construct(&compiler_t, VariableState::Public, false)
             output += fndef.to_cpp(false)
             fnheaders += fndef.to_cpp_h()
         ;
-        elif next.token == TEnum
+        elif next.token == Token::Enum
             let enumdef = enums_construct(&compiler_t)
             output += enumdef.to_cpp()
             headers += enumdef.to_cpp_h()
         ;
-        elif next.token == TGlobal
+        elif next.token == Token::Global
             let global = global_construct(&compiler_t)
             headers += global.to_cpp()
         ;
-        elif next.token == TInclude
+        elif next.token == Token::Include
             incs = imports_creation(&compiler_t, next)
             for i until incs.size() do includes += Include(incs.at(i)).to_cpp()
         ;
-        elif next.token == TUse
+        elif next.token == Token::Use
             incs = imports_creation(&compiler_t, next)
             for i until incs.size() do includes += Uses(incs.at(i)).to_cpp()
         ;
-        elif next.token == TGet
+        elif next.token == Token::Get
             incs = imports_creation(&compiler_t, next)
             for i until incs.size()
                 FpFn fpfn = get_folder_and_name(paths.folder_path + incs.at(i) + HA_SUFFIX)
@@ -98,9 +98,9 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
                 compiler_t.add_args(get_out.arguments)
             ;
         ;
-        elif next.token == TCompiler
+        elif next.token == Token::Compiler
             get_arrow_or_exit(compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: " + next.name)
-            args = get_or_exit(compiler_t.next(), TString, "[Compiler] Missing value of compiler intent [TString]: " + next.name)
+            args = get_or_exit(compiler_t.next(), Token::String, "[Compiler] Missing value of compiler intent [TString]: " + next.name)
             compiler_t.add_arg(args)
         ;
         else do display_err_message("Token not handled: " + next.name)

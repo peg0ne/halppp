@@ -4,6 +4,15 @@ struct Expressioner
     Option<string> line = None<string>()
     Expressioner =>
     ;
+    Expressioner Conditions conditions => 
+        this->e_condition = Some(conditions)
+    ;
+    Expressioner For fors => 
+        this->e_for = Some(fors)
+    ;
+    Expressioner string line => 
+        this->line = Some(line)
+    ;
     Expressioner Option<Conditions> conditions, Option<For> fors, Option<string> line =>
         this->e_condition = conditions
         this->e_for = fors

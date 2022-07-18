@@ -1,14 +1,14 @@
 enum VariableState =>
-    Private_State,
-    Protected_State,
-    Public_State,
+    Private,
+    Protected,
+    Public,
 ;
 
 fn variable_state_to_cpp VariableState self => string
     switch self
-    case Private_State doremi PRIVATE_STATE
-    case Protected_State doremi PROTECTED_STATE
-    case Public_State doremi PUBLIC_STATE
+    case VariableState::Private doremi PRIVATE_STATE
+    case VariableState::Protected doremi PROTECTED_STATE
+    case VariableState::Public doremi PUBLIC_STATE
     default doremi PRIVATE_STATE
     ;
 ;

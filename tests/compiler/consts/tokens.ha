@@ -15,6 +15,7 @@ glob =>
     TOKEN_COMMA ","
     TOKEN_COMPILER "compiler"
     TOKEN_COOLARROW "=>"
+    TOKEN_DBLCOLON "::"
     TOKEN_DBLLESSTHAN "<<"
     TOKEN_DBLMORETHAN ">>"
     TOKEN_DEFAULT "default"

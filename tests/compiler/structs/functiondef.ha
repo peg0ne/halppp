@@ -1,6 +1,6 @@
 struct Function
     string id = EMPTY
-    VariableState variable_state = Public_State
+    VariableState variable_state = VariableState::Public
     Option<Variable> return_value = None<Variable>()
     vector<Variable> arguments = {}
     vector<Expressioner> expressions = {}

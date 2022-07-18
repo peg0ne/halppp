@@ -15,21 +15,18 @@ pub fn construct(compiler: &mut Compiler) -> Enum {
         match next.token {
             Token::Id => {
                 if enum_def.name.len() > 0 {
-                    println!("{:?}",enum_def);
                     display_err_message("[Enum] Cannot assign id to EnumValue that already has id");
                 }
                 enum_def.name = next.name;
             },
             Token::Number => {
                 if enum_def.name.len() == 0 {
-                    println!("{:?}",enum_def);
                     display_err_message("[Enum] Cannot assign value to EnumValue without id");
                 }
                 enum_def.value = Some(next.name);
             },
             Token::Equals => {
                 if enum_def.name.len() == 0 {
-                    println!("{:?}",enum_def);
                     display_err_message("[Enum] Cannot assign value to EnumValue without id");
                 }
             },

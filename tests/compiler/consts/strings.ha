@@ -10,7 +10,7 @@ glob =>
     COMPILER_OUT " -o "
     CPP_SUFFIX ".cpp"
     EMPTY ""
-    ENUM "enum "
+    ENUM "enum class "
     ENUM_SEP ",\n"
     FOR_AFTER_UNTIL "; "
     FOR_END "++) {\n"

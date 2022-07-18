@@ -18,10 +18,15 @@ impl Enum {
         }
     }
     pub fn to_cpp_start(self: &Enum) -> String {
-        format!("enum {}: int", self.name)
+        format!("enum class {}: int", self.name)
+    }
+    pub fn to_string_cpp_start(self: &Enum) -> String {
+        format!("string to_string({} enumerator)", self.name)
     }
     pub fn to_cpp_h(self: &Enum) -> String {
         let mut enum_str = self.to_cpp_start();
+        enum_str.push_str(";\n");
+        enum_str.push_str(self.to_string_cpp_start().as_str());
         enum_str.push_str(";\n");
         enum_str
     }
@@ -36,6 +41,13 @@ impl Enum {
             }
         }
         enum_str.push_str("};\n");
+        enum_str.push_str(self.to_string_cpp_start().as_str());
+        enum_str.push_str(" {\n");
+        enum_str.push_str("switch (enumerator) {\n");
+        for i in self.enums.iter() {
+            enum_str.push_str(format!("case {}::{}: return \"{}\";\n", self.name, i.name, i.name).as_str());
+        }
+        enum_str.push_str("default: return \"UNKNOWN TYPE\";\n}};\n");
         enum_str
     }
 }

@@ -25,8 +25,9 @@ pub fn create(content: &String) -> Vec<AstToken> {
         if is_char_token(c) {
             let dbl_less = id != "<" && c == '<';
             let dbl_more = id != ">" && c == '>';
+            let dbl_col = id != ":" && c == ':';
             let dbl_eq = id != "=" && c == '=';
-            if dbl_less || dbl_more || dbl_eq {
+            if dbl_less || dbl_more || dbl_eq || dbl_col {
                 match try_get_dbl(&mut peekable, c) {
                     Some(s) => {
                         id = try_add_token(id, &mut ast);
