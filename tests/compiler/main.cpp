@@ -6,15 +6,286 @@ using namespace std;
 #include <vector>
 #include <iostream>
 using namespace std;
-#include "cpp/strings.h"
-#include "cpp/tokens.h"
-#include "cpp/errors.h"
 #include <fstream>
 template <typename T>
 struct Option;
 template <typename T>
 struct Peekable;
 class String;
+
+#define ARG_END ") {\n"
+
+#define ARG_SEP ", "
+
+#define ASSIGNMENT " = "
+
+#define BLOCK_END "}\n"
+
+#define BLOCK_START " {\n"
+
+#define CHAR_QUOTE '"'
+
+#define CHAR_SINGLE '\''
+
+#define CLASS "class "
+
+#define COMPILER_OUT " -o "
+
+#define CPP_SUFFIX ".cpp"
+
+#define EMPTY ""
+
+#define ENUM "enum "
+
+#define ENUM_SEP ",\n"
+
+#define FOR_AFTER_UNTIL "; "
+
+#define FOR_END "++) {\n"
+
+#define FOR_MID " = 0; "
+
+#define FOR_START "for(int "
+
+#define FOR_UNTIL " < "
+
+#define HA_SUFFIX ".ha"
+
+#define INCLUDE "#include "
+
+#define INHERIT ": public "
+
+#define LARROW "<"
+
+#define LINE_END ";\n"
+
+#define LPAREN "("
+
+#define NAMESPACE "using namespace "
+
+#define NEWLINE "\n"
+
+#define PRIVATE_STATE " private:\n"
+
+#define PROTECTED_STATE " protected:\n"
+
+#define PUBLIC_STATE " public:\n"
+
+#define QUOTE "\""
+
+#define RARROW ">"
+
+#define RBRACK "}"
+
+#define RETURN_VALUE_IDS "return_value"
+
+#define RPAREN ")"
+
+#define SPACE " "
+
+#define STRUCT "struct "
+
+#define TAB "   "
+
+#define TEMPLATE "template <typename "
+
+#define TEMPLATE_END ">\n"
+
+#define TEMPLATE_MID ", typename "
+
+#define VOID "void"
+
+#define GLOBAL "#define "
+
+#define TOKEN_ALLEQUALS "=&="
+
+#define TOKEN_ALLLESSOREQUALS "=<="
+
+#define TOKEN_ALLLESSTHAN "<<<"
+
+#define TOKEN_ALLMOREOREQUALS "=>="
+
+#define TOKEN_ALLMORETHAN ">>>"
+
+#define TOKEN_ALLNOTEQUALS "=!="
+
+#define TOKEN_AND "&&"
+
+#define TOKEN_ANYEQUALS "=|="
+
+#define TOKEN_ASTERIX "*"
+
+#define TOKEN_BANG "!"
+
+#define TOKEN_CASE "case"
+
+#define TOKEN_CLASS "class"
+
+#define TOKEN_COLON ":"
+
+#define TOKEN_COMMA ","
+
+#define TOKEN_COMPILER "compiler"
+
+#define TOKEN_COOLARROW "=>"
+
+#define TOKEN_DBLLESSTHAN "<<"
+
+#define TOKEN_DBLMORETHAN ">>"
+
+#define TOKEN_DEFAULT "default"
+
+#define TOKEN_DO "do"
+
+#define TOKEN_DOBR "dobr"
+
+#define TOKEN_DOCO "doco"
+
+#define TOKEN_DORE "dore"
+
+#define TOKEN_DOREMI "doremi"
+
+#define TOKEN_EIGHT "8"
+
+#define TOKEN_ELIF "elif"
+
+#define TOKEN_ELSE "else"
+
+#define TOKEN_ENUM "enum"
+
+#define TOKEN_EOF "EOF"
+
+#define TOKEN_EQUALITY "=="
+
+#define TOKEN_EQUALS "="
+
+#define TOKEN_EXTEND "extend"
+
+#define TOKEN_FALSE "false"
+
+#define TOKEN_FIVE "5"
+
+#define TOKEN_FOR "for"
+
+#define TOKEN_FOREACH "foreach"
+
+#define TOKEN_FORWARDSLASH "/"
+
+#define TOKEN_FOUR "4"
+
+#define TOKEN_FUNCTION "fn"
+
+#define TOKEN_GET "get"
+
+#define TOKEN_GLOBAL "glob"
+
+#define TOKEN_IFS "if"
+
+#define TOKEN_INCLUDE "inc"
+
+#define TOKEN_INT "int"
+
+#define TOKEN_LBLOCK "{"
+
+#define TOKEN_LBRACK "["
+
+#define TOKEN_LESSTHAN "<"
+
+#define TOKEN_LESSTHANOREQUALS "<="
+
+#define TOKEN_LET "let"
+
+#define TOKEN_LINE_COMMENT "//"
+
+#define TOKEN_LOOP "loop"
+
+#define TOKEN_LPAREN "("
+
+#define TOKEN_MACRODEFINITION "def"
+
+#define TOKEN_MORETHAN ">"
+
+#define TOKEN_MORETHANOREQUALS ">="
+
+#define TOKEN_NEWLINE "\n"
+
+#define TOKEN_NINE "9"
+
+#define TOKEN_NONEQUALITY "!="
+
+#define TOKEN_ONE "1"
+
+#define TOKEN_OR "||"
+
+#define TOKEN_POINTER "->"
+
+#define TOKEN_PRIVATE "private"
+
+#define TOKEN_PROTECTED "protected"
+
+#define TOKEN_PUBLIC "pub"
+
+#define TOKEN_RBLOCK "}"
+
+#define TOKEN_RBRACK "]"
+
+#define TOKEN_RETURN "return"
+
+#define TOKEN_RPAREN ")"
+
+#define TOKEN_SEMICOLON ";"
+
+#define TOKEN_SEVEN "7"
+
+#define TOKEN_SIX "6"
+
+#define TOKEN_STR "str"
+
+#define TOKEN_STRING "string"
+
+#define TOKEN_STRUCT "struct"
+
+#define TOKEN_SUB "-"
+
+#define TOKEN_SUM "+"
+
+#define TOKEN_SWITCH "switch"
+
+#define TOKEN_THREE "3"
+
+#define TOKEN_TRUE "true"
+
+#define TOKEN_TWO "2"
+
+#define TOKEN_TYPE "char"
+
+#define TOKEN_UNTIL "until"
+
+#define TOKEN_USE "use"
+
+#define TOKEN_WHILE "while"
+
+#define TOKEN_ZERO "0"
+
+#define VAR_ERR_COM "[Variable]: Variable declaration already complete: "
+
+#define VAR_ERR_ERR "[Variable]: Unexpected error"
+
+#define VAR_ERR_INC "[Variable]: Variable declaration incomplete: "
+
+#define VAR_ERR_INV "[Variable]: Invalid Declaration"
+
+#define VAR_ERR_NON "[Variable]: No token available"
+
+#define VAR_ERR_POI "[Variable]: Pointer infront of type not allowed: "
+
+#define VAR_ERR_SET "[Variable]: Invalid value setter"
+
+#define VAR_ERR_TEM "[Variable]: Variable declaration cannot have template without id and type: "
+
+#define VAR_ERR_TYP "[Variable]: Expected return value type got: "
+
+#define VAR_ERR_VAL "[Variable]: Invalid value"
 enum Token: int;
 struct Token_t;
 enum VariableState: int;
@@ -108,6 +379,8 @@ string c_err(ClassError err, string opt);
 string c_err(ClassError err, string opt, bool display);
 void class_validate(Class class_def, Compiler* compiler_t);
 Class class_construct(Compiler* compiler_t, bool is_struct);
+Global global_construct(Compiler* compiler_t);
+void try_add_variable(Compiler* compiler_t, Global* global, Variable variable);
 int main(int argc, char* argv[]);
 CompileOutput compile_main(CompilerPath paths, Program p);
 CompileOutput compile(CompilerPath paths, Program p, bool is_main);
@@ -1403,6 +1676,18 @@ struct Global {
  public:
    Global () {
    }
+ public:
+   string to_cpp() {
+      string g_str= EMPTY;
+         for(int i = 0; i < variables.size(); i++) {
+            auto v = variables.at(i);
+            g_str+= NEWLINE;
+            g_str+= GLOBAL+ v.v_type;
+            g_str+= SPACE+ v.id;
+            g_str+= NEWLINE;
+}
+      return  g_str;
+   }
 };
 struct Struct {
  public:
@@ -1734,6 +2019,11 @@ return  ast.prev();
  program.enums.push_back( enum_def);
    }
  public:
+   void add_glob(Global global) {
+      
+ program.global.push_back( global);
+   }
+ public:
    void add_inc(vector<string> includes) {
          for(int i = 0; i < includes.size(); i++) {
             
@@ -1805,6 +2095,19 @@ return true;
                if(program.enums.at ( i ) .name  == id  ) {
                   
 return true;
+}
+}
+      return false;
+   }
+ public:
+   bool has_glob(string id) {
+         for(int i = 0; i < program.global.size(); i++) {
+            auto g = program.global.at(i);
+               for(int j = 0; j < g.variables.size(); j++) {
+                     if(g.variables.at ( j ) .v_type  == id  ) {
+                        
+return true;
+}
 }
 }
       return false;
@@ -1916,19 +2219,22 @@ return  None<string>();
    return  Some( dbl+ dbl);
 }
 string get_matching(Peekable<char>* peekable, char ch) {
+   bool escaped = false;
    string matching( 1, ch);
       while(true   ) {
-         auto c = peekable->next();
-            if(c.is_none ( )    ) {
+         auto c_opt = peekable->next();
+            if(c_opt.is_none ( )    ) {
                
 return  matching;
 }
-         string matchbuf( 1, c.value_or(' '));
+         auto c = c_opt.value_or(' ');
+         string matchbuf( 1, c);
          matching+= matchbuf;
-            if(c.value_or ( ' ' )  == ch  ) {
+            if(c  == ch  &&! escaped    ) {
                
 return  matching;
 }
+         escaped=! escaped&& c=='\\';
 }
 }
 AstToken collect_num(Peekable<char>* peekable, char ch) {
@@ -2793,6 +3099,53 @@ break ;
    compiler_t-> add_class( class_def);
    return  class_def;
 }
+Global global_construct(Compiler* compiler_t) {
+   auto global = Global();
+   auto variable = Variable();
+   get_arrow_or_exit( compiler_t-> next(),"[Global]: Requires => after glob keyword");
+      while(true   ) {
+         auto x = get_next_or_exit(compiler_t->next(),"[Global]: Unexpected end of global");
+            if(any ( x.token , { TSemiColon , TEof } )    ) {
+                try_add_variable( compiler_t, &global, variable);
+break ;
+}
+            if(x.token  == TNewLine  ) {
+               try_add_variable( compiler_t, &global, variable);
+                variable= Variable();
+continue ;
+}
+            if(! variable.has_type ( )    ) {
+               
+ variable.v_type= x.name;
+}
+            else if(! variable.has_id ( )    ) {
+               
+ variable.id= x.name;
+}
+            else {
+               
+ display_err_message("[Global]: Variable is already finished");
+}
+}
+   compiler_t-> add_glob( global);
+   return  global;
+}
+void try_add_variable(Compiler* compiler_t, Global* global, Variable variable) {
+      if(! variable.has_minimum ( )    ) {
+         
+return ;
+}
+      for(int i = 0; i < global->variables.size(); i++) {
+         auto v = global->variables.at(i);
+            if(v.v_type  == variable.v_type  ) {
+               display_err_message("[Global]: Multiple declarations of same value");
+}
+}
+      if(compiler_t -> has_glob ( variable.v_type )    ) {
+         display_err_message("[Global]: Multiple declarations of same value");
+}
+   global-> variables.push_back( variable);
+}
 struct CompileOutput {
  public:
    string output = EMPTY;
@@ -2870,6 +3223,10 @@ CompileOutput compile(CompilerPath paths, Program p, bool is_main) {
                auto enumdef = enums_construct(&compiler_t);
                output+= enumdef.to_cpp();
                headers+= enumdef.to_cpp_h();
+}
+            else if(next.token  == TGlobal  ) {
+               auto global = global_construct(&compiler_t);
+               headers+= global.to_cpp();
 }
             else if(next.token  == TInclude  ) {
                incs= imports_creation( &compiler_t, next);

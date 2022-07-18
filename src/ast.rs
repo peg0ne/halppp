@@ -11,9 +11,9 @@ pub fn create(content: &String) -> Vec<AstToken> {
             Some(c) => c,
         };
         if c == '"' || c == '\'' {
-            let matched = get_matching(&mut peekable, c, c);
+            let string = collect_string(&mut peekable, c);
             id = try_add_token(id, &mut ast);
-            try_add_token(matched, &mut ast);
+            try_add_token(string, &mut ast);
             continue;
         }
         if is_char_number(c) {
@@ -109,17 +109,19 @@ fn try_get_dbl(peekable: &mut Peekable<Chars>, c: char) -> Option<String> {
     None
 }
 
-fn get_matching(peekable: &mut Peekable<Chars>, c: char, m1: char) -> String {
-    let mut matching = String::from(c);
+fn collect_string(peekable: &mut Peekable<Chars>, ch: char) -> String {
+    let mut escaped = false;
+    let mut matching = String::from(ch);
     loop {
         let c = match peekable.next() {
             None => return matching,
             Some(c) => c,
         };
         matching.push(c);
-        if c == m1 {
+        if c == ch && !escaped {
             break;
         }
+        escaped = !escaped && c == '\\'
     }
     matching
 }

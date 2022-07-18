@@ -1,4 +1,4 @@
-use crate::structs::{AstToken, Class, Enum, Function, Include, Program, Use};
+use crate::structs::{AstToken, Class, Enum, Function, Global, Include, Program, Use};
 use std::{iter::Peekable, slice::Iter};
 
 pub struct Compiler<'a> {
@@ -33,6 +33,9 @@ impl<'a> Compiler<'a> {
     pub fn add_enum(self: &mut Compiler<'a>, enum_def: Enum) {
         self.program.enums.push(enum_def.to_owned())
     }
+    pub fn add_glob(self: &mut Compiler<'a>, glob: &Global) {
+        self.program.global.push(glob.to_owned())
+    }
     pub fn add_args(self: &mut Compiler<'a>, args: Vec<String>) {
         for i in args.iter() {
             self.arguments.push(i.to_owned());
@@ -42,41 +45,57 @@ impl<'a> Compiler<'a> {
         self.arguments.push(arg.to_owned().replace("\"", ""));
     }
     pub fn contains_class(self: &Compiler<'a>, id: &String) -> bool {
+        let id_str = id.to_owned();
         for c in self.program.classes.iter() {
-            if c.id == id.to_string() {
+            if c.id == id_str {
                 return true;
             }
         }
         false
     }
     pub fn contains_function(self: &Compiler<'a>, id: &String) -> bool {
+        let id_str = id.to_owned();
         for f in self.program.functions.iter() {
-            if f.id == id.to_string() {
+            if f.id == id_str {
                 return true;
             }
         }
         false
     }
     pub fn contains_inc(self: &Compiler<'a>, id: &String) -> bool {
+        let id_str = id.to_owned();
         for f in self.program.includes.iter() {
-            if f.include == id.to_owned() {
+            if f.include == id_str {
                 return true;
             }
         }
         false
     }
     pub fn contains_use(self: &Compiler<'a>, id: &String) -> bool {
+        let id_str = id.to_owned();
         for f in self.program.usings.iter() {
-            if f.using == id.to_owned() {
+            if f.using == id_str {
                 return true;
             }
         }
         false
     }
     pub fn contains_enum(self: &Compiler<'a>, id: &String) -> bool {
+        let id_str = id.to_owned();
         for e in self.program.enums.iter() {
-            if e.name == id.to_owned() {
+            if e.name == id_str {
                 return true;
+            }
+        }
+        false
+    }
+    pub fn contains_glob(self: &Compiler<'a>, id: &String) -> bool {
+        let id_str = id.to_owned();
+        for g in self.program.global.iter() {
+            for v in g.variables.iter() {
+                if v.v_type == id_str {
+                    return true;
+                }
             }
         }
         false

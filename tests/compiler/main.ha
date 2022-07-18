@@ -1,6 +1,6 @@
 inc => string
 get => ../../lib/[peekable, print, stringextensions, conditional]
-inc => "cpp/strings.h", "cpp/tokens.h", "cpp/errors.h"
+get => consts/[strings, tokens, errors]
 get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
 get => message, utils, fileutil
@@ -10,7 +10,8 @@ get => structs/[fordef, conditiondef, expressiondef]
 get => structs/[functiondef, classdef]
 get => structs/[programdef, compilerdef]
 get => ast, imports, enums, foreacher, expressions
-get => switch, conditions, variable, template, functions, classdef
+get => switch, conditions, variable, template
+get => functions, classdef, globals
 
 struct CompileOutput
     string output = EMPTY
@@ -71,6 +72,10 @@ fn compile CompilerPath paths, Program p, bool is_main => CompileOutput
             let enumdef = enums_construct(&compiler_t)
             output += enumdef.to_cpp()
             headers += enumdef.to_cpp_h()
+        ;
+        elif next.token == TGlobal
+            let global = global_construct(&compiler_t)
+            headers += global.to_cpp()
         ;
         elif next.token == TInclude
             incs = imports_creation(&compiler_t, next)

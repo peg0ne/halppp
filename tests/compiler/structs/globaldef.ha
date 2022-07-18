@@ -2,4 +2,15 @@ struct Global
     vector<Variable> variables = {}
     Global =>
     ;
+    fn to_cpp => string
+        string g_str = EMPTY
+        for i until variables.size()
+            let v = variables.at(i)
+            g_str += NEWLINE
+            g_str += GLOBAL + v.v_type
+            g_str += SPACE + v.id
+            g_str += NEWLINE
+        ;
+        return g_str
+    ;
 ;

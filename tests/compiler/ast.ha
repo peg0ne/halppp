@@ -77,13 +77,16 @@ fn try_get_dbl Peekable<char> *peekable, char ch => Option<string>
 ;
 
 fn get_matching Peekable<char> *peekable, char ch => string
+    let escaped = false
     string matching(1, ch)
     loop
-        let c = peekable->next()
-        if c.is_none() doremi matching
-        string matchbuf(1, c.value_or(' '))
+        let c_opt = peekable->next()
+        if c_opt.is_none() doremi matching
+        let c = c_opt.value_or(' ')
+        string matchbuf(1, c)
         matching += matchbuf
-        if c.value_or(' ') == ch doremi matching
+        if c == ch && !escaped doremi matching
+        escaped = !escaped && c == '\\'
     ;
 ;
 

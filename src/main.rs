@@ -14,6 +14,7 @@ mod variable;
 mod template;
 mod enumerator;
 mod switch;
+mod globals;
 
 use crate::{
     enums::{Token, VariableState},
@@ -78,6 +79,10 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> CompilerOutp
                 let enum_def = enumerator::construct(&mut compiler);
                 output.push_str(enum_def.to_cpp().as_str());
                 headers.push_str(enum_def.to_cpp_h().as_str());
+            }
+            Token::Global => {
+                let globals = globals::construct(&mut compiler);
+                headers.push_str(globals.to_cpp().as_str());
             }
             Token::Include => {
                 let incs = imports::imports_creation(&mut compiler, next);
