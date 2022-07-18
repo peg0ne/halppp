@@ -24,5 +24,8 @@ pub
         ;
         return replaced
     ;
+    fn contains string contains => bool doremi _value.find(contains) != -1
     fn starts_with string start => bool doremi _value.rfind(start, 0) == 0
+    fn substr int start => string doremi _value.substr(start)
+    fn substr int start, int end => string doremi _value.substr(start, end)
 ;

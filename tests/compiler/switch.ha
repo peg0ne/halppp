@@ -43,8 +43,9 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expressioner>
             compiler_t->next()
             let enum_name = get_next_or_exit(compiler_t->next(), "[Switch] Unexpected end")
             if !compiler_t->has_enum_name(enum_name.name) do display_err_message("[Switch] Enum member doesn't exist: " + enum_name.name)
-            label += enum_name.name + ":\n"
+            label += enum_name.name
         ;
+        label += ":\n"
     ;
     else do label = "default:\n"
     lines.push_back(Expressioner(label))

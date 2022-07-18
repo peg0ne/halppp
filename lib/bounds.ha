@@ -9,4 +9,6 @@ struct Bounds
         min = Vector(minX, minY)
         max = Vector(maxX, maxY)
     ;
+    fn width => int doremi max.x - min.x
+    fn height => int doremi max.y - min.y
 ;

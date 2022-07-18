@@ -77,6 +77,13 @@ pub
     fn add int y, int x, short s => void do add(y, x, to_string(s), false)
     fn add int y, int x, float s => void do add(y, x, to_string(s), false)
     fn add int y, int x, double s => void do add(y, x, to_string(s), false)
+    fn add_until int y, int x, string s, int limit, bool is_bold =>
+        for i until s.size()
+            if s.at(i) == '\0' do break
+            if x + i >= limit do break
+            add(y, x + i, s.at(i), is_bold)
+        ;
+    ;
     fn v_line int y, int x, int len =>
         for i until len do add(y + i, x, "|")
     ;
