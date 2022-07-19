@@ -30,6 +30,15 @@ impl<'a> Compiler<'a> {
             self.program.usings.push(Use::from(i.to_owned()));
         }
     }
+    pub fn add_get(self: &mut Compiler<'a>, gets: Vec<String>) {
+        for g in gets.iter() {
+            let mut getter = g.to_owned();
+            while getter.contains("/") {
+                getter.remove(0);
+            }
+            self.program.gets.push(getter);
+        }
+    }
     pub fn add_enum(self: &mut Compiler<'a>, enum_def: Enum) {
         self.program.enums.push(enum_def.to_owned())
     }
@@ -76,6 +85,18 @@ impl<'a> Compiler<'a> {
         for f in self.program.usings.iter() {
             if f.using == id_str {
                 return true;
+            }
+        }
+        false
+    }
+    pub fn contains_get(self: &Compiler<'a>, id: &String) -> bool {
+        let mut getter = id.to_owned();
+        while getter.contains("/") {
+            getter.remove(0);
+        }
+        for g in self.program.gets.iter() {
+            if g == &getter {
+                return true
             }
         }
         false

@@ -1,5 +1,5 @@
-fn switch_construct Compiler *compiler_t => Expressioner
-    let cond = Conditions("switch")
+fn switch_construct Compiler *compiler_t => Expression
+    let cond = Condition("switch")
     let expression = ConditionalExpression()
     loop
         let x = get_next_or_exit(compiler_t->next(), "[Switch] Switch is not closed")
@@ -10,7 +10,7 @@ fn switch_construct Compiler *compiler_t => Expressioner
     loop
         let x = get_next_or_exit(compiler_t->next(), "[Switch] Switch is not closed")
         let exit = false
-        vector<Expressioner> result = {}
+        vector<Expression> result = {}
         switch x.token
             case Token::Default
                 result = create_case(compiler_t, x.token == Token::Default)
@@ -27,11 +27,11 @@ fn switch_construct Compiler *compiler_t => Expressioner
         ;
         if exit do break
     ;
-    return Expressioner(cond)
+    return Expression(cond)
 ;
 
-fn create_case Compiler *compiler_t, bool is_default => vector<Expressioner>
-    vector<Expressioner> lines = {}
+fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
+    vector<Expression> lines = {}
     string label = EMPTY
     if !is_default
         let next = get_next_or_exit(compiler_t->next(), "[Switch] Case unfinished")
@@ -48,10 +48,10 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expressioner>
         label += ":\n"
     ;
     else do label = "default:\n"
-    lines.push_back(Expressioner(label))
+    lines.push_back(Expression(label))
     loop
         let x = get_next_or_exit(compiler_t->next(), "[Switch] Case unfinished")
-        vector<Expressioner> result = {}
+        vector<Expression> result = {}
         switch x.token
             case Token::Case
             case Token::Default

@@ -1,5 +1,5 @@
 inc => string
-get => ../lib/[peekable, print, stringextensions, conditional]
+get => ../lib/[peekable, print, stringextensions, conditional, clap]
 get => consts/[strings, tokens, errors]
 get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
@@ -11,10 +11,7 @@ get => structs/[functiondef, classdef]
 get => structs/[programdef, compilerdef]
 get => ast, imports, enums, foreacher, expressions
 get => switch, conditions, variable, template
-get => functions, classdef, globals
-
-//struct CompileOutput =>
-//;
+get => functions, classes, globals
 
 struct CompileOutput
     string output = EMPTY
@@ -33,13 +30,13 @@ struct CompileOutput
 ;
 
 fn main =>
-    let should_remove_cpp = false
+    let clap = Clap(argc, argv)
     FpFn fpfn = get_folder_and_name(get_file_path(argc, argv))
     let paths = CompilerPath(get_file_path(argc, argv), fpfn.f_p, fpfn.f_n)
     let p = Program()
     let output = compile_main(paths, &p)
     write_program(output.content(), paths)
-    compile_program(paths, output.arguments, should_remove_cpp)
+    if !clap.has("-t") do compile_program(paths, output.arguments)
 ;
 
 fn compile_main CompilerPath paths, Program *p => CompileOutput doremi compile(paths, p, true)

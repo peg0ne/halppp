@@ -5,6 +5,7 @@ struct Program
     vector<Class> classes = {}
     vector<Include> includes = {}
     vector<Uses> usings = {}
+    vector<string> gets = {}
     vector<Enum> enums = {}
     Program =>
     ;

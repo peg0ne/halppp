@@ -1,19 +1,19 @@
-struct Expressioner
-    Option<Conditions> e_condition = None<Conditions>()
+struct Expression
+    Option<Condition> e_condition = None<Condition>()
     Option<For> e_for = None<For>()
     Option<string> line = None<string>()
-    Expressioner =>
+    Expression =>
     ;
-    Expressioner Conditions conditions => 
+    Expression Condition conditions => 
         this->e_condition = Some(conditions)
     ;
-    Expressioner For fors => 
+    Expression For fors => 
         this->e_for = Some(fors)
     ;
-    Expressioner string line => 
+    Expression string line => 
         this->line = Some(line)
     ;
-    Expressioner Option<Conditions> conditions, Option<For> fors, Option<string> line =>
+    Expression Option<Condition> conditions, Option<For> fors, Option<string> line =>
         this->e_condition = conditions
         this->e_for = fors
         this->line = line
@@ -21,13 +21,13 @@ struct Expressioner
     fn to_cpp int indentation => string doremi expr_to_cpp(this, indentation)
 ;
 
-fn expr_to_cpp Expressioner *self, int indent => string
+fn expr_to_cpp Expression *self, int indent => string
     let condition = self->e_condition
     let foreacher = self->e_for
     let line = self->line
     string expression = EMPTY
 
-    if condition.is_some() doremi condition.value_or(Conditions()).to_cpp(indent + 1)
+    if condition.is_some() doremi condition.value_or(Condition()).to_cpp(indent + 1)
     if foreacher.is_some() doremi foreacher.value_or(For()).to_cpp(indent + 1)
 
     for i until indent do expression += TAB

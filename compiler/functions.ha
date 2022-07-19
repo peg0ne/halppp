@@ -47,7 +47,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
         if x.is_do() do break
     ;
     if function.id == "main"
-        function.add_expr(Expressioner("return 0"))
+        function.add_expr(Expression("return 0"))
     ;
     // validate_function(function, compiler_t)
     compiler_t->add_fn(function)

@@ -8,6 +8,7 @@ pub struct Program {
     pub classes: Vec<Class>,
     pub includes: Vec<Include>,
     pub usings: Vec<Use>,
+    pub gets: Vec<String>,
     pub enums: Vec<Enum>,
 }
 
@@ -20,6 +21,7 @@ impl Program {
                 classes: Vec::new(),
                 includes: Vec::new(),
                 usings: Vec::new(),
+                gets: Vec::new(),
                 enums: Vec::new(),
         }
     }

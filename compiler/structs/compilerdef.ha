@@ -24,6 +24,13 @@ struct Compiler
     fn add_use vector<string> usings =>
         for i until usings.size() do program->usings.push_back(Uses(usings.at(i)))
     ;
+    fn add_get vector<string> gets =>
+        for i until gets.size()
+            let getter = gets.at(i)
+            while getter.find("/") != -1 do getter = getter.substr(1)
+            program->gets.push_back(getter)
+        ;
+    ;
     fn add_arg string arg => void do arguments.push_back(String(arg).replace(QUOTE, EMPTY))
     fn add_args vector<string> args =>
         for i until args.size() do arguments.push_back(args.at(i))
@@ -49,6 +56,14 @@ struct Compiler
     fn has_inc string id => bool
         for i until program->includes.size()
             if program->includes.at(i).include == id doremi true
+        ;
+        return false
+    ;
+    fn has_get string id => bool
+        let getter = id
+        while getter.find("/") != -1 do getter = getter.substr(1)
+        for i until program->gets.size()
+            if program->gets.at(i) == getter doremi true
         ;
         return false
     ;

@@ -103,9 +103,8 @@ pub fn construct_impl(compiler: &mut Compiler) -> Vec<String> {
 }
 
 pub fn imports_creation(compiler: &mut Compiler, next: AstToken) -> Vec<String> {
-    let import = construct(compiler);
-    let import_return = import.to_owned();
-    let mut found = false;
+    let mut import = construct(compiler);
+    let mut remove: Vec<String> = Vec::new();
     for i in import.iter() {
         match next.token {
             Token::Use => {
@@ -113,7 +112,7 @@ pub fn imports_creation(compiler: &mut Compiler, next: AstToken) -> Vec<String> 
                     display_hint_message(
                         format!("[{:?}]: Duplicate entry of [{}]", next.token, i).as_str(),
                     );
-                    found = true;
+                    remove.push(i.to_owned())
                 }
             }
             Token::Include => {
@@ -121,20 +120,39 @@ pub fn imports_creation(compiler: &mut Compiler, next: AstToken) -> Vec<String> 
                     display_hint_message(
                         format!("[{:?}]: Duplicate entry of [{}]", next.token, i).as_str(),
                     );
-                    found = true;
+                    remove.push(i.to_owned())
                 }
             }
-            Token::Get => {}
+            Token::Get => {
+                if compiler.contains_get(i) {
+                    display_hint_message(
+                        format!("[{:?}]: Duplicate entry of [{}]", next.token, i).as_str(),
+                    );
+                    remove.push(i.to_owned())
+                }
+            }
             _ => display_err_message(format!("[{:?}]: Unhandled import", next.token).as_str()),
         }
     }
-    if !found {
-        match next.token {
-            Token::Use => compiler.add_use(import),
-            Token::Include => compiler.add_inc(import),
-            Token::Get => {},
-            _ => display_err_message(format!("[{:?}]: Unhandled import", next.token).as_str()),
+    for i in remove.iter() {
+        let mut index = 0;
+        loop {
+            let check = match import.get(index) {
+                Some(c) => c,
+                None => break,
+            };
+            if check == i {
+                import.remove(index);
+            }
+            index += 1;
         }
+    }
+    let import_return = import.to_owned();
+    match next.token {
+        Token::Use => compiler.add_use(import),
+        Token::Include => compiler.add_inc(import),
+        Token::Get => compiler.add_get(import),
+        _ => display_err_message(format!("[{:?}]: Unhandled import", next.token).as_str()),
     }
     import_return
 }

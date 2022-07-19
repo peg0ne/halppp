@@ -13,13 +13,13 @@ struct ConditionalExpression
     ;
 ;
 
-struct Conditions
+struct Condition
     string conditioner = EMPTY
     vector<ConditionalExpression> expressions = {}
-    vector<Expressioner> lines = {}
-    Conditions =>
+    vector<Expression> lines = {}
+    Condition =>
     ;
-    Conditions string conditioner =>
+    Condition string conditioner =>
         this->conditioner = conditioner
     ;
     fn add_expr ConditionalExpression cexpr => void do expressions.push_back(cexpr)

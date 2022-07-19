@@ -2,16 +2,13 @@
 #include <vector>
 using namespace std;
 #include <iostream>
-using namespace std;
-#include <vector>
-#include <iostream>
-using namespace std;
 #include <fstream>
 template <typename T>
 struct Option;
 template <typename T>
 struct Peekable;
 class String;
+struct Clap;
 
 #define ARG_END ") {\n"
 
@@ -308,8 +305,8 @@ struct Global;
 struct Struct;
 struct For;
 struct ConditionalExpression;
-struct Conditions;
-struct Expressioner;
+struct Condition;
+struct Expression;
 struct Function;
 struct Class;
 struct Program;
@@ -356,8 +353,8 @@ string get_file_path(int argc, char** argv);
 string get_content(CompilerPath paths);
 void write_program(string program, CompilerPath paths);
 char* to_char_arr(string s, char* buf);
-void compile_program(CompilerPath paths, vector<string> arguments, bool should_remove_cpp);
-string expr_to_cpp(Expressioner* self, int indent);
+void compile_program(CompilerPath paths, vector<string> arguments);
+string expr_to_cpp(Expression* self, int indent);
 vector<AstToken> ast_create(string content);
 string try_add_token(string id, vector<AstToken>* ast, Peekable<char>* peekable);
 bool is_str_tokens(string s);
@@ -375,15 +372,15 @@ string e_err(EnumError err, string opt);
 string e_err(EnumError err, string opt, bool display);
 void validate_enum(Enum enumerator, Compiler* compiler_t);
 Enum enums_construct(Compiler* compiler_t);
-Expressioner for_construct(Compiler* compiler_t);
-Expressioner expression_construct(Compiler* compiler_t, AstToken first);
-Expressioner get_let_expr(Compiler* compiler_t);
-Expressioner switch_construct(Compiler* compiler_t);
-vector<Expressioner> create_case(Compiler* compiler_t, bool is_default);
+Expression for_construct(Compiler* compiler_t);
+Expression expression_construct(Compiler* compiler_t, AstToken first);
+Expression get_let_expr(Compiler* compiler_t);
+Expression switch_construct(Compiler* compiler_t);
+vector<Expression> create_case(Compiler* compiler_t, bool is_default);
 string co_err(ConditionError err);
 string co_err(ConditionError err, string opt);
 string co_err(ConditionError err, string opt, bool display);
-Expressioner condition_construct(Compiler* compiler_t, string condition_type);
+Expression condition_construct(Compiler* compiler_t, string condition_type);
 Option<string> get_value(Compiler* compiler_t, bool found_setter);
 Variable get_type(Compiler* compiler_t);
 VariableNBool construct_args(Compiler* compiler_t);
@@ -644,6 +641,42 @@ return false;
 }
    return true;
 }
+struct Clap {
+ private:
+   int _argc = 0;
+ private:
+   char** _argv;
+ public:
+   bool has(string check) {
+         for(int i = 0; i < _argc; i++) {
+               if(_argv [ i ]  == check  ) {
+                  
+return true;
+}
+}
+      return false;
+   }
+ public:
+   Option<string> peek(string check) {
+         for(int i = 0; i < _argc; i++) {
+               if(_argv [ i ]  != check  ) {
+                  
+ continue;
+}
+               if(i  > _argc - 2  ) {
+                  
+ break;
+}
+            return (string) _argv[ i+ 1];
+}
+      return  None<string>();
+   }
+ public:
+   Clap (int argc, char** argv) {
+      _argc= argc;
+      _argv= argv;
+   }
+};
 enum class Token: int {
    AllEquals,
    AllLessOrEquals,
@@ -1602,7 +1635,7 @@ char* to_char_arr(string s, char* buf) {
    buf[ s.size()]='\0';
    return  buf;
 }
-void compile_program(CompilerPath paths, vector<string> arguments, bool should_remove_cpp) {
+void compile_program(CompilerPath paths, vector<string> arguments) {
    string base_cmd="g++ "+ paths.output;
       for(int i = 0; i < arguments.size(); i++) {
          
@@ -1612,10 +1645,7 @@ void compile_program(CompilerPath paths, vector<string> arguments, bool should_r
    char cmd[ base_cmd.size()+ 1];
    char cpp_path[ paths.main_path_cpp.size()+ 1];
    system( to_char_arr( base_cmd, cmd));
-      if(should_remove_cpp    ) {
-         
- remove( to_char_arr( paths.main_path_cpp, cpp_path));
-}
+   remove( to_char_arr( paths.main_path_cpp, cpp_path));
 }
 struct Variable {
  public:
@@ -1789,7 +1819,7 @@ struct For {
  public:
    string until = EMPTY;
  public:
-   vector<Expressioner> lines = {};
+   vector<Expression> lines = {};
  public:
    For () {
    }
@@ -1832,18 +1862,18 @@ struct ConditionalExpression {
       return  expr_str;
    }
 };
-struct Conditions {
+struct Condition {
  public:
    string conditioner = EMPTY;
  public:
    vector<ConditionalExpression> expressions = {};
  public:
-   vector<Expressioner> lines = {};
+   vector<Expression> lines = {};
  public:
-   Conditions () {
+   Condition () {
    }
  public:
-   Conditions (string conditioner) {
+   Condition (string conditioner) {
       this-> conditioner= conditioner;
    }
  public:
@@ -1876,30 +1906,30 @@ struct Conditions {
       return  condition_str;
    }
 };
-struct Expressioner {
+struct Expression {
  public:
-   Option<Conditions> e_condition = None<Conditions>();
+   Option<Condition> e_condition = None<Condition>();
  public:
    Option<For> e_for = None<For>();
  public:
    Option<string> line = None<string>();
  public:
-   Expressioner () {
+   Expression () {
    }
  public:
-   Expressioner (Conditions conditions) {
+   Expression (Condition conditions) {
       this-> e_condition= Some( conditions);
    }
  public:
-   Expressioner (For fors) {
+   Expression (For fors) {
       this-> e_for= Some( fors);
    }
  public:
-   Expressioner (string line) {
+   Expression (string line) {
       this-> line= Some( line);
    }
  public:
-   Expressioner (Option<Conditions> conditions, Option<For> fors, Option<string> line) {
+   Expression (Option<Condition> conditions, Option<For> fors, Option<string> line) {
       this-> e_condition= conditions;
       this-> e_for= fors;
       this-> line= line;
@@ -1910,14 +1940,14 @@ struct Expressioner {
 return  expr_to_cpp( this, indentation);
    }
 };
-string expr_to_cpp(Expressioner* self, int indent) {
+string expr_to_cpp(Expression* self, int indent) {
    auto condition = self->e_condition;
    auto foreacher = self->e_for;
    auto line = self->line;
    string expression= EMPTY;
       if(condition.is_some ( )    ) {
          
-return  condition.value_or( Conditions()) .to_cpp( indent+ 1);
+return  condition.value_or( Condition()) .to_cpp( indent+ 1);
 }
       if(foreacher.is_some ( )    ) {
          
@@ -1948,7 +1978,7 @@ struct Function {
  public:
    vector<Variable> arguments = {};
  public:
-   vector<Expressioner> expressions = {};
+   vector<Expression> expressions = {};
  public:
    vector<string> templates = {};
  public:
@@ -1961,7 +1991,7 @@ struct Function {
  arguments.push_back( var);
    }
  public:
-   void add_expr(Expressioner expr) {
+   void add_expr(Expression expr) {
       
  expressions.push_back( expr);
    }
@@ -2066,6 +2096,8 @@ struct Program {
  public:
    vector<Uses> usings = {};
  public:
+   vector<string> gets = {};
+ public:
    vector<Enum> enums = {};
  public:
    Program () {
@@ -2138,6 +2170,17 @@ return  ast.prev();
 }
    }
  public:
+   void add_get(vector<string> gets) {
+         for(int i = 0; i < gets.size(); i++) {
+            auto getter = gets.at(i);
+               while(getter.find ( "/" )  != - 1  ) {
+                  
+ getter= getter.substr( 1);
+}
+            program-> gets.push_back( getter);
+}
+   }
+ public:
    void add_arg(string arg) {
       
  arguments.push_back( String( arg) .replace( QUOTE, EMPTY));
@@ -2183,6 +2226,21 @@ return true;
    bool has_inc(string id) {
          for(int i = 0; i < program->includes.size(); i++) {
                if(program -> includes.at ( i ) .include  == id  ) {
+                  
+return true;
+}
+}
+      return false;
+   }
+ public:
+   bool has_get(string id) {
+      auto getter = id;
+         while(getter.find ( "/" )  != - 1  ) {
+            
+ getter= getter.substr( 1);
+}
+         for(int i = 0; i < program->gets.size(); i++) {
+               if(program -> gets.at ( i )  == getter  ) {
                   
 return true;
 }
@@ -2432,52 +2490,66 @@ vector<string> imports_construct_impl(Compiler* compiler_t) {
 }
 vector<string> imports_creation(Compiler* compiler_t, AstToken next) {
    auto import = imports_construct(compiler_t);
-   auto import_return = import;
-   bool found = false;
+   vector<int> remove={};
    bool contains = false;
       for(int i = 0; i < import.size(); i++) {
          auto imp = import.at(i);
-            if(next.token  == Token :: Use  ) {
-               contains= compiler_t-> has_use( imp);
-                  if(contains    ) {
-                     display_hint_message("[Use]: Duplicate entry of: "+ to_string( next.token));
-                     found=true;
+            switch(next.token    ) {
+               case Token::Use:
+                  if(compiler_t -> has_use ( imp )    ) {
+                     display_hint_message("[Use]: Duplicate entry of: "+ imp);
+                     remove.push_back( i);
 }
-               continue;
+               break;
+               case Token::Include:
+                  if(compiler_t -> has_inc ( imp )    ) {
+                     display_hint_message("[Include]: Duplicate entry of: "+ imp);
+                     remove.push_back( i);
 }
-            else if(next.token  == Token :: Include  ) {
-               contains= compiler_t-> has_inc( imp);
-                  if(contains    ) {
-                     display_hint_message("[Include]: Duplicate entry of: "+ to_string( next.token));
-                     found=true;
+               break;
+               case Token::Get:
+                  if(compiler_t -> has_get ( imp )    ) {
+                     display_hint_message("[Get]: Duplicate entry of: "+ imp);
+                     remove.push_back( i);
 }
-               continue;
+               break;
+               default:
+;
+                display_err_message("["+ to_string( next.token)+"]: Unhandled import");
+break ;
 }
-            else if(next.token  == Token :: Get  ) {
+}
+   vector<string> import_buf={};
+      for(int i = 0; i < import.size(); i++) {
+         bool found = false;
+            for(int j = 0; j < remove.size(); j++) {
+                  if(i  == remove.at ( j )  ) {
+                     
+ found=true;
+}
+}
+            if(! found    ) {
                
- continue;
-}
-         display_err_message("["+ to_string( next.token)+"]: Unhandled import");
-}
-      if(! found    ) {
-            if(next.token  == Token :: Use  ) {
-               
- compiler_t-> add_use( import);
-}
-            else if(next.token  == Token :: Include  ) {
-               
- compiler_t-> add_inc( import);
-}
-            else if(next.token  == Token :: Get  ) {
-               
-return  import_return;
-}
-            else {
-               
- display_err_message("["+ to_string( next.token)+"]: Unhandled import");
+ import_buf.push_back( import.at( i));
 }
 }
-   return  import_return;
+   import= import_buf;
+      switch(next.token    ) {
+         case Token::Use:
+          compiler_t-> add_use( import);
+break ;
+         case Token::Include:
+          compiler_t-> add_inc( import);
+break ;
+         case Token::Get:
+          compiler_t-> add_get( import);
+break ;
+         default:
+;
+          display_err_message("["+ to_string( next.token)+"]: Unhandled import");
+break ;
+}
+   return  import;
 }
 bool imports_check_duplicate(vector<string> imports, string id) {
       for(int i = 0; i < imports.size(); i++) {
@@ -2623,7 +2695,7 @@ continue ;
    compiler_t-> add_enum( enumerator);
    return  enumerator;
 }
-Expressioner for_construct(Compiler* compiler_t) {
+Expression for_construct(Compiler* compiler_t) {
    auto for_def = For();
    for_def.iterator= get_id_or_exit( compiler_t-> next(),"[For] For loop is not closed");
    get_or_exit( compiler_t-> next(), Token:: Until,"[For] Missing until keyword");
@@ -2632,7 +2704,7 @@ Expressioner for_construct(Compiler* compiler_t) {
          auto x = get_next_or_exit(compiler_t->next(),"[For] For loop is not closed");
             if(x.is_do ( )    ) {
                for_def.lines.push_back( expression_construct( compiler_t, x));
-               return  Expressioner( for_def);
+               return  Expression( for_def);
 }
             if(x.is_nl ( )    ) {
                
@@ -2666,9 +2738,9 @@ break ;
 break ;
 }
 }
-   return  Expressioner( for_def);
+   return  Expression( for_def);
 }
-Expressioner expression_construct(Compiler* compiler_t, AstToken first) {
+Expression expression_construct(Compiler* compiler_t, AstToken first) {
    string doing= EMPTY;
    string expression= EMPTY;
       if(first.token  == Token :: Let  ) {
@@ -2741,9 +2813,9 @@ break ;
 break ;
 }
 }
-   return  Expressioner( expression);
+   return  Expression( expression);
 }
-Expressioner get_let_expr(Compiler* compiler_t) {
+Expression get_let_expr(Compiler* compiler_t) {
    auto id = get_id_or_exit(compiler_t->next(),"[Let] Required id after let");
    get_or_exit( compiler_t-> next(), Token:: Equals,"[Let] Required equals after id");
    string expression= EMPTY;
@@ -2782,10 +2854,10 @@ Expressioner get_let_expr(Compiler* compiler_t) {
  expression="auto ";
 }
    expression+= id+" = "+ value;
-   return  Expressioner( expression);
+   return  Expression( expression);
 }
-Expressioner switch_construct(Compiler* compiler_t) {
-   auto cond = Conditions("switch");
+Expression switch_construct(Compiler* compiler_t) {
+   auto cond = Condition("switch");
    auto expression = ConditionalExpression();
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),"[Switch] Switch is not closed");
@@ -2802,7 +2874,7 @@ break ;
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),"[Switch] Switch is not closed");
          bool exit = false;
-         vector< Expressioner> result={};
+         vector< Expression> result={};
             switch(x.token    ) {
                case Token::Default:
                result= create_case( compiler_t, x.token== Token:: Default);
@@ -2837,10 +2909,10 @@ break ;
  break;
 }
 }
-   return  Expressioner( cond);
+   return  Expression( cond);
 }
-vector<Expressioner> create_case(Compiler* compiler_t, bool is_default) {
-   vector< Expressioner> lines={};
+vector<Expression> create_case(Compiler* compiler_t, bool is_default) {
+   vector< Expression> lines={};
    string label= EMPTY;
       if(! is_default    ) {
          auto next = get_next_or_exit(compiler_t->next(),"[Switch] Case unfinished");
@@ -2869,10 +2941,10 @@ vector<Expressioner> create_case(Compiler* compiler_t, bool is_default) {
          
  label="default:\n";
 }
-   lines.push_back( Expressioner( label));
+   lines.push_back( Expression( label));
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),"[Switch] Case unfinished");
-         vector< Expressioner> result={};
+         vector< Expression> result={};
             switch(x.token    ) {
                case Token::Case:
                case Token::Default:
@@ -2933,15 +3005,15 @@ break ;
 }
    return  msg;
 }
-Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
-   auto cond = Conditions(condition_type);
+Expression condition_construct(Compiler* compiler_t, string condition_type) {
+   auto cond = Condition(condition_type);
    auto expression = ConditionalExpression();
       if(condition_type  == "elif"  ) {
          
- cond= Conditions("else if");
+ cond= Condition("else if");
 }
       if(condition_type  == "loop"  ) {
-         cond= Conditions("while");
+         cond= Condition("while");
          expression.value_left="true";
 }
       while(true   ) {
@@ -2949,7 +3021,7 @@ Expressioner condition_construct(Compiler* compiler_t, string condition_type) {
             if(x.is_do ( )    ) {
                cond.add_expr( expression);
                cond.lines.push_back( expression_construct( compiler_t, x));
-               return  Expressioner( cond);
+               return  Expression( cond);
 }
             if(x.is_conditional_sep ( )    ) {
                expression.continuation= x.name;
@@ -2997,7 +3069,7 @@ break ;
 break ;
 }
 }
-   return  Expressioner( cond);
+   return  Expression( cond);
 }
 struct VariableNBool {
  public:
@@ -3229,7 +3301,7 @@ break ;
 }
 }
       if(function.id  == "main"  ) {
-         function.add_expr( Expressioner("return 0"));
+         function.add_expr( Expression("return 0"));
 }
    compiler_t-> add_fn( function);
    return  function;
@@ -3448,13 +3520,16 @@ return  includes+ headers+ fnheaders+ output;
    }
 };
 int main(int argc, char* argv[]) {
-   bool should_remove_cpp = false;
+   auto clap = Clap(argc,argv);
    FpFn fpfn= get_folder_and_name( get_file_path( argc, argv));
    auto paths = CompilerPath(get_file_path(argc,argv),fpfn.f_p,fpfn.f_n);
    auto p = Program();
    auto output = compile_main(paths,&p);
    write_program( output.content(), paths);
-   compile_program( paths, output.arguments, should_remove_cpp);
+      if(! clap.has ( "-t" )    ) {
+         
+ compile_program( paths, output.arguments);
+}
    return 0;
 }
 CompileOutput compile_main(CompilerPath paths, Program* p) {

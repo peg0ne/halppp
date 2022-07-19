@@ -1,4 +1,4 @@
-fn for_construct Compiler *compiler_t => Expressioner
+fn for_construct Compiler *compiler_t => Expression
     let for_def = For()
     for_def.iterator = get_id_or_exit(compiler_t->next(), "[For] For loop is not closed")
     get_or_exit(compiler_t->next(), Token::Until, "[For] Missing until keyword")
@@ -7,7 +7,7 @@ fn for_construct Compiler *compiler_t => Expressioner
         let x = get_next_or_exit(compiler_t->next(), "[For] For loop is not closed")
         if x.is_do()
             for_def.lines.push_back(expression_construct(compiler_t, x))
-            return Expressioner(for_def)
+            return Expression(for_def)
         ;
         if x.is_nl() do break
         for_def.until += x.name
@@ -23,5 +23,5 @@ fn for_construct Compiler *compiler_t => Expressioner
             default dobr for_def.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
-    return Expressioner(for_def)
+    return Expression(for_def)
 ;

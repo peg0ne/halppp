@@ -27,12 +27,12 @@ fn to_char_arr string s, char *buf => char*
     buf[s.size()] = '\0'
     return buf
 ;
-fn compile_program CompilerPath paths, vector<string> arguments, bool should_remove_cpp =>
+fn compile_program CompilerPath paths, vector<string> arguments =>
     string base_cmd= "g++ " + paths.output
     for i until arguments.size() do base_cmd += " " + arguments.at(i)
     println("compiling: " + base_cmd)
     char cmd[base_cmd.size() + 1]
     char cpp_path[paths.main_path_cpp.size() + 1]
     system(to_char_arr(base_cmd, cmd))
-    if should_remove_cpp do remove(to_char_arr(paths.main_path_cpp, cpp_path))
+    remove(to_char_arr(paths.main_path_cpp, cpp_path))
 ;

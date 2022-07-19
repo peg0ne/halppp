@@ -1,4 +1,4 @@
-fn expression_construct Compiler *compiler_t, AstToken first => Expressioner
+fn expression_construct Compiler *compiler_t, AstToken first => Expression
     string doing = EMPTY
     string expression = EMPTY
     if first.token == Token::Let doremi get_let_expr(compiler_t)
@@ -27,10 +27,10 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expressioner
             default dobr expression += x.name
         ;
     ;
-    return Expressioner(expression)
+    return Expression(expression)
 ;
 
-fn get_let_expr Compiler *compiler_t => Expressioner
+fn get_let_expr Compiler *compiler_t => Expression
     let id = get_id_or_exit(compiler_t->next(), "[Let] Required id after let")
     get_or_exit(compiler_t->next(), Token::Equals,"[Let] Required equals after id")
     string expression = EMPTY
@@ -48,5 +48,5 @@ fn get_let_expr Compiler *compiler_t => Expressioner
     elif token.is_string() do expression = "string "
     else do expression = "auto "
     expression += id + " = " + value
-    return Expressioner(expression)
+    return Expression(expression)
 ;

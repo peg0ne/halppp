@@ -15,12 +15,12 @@ fn co_err ConditionError err, string opt, bool display => string
     return msg
 ;
 
-fn condition_construct Compiler *compiler_t, string condition_type => Expressioner
-    let cond = Conditions(condition_type)
+fn condition_construct Compiler *compiler_t, string condition_type => Expression
+    let cond = Condition(condition_type)
     let expression = ConditionalExpression()
-    if condition_type == "elif" do cond = Conditions("else if")
+    if condition_type == "elif" do cond = Condition("else if")
     if condition_type == "loop"
-        cond = Conditions("while")
+        cond = Condition("while")
         expression.value_left = "true"
     ;
     loop
@@ -28,7 +28,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         if x.is_do()
             cond.add_expr(expression)
             cond.lines.push_back(expression_construct(compiler_t, x))
-            return Expressioner(cond)
+            return Expression(cond)
         ;
         if x.is_conditional_sep()
             expression.continuation = x.name
@@ -51,5 +51,5 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
             default dobr cond.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
-    return Expressioner(cond)
+    return Expression(cond)
 ;
