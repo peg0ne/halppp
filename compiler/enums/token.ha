@@ -52,6 +52,7 @@ enum Token
     MacroDefinition,
     MoreThan,
     MoreThanOrEquals,
+    Named,
     NewLine,
     NonEquality,
     Number,
@@ -132,6 +133,7 @@ struct Token_t
         elif s == TOKEN_MACRODEFINITION dore t = Token::MacroDefinition
         elif s == TOKEN_MORETHAN dore t = Token::MoreThan
         elif s == TOKEN_MORETHANOREQUALS dore t = Token::MoreThanOrEquals
+        elif s == TOKEN_NAMED dore t = Token::Named
         elif s == TOKEN_NEWLINE dore t = Token::NewLine
         elif s == TOKEN_NONEQUALITY dore t = Token::NonEquality
         elif s == TOKEN_OR dore t = Token::Or
@@ -179,6 +181,7 @@ struct Token_t
         case Token::Global
         case Token::Include
         case Token::MacroDefinition
+        case Token::Named
         case Token::NewLine
         case Token::SemiColon
         case Token::Struct

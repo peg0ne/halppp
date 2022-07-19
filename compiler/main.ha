@@ -46,6 +46,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     string includes = EMPTY
     string headers = EMPTY
     string fnheaders = EMPTY
+    let is_named = false
     let content = get_content(paths)
     let ast = ast_create(content)
     let compiler_t = Compiler(p, ast)
@@ -62,6 +63,13 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             let classdef = class_construct(&compiler_t, next.token == Token::Struct)
             output += classdef.to_cpp()
             headers += classdef.to_cpp_h()
+        ;
+        elif next.token == Token::Named
+            if is_named do display_err_message("[Named] cannot have nested namespaces")
+            is_named = true
+            get_arrow_or_exit(compiler_t.next(), "[Named] missing => in declaration");
+            let id = get_id_or_exit(compiler_t.next(), "[Named] cannot create namespace without Id");
+            output += "namespace " + id + "\n{\n"
         ;
         elif next.token == Token::Function
             let fndef = function_construct(&compiler_t, VariableState::Public, false)
@@ -105,6 +113,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
         ;
         else do display_err_message("Token not handled: " + next.name)
     ;
+    if is_named do output += "\n}\n"
     validate_compiled(compiler_t, is_main)
     return CompileOutput(output, includes, headers, fnheaders, compiler_t.arguments)
 ;

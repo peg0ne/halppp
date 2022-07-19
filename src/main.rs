@@ -42,6 +42,7 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> CompilerOutp
     let mut includes = String::new();
     let mut headers = String::new();
     let mut fnheaders = String::new();
+    let mut is_named = false;
     let mut compiler = Compiler {
         program: p,
         ast: ast.iter().peekable(),
@@ -60,6 +61,13 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> CompilerOutp
             );
         }
         match next.token {
+            Token::Named => {
+                if is_named {display_err_message("[Named] cannot have nested namespaces");}
+                is_named = true;
+                get_arrow_or_exit(compiler.next(), "[Named] missing => in declaration");
+                let id = get_id_or_exit(compiler.next(), "[Named] cannot create namespace without Id");
+                output.push_str(format!("namespace {}\n{{\n", id).as_str());
+            }
             Token::Struct => {
                 let class = class::construct(&mut compiler, true);
                 output.push_str(class.to_cpp().as_str());
@@ -118,6 +126,7 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> CompilerOutp
             _ => display_err_message(format!("Token not handled: {:?}", next.token).as_str()),
         }
     }
+    if is_named {output.push_str("\n}\n");}
     validate_compiled(&mut compiler, is_main);
     CompilerOutput::from(output, includes, headers, fnheaders, compiler.arguments)
 }

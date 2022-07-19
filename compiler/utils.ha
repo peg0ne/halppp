@@ -7,7 +7,6 @@ struct FpFn
         this->f_n = f_n
     ;
 ;
-
 fn get_next_or_exit Option<AstToken> next, string s => AstToken
     if next.is_none() do display_err_message(s)
     return next.value_or(AstToken())

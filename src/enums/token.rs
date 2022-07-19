@@ -47,6 +47,7 @@ pub enum Token {
     MacroDefinition,
     MoreThan,
     MoreThanOrEquals,
+    Named,
     NewLine,
     NonEquality,
     Number,
@@ -144,6 +145,7 @@ impl Token {
             "inc" => Token::Include,
             "int" => Token::Type,
             "let" => Token::Let,
+            "named" => Token::Named,
             "private" => Token::Private,
             "protected" => Token::Protected,
             "pub" => Token::Public,
@@ -176,6 +178,7 @@ impl Token {
             Token::Use => true,
             Token::Compiler => true,
             Token::Enum => true,
+            Token::Named => true,
             _ => false,
         }
     }
