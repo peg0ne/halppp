@@ -11,6 +11,7 @@ pub
     Peekable vector<T> values =>
         _values = values
     ;
+    fn index => int doremi _index
     fn size => int doremi _values.size()
     fn is_end => bool doremi _index > _values.size() - 2
     fn is_begin => bool doremi _index == 0

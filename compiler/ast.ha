@@ -6,32 +6,35 @@ fn ast_create string content => vector<AstToken>
     vector<AstToken> ast = {}
     loop
         let c_opt = peekable.next()
-        if c_opt.is_none() dobr try_add_token(id, &ast)
+        let last_known_index = peekable.index()
+        if c_opt.is_none() dobr try_add_token(id, &ast, &peekable)
         let c = c_opt.value_or(' ')
         if any(c, {CHAR_QUOTE, CHAR_SINGLE})
             let matched = get_matching(&peekable, c)
-            id = try_add_token(id, &ast)
-            doco try_add_token(matched, &ast)
+            id = try_add_token(id, &ast, &peekable)
+            doco try_add_token(matched, &ast, &peekable)
         ;
         elif is_char_number(c)
             let num = collect_num(&peekable, c)
-            id = try_add_token(id, &ast)
+            id = try_add_token(id, &ast, &peekable)
             doco ast.push_back(num)
         ;
         string ch(1, c)
         let is_white_space = any(c, {'\n', ' ', '\t'})
         let is_both_token = is_str_tokens(id) == is_char_token(c)
         if !is_both_token
-            id = try_add_token(id, &ast)
+            id = try_add_token(id, &ast, &peekable)
+            if peekable.index() != last_known_index do continue
             if !is_white_space doco id += ch
         ;
         if is_both_token && is_str_tokens(id + ch) doco id += ch
         elif is_char_token(c)
-            id = try_add_token(id, &ast)
+            id = try_add_token(id, &ast, &peekable)
+            if peekable.index() != last_known_index do continue
             doco ast.push_back(AstToken(c))
         ;
         elif is_white_space
-            id = try_add_token(id, &ast)
+            id = try_add_token(id, &ast, &peekable)
             if c == '\n' do ast.push_back(AstToken("\n"))
             continue
         ;
@@ -47,8 +50,15 @@ fn ast_create string content => vector<AstToken>
     return ast
 ;
 
-fn try_add_token string id, vector<AstToken> *ast => string
+fn try_add_token string id, vector<AstToken> *ast, Peekable<char> *peekable => string
     if id.size() == 0 doremi id
+    if id == "//"
+        loop
+            let next = peekable->next().value_or('\n')
+            if next == '\n' do break
+        ;
+        id = "\n"
+    ;
     ast->push_back(AstToken(id))
     return EMPTY
 ;

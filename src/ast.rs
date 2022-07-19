@@ -27,7 +27,8 @@ pub fn create(content: &String) -> Vec<AstToken> {
             let dbl_more = id != ">" && c == '>';
             let dbl_col = id != ":" && c == ':';
             let dbl_eq = id != "=" && c == '=';
-            if dbl_less || dbl_more || dbl_eq || dbl_col {
+            let dbl_slash = id != "/" && c == '/';
+            if dbl_less || dbl_more || dbl_eq || dbl_col{
                 match try_get_dbl(&mut peekable, c) {
                     Some(s) => {
                         id = try_add_token(id, &mut ast);
@@ -35,6 +36,19 @@ pub fn create(content: &String) -> Vec<AstToken> {
                         continue;
                     }
                     None => {}
+                }
+            }
+            if dbl_slash {
+                if try_get_dbl(&mut peekable, c).is_some() {
+                    id = try_add_token(id, &mut ast);
+                    loop {
+                        let next = peekable.next().unwrap_or('\n');
+                        if next == '\n' { 
+                            ast.push(AstToken::from_char(next));
+                            break;
+                        }
+                    }
+                    continue;
                 }
             }
         }

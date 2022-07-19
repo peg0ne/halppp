@@ -7,10 +7,11 @@ struct Compiler
         this->ast = ast
     ;
     fn size => int doremi ast.size()
-    fn next => Option<AstToken>
-        // println(ast.peek().value_or(AstToken()).to_string())
-        return ast.next()
-    ;
+    fn next => Option<AstToken> doremi ast.next()
+    // fn next => Option<AstToken>
+    //     println(ast.peek().value_or(AstToken()).to_string())
+    //     return ast.next()
+    // ;
     fn peek => Option<AstToken> doremi ast.peek()
     fn prev => Option<AstToken> doremi ast.prev()
     fn add_fn Function function => void do program->functions.push_back(function)

@@ -1,5 +1,5 @@
 inc => string
-get => ../../lib/[peekable, print, stringextensions, conditional]
+get => ../lib/[peekable, print, stringextensions, conditional]
 get => consts/[strings, tokens, errors]
 get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
@@ -12,6 +12,9 @@ get => structs/[programdef, compilerdef]
 get => ast, imports, enums, foreacher, expressions
 get => switch, conditions, variable, template
 get => functions, classdef, globals
+
+//struct CompileOutput =>
+//;
 
 struct CompileOutput
     string output = EMPTY
