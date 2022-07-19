@@ -1,6 +1,6 @@
 fn ast_create string content => vector<AstToken>
     vector<char> vec = {}
-    for i until content.size() do vec.push_back(content[i])
+    foreach i in content do vec.push_back(i)
     let peekable = Peekable<char>(vec)
     string id = EMPTY
     vector<AstToken> ast = {}
@@ -65,8 +65,8 @@ fn try_add_token string id, vector<AstToken> *ast, Peekable<char> *peekable => s
 
 fn is_str_tokens string s => bool
     if s.size() == 0 doremi false
-    for i until s.size()
-        if !is_char_token(s.at(i)) doremi false
+    foreach i in s
+        if !is_char_token(i) doremi false
     ;
     return !Token_t(s).is_id()
 ;

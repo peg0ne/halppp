@@ -30,8 +30,8 @@ struct Function
     fn to_cpp bool in_class => string
         string fun_str = to_cpp_start(in_class)
         fun_str += BLOCK_START
-        for i until expressions.size()
-            fun_str += expressions.at(i).to_cpp(1 + in_class)
+        foreach e in expressions
+            fun_str += e.to_cpp(1 + in_class)
         ;
         if in_class do fun_str += TAB
         fun_str += BLOCK_END

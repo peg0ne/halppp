@@ -13,9 +13,9 @@ fn imports_construct_impl Compiler *compiler_t => vector<string>
         ;
         elif next.token == Token::LBrack
             let combined = imports_construct_impl(compiler_t)
-            for i until combined.size()
+            foreach i in combined
                 let base = id
-                base += combined.at(i)
+                base += i
                 imports.push_back(base)
             ;
             id = EMPTY
@@ -58,8 +58,8 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
     vector<string> import_buf = {}
     for i until import.size()
         let found = false
-        for j until remove.size()
-            if i == remove.at(j) do found = true
+        foreach j in remove
+            if i == j do found = true
         ;
         if !found do import_buf.push_back(import.at(i))
     ;
@@ -74,8 +74,8 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
 ;
 
 fn imports_check_duplicate vector<string> imports, string id => bool
-    for i until imports.size()
-        if imports.at(i) == id
+    foreach imp in imports
+        if imp == id
             display_hint_message("[Import]: Token duplicate in entry " + id)
             return true
         ;

@@ -21,13 +21,11 @@ struct Class
     fn to_cpp => string
         string class_str = to_cpp_start()
         class_str += BLOCK_START
-        for i until variables.size()
-            let v = variables.at(i)
+        foreach v in variables
             class_str += variable_state_to_cpp(v.variable_state)
             class_str += v.to_cpp(TAB, LINE_END)
         ;
-        for i until functions.size()
-            let f = functions.at(i)
+        foreach f in functions
             class_str += variable_state_to_cpp(f.variable_state)
             class_str += f.to_cpp(true)
         ;

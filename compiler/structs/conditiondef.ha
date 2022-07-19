@@ -27,7 +27,7 @@ struct Condition
         condition_str += conditioner
         if conditioner != TOKEN_ELSE
             condition_str += LPAREN
-            for i until expressions.size() do condition_str += expressions.at(i).to_cpp()
+            foreach expr in expressions do condition_str += expr.to_cpp()
             condition_str += RPAREN
         ;
         condition_str += BLOCK_START

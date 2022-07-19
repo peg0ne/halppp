@@ -15,8 +15,7 @@ struct Enum
     fn to_cpp_h => string doremi to_cpp_start() + LINE_END + to_cpp_string_start() + LINE_END
     fn to_cpp => string
         string enum_str = to_cpp_start() + BLOCK_START
-        for i until enums.size()
-            let e = enums.at(i)
+        foreach e in enums
             enum_str += TAB + e.name
             enum_str += e.value.is_some() ? ASSIGNMENT + e.value.value_or(EMPTY) : EMPTY
             enum_str += ENUM_SEP
@@ -25,8 +24,7 @@ struct Enum
         enum_str += LINE_END
         enum_str += to_cpp_string_start() + BLOCK_START
         enum_str += "switch (enumerator) {\n" 
-        for i until enums.size()
-            let e = enums.at(i)
+        foreach e in enums
             enum_str += "case " + name
             enum_str += "::" + e.name
             enum_str += ": return \"" + e.name + "\";\n"

@@ -19,74 +19,71 @@ struct Compiler
     fn add_enum Enum enum_def => do program->enums.push_back(enum_def)
     fn add_glob Global global => do program->global.push_back(global)
     fn add_inc vector<string> includes =>
-        for i until includes.size() do program->includes.push_back(Include(includes.at(i)))
+        foreach i in includes do program->includes.push_back(Include(i))
     ;
     fn add_use vector<string> usings =>
-        for i until usings.size() do program->usings.push_back(Uses(usings.at(i)))
+        foreach i in usings do program->usings.push_back(Uses(i))
     ;
     fn add_get vector<string> gets =>
-        for i until gets.size()
-            let getter = gets.at(i)
-            while getter.find("/") != -1 do getter = getter.substr(1)
-            program->gets.push_back(getter)
+        foreach i in gets
+            while i.find("/") != -1 do i = i.substr(1)
+            program->gets.push_back(i)
         ;
     ;
     fn add_arg string arg => do arguments.push_back(String(arg).replace(QUOTE, EMPTY))
     fn add_args vector<string> args =>
-        for i until args.size() do arguments.push_back(args.at(i))
+        foreach i in args do arguments.push_back(i)
     ;
     fn has_use string id => bool
-        for i until program->usings.size()
-            if program->usings.at(i).usings == id doremi true
+        foreach i in program->usings
+            if i.usings == id doremi true
         ;
         return false
     ;
     fn has_function string id => bool
-        for i until program->functions.size()
-            if program->functions.at(i).id == id doremi true
+        foreach i in program->functions
+            if i.id == id doremi true
         ;
         return false
     ;
     fn has_class string id => bool
-        for i until program->classes.size()
-            if program->classes.at(i).id == id doremi true
+        foreach i in program->classes
+            if i.id == id doremi true
         ;
         return false
     ;
     fn has_inc string id => bool
-        for i until program->includes.size()
-            if program->includes.at(i).include == id doremi true
+        foreach i in program->includes
+            if i.include == id doremi true
         ;
         return false
     ;
     fn has_get string id => bool
         let getter = id
         while getter.find("/") != -1 do getter = getter.substr(1)
-        for i until program->gets.size()
-            if program->gets.at(i) == getter doremi true
+        foreach i in program->gets
+            if i == getter doremi true
         ;
         return false
     ;
     fn has_enum string id => bool
-        for i until program->enums.size()
-            if program->enums.at(i).name == id doremi true
+        foreach i in program->enums
+            if i.name == id doremi true
         ;
         return false
     ;
     fn has_glob string id => bool
-        for i until program->global.size()
-            let g = program->global.at(i)
-            for j until g.variables.size()
-                if g.variables.at(j).v_type == id doremi true
+        foreach g in program->global
+            foreach v in g.variables
+                if v.v_type == id doremi true
             ;
         ;
         return false
     ;
     fn has_enum_name string id => bool
-        for i until program->enums.size()
-            let e = program->enums.at(i)
-            for j until e.enums.size()
-                if e.enums.at(j).name == id doremi true
+        foreach e in program->enums
+            foreach j in e.enums
+                if j.name == id doremi true
             ;
         ;
         return false

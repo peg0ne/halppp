@@ -35,11 +35,13 @@ enum Token
     False,
     Float,
     For,
+    Foreach,
     ForwardSlash,
     Function,
     Get,
     Global,
     Id,
+    In,
     Include,
     LBlock,
     LBrack,
@@ -112,10 +114,13 @@ struct Token_t
         elif s == TOKEN_EQUALS dore t = Token::Equals
         elif s == TOKEN_EXTEND dore t = Token::Extend
         elif s == TOKEN_FALSE dore t = Token::False
+        elif s == TOKEN_FOR dore t = Token::For
+        elif s == TOKEN_FOREACH dore t = Token::Foreach
         elif s == TOKEN_FORWARDSLASH dore t = Token::ForwardSlash
         elif s == TOKEN_FUNCTION dore t = Token::Function
         elif s == TOKEN_GET dore t = Token::Get
         elif s == TOKEN_GLOBAL dore t = Token::Global
+        elif s == TOKEN_IN dore t = Token::In
         elif s == TOKEN_INCLUDE dore t = Token::Include
         elif s == TOKEN_LBLOCK dore t = Token::LBlock
         elif s == TOKEN_LBRACK dore t = Token::LBrack
@@ -151,7 +156,6 @@ struct Token_t
         elif any(s, {TOKEN_ZERO, TOKEN_ONE, TOKEN_TWO}) dore t = Token::Number
         elif any(s, {TOKEN_THREE, TOKEN_FOUR, TOKEN_FIVE}) dore t = Token::Number
         elif any(s, {TOKEN_SIX, TOKEN_SEVEN, TOKEN_EIGHT, TOKEN_NINE}) dore t = Token::Number
-        elif any(s, {TOKEN_FOR, TOKEN_FOREACH}) dore t = Token::For
         elif any(s, {TOKEN_INT, TOKEN_STR, TOKEN_STRING}) dore t = Token::Type
         t = Token::Id
     ;

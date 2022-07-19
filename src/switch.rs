@@ -100,7 +100,8 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
             },
             Token::SemiColon => return lines,
             Token::NewLine => {},
-            Token::For => lines.push(foreach::construct(compiler)),
+            Token::Foreach => lines.push(foreach::construct(compiler, true)),
+            Token::For => lines.push(foreach::construct(compiler, false)),
             Token::Condition => lines.push(condition::construct(compiler, x.name)),
             _ => lines.push(expression::construct(compiler, x)),
         }

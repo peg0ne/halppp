@@ -1,7 +1,7 @@
 fn global_construct Compiler *compiler_t => Global
     let global = Global()
     let variables = get_variables(compiler_t)
-    for i until variables.size() do try_add_variable(compiler_t, &global, variables.at(i))
+    foreach i in variables do try_add_variable(compiler_t, &global, i)
     compiler_t->add_glob(global)
     return global
 ;
@@ -28,8 +28,7 @@ fn get_variables Compiler *compiler_t => vector<Variable>
 
 fn try_add_variable Compiler *compiler_t, Global *global, Variable variable =>
     if !variable.has_minimum() do return
-    for i until global->variables.size() 
-        let v = global->variables.at(i)
+    foreach v in global->variables
         if v.v_type == variable.v_type
             display_err_message("[Global]: Multiple declarations of same value")
         ;

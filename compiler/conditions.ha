@@ -45,8 +45,9 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token
+            case Token::Foreach
+            case Token::For dobr cond.lines.push_back(for_construct(compiler_t, x.token == Token::Foreach))
             case Token::Condition dobr cond.lines.push_back(condition_construct(compiler_t, x.name))
-            case Token::For dobr cond.lines.push_back(for_construct(compiler_t))
             case Token::Switch dobr cond.lines.push_back(switch_construct(compiler_t))
             default dobr cond.lines.push_back(expression_construct(compiler_t, x))
         ;

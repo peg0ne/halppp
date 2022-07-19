@@ -58,27 +58,15 @@ pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression 
     loop {
         let x = get_next_or_exit(compiler.next(), "[Condition] Condition is not closed");
         match x.token {
-            Token::Condition => {
-                condition_def.lines.push(construct(compiler, x.name));
-                continue;
-            }
-            Token::For => {
-                condition_def.lines.push(foreach::construct(compiler));
-                continue;
-            }
-            Token::Switch => {
-                condition_def.lines.push(switch::construct(compiler));
-                continue;
-            }
+            Token::Condition => condition_def.lines.push(construct(compiler, x.name)),
+            Token::Foreach => condition_def.lines.push(foreach::construct(compiler, true)),
+            Token::For => condition_def.lines.push(foreach::construct(compiler, false)),
+            Token::Switch => condition_def.lines.push(switch::construct(compiler)),
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => continue,
-            _ => {
-                condition_def
-                    .lines
-                    .push(expression::construct(compiler, x));
-                continue;
-            }
+            _ => condition_def.lines.push(expression::construct(compiler, x)),
+                
         }
     }
     Expression {

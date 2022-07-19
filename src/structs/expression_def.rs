@@ -17,11 +17,20 @@ impl Expression {
         }
         match self.e_for.as_ref() {
             Some(for_e) => {
+                let mut iter = for_e.iterator.to_owned();
+                let mut to = for_e.until.to_owned();
+                if for_e.is_foreach {
+                    iter.push_str("_iterator");
+                    to.push_str(".size()");
+                }
                 let formatted = format!(
                     "{}for(int {} = 0; {} < {}; {}++) {{\n",
-                    spacing, for_e.iterator, for_e.iterator, for_e.until, for_e.iterator
+                    spacing, iter, iter, to, iter
                 );
                 expression.push_str(formatted.as_str());
+                if for_e.is_foreach {
+                    expression.push_str(format!("auto {} = {}.at({});\n", for_e.iterator, for_e.until, iter).as_str());
+                }
                 for line in for_e.lines.iter() {
                     expression.push_str(line.to_cpp(indentation + 1).as_str());
                 }

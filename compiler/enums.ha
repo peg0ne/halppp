@@ -50,8 +50,8 @@ fn enums_construct Compiler *compiler_t => Enum
         ;
         elif next.token == Token::Comma
             if enum_def.name.size() == 0 do e_err(EnumError::CommaNoId, EMPTY, true)
-            for i until enumerator.enums.size()
-                if enumerator.enums.at(i).name == enum_def.name
+            foreach i in enumerator.enums
+                if i.name == enum_def.name
                     e_err(EnumError::Member, enum_def.name, true)
                 ;
             ;

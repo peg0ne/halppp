@@ -14,11 +14,11 @@ fn switch_construct Compiler *compiler_t => Expression
         switch x.token
             case Token::Default
                 result = create_case(compiler_t, x.token == Token::Default)
-                for i until result.size() do cond.lines.push_back(result.at(i))
+                foreach i in result do cond.lines.push_back(i)
                 break
             case Token::Case
                 result = create_case(compiler_t, x.token == Token::Default)
-                for i until result.size() do cond.lines.push_back(result.at(i))
+                foreach i in result do cond.lines.push_back(i)
                 break
             case Token::Eof dobr exit = true
             case Token::SemiColon dobr exit = true
@@ -58,8 +58,9 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
             case Token::SemiColon
                 compiler_t->prev()
                 doremi lines
+            case Token::Foreach
+            case Token::For dobr lines.push_back(for_construct(compiler_t, x.token == Token::Foreach))
             case Token::Condition dobr lines.push_back(condition_construct(compiler_t, x.name))
-            case Token::For dobr lines.push_back(for_construct(compiler_t))
             case Token::Switch dobr lines.push_back(switch_construct(compiler_t))
             case Token::NewLine do break
             default dobr lines.push_back(expression_construct(compiler_t, x))

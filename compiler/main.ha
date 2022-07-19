@@ -79,17 +79,17 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
         ;
         elif next.token == Token::Include
             incs = imports_creation(&compiler_t, next)
-            for i until incs.size() do includes += Include(incs.at(i)).to_cpp()
+            foreach i in incs do includes += Include(i).to_cpp()
         ;
         elif next.token == Token::Use
             incs = imports_creation(&compiler_t, next)
-            for i until incs.size() do includes += Uses(incs.at(i)).to_cpp()
+            foreach i in incs do includes += Uses(i).to_cpp()
         ;
         elif next.token == Token::Get
             incs = imports_creation(&compiler_t, next)
-            for i until incs.size()
-                FpFn fpfn = get_folder_and_name(paths.folder_path + incs.at(i) + HA_SUFFIX)
-                let get_path = CompilerPath(paths.folder_path + incs.at(i) + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
+            foreach i in incs
+                FpFn fpfn = get_folder_and_name(paths.folder_path + i + HA_SUFFIX)
+                let get_path = CompilerPath(paths.folder_path + i + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
                 let get_out = compile(get_path, p, false)
                 output += get_out.output
                 includes += get_out.includes
@@ -111,8 +111,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
 
 fn validate_compiled Compiler compiler, bool is_main =>
     let has_main = false
-    for i until compiler.program->functions.size()
-        let f = compiler.program->functions.at(i)
+    foreach f in compiler.program->functions
         if f.id == "main" dobr has_main = true
     ;
     if !has_main && is_main do display_hint_message("Main function is not present!")
