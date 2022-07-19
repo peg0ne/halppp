@@ -14,10 +14,10 @@ struct Compiler
     // ;
     fn peek => Option<AstToken> doremi ast.peek()
     fn prev => Option<AstToken> doremi ast.prev()
-    fn add_fn Function function => void do program->functions.push_back(function)
-    fn add_class Class class_obj => void do program->classes.push_back(class_obj)
-    fn add_enum Enum enum_def => void do program->enums.push_back(enum_def)
-    fn add_glob Global global => void do program->global.push_back(global)
+    fn add_fn Function function => do program->functions.push_back(function)
+    fn add_class Class class_obj => do program->classes.push_back(class_obj)
+    fn add_enum Enum enum_def => do program->enums.push_back(enum_def)
+    fn add_glob Global global => do program->global.push_back(global)
     fn add_inc vector<string> includes =>
         for i until includes.size() do program->includes.push_back(Include(includes.at(i)))
     ;
@@ -31,7 +31,7 @@ struct Compiler
             program->gets.push_back(getter)
         ;
     ;
-    fn add_arg string arg => void do arguments.push_back(String(arg).replace(QUOTE, EMPTY))
+    fn add_arg string arg => do arguments.push_back(String(arg).replace(QUOTE, EMPTY))
     fn add_args vector<string> args =>
         for i until args.size() do arguments.push_back(args.at(i))
     ;

@@ -2,8 +2,7 @@ struct AstToken
     string name = EMPTY
     Token token = Token::Id
     Token_t t = Token_t("\n")
-    AstToken =>
-    ;
+    AstToken => do return
     AstToken string id =>
         this->name = id
         this->t = Token_t(name)

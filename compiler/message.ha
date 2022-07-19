@@ -1,4 +1,4 @@
-enum MessageSeverity =>
+enum MessageSeverity
     Hint,
     Error,
 ;
@@ -10,8 +10,8 @@ fn colored MessageSeverity severity, string msg =>
     ;
     println(color + "[" + to_string(severity) + "] >> " + msg + "\033[0m")
 ;
-fn display_message MessageSeverity severity, string msg => void do colored(severity, msg)
-fn display_hint_message string msg => void do display_message(MessageSeverity::Hint, msg)
+fn display_message MessageSeverity severity, string msg => do colored(severity, msg)
+fn display_hint_message string msg => do display_message(MessageSeverity::Hint, msg)
 fn display_err_message string msg =>
     display_message(MessageSeverity::Error, msg)
     exit(1)

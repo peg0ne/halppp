@@ -1,8 +1,7 @@
 struct EnumValue
     string name = EMPTY
     Option<string> value = None<string>()
-    EnumValue =>
-    ;
+    EnumValue => do return
 ;
 
 struct Enum

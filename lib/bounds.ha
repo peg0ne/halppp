@@ -3,8 +3,7 @@ get => vector
 struct Bounds
     Vector min = Vector()
     Vector max = Vector()
-    Bounds =>
-    ;
+    Bounds => do return
     Bounds int minX, int minY, int maxX, int maxY =>
         min = Vector(minX, minY)
         max = Vector(maxX, maxY)

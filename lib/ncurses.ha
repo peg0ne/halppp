@@ -49,34 +49,34 @@ pub
         foreach i until h-2 do box_line(y + i + 1, x, w, 1)
         box_line(y + h - 1, x, w, 2)
     ;
-    fn use_arrows => void do keypad(win, true)
+    fn use_arrows => do keypad(win, true)
     fn col short c, bool on =>
         if !has_colors() do return
         on ? attron(COLOR_PAIR(c)) : attroff(COLOR_PAIR(c))
     ;
-    fn col short c => void do col(c, true)
-    fn bold bool on => void do on ? attron(A_BOLD) : attroff(A_BOLD)
+    fn col short c => do col(c, true)
+    fn bold bool on => do on ? attron(A_BOLD) : attroff(A_BOLD)
     fn clear int y, int len =>
         for i until len do add(y, i, ' ')
     ;
     fn clearScr => void
         for i until LINES do clear(i, COLS)
     ;
-    fn clearLn int y => void do clear(y, COLS)
+    fn clearLn int y => do clear(y, COLS)
     fn add int y, int x, char c, bool is_bold =>
         if is_bold do bold(true)
         mvaddch(y,x,c)
         if is_bold do bold(false)
     ;
-    fn add int y, int x, char c => void do add(y, x, c, false)
+    fn add int y, int x, char c => do add(y, x, c, false)
     fn add int y, int x, string s, bool is_bold =>
         for i until s.size() do add(y, x + i, s[i], is_bold)
     ;
-    fn add int y, int x, string s => void do add(y, x, s, false)
-    fn add int y, int x, int s => void do add(y, x, to_string(s), false)
-    fn add int y, int x, short s => void do add(y, x, to_string(s), false)
-    fn add int y, int x, float s => void do add(y, x, to_string(s), false)
-    fn add int y, int x, double s => void do add(y, x, to_string(s), false)
+    fn add int y, int x, string s => do add(y, x, s, false)
+    fn add int y, int x, int s => do add(y, x, to_string(s), false)
+    fn add int y, int x, short s => do add(y, x, to_string(s), false)
+    fn add int y, int x, float s => do add(y, x, to_string(s), false)
+    fn add int y, int x, double s => do add(y, x, to_string(s), false)
     fn add_until int y, int x, string s, int limit, bool is_bold =>
         for i until s.size()
             if s.at(i) == '\0' do break

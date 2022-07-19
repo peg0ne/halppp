@@ -1,4 +1,4 @@
-glob =>
+glob
     VAR_ERR_COM "[Variable]: Variable declaration already complete: "
     VAR_ERR_ERR "[Variable]: Unexpected error"
     VAR_ERR_INC "[Variable]: Variable declaration incomplete: "

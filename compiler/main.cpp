@@ -454,6 +454,8 @@ struct Peekable {
    int _index = 0;
  public:
    Peekable () {
+      
+return ;
    }
  public:
    Peekable (vector<T> values) {
@@ -1372,6 +1374,8 @@ struct AstToken {
    Token_t t = Token_t("\n");
  public:
    AstToken () {
+      
+return ;
    }
  public:
    AstToken (string id) {
@@ -1532,6 +1536,8 @@ struct FpFn {
    string f_n = EMPTY;
  public:
    FpFn () {
+      
+return ;
    }
  public:
    FpFn (string f_p, string f_n) {
@@ -1658,6 +1664,8 @@ struct Variable {
    VariableState variable_state = VariableState::Private;
  public:
    Variable () {
+      
+return ;
    }
  public:
    Variable (string id, string type) {
@@ -1706,6 +1714,8 @@ struct EnumValue {
    Option<string> value = None<string>();
  public:
    EnumValue () {
+      
+return ;
    }
 };
 struct Enum {
@@ -1793,6 +1803,8 @@ struct Global {
    vector<Variable> variables = {};
  public:
    Global () {
+      
+return ;
    }
  public:
    string to_cpp() {
@@ -1822,6 +1834,8 @@ struct For {
    vector<Expression> lines = {};
  public:
    For () {
+      
+return ;
    }
  public:
    string to_cpp(int indent) {
@@ -1853,6 +1867,8 @@ struct ConditionalExpression {
    string continuation = EMPTY;
  public:
    ConditionalExpression () {
+      
+return ;
    }
  public:
    string to_cpp() {
@@ -1871,6 +1887,8 @@ struct Condition {
    vector<Expression> lines = {};
  public:
    Condition () {
+      
+return ;
    }
  public:
    Condition (string conditioner) {
@@ -1915,6 +1933,8 @@ struct Expression {
    Option<string> line = None<string>();
  public:
    Expression () {
+      
+return ;
    }
  public:
    Expression (Condition conditions) {
@@ -2101,6 +2121,8 @@ struct Program {
    vector<Enum> enums = {};
  public:
    Program () {
+      
+return ;
    }
 };
 struct Compiler {
@@ -2649,7 +2671,6 @@ void validate_enum(Enum enumerator, Compiler* compiler_t) {
 Enum enums_construct(Compiler* compiler_t) {
    auto id = get_id_or_exit(compiler_t->next(),e_err(EnumError::NoId));
    auto enumerator = Enum(id);
-   get_arrow_or_exit( compiler_t-> next(), e_err( EnumError:: NoArrow));
    auto enum_def = EnumValue();
       while(true   ) {
          auto next = get_next_or_exit(compiler_t->next(),e_err(EnumError::Closed));
@@ -3267,8 +3288,9 @@ Function function_construct(Compiler* compiler_t, VariableState state, bool cons
          function.return_value= Some( Variable("","int"));
 }
       else {
-         
- function.return_value= Some( get_type( compiler_t));
+         peeked_opt= compiler_t-> peek();
+         auto is_do = peeked_opt.value_or(AstToken("NONE")).is_do();
+         function.return_value= is_do ? Some( Variable(true)): Some( get_type( compiler_t));
 }
       while(true   ) {
          auto x = get_next_or_exit(compiler_t->next(),"Function is not closed "+function.id);
@@ -3301,8 +3323,10 @@ break ;
 }
 }
       if(function.id  == "main"  ) {
-         function.add_expr( Expression("return 0"));
+         
+ function.add_expr( Expression("return 0"));
 }
+   validate_function( function, compiler_t);
    compiler_t-> add_fn( function);
    return  function;
 }
@@ -3440,7 +3464,6 @@ break ;
    return  class_def;
 }
 Global global_construct(Compiler* compiler_t) {
-   get_arrow_or_exit( compiler_t-> next(),"[Global]: Requires => after glob keyword");
    auto global = Global();
    auto variables = get_variables(compiler_t);
       for(int i = 0; i < variables.size(); i++) {

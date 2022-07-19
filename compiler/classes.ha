@@ -1,4 +1,4 @@
-enum ClassError =>
+enum ClassError
     Closed,
     Definition,
     Duplicate,

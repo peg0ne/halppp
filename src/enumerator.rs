@@ -1,14 +1,13 @@
 use crate::{
     enums::Token,
     structs::{Enum, EnumValue, Compiler},
-    utils::{get_id_or_exit, get_arrow_or_exit, get_next_or_exit},
+    utils::{get_id_or_exit, get_next_or_exit},
     message::display_err_message,
 };
 
 pub fn construct(compiler: &mut Compiler) -> Enum {
     let id = get_id_or_exit(compiler.next(), "[Enum] Requires Id in initialization");
     let mut enumerator = Enum::from(id);
-    get_arrow_or_exit(compiler.next(), "[Enum] Requires [=>] after Id");
     let mut enum_def = EnumValue::new();
     loop {
         let next = get_next_or_exit(compiler.next(), "[Enum] Ends without closing itself");

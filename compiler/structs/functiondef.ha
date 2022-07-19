@@ -8,8 +8,8 @@ struct Function
     Function VariableState state =>
         this->variable_state = state
     ;
-    fn add_args Variable var => void do arguments.push_back(var)
-    fn add_expr Expression expr => void do expressions.push_back(expr)
+    fn add_args Variable var => do arguments.push_back(var)
+    fn add_expr Expression expr => do expressions.push_back(expr)
     fn to_cpp_start bool in_class => string
         string fun_str = templates.size() > 0 ? TEMPLATE : EMPTY
         for i until templates.size()

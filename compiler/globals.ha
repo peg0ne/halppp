@@ -1,5 +1,4 @@
 fn global_construct Compiler *compiler_t => Global
-    get_arrow_or_exit(compiler_t->next(), "[Global]: Requires => after glob keyword")
     let global = Global()
     let variables = get_variables(compiler_t)
     for i until variables.size() do try_add_variable(compiler_t, &global, variables.at(i))

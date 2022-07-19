@@ -6,8 +6,7 @@ private
     vector<T> _values = {}
     int _index = 0
 pub
-    Peekable =>
-    ;
+    Peekable => do return
     Peekable vector<T> values =>
         _values = values
     ;

@@ -1,4 +1,4 @@
-enum ConditionError =>
+enum ConditionError
     Closed,
 ;
 

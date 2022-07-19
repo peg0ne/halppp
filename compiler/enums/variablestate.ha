@@ -1,4 +1,4 @@
-enum VariableState =>
+enum VariableState
     Private,
     Protected,
     Public,

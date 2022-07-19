@@ -1,8 +1,7 @@
 struct FpFn
     string f_p = EMPTY
     string f_n = EMPTY
-    FpFn =>
-    ;
+    FpFn => do return
     FpFn string f_p, string f_n =>
         this->f_p = f_p
         this->f_n = f_n

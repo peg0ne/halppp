@@ -3,8 +3,7 @@ struct ConditionalExpression
     string value_right = EMPTY
     string operator_value = EMPTY
     string continuation = EMPTY
-    ConditionalExpression =>
-    ;
+    ConditionalExpression => do return
     fn to_cpp => string
         let expr_str = value_left + SPACE
         expr_str += operator_value + SPACE
@@ -17,12 +16,11 @@ struct Condition
     string conditioner = EMPTY
     vector<ConditionalExpression> expressions = {}
     vector<Expression> lines = {}
-    Condition =>
-    ;
+    Condition => do return
     Condition string conditioner =>
         this->conditioner = conditioner
     ;
-    fn add_expr ConditionalExpression cexpr => void do expressions.push_back(cexpr)
+    fn add_expr ConditionalExpression cexpr => do expressions.push_back(cexpr)
     fn to_cpp int indentation => string
         string condition_str = EMPTY
         for i until indentation do condition_str += TAB

@@ -50,7 +50,16 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
             VariableState::Private,
         ));
     } else {
-        function.return_value = Some(variable::get_type(compiler));
+        match compiler.peek() {
+            Some(p) => {
+                if p.token.is_do() {
+                    function.return_value = Some(Variable::return_void())
+                } else {
+                    function.return_value = Some(variable::get_type(compiler));
+                }
+            }
+            _ => {},
+        }
     }
     // Set Inner Function stuff
     loop {

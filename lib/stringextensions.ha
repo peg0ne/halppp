@@ -6,7 +6,7 @@ class String
 pub
     fn len => long doremi _value.size()
     fn at int at => char doremi _value.at(at)
-    fn append string value => void do _value += value
+    fn append string value => do _value += value
     fn replace string from, string to => string
         string replaced = _value
         loop 

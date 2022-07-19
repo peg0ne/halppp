@@ -1,7 +1,6 @@
 struct Global
     vector<Variable> variables = {}
-    Global =>
-    ;
+    Global => do return
     fn to_cpp => string
         string g_str = EMPTY
         for i until variables.size()

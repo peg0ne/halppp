@@ -7,6 +7,5 @@ struct Program
     vector<Uses> usings = {}
     vector<string> gets = {}
     vector<Enum> enums = {}
-    Program =>
-    ;
+    Program => do return
 ;

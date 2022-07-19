@@ -2,8 +2,7 @@ struct Vector
     int x = 0
     int y = 0
     int z = 0
-    Vector =>
-    ;
+    Vector => do return
     Vector int x, int y =>
         x = x
         y = y

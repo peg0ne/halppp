@@ -33,7 +33,11 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
         function.add_args(Variable("argv[]", "char*"))
         function.return_value = Some(Variable("", "int"))
     ;
-    else do function.return_value = Some(get_type(compiler_t))
+    else
+        peeked_opt = compiler_t->peek()
+        let is_do = peeked_opt.value_or(AstToken("NONE")).is_do()
+        function.return_value = is_do ? Some(Variable(true)) : Some(get_type(compiler_t))
+    ;
     loop
         let x = get_next_or_exit(compiler_t->next(), "Function is not closed " + function.id)
         if any(x.token, {Token::SemiColon, Token::Function, Token::Eof}) do break
@@ -46,10 +50,8 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
         ;
         if x.is_do() do break
     ;
-    if function.id == "main"
-        function.add_expr(Expression("return 0"))
-    ;
-    // validate_function(function, compiler_t)
+    if function.id == "main" do function.add_expr(Expression("return 0"))
+    validate_function(function, compiler_t)
     compiler_t->add_fn(function)
     return function
 ;

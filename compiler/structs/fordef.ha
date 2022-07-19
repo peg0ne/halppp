@@ -2,8 +2,7 @@ struct For
     string iterator = EMPTY
     string until = EMPTY
     vector<Expression> lines = {}
-    For =>
-    ;
+    For => do return
     fn to_cpp int indent => string
         string for_str = EMPTY
         for i until indent do for_str += TAB

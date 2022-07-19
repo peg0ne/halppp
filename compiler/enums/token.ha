@@ -1,4 +1,4 @@
-enum Token =>
+enum Token
     AllEquals,
     AllLessOrEquals,
     AllLessThan,

@@ -2,13 +2,12 @@ use crate::{
     enums::Token,
     message::display_err_message,
     structs::{Compiler, Global, Variable},
-    utils::{get_arrow_or_exit, get_next_or_exit},
+    utils::get_next_or_exit,
 };
 
 pub fn construct(compiler: &mut Compiler) -> Global {
     let mut global = Global::new();
     let mut variable = Variable::new();
-    get_arrow_or_exit(compiler.next(), "[Global]: Requires => after glob keyword");
     loop {
         let x = get_next_or_exit(compiler.next(), "[Global]: Unexpected end of global");
         match x.token {

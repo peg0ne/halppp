@@ -2,8 +2,7 @@ struct Expression
     Option<Condition> e_condition = None<Condition>()
     Option<For> e_for = None<For>()
     Option<string> line = None<string>()
-    Expression =>
-    ;
+    Expression => do return
     Expression Condition conditions => 
         this->e_condition = Some(conditions)
     ;

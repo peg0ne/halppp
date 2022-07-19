@@ -1,4 +1,4 @@
-glob =>
+glob
     TOKEN_ALLEQUALS "=&="
     TOKEN_ALLLESSOREQUALS "=<="
     TOKEN_ALLLESSTHAN "<<<"

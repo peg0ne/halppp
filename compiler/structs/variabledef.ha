@@ -3,8 +3,7 @@ struct Variable
     string v_type = EMPTY
     Option<string> v_value = None<string>()
     VariableState variable_state = VariableState::Private
-    Variable =>
-    ;
+    Variable => do return
     Variable string id, string type =>
         this->id = id
         this->v_type = type

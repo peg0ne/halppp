@@ -1,4 +1,4 @@
-glob =>
+glob
     ARG_END ") {\n"
     ARG_SEP ", "
     ASSIGNMENT " = "

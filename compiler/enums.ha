@@ -1,4 +1,4 @@
-enum EnumError =>
+enum EnumError
     Closed,
     CommaNoId,
     Duplicate,
@@ -41,7 +41,6 @@ fn validate_enum Enum enumerator, Compiler *compiler_t =>
 fn enums_construct Compiler *compiler_t => Enum
     let id = get_id_or_exit(compiler_t->next(), e_err(EnumError::NoId))
     let enumerator = Enum(id)
-    get_arrow_or_exit(compiler_t->next(), e_err(EnumError::NoArrow))
     let enum_def = EnumValue()
     loop
         let next = get_next_or_exit(compiler_t->next(), e_err(EnumError::Closed))
