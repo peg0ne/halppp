@@ -31,11 +31,8 @@ fn class_validate Class class_def, Compiler *compiler_t =>
         c_err(ClassError::Duplicate, class_def.id, true)
     ;
     // Check Inheritance
-    let inherit = class_def.inherit
-    if inherit.is_none() do return
-    if compiler_t->has_class(inherit.value_or(EMPTY)) do return
-    let contains = compiler_t->has_class(inherit.value_or(EMPTY))
-    if class_def.inherit.is_some() && !contains
+    select inherit from class_def.inherit
+        if compiler_t->has_class(inherit) do return
         c_err(ClassError::Inheritance, class_def.id, true)
     ;
 ;

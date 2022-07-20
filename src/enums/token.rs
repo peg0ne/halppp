@@ -11,6 +11,7 @@ pub enum Token {
     Asterix,
     Bang,
     Class,
+    Char,
     Colon,
     Comma,
     Comment,
@@ -30,6 +31,7 @@ pub enum Token {
     Equals,
     Extend,
     False,
+    From,
     For,
     Foreach,
     ForwardSlash,
@@ -58,8 +60,10 @@ pub enum Token {
     RBrack,
     Return,
     RParen,
+    Select,
     SemiColon,
     Struct,
+    String,
     Sub,
     Sum,
     True,
@@ -74,6 +78,8 @@ pub enum Token {
 
 impl Token {
     pub fn from(s: String) -> Token {
+        if s.starts_with("\"") {return Token::String;}
+        if s.starts_with("'") {return Token::Char;}
         match s.as_str() {
             "-" => Token::Sub,
             "," => Token::Comma,
@@ -119,6 +125,7 @@ impl Token {
             "7" => Token::Number,
             "8" => Token::Number,
             "9" => Token::Number,
+            "from" => Token::From,
             "char" => Token::Type,
             "case" => Token::Case,
             "default" => Token::Default,
@@ -150,7 +157,7 @@ impl Token {
             "protected" => Token::Protected,
             "pub" => Token::Public,
             "return" => Token::Return,
-            "str" => Token::Type,
+            "select" => Token::Select,
             "string" => Token::Type,
             "struct" => Token::Struct,
             "switch" => Token::Switch,

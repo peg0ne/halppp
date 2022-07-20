@@ -14,7 +14,7 @@ fn ast_create string content => vector<AstToken>
             id = try_add_token(id, &ast, &peekable)
             doco try_add_token(matched, &ast, &peekable)
         ;
-        elif is_char_number(c)
+        elif is_char_number_t(c)
             let num = collect_num(&peekable, c)
             id = try_add_token(id, &ast, &peekable)
             doco ast.push_back(num)
@@ -74,7 +74,7 @@ fn is_char_token char ch => bool
     string s(1,ch)
     return !Token_t(s).is_id()
 ;
-fn is_char_number char ch => bool
+fn is_char_number_t char ch => bool
     string s(1,ch)
     return Token_t(s).is_num()
 ;
@@ -106,7 +106,7 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
     let token = AstToken()
     loop
         let peeked = peekable->peek().value_or(' ')
-        if !is_char_number(peeked) && peeked != '.'
+        if !is_char_number_t(peeked) && peeked != '.'
             token.name = num
             token.token = is_float ? Token::Float : Token::Number 
             token.t = Token_t("0")

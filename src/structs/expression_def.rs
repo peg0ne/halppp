@@ -1,9 +1,10 @@
-use crate::structs::{Condition, For};
+use crate::structs::{Condition, For, Select};
 
 #[derive(Clone, Debug)]
 pub struct Expression {
     pub e_condition: Option<Condition>,
     pub e_for: Option<For>,
+    pub e_select: Option<Select>,
     pub line: Option<String>,
 }
 
@@ -32,6 +33,18 @@ impl Expression {
                     expression.push_str(format!("auto {} = {}.at({});\n", for_e.iterator, for_e.until, iter).as_str());
                 }
                 for line in for_e.lines.iter() {
+                    expression.push_str(line.to_cpp(indentation + 1).as_str());
+                }
+                expression.push_str(format!("{}}}\n", spacing).as_str());
+                return expression;
+            }
+            _ => {}
+        }
+        match self.e_select.as_ref() {
+            Some(select_e) => {
+                expression.push_str(format!("if ({}.is_some()) {{\n", select_e.optional_value).as_str());
+                expression.push_str(format!("auto {} = {}.value_unsafe();\n", select_e.value_name, select_e.optional_value).as_str());
+                for line in select_e.lines.iter() {
                     expression.push_str(line.to_cpp(indentation + 1).as_str());
                 }
                 expression.push_str(format!("{}}}\n", spacing).as_str());

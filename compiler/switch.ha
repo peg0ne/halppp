@@ -62,6 +62,7 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
             case Token::For dobr lines.push_back(for_construct(compiler_t, x.token == Token::Foreach))
             case Token::Condition dobr lines.push_back(condition_construct(compiler_t, x.name))
             case Token::Switch dobr lines.push_back(switch_construct(compiler_t))
+            case Token::Select dobr lines.push_back(select_construct(compiler_t))
             case Token::NewLine do break
             default dobr lines.push_back(expression_construct(compiler_t, x))
         ;

@@ -1,7 +1,7 @@
 use crate::{
     condition,
     enums::{Token, VariableState},
-    expression, foreach,
+    expression, foreach, selects,
     message::display_err_message,
     structs::{Compiler, Function, Variable, Expression},
     utils::{get_id_or_exit, get_next_or_exit},
@@ -72,6 +72,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
             Token::For => function.expressions.push(foreach::construct(compiler, false)),
             Token::Condition => function.expressions.push(condition::construct(compiler, x.name)),
             Token::Switch => function.expressions.push(switch::construct(compiler)),
+            Token::Select => function.expressions.push(selects::construct(compiler)),
             Token::SemiColon => break,
             Token::Function => break,
             Token::EOF => break,
@@ -86,6 +87,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
         function.expressions.push(Expression {
             e_condition: None,
             e_for: None,
+            e_select: None,
             line: Some(String::from("return 0")),
         });
     }

@@ -52,6 +52,10 @@ impl Class {
         } else {
             class.push_str(format!("class {}", self.id).as_str())
         }
+        class
+    }
+    pub fn to_cpp_start_inherit(self: &Class) -> String {
+        let mut class = self.to_cpp_start();
         match &self.inherit {
             None => {}
             Some(a) => class.push_str(format!(": public {}", a).as_str()),
@@ -64,7 +68,7 @@ impl Class {
         class
     }
     pub fn to_cpp(self: &Class) -> String {
-        let mut class = self.to_cpp_start();
+        let mut class = self.to_cpp_start_inherit();
         class.push_str(" {\n");
         for v in self.variables.iter() {
             match v.variable_state {

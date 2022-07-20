@@ -37,6 +37,7 @@ enum Token
     For,
     Foreach,
     ForwardSlash,
+    From,
     Function,
     Get,
     Global,
@@ -71,6 +72,7 @@ enum Token
     Sub,
     Sum,
     Switch,
+    Select,
     True,
     Type,
     Until,
@@ -118,6 +120,7 @@ struct Token_t
         elif s == TOKEN_FOR dore t = Token::For
         elif s == TOKEN_FOREACH dore t = Token::Foreach
         elif s == TOKEN_FORWARDSLASH dore t = Token::ForwardSlash
+        elif s == TOKEN_FROM dore t = Token::From
         elif s == TOKEN_FUNCTION dore t = Token::Function
         elif s == TOKEN_GET dore t = Token::Get
         elif s == TOKEN_GLOBAL dore t = Token::Global
@@ -146,6 +149,7 @@ struct Token_t
         elif s == TOKEN_RETURN dore t = Token::Return
         elif s == TOKEN_RPAREN dore t = Token::RParen
         elif s == TOKEN_SEMICOLON dore t = Token::SemiColon
+        elif s == TOKEN_SELECT dore t = Token::Select
         elif s == TOKEN_STRUCT dore t = Token::Struct
         elif s == TOKEN_SUB dore t = Token::Sub
         elif s == TOKEN_SUM dore t = Token::Sum

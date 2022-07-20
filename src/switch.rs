@@ -1,8 +1,8 @@
 use crate::{
-    expression, condition, foreach,
+    expression, condition, foreach, selects,
     enums::Token,
     structs::{Compiler, Condition, Expression, ConditionalExpression},
-    utils::{get_next_or_exit, get_id_or_exit, try_get},
+    utils::{get_next_or_exit, try_get},
     message::display_err_message,
 };
 
@@ -51,6 +51,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
     Expression {
         e_condition: Some(condition_def),
         e_for: None,
+        e_select: None,
         line: None,
     }
 }
@@ -58,19 +59,28 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
 fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
     let mut lines: Vec<Expression> = Vec::new();
     if !is_default {
-        let mut id = get_id_or_exit(compiler.next(), "[Switch] Case has to be followed by an Id");
-        if !compiler.contains_enum(&id) {
-            display_err_message("[Switch] Enum member doesn't exist")
-        }
-        if try_get(compiler.peek(), Token::DblColon) {
-            id.push_str("::");
-            compiler.next();
-            let enum_name = get_next_or_exit(compiler.next(), "[Switch] Unexpected end");
-            id.push_str(enum_name.name.as_str());
+        let next = get_next_or_exit(compiler.next(), "[Switch] Case has to be followed by an Id");
+        let mut id = next.name;
+        match next.token {
+            Token::Id => {
+                if !compiler.contains_enum(&id) {
+                    display_err_message("[Switch] Enum member doesn't exist")
+                }
+                if try_get(compiler.peek(), Token::DblColon) {
+                    id.push_str("::");
+                    compiler.next();
+                    let enum_name = get_next_or_exit(compiler.next(), "[Switch] Unexpected end");
+                    id.push_str(enum_name.name.as_str());
+                }
+            }
+            Token::Char => {}
+            Token::Number => {}
+            _ => display_err_message(format!("[Switch] Token not allowed in switch: {:?}", next.token).as_str()),
         }
         lines.push(Expression {
             e_condition: None,
             e_for: None,
+            e_select: None,
             line: Some(format!("case {}:\n", id))
         });
     }
@@ -78,6 +88,7 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
         lines.push(Expression {
             e_condition: None,
             e_for: None,
+            e_select: None,
             line: Some(String::from("default:\n"))
         });
     }
@@ -102,6 +113,8 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
             Token::NewLine => {},
             Token::Foreach => lines.push(foreach::construct(compiler, true)),
             Token::For => lines.push(foreach::construct(compiler, false)),
+            Token::Select => lines.push(selects::construct(compiler)),
+            Token::Switch => lines.push(construct(compiler)),
             Token::Condition => lines.push(condition::construct(compiler, x.name)),
             _ => lines.push(expression::construct(compiler, x)),
         }

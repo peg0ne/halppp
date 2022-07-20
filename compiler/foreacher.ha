@@ -22,6 +22,7 @@ fn for_construct Compiler *compiler_t, bool is_foreach => Expression
             case Token::For dobr for_def.lines.push_back(for_construct(compiler_t, x.token == Token::Foreach))
             case Token::Condition dobr for_def.lines.push_back(condition_construct(compiler_t, x.name))
             case Token::Switch dobr for_def.lines.push_back(switch_construct(compiler_t))
+            case Token::Select dobr for_def.lines.push_back(select_construct(compiler_t))
             default dobr for_def.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;

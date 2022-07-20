@@ -1,6 +1,6 @@
 use crate::{
     enums::Token,
-    expression, foreach, switch,
+    expression, foreach, switch, selects,
     structs::{Compiler, Condition, Expression, ConditionalExpression},
     utils::get_next_or_exit,
 };
@@ -25,6 +25,7 @@ pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression 
             return Expression {
                 e_condition: Some(condition_def),
                 e_for: None,
+                e_select: None,
                 line: None,
             }
         }
@@ -62,6 +63,7 @@ pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression 
             Token::Foreach => condition_def.lines.push(foreach::construct(compiler, true)),
             Token::For => condition_def.lines.push(foreach::construct(compiler, false)),
             Token::Switch => condition_def.lines.push(switch::construct(compiler)),
+            Token::Select => condition_def.lines.push(selects::construct(compiler)),
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => continue,
@@ -72,6 +74,7 @@ pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression 
     Expression {
         e_condition: Some(condition_def),
         e_for: None,
+        e_select: None,
         line: None,
     }
 }

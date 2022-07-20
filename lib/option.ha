@@ -8,6 +8,7 @@ pub
     fn is_none => bool doremi &_value == nullptr || _forced_none
     fn is_some => bool doremi !is_none()
     fn value_or T value => T doremi is_some() ? _value : value
+    fn value_unsafe => T doremi _value
     fn to_string => string doremi is_some() ? "Some(" + std::to_string(_value) + ")" : "None"
     Option => 
         _forced_none = true

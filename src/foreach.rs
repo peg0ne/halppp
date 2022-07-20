@@ -1,8 +1,6 @@
 use crate::{
-    condition,
+    condition, expression, switch, selects,
     enums::Token,
-    expression,
-    switch,
     structs::{Compiler, Expression, For},
     utils::{get_id_or_exit, get_next_or_exit, get_or_exit},
 };
@@ -20,6 +18,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
             return Expression {
                 e_condition: None,
                 e_for: Some(for_def),
+                e_select: None,
                 line: None,
             }
         }
@@ -35,6 +34,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
             Token::Foreach => for_def.lines.push(construct(compiler, true)),
             Token::For => for_def.lines.push(construct(compiler, false)),
             Token::Switch => for_def.lines.push(switch::construct(compiler)),
+            Token::Select => for_def.lines.push(selects::construct(compiler)),
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => continue,
@@ -44,6 +44,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
     Expression {
         e_condition: None,
         e_for: Some(for_def),
+        e_select: None,
         line: None,
     }
 }

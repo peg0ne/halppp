@@ -79,6 +79,8 @@ glob
     TOKEN_SUB "-"
     TOKEN_SUM "+"
     TOKEN_SWITCH "switch"
+    TOKEN_SELECT "select"
+    TOKEN_FROM "from"
     TOKEN_THREE "3"
     TOKEN_TRUE "true"
     TOKEN_TWO "2"

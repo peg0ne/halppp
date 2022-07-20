@@ -6,11 +6,11 @@ get => structs/[asttoken, pathdef]
 get => message, utils, fileutil
 get => structs/[variabledef, enumdef]
 get => structs/[importsdef, globaldef, structdef]
-get => structs/[fordef, conditiondef, expressiondef]
+get => structs/[fordef, conditiondef, selectdef, expressiondef]
 get => structs/[functiondef, classdef]
 get => structs/[programdef, compilerdef]
 get => ast, imports, enums, foreacher, expressions
-get => switch, conditions, variable, template
+get => switch, selects, conditions, variable, template
 get => functions, classes, globals
 
 struct CompileOutput

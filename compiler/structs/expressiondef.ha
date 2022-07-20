@@ -1,6 +1,7 @@
 struct Expression
     Option<Condition> e_condition = None<Condition>()
     Option<For> e_for = None<For>()
+    Option<Select> e_select = None<Select>()
     Option<string> line = None<string>()
     Expression => do return
     Expression Condition conditions => 
@@ -8,6 +9,9 @@ struct Expression
     ;
     Expression For fors => 
         this->e_for = Some(fors)
+    ;
+    Expression Select selects => 
+        this->e_select = Some(selects)
     ;
     Expression string line => 
         this->line = Some(line)

@@ -46,6 +46,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
             case Token::For dobr function.add_expr(for_construct(compiler_t, x.token == Token::Foreach))
             case Token::Condition dobr function.add_expr(condition_construct(compiler_t, x.name))
             case Token::Switch dobr function.add_expr(switch_construct(compiler_t))
+            case Token::Select dobr function.add_expr(select_construct(compiler_t))
             default dobr function.add_expr(expression_construct(compiler_t, x))
         ;
         if x.is_do() do break
