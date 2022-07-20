@@ -4,13 +4,13 @@ struct Vector
     int z = 0
     Vector => do return
     Vector int x, int y =>
-        x = x
-        y = y
+        this->x = x
+        this->y = y
     ;
     Vector int x, int y, int z =>
-        x = x
-        y = y
-        z = z
+        this->x = x
+        this->y = y
+        this->z = z
     ;
     fn add Vector other =>
         x += other.x

@@ -13,13 +13,17 @@ struct Class
         ;
         class_str += is_struct ? STRUCT : CLASS
         class_str += id
+        return class_str
+    ;
+    fn to_cpp_start_inherit => string
+        string class_str = to_cpp_start()
         class_str += inherit.is_some() ? INHERIT : EMPTY 
         class_str += inherit.value_or(EMPTY)
         return class_str
     ;
     fn to_cpp_h => string doremi to_cpp_start() + LINE_END
     fn to_cpp => string
-        string class_str = to_cpp_start()
+        string class_str = to_cpp_start_inherit()
         class_str += BLOCK_START
         foreach v in variables
             class_str += variable_state_to_cpp(v.variable_state)

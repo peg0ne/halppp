@@ -36,19 +36,24 @@ class Ncurses
         if pos == 3 dore add(y, x, " ")
         add(y, x, "-")
     ;
-    fn box_line int y, int x, int len, int pos =>
-        foreach i until len
+    fn box_line int y, int x, int len, int pos, bool invis =>
+        if invis do pos = 3
+        for i until len
             if i == 0 doco box_char(y, x + i, pos)
             if i == len-1 doco stop_box_char(y, x + i, pos)
             center_box_char(y, x + i, pos)
         ;
     ;
 pub
-    fn box int y, int x, int h, int w =>
-        box_line(y, x, w, 0)
-        foreach i until h-2 do box_line(y + i + 1, x, w, 1)
-        box_line(y + h - 1, x, w, 2)
+    fn box int y, int x, int h, int w, bool invis =>
+        box_line(y, x, w, 0, invis)
+        if y + 1 >= LINES do return
+        for i until h-2 do box_line(y + i + 1, x, w, 1, invis)
+        if y + h - 1 >= LINES do return
+        box_line(y + h - 1, x, w, 2, invis)
     ;
+    fn box int y, int x, int h, int w => do box(y, x, h, w, false)
+    fn invis_box int y, int x, int h, int w => do box(y, x, h, w, true)
     fn use_arrows => do keypad(win, true)
     fn col short c, bool on =>
         if !has_colors() do return

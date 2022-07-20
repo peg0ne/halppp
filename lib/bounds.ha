@@ -5,8 +5,8 @@ struct Bounds
     Vector max = Vector()
     Bounds => do return
     Bounds int minX, int minY, int maxX, int maxY =>
-        min = Vector(minX, minY)
-        max = Vector(maxX, maxY)
+        this->min = Vector(minX, minY)
+        this->max = Vector(maxX, maxY)
     ;
     fn width => int doremi max.x - min.x
     fn height => int doremi max.y - min.y
