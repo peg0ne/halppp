@@ -42,17 +42,19 @@ pub
             ;
 
             let num_opt = char_to_number(c)
-            if num_opt.is_none() doremi None<double>()
-
-            if is_dec
-                dec *= 10
-                dec += num_opt.value_or(0)
-                dec_len++
+            select num_val from char_to_number(c)
+                if is_dec
+                    dec *= 10
+                    dec += num_val
+                    dec_len++
+                ;
+                else
+                    num *= 10
+                    num += num_val
+                ;
+                continue
             ;
-            else
-                num *= 10
-                num += num_opt.value_or(0)
-            ;
+            return None<double>()
         ;
         for i until dec_len do dec *= 0.1
         return Some(num + dec)

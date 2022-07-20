@@ -17,8 +17,7 @@ struct Class
     ;
     fn to_cpp_start_inherit => string
         string class_str = to_cpp_start()
-        class_str += inherit.is_some() ? INHERIT : EMPTY 
-        class_str += inherit.value_or(EMPTY)
+        select i from inherit do class_str += INHERIT + i
         return class_str
     ;
     fn to_cpp_h => string doremi to_cpp_start() + LINE_END

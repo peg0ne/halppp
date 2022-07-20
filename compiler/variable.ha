@@ -45,7 +45,7 @@ fn get_type Compiler *compiler_t => Variable
 fn construct_args Compiler *compiler_t => VariableNBool doremi construct_args(compiler_t, None<string>())
 fn construct_args Compiler *compiler_t, Option<string> type_name => VariableNBool
     let variable = Variable()
-    if type_name.is_some() do variable.v_type = type_name.value_or(VOID)
+    select t from type_name do variable.v_type = t
     let is_end = false
     loop
         let next = get_next_or_exit(compiler_t->next(), VAR_ERR_INV)

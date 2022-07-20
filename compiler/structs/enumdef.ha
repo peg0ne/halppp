@@ -17,7 +17,7 @@ struct Enum
         string enum_str = to_cpp_start() + BLOCK_START
         foreach e in enums
             enum_str += TAB + e.name
-            enum_str += e.value.is_some() ? ASSIGNMENT + e.value.value_or(EMPTY) : EMPTY
+            select e_val from e.value do enum_str += ASSIGNMENT + e_val
             enum_str += ENUM_SEP
         ;
         enum_str += RBRACK

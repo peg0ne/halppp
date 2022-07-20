@@ -23,8 +23,8 @@ struct Variable
     fn has_minimum => bool doremi has_id() && has_type()
     fn to_cpp string spacing, string new_line => string
         string base = spacing + v_type + SPACE + id
-        base += v_value.is_some() ? ASSIGNMENT : EMPTY
-        base += v_value.value_or(EMPTY) + new_line
+        select v from v_value do base += ASSIGNMENT + v
+        base += new_line
         return base
     ;
 ;
