@@ -64,7 +64,7 @@ pub
     fn substr int start => string doremi _value.substr(start)
     fn substr int start, int end => string doremi _value.substr(start, end)
 ;
-
+named => stringutils
 fn is_char_number char ch => bool
     switch ch
     case '0'

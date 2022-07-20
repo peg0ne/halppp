@@ -27,11 +27,13 @@ struct Expression
 fn expr_to_cpp Expression *self, int indent => string
     let condition = self->e_condition
     let foreacher = self->e_for
+    let selects = self->e_select
     let line = self->line
     string expression = EMPTY
 
     select c from condition doremi c.to_cpp(indent + 1)
     select f from foreacher doremi f.to_cpp(indent + 1)
+    select s from selects doremi s.to_cpp(indent + 1)
 
     for i until indent do expression += TAB
     let line_value = line.value_or(EMPTY)
