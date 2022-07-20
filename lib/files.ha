@@ -1,5 +1,5 @@
-inc => fstream, stdlib.h
-get => option
+inc => fstream, stdlib.h, vector, dirent.h
+get => option, conditional
 
 fn read string path => Option<string>
     string content, linebuf
@@ -38,4 +38,17 @@ fn env string env_var => Option<string>
     let e = getenv(env_var_arr)
     if e == NULL doremi None<string>()
     return Some((string)e)
+;
+fn list_files string path => vector<string>
+    vector<string> files = {}
+    char path_arr[path.size() + 1]
+    for i until path.size() do path_arr[i] = path.at(i)
+    path_arr[path.size()] = '\0'
+    DIR *dir
+    struct dirent *diread
+    if (dir = opendir(path_arr)) != nullptr
+        while (diread = readdir(dir)) != nullptr do files.push_back(diread->d_name)
+        closedir(dir)
+    ;
+    return files
 ;

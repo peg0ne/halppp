@@ -22,7 +22,7 @@ use crate::{
     fileutil::{get_content, get_file_path, write_program, compile_program},
     message::{display_err_message, display_hint_message},
     structs::{Compiler, Include, Program, Use, CompilerPath, CompilerOutput},
-    utils::{get_next_or_exit, get_id_or_exit, get_arrow_or_exit},
+    utils::{get_next_or_exit, get_id_or_exit, get_arrow_or_exit, get_or_exit},
 };
 
 fn main() {
@@ -119,7 +119,7 @@ fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> CompilerOutp
             }
             Token::Compiler => {
                 get_arrow_or_exit(compiler.next(), format!("[Compiler] Missing start of compiler intent [=>]: {:?}", next.token).as_str());
-                let arg = get_id_or_exit(compiler.next(), format!("[Compiler] Missing value of compiler intent [Token::Id]: {:?}", next.token).as_str());
+                let arg = get_or_exit(compiler.next(), Token::String, format!("[Compiler] Missing value of compiler intent [Token::String]: {:?}", next.token).as_str());
                 compiler.add_arg(&arg);
             }
             Token::NewLine => {}
