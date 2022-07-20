@@ -16,4 +16,4 @@ get_info_in() {
 }
 
 get_info_in "src" "Rust Compiler" "\.rs"
-get_info_in "tests/compiler" "Self Compiler" "\.h"
+get_info_in "compiler" "Self Compiler" "\.h"
