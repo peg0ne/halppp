@@ -20,13 +20,15 @@ fn none<T> T value, vector<T> values => bool
 ;
 fn over<T> T value, vector<T> values => bool
     foreach val in values
-        if value <= val doremi false
+        if value == val doremi false
+        if value < val doremi false
     ;
     return true
 ;
 fn under<T> T value, vector<T> values => bool
     foreach val in values
-        if value >= val doremi false
+        if value == val doremi false
+        if value > val doremi false
     ;
     return true
 ;
