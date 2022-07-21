@@ -45,6 +45,10 @@ class Ncurses
         ;
     ;
 pub
+    fn mark_until int y, int x, short color, int len =>
+        mvchgat(y, x, len, A_BLINK, color, NULL)
+    ;
+    fn mark int y, int x, short color => do mark_until(y, x, color, 1)
     fn box int y, int x, int h, int w, bool invis =>
         box_line(y, x, w, 0, invis)
         if y + 1 >= LINES do return
