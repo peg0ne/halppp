@@ -10,11 +10,11 @@ struct Select
         select_str += "\n{\n"
         select_str += "auto " + wrapped + " = " + optional_value + LINE_END
         select_str += (string)"if" + LPAREN
-        select_str += optional_value + ".is_some()"
+        select_str += wrapped + ".is_some()"
         select_str += RPAREN
         select_str += BLOCK_START
         select_str += "auto " + value_name
-        select_str += " = " + optional_value
+        select_str += " = " + wrapped
         select_str += ".value_unsafe()"
         select_str += LINE_END
         for i until lines.size() do select_str += expr_to_cpp(&lines.at(i), indent + 1)
