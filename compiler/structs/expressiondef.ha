@@ -40,7 +40,9 @@ fn expr_to_cpp Expression *self, int indent => string
     let line_str = String(line_value)
     if line_value.size() != 0
         expression += line_value
-        if !line_str.starts_with("case ") do expression += LINE_END
+        let is_case = line_str.starts_with("case ")
+        let is_default = line_str.starts_with("default")
+        if !is_case && !is_default do expression += LINE_END
     ;
     return expression
 ;
