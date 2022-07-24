@@ -1,3 +1,4 @@
+inc => algorithm
 fn clamp double value, double min, double max => double
     if max <= min doremi min
     if value > max doremi max
