@@ -8,7 +8,6 @@ enum ContainerType
 
 class IContainer
 protected
-    string _label = ""
     ContainerType _type
     short _color = 0
     AnchorX _anchor_x = AnchorX::Left
@@ -56,14 +55,15 @@ pub
     fn FillY => Fill doremi _fill_y
     fn FillX => Fill doremi _fill_x
     fn Size => Vector doremi _size
+    fn Active => bool doremi is_active
+    fn SetActive bool active => do is_active = active
     fn SetSize double x, double y => do _size = Vector(x,y)
     fn SetOffset double x, double y => do _offset = Vector(x,y)
     fn SetColor short col => do _color = col
-    fn SetLabel string label => do _label = label
     fn draw Ncurses *n =>
+        if !is_active do return
         n->col(_color)
         n->box(_offset.y, _offset.x, _size.y, _size.x)
-        n->add(_offset.y, _offset.x, _label)
         n->col(_color, false)
     ;
 ;
@@ -77,6 +77,7 @@ protected
 pub
     fn add IContainer* c => do _containers.push_back(c)
     fn draw Ncurses *n =>
+        if !is_active do return
         ((IContainer*)this)->draw(n)
         foreach c in _containers do draw_container_impl(c,n)
     ;
@@ -95,31 +96,37 @@ class VerticalLayout => GroupedContainer
         _fill_y = f
         _size = s
     ;
-    pub fn draw Ncurses *n => do ((GroupedContainer*)this)->draw(n)
+    pub fn draw Ncurses *n =>
+        if !is_active do return
+        update()
+        ((GroupedContainer*)this)->draw(n)
+    ;
     pub fn update =>
         double available_space = _size.y
         int offset = 0
         int sharers = 0
         int extra = 0
         foreach c in _containers
-            if !is_active do continue
+            if !c->Active() do continue        
             switch c->FillY()
             case Fill::Static dobr available_space -= c->Size().y
             case Fill::Flex dobr sharers++
             ;
         ;
-        int space = available_space/sharers
-        if space * sharers < available_space do extra++
-        if space * sharers > available_space do extra--
+        if sharers != 0
+            int space = available_space/sharers
+            int diff = available_space - (space * sharers)
+            extra = diff
+        ;
         for i until _containers.size()
             let c = _containers.at(i)
-            if !is_active do continue
-            if i + 1 == _containers.size()
-                available_space += extra
-            ;
+            if !c->Active() do continue        
             c->SetOffset(_offset.x, offset + _offset.y)
             if c->FillY() == Fill::Flex
                 c->SetSize(_size.x, (available_space / sharers))
+            ;
+            if i + 1 == _containers.size()
+                c->SetSize(c->Size().x, c->Size().y + extra)
             ;
             else do c->SetSize(_size.x, c->Size().y)
             offset += c->Size().y
@@ -142,31 +149,37 @@ class HorizontalLayout => GroupedContainer
         _fill_y = f
         _size = s
     ;
-    pub fn draw Ncurses *n => do ((GroupedContainer*)this)->draw(n)
+    pub fn draw Ncurses *n =>
+        if !is_active do return
+        update()
+        ((GroupedContainer*)this)->draw(n)
+    ;
     pub fn update =>
         double available_space = _size.x
         int offset = 0
         int sharers = 0
         int extra = 0
         foreach c in _containers
-            if !is_active do continue
+            if !c->Active() do continue
             switch c->FillX()
             case Fill::Static dobr available_space -= c->Size().x
             case Fill::Flex dobr sharers++
             ;
         ;
-        int space = available_space/sharers
-        if space * sharers < available_space do extra++
-        if space * sharers > available_space do extra--
+        if sharers != 0
+            int space = available_space/sharers
+            int diff = available_space - (space * sharers)
+            extra = diff
+        ;
         for i until _containers.size()
             let c = _containers.at(i)
-            if !is_active do continue        
+            if !c->Active() do continue        
             c->SetOffset(offset + _offset.x, _offset.y)
-            if i + 1 == _containers.size()
-                available_space += extra
-            ;
             if c->FillX() == Fill::Flex
                 c->SetSize((available_space / sharers), _size.y)
+            ;
+            if i + 1 == _containers.size()
+                c->SetSize(c->Size().x + extra, c->Size().y)
             ;
             else do c->SetSize(c->Size().x, _size.y)
             offset += c->Size().x
@@ -184,12 +197,14 @@ class MainContainer => VerticalLayout
         ((VerticalLayout*)this)->update()
     ;
     pub fn draw Ncurses *n =>
+        if !is_active do return
         update()
         ((VerticalLayout*)this)->draw(n)
     ;
 ;
 
 fn draw_container_impl IContainer* c, Ncurses *n =>
+    if !c->Active() do return
     switch c->Type()
     case ContainerType::Base dobr c->draw(n)
     case ContainerType::Grouped
@@ -204,6 +219,7 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
         ((HorizontalLayout*)c)->draw(n)
         break
     case ContainerType::Main
+        ((MainContainer*)c)->update()
         ((MainContainer*)c)->draw(n)
         break
     default do break
