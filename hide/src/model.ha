@@ -52,9 +52,11 @@ class Model => MainContainer
     pub fn add_space =>
         _editorspace.push_back(HorizontalLayout(Fill::Flex))
         add_editor()
+        _grid.add(&_editorspace.back())
     ;
     pub fn add_editor =>
         _editors.push_back(IContainer(Fill::Flex))
+        _editorspace.back().add(&_editors.back())
     ;
     pub fn render =>
         update()
