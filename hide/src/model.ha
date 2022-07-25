@@ -4,8 +4,8 @@ get => components/IContainer
 class Model => MainContainer
     HorizontalLayout _top
     HorizontalLayout _status
-    vector<HorizontalLayout> _editorspace
-    vector<IContainer> _editors
+    vector<HorizontalLayout> _editorspace = {}
+    vector<IContainer> _editors = {}
     VerticalLayout _grid
     IContainer _fileex
     IContainer _mode
@@ -29,10 +29,6 @@ class Model => MainContainer
         _fileex.SetColor(5)
         _grid = VerticalLayout(Fill::Flex)
         _grid.SetColor(6)
-        _editorspace = {HorizontalLayout(Fill::Flex)}
-        _editors = {IContainer(Fill::Flex)}
-        _editorspace.back().add(&_editors.back())
-        _grid.add(&_editorspace.back())
 
         _top.add(&_fileex)
         _top.add(&_grid)
@@ -45,18 +41,25 @@ class Model => MainContainer
         _status.add(&_mode)
         _status.add(&_line)
 
+        add_space()
         update()
-
         draw(&n)
     ;
-    pub fn add_space =>
-        _editorspace.push_back(HorizontalLayout(Fill::Flex))
-        add_editor()
-        _grid.add(&_editorspace.back())
+    pub fn refresh =>
+        _grid = VerticalLayout(Fill::Flex)
+        for i until _editorspace.size() do _grid.add(&_editorspace.at(i))
     ;
-    pub fn add_editor =>
-        _editors.push_back(IContainer(Fill::Flex))
-        _editorspace.back().add(&_editors.back())
+    pub fn add_editor => do add_editor(&this->_editorspace.back())
+    pub fn add_editor HorizontalLayout *layout =>
+        this->_editors.push_back(IContainer(Fill::Flex))
+        if this->_editors.size() > 100 do return
+        if this->_editors.size() < 0 do return
+        layout->add(&this->_editors.back())
+    ;
+    pub fn add_space =>
+        this->_editorspace.push_back(HorizontalLayout(Fill::Flex))
+        this->add_editor(&_editorspace.back())
+        this->refresh()
     ;
     pub fn render =>
         update()

@@ -8,6 +8,7 @@ enum ContainerType
 
 class IContainer
 protected
+    vector<IContainer*> _containers = {}
     ContainerType _type
     short _color = 0
     AnchorX _anchor_x = AnchorX::Left
@@ -60,6 +61,7 @@ pub
     fn SetSize double x, double y => do _size = Vector(x,y)
     fn SetOffset double x, double y => do _offset = Vector(x,y)
     fn SetColor short col => do _color = col
+    fn add IContainer* c => do _containers.push_back(c)
     fn draw Ncurses *n =>
         if !is_active do return
         n->col(_color)
@@ -70,12 +72,10 @@ pub
 
 class GroupedContainer => IContainer
 protected
-    vector<IContainer*> _containers = {}
     GroupedContainer =>
         _type = ContainerType::Grouped
     ;
 pub
-    fn add IContainer* c => do _containers.push_back(c)
     fn draw Ncurses *n =>
         if !is_active do return
         ((IContainer*)this)->draw(n)
@@ -84,7 +84,9 @@ pub
 ;
 
 class VerticalLayout => GroupedContainer
-    VerticalLayout => do return
+    VerticalLayout =>
+        _type = ContainerType::Vertical
+    ;
     VerticalLayout Fill f =>
         _type = ContainerType::Vertical
         _fill_x = f
@@ -126,7 +128,7 @@ class VerticalLayout => GroupedContainer
                 c->SetSize(_size.x, (available_space / sharers))
             ;
             if i + 1 == _containers.size()
-                c->SetSize(c->Size().x, c->Size().y + extra)
+                c->SetSize(_size.x, c->Size().y + extra)
             ;
             else do c->SetSize(_size.x, c->Size().y)
             offset += c->Size().y
@@ -179,7 +181,7 @@ class HorizontalLayout => GroupedContainer
                 c->SetSize((available_space / sharers), _size.y)
             ;
             if i + 1 == _containers.size()
-                c->SetSize(c->Size().x + extra, c->Size().y)
+                c->SetSize(c->Size().x + extra, _size.y)
             ;
             else do c->SetSize(c->Size().x, _size.y)
             offset += c->Size().x
