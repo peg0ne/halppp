@@ -18,24 +18,31 @@ protected
     Vector _size = Vector(0,0)
     Vector _offset = Vector(0,0)
     bool is_active = true
-    IContainer => do return
+    IContainer =>
+        _containers = {}
+        _type = ContainerType::Base
+    ;
     IContainer Fill f =>
+        _containers = {}
         _type = ContainerType::Base
         _fill_x = f
         _fill_y = f
     ;
     IContainer Fill f, Vector s =>
+        _containers = {}
         _type = ContainerType::Base
         _fill_x = f
         _fill_y = f
         _size = s
     ;
     IContainer Vector s, Vector o =>
+        _containers = {}
         _type = ContainerType::Base
         _size = s
         _offset = o
     ;
     IContainer Fill f_x, Fill f_y, Vector s, Vector o =>
+        _containers = {}
         _type = ContainerType::Base
         _fill_x = f_x
         _fill_y = f_y
@@ -43,6 +50,7 @@ protected
         _offset = o
     ;
     IContainer AnchorX a_x, AnchorY a_y, Fill f_x, Fill f_y, Vector s, Vector o =>
+        _containers = {}
         _type = ContainerType::Base
         _anchor_x = a_x
         _anchor_y = a_y
@@ -62,6 +70,7 @@ pub
     fn SetOffset double x, double y => do _offset = Vector(x,y)
     fn SetColor short col => do _color = col
     fn add IContainer* c => do _containers.push_back(c)
+    fn clear => do _containers = {}
     fn draw Ncurses *n =>
         if !is_active do return
         n->col(_color)
@@ -73,6 +82,7 @@ pub
 class GroupedContainer => IContainer
 protected
     GroupedContainer =>
+        _containers = {}
         _type = ContainerType::Grouped
     ;
 pub
@@ -85,14 +95,17 @@ pub
 
 class VerticalLayout => GroupedContainer
     VerticalLayout =>
+        _containers = {}
         _type = ContainerType::Vertical
     ;
     VerticalLayout Fill f =>
+        _containers = {}
         _type = ContainerType::Vertical
         _fill_x = f
         _fill_y = f
     ;
     VerticalLayout Fill f, Vector s =>
+        _containers = {}
         _type = ContainerType::Vertical
         _fill_x = f
         _fill_y = f
@@ -130,22 +143,25 @@ class VerticalLayout => GroupedContainer
             if i + 1 == _containers.size()
                 c->SetSize(_size.x, c->Size().y + extra)
             ;
-            else do c->SetSize(_size.x, c->Size().y)
+            c->SetSize(_size.x, c->Size().y)
             offset += c->Size().y
         ;
     ;
 ;
 
 class HorizontalLayout => GroupedContainer
-    HorizontalLayout => 
+    HorizontalLayout =>
+        _containers = {} 
         _type = ContainerType::Horizontal
     ;
     HorizontalLayout Fill f =>
+        _containers = {}
         _type = ContainerType::Horizontal
         _fill_x = f
         _fill_y = f
     ;
     HorizontalLayout Fill f, Vector s =>
+        _containers = {}
         _type = ContainerType::Horizontal
         _fill_x = f
         _fill_y = f
@@ -183,7 +199,7 @@ class HorizontalLayout => GroupedContainer
             if i + 1 == _containers.size()
                 c->SetSize(c->Size().x + extra, _size.y)
             ;
-            else do c->SetSize(c->Size().x, _size.y)
+            c->SetSize(c->Size().x, _size.y)
             offset += c->Size().x
         ;
     ;
@@ -191,6 +207,7 @@ class HorizontalLayout => GroupedContainer
 
 class MainContainer => VerticalLayout
     MainContainer =>
+        _containers = {}
         _type = ContainerType::Main
         _size = Vector(COLS, LINES)
     ;
@@ -201,7 +218,8 @@ class MainContainer => VerticalLayout
     pub fn draw Ncurses *n =>
         if !is_active do return
         update()
-        ((VerticalLayout*)this)->draw(n)
+        ((IContainer*)this)->draw(n)
+        foreach c in _containers do draw_container_impl(c,n)
     ;
 ;
 
@@ -209,21 +227,13 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
     if !c->Active() do return
     switch c->Type()
     case ContainerType::Base dobr c->draw(n)
-    case ContainerType::Grouped
-        ((GroupedContainer*)c)->draw(n)
+    case ContainerType::Grouped dobr ((GroupedContainer*)c)->draw(n)
+    case ContainerType::Vertical dobr ((VerticalLayout*)c)->draw(n)
+    case ContainerType::Horizontal dobr ((HorizontalLayout*)c)->draw(n)
+    case ContainerType::Main dobr ((MainContainer*)c)->draw(n)
+    default 
+        n->add(0,0,"ERORR")
+        n->key()
         break
-    case ContainerType::Vertical
-        ((VerticalLayout*)c)->update()
-        ((VerticalLayout*)c)->draw(n)
-        break
-    case ContainerType::Horizontal
-        ((HorizontalLayout*)c)->update()
-        ((HorizontalLayout*)c)->draw(n)
-        break
-    case ContainerType::Main
-        ((MainContainer*)c)->update()
-        ((MainContainer*)c)->draw(n)
-        break
-    default do break
     ;
 ;
