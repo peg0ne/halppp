@@ -8,52 +8,31 @@ enum ContainerType
 
 class IContainer
 protected
+    string _label = " "
+    vector<string> _content = {}
     vector<IContainer*> _containers = {}
-    ContainerType _type
+    ContainerType _type = ContainerType::Base
     short _color = 0
-    AnchorX _anchor_x = AnchorX::Left
-    AnchorY _anchor_y = AnchorY::Top
     Fill _fill_x = Fill::Flex
     Fill _fill_y = Fill::Flex
     Vector _size = Vector(0,0)
     Vector _offset = Vector(0,0)
     bool is_active = true
-    IContainer =>
-        _containers = {}
-        _type = ContainerType::Base
-    ;
+    IContainer => do return
     IContainer Fill f =>
-        _containers = {}
-        _type = ContainerType::Base
         _fill_x = f
         _fill_y = f
     ;
     IContainer Fill f, Vector s =>
-        _containers = {}
-        _type = ContainerType::Base
         _fill_x = f
         _fill_y = f
         _size = s
     ;
     IContainer Vector s, Vector o =>
-        _containers = {}
-        _type = ContainerType::Base
         _size = s
         _offset = o
     ;
     IContainer Fill f_x, Fill f_y, Vector s, Vector o =>
-        _containers = {}
-        _type = ContainerType::Base
-        _fill_x = f_x
-        _fill_y = f_y
-        _size = s
-        _offset = o
-    ;
-    IContainer AnchorX a_x, AnchorY a_y, Fill f_x, Fill f_y, Vector s, Vector o =>
-        _containers = {}
-        _type = ContainerType::Base
-        _anchor_x = a_x
-        _anchor_y = a_y
         _fill_x = f_x
         _fill_y = f_y
         _size = s
@@ -64,17 +43,28 @@ pub
     fn FillY => Fill doremi _fill_y
     fn FillX => Fill doremi _fill_x
     fn Size => Vector doremi _size
+    fn Offset => Vector doremi _offset
+    fn Color => short doremi _color
+    fn Label => string doremi _label
     fn Active => bool doremi is_active
     fn SetActive bool active => do is_active = active
     fn SetSize double x, double y => do _size = Vector(x,y)
     fn SetOffset double x, double y => do _offset = Vector(x,y)
     fn SetColor short col => do _color = col
+    fn SetLabel string label => do _label = label
+    fn SetContent vector<string> content => do _content = content
     fn add IContainer* c => do _containers.push_back(c)
+    fn size => int doremi _containers.size()
     fn clear => do _containers = {}
     fn draw Ncurses *n =>
         if !is_active do return
         n->col(_color)
-        n->box(_offset.y, _offset.x, _size.y, _size.x)
+        n->invis_box(_offset.y, _offset.x, _size.y, _size.x)
+        n->add(_offset.y, _offset.x, _label)
+        let i = 0
+        foreach s in _content
+            n->add_until(_offset.y + i++, _offset.x, s, _size.x + _offset.x, false)
+        ;
         n->col(_color, false)
     ;
 ;
@@ -82,7 +72,6 @@ pub
 class GroupedContainer => IContainer
 protected
     GroupedContainer =>
-        _containers = {}
         _type = ContainerType::Grouped
     ;
 pub
@@ -95,17 +84,14 @@ pub
 
 class VerticalLayout => GroupedContainer
     VerticalLayout =>
-        _containers = {}
         _type = ContainerType::Vertical
     ;
     VerticalLayout Fill f =>
-        _containers = {}
         _type = ContainerType::Vertical
         _fill_x = f
         _fill_y = f
     ;
     VerticalLayout Fill f, Vector s =>
-        _containers = {}
         _type = ContainerType::Vertical
         _fill_x = f
         _fill_y = f
@@ -151,17 +137,14 @@ class VerticalLayout => GroupedContainer
 
 class HorizontalLayout => GroupedContainer
     HorizontalLayout =>
-        _containers = {} 
         _type = ContainerType::Horizontal
     ;
     HorizontalLayout Fill f =>
-        _containers = {}
         _type = ContainerType::Horizontal
         _fill_x = f
         _fill_y = f
     ;
     HorizontalLayout Fill f, Vector s =>
-        _containers = {}
         _type = ContainerType::Horizontal
         _fill_x = f
         _fill_y = f
@@ -207,7 +190,6 @@ class HorizontalLayout => GroupedContainer
 
 class MainContainer => VerticalLayout
     MainContainer =>
-        _containers = {}
         _type = ContainerType::Main
         _size = Vector(COLS, LINES)
     ;
@@ -232,6 +214,8 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
     case ContainerType::Horizontal dobr ((HorizontalLayout*)c)->draw(n)
     case ContainerType::Main dobr ((MainContainer*)c)->draw(n)
     default 
+        n->add(2,0,c->Label())
+        n->add(1,0,(int)c->Type())
         n->add(0,0,"ERORR")
         n->key()
         break

@@ -1,59 +1,51 @@
-get => enums/[movement, commands, rects]
-get => components/IContainer
+get => enums/[movement, commands, rects, modes]
+get => components/[IContainer, IContent]
+get => components/[CommandLine, Editor, Explorer, ModeView]
 
 class Model => MainContainer
-    HorizontalLayout _top
-    HorizontalLayout _status
-    vector<HorizontalLayout> _editorspace = {}
-    vector<IContainer> _editors_a = {}
-    vector<IContainer> _editors_b = {}
-    vector<IContainer> _editors_c = {}
-    vector<IContainer> _editors_d = {}
-    vector<IContainer> _editors_e = {}
-    VerticalLayout _grid
-    IContainer _fileex
-    IContainer _mode
-    IContainer _line
-    IContainer _cmd
     Ncurses n = Ncurses()
+    Option<Editor*> _active = None<Editor*>()
+    HorizontalLayout _top = HorizontalLayout(Fill::Flex)
+    HorizontalLayout _status = HorizontalLayout(Fill::Static, Vector(0,1))
+    vector<HorizontalLayout> _editorspace = {}
+    vector<Editor> _editors_a = {}
+    vector<Editor> _editors_b = {}
+    vector<Editor> _editors_c = {}
+    vector<Editor> _editors_d = {}
+    vector<Editor> _editors_e = {}
+    VerticalLayout _grid = VerticalLayout(Fill::Flex)
+    Explorer _explorer = Explorer(&n)
+    CommandLine _command_line = CommandLine(&n)
+    ModeView _mode_view = ModeView(&n)
+    IContainer _line = IContainer(Fill::Flex)
 
     Model int argc, char **argv =>
-        _top = HorizontalLayout(Fill::Flex)
         _top.SetColor(0)
-        _status = HorizontalLayout(Fill::Static, Vector(0,1))
         _status.SetColor(1)
-        _cmd = IContainer(Fill::Static, Vector(0,1))
-        _cmd.SetColor(4)
+        _grid.SetColor(6)
+        _line.SetColor(3)
+        _line.SetLabel(" << [f] $ [0,0]")
 
         add(&_top)
         add(&_status)
-        add(&_cmd)
+        add(_command_line.origin())
 
-        _fileex = IContainer(Fill::Static, Vector(25,0))
-        _fileex.SetColor(5)
-        _grid = VerticalLayout(Fill::Flex)
-        _grid.SetColor(6)
-
-        _top.add(&_fileex)
+        _top.add(_explorer.origin())
         _top.add(&_grid)
 
-        _mode = IContainer(Fill::Static, Vector(15,0))
-        _mode.SetColor(2)
-        _line = IContainer(Fill::Flex)
-        _line.SetColor(3)
-
-        _status.add(&_mode)
+        _status.add(_mode_view.origin())
         _status.add(&_line)
 
         add_space()
         update()
         draw(&n)
     ;
-    pub fn refresh =>
+pub
+    fn refresh =>
         _grid.clear()
         for i until _editorspace.size() do _grid.add(&_editorspace.at(i))
     ;
-    pub fn get_list int index => vector<IContainer>*
+    fn get_list int index => vector<Editor>*
         switch index
         case 1 doremi &_editors_a
         case 2 doremi &_editors_b
@@ -63,33 +55,61 @@ class Model => MainContainer
         default doremi &_editors_a
         ;
     ;
-    pub fn add_editor =>
+    fn add_editor Option<string> path =>
         let editors = get_list(_editorspace.size())
         if editors->size() >= 5 do return
-        editors->push_back(IContainer(Fill::Flex))
+        editors->push_back(Editor(&n, path.value_or("")))
+        _active = Some(&editors->back())
         if editors->size() <= 0 do return
         for i until _editorspace.size()
             let e = _editorspace.at(i)
             e.clear()
             editors = get_list(i+1)
-            for j until editors->size()
-                e.add(&editors->at(j))
-            ;
+            for j until editors->size() do e.add(editors->at(j).origin())
             _editorspace[i] = e
         ;
         refresh()
     ;
-    pub fn add_space =>
+    fn add_space =>
         if _editorspace.size() >= 5 do return
         _editorspace.push_back(HorizontalLayout(Fill::Flex))
         if _editorspace.size() <= 0 do return
-        add_editor()
+        add_editor(None<string>())
     ;
-    pub fn render =>
+    fn render =>
         update()
         draw(&n)
+        _explorer.draw()
+        for i until _editorspace.size()
+            let editors = get_list(i+1)
+            for j until editors->size() do editors->at(j).draw()
+        ;
     ;
-    pub fn file_ex =>
-        _fileex.SetActive(!_fileex.Active())
+    fn run => bool
+        let mode = _mode_view.mode()
+        let cmd = Command::Nop
+        switch mode
+        case Mode::FileEx dobr cmd = _explorer.run()
+        case Mode::CmdHan dobr cmd = _command_line.run()
+        case Mode::Normal 
+        case Mode::Visual 
+        case Mode::Insert
+            select a from _active
+                cmd = a->run(mode)
+            ;
+            break
+        ;
+        switch cmd
+        case Command::Exit dobr n.stop(); return true
+        case Command::ModeFileEx dobr _mode_view.set(Mode::FileEx)
+        case Command::ModeCmdHan dobr _mode_view.set(Mode::CmdHan)
+        case Command::ModeNormal dobr _active.is_none() ? _mode_view.set(Mode::FileEx) : _mode_view.set(Mode::Normal)
+        case Command::ModeInsert dobr _active.is_none() ? _mode_view.set(Mode::FileEx) : _mode_view.set(Mode::Insert)
+        case Command::ModeVisual dobr _active.is_none() ? _mode_view.set(Mode::FileEx) : _mode_view.set(Mode::Visual)
+        case Command::SelectFile dobr add_editor(_explorer.get_fp())
+        case Command::CloseEditor dobr n.stop(); return true
+        case Command::Nop do break
+        ;
+        return false
     ;
 ;

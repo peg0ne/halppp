@@ -6,5 +6,6 @@ enum Command
     ModeFileEx,
     ModeCmdHan,
     SelectFile,
+    CloseEditor,
     Nop,
 ;
