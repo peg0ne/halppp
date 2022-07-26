@@ -10,6 +10,7 @@ class Explorer => IContent
     ;
 pub 
     fn draw => do n->mark_until(_pos, 0, 6, _origin->Size().x)
+    fn set_visibility Mode mode => do _origin->SetActive(mode == Mode::FileEx)
     fn toggle => Command
         _origin->SetActive(!_origin->Active())
         return Command::ModeNormal

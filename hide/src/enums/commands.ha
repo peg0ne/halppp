@@ -7,5 +7,7 @@ enum Command
     ModeCmdHan,
     SelectFile,
     CloseEditor,
+    SplitVertical,
+    SplitHorizontal,
     Nop,
 ;

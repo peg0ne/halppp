@@ -43,7 +43,10 @@ class Model => MainContainer
 pub
     fn refresh =>
         _grid.clear()
-        for i until _editorspace.size() do _grid.add(&_editorspace.at(i))
+        for i until _editorspace.size()
+            if !_editorspace.at(i).Active() do continue
+            _grid.add(&_editorspace.at(i))
+        ;
     ;
     fn get_list int index => vector<Editor>*
         switch index
@@ -54,6 +57,31 @@ pub
         case 5 doremi &_editors_e
         default doremi &_editors_a
         ;
+    ;
+    fn open_file string path =>
+        select a from _active
+            a->open(path)
+        ;
+    ;
+    fn close_editor => bool
+        select a from _active
+            a->set_active(false)
+            for i until _editorspace.size()
+                let editors = get_list(_editorspace.size() - i)
+                for j until editors->size()
+                    let is_active = editors->at(j).is_active()
+                    if is_active
+                        _active = Some(&editors->at(j))
+                        _mode_view.set(Mode::Normal)
+                        return false
+                    ;
+                ;
+                _editorspace.at(_editorspace.size() - 1 - i).SetActive(false)
+                refresh()
+            ;
+        ;
+        n.stop();
+        return true
     ;
     fn add_editor Option<string> path =>
         let editors = get_list(_editorspace.size())
@@ -69,6 +97,7 @@ pub
             _editorspace[i] = e
         ;
         refresh()
+        _mode_view.set(Mode::FileEx)
     ;
     fn add_space =>
         if _editorspace.size() >= 5 do return
@@ -84,6 +113,7 @@ pub
             let editors = get_list(i+1)
             for j until editors->size() do editors->at(j).draw()
         ;
+        select a from _active do a->draw(6)
     ;
     fn run => bool
         let mode = _mode_view.mode()
@@ -106,10 +136,13 @@ pub
         case Command::ModeNormal dobr _active.is_none() ? _mode_view.set(Mode::FileEx) : _mode_view.set(Mode::Normal)
         case Command::ModeInsert dobr _active.is_none() ? _mode_view.set(Mode::FileEx) : _mode_view.set(Mode::Insert)
         case Command::ModeVisual dobr _active.is_none() ? _mode_view.set(Mode::FileEx) : _mode_view.set(Mode::Visual)
-        case Command::SelectFile dobr add_editor(_explorer.get_fp())
-        case Command::CloseEditor dobr n.stop(); return true
+        case Command::SelectFile dobr open_file(_explorer.get_fp())
+        case Command::SplitVertical dobr add_space()
+        case Command::SplitHorizontal dobr add_editor(None<string>())
+        case Command::CloseEditor doremi close_editor()
         case Command::Nop do break
         ;
+        _explorer.set_visibility(_mode_view.mode())
         return false
     ;
 ;

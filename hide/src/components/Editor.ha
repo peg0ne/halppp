@@ -19,12 +19,20 @@ class Editor => IContent
         _base->add(_content)
         _origin->add(_header)
         _origin->add(_base)
-        _path = path
-        _text = readlines(path)
+        open(path)
         this->n = n
     ;
 pub 
-    fn draw =>
+    fn is_active => bool doremi _origin->Active()
+    fn set_active bool active => do _origin->SetActive(active)
+    fn open string path =>
+        _path = "| " + path
+        _text = readlines(_path)
+    ;
+    fn draw => do draw(5)
+    fn draw short color =>
+        if !is_active() do return
+        _header->SetColor(color)
         //Header
         _header->SetLabel(_path)
         _header->draw(n)
@@ -43,7 +51,7 @@ pub
         let key = n->key()
         switch key
         case ':' doremi Command::ModeCmdHan
-        case ' ' doremi Command::ModeFileEx
+        case ' ' doremi run_space()
         case 'j' dobr move(Dir::Up)
         case 'k' dobr move(Dir::Down)
         case 'l' dobr move(Dir::Right)
@@ -76,6 +84,14 @@ pub
         switch key
         case 'i' doremi Command::ModeInsert
         case 27 doremi Command::ModeNormal
+        ;
+        return Command::Nop
+    ;
+    fn run_space => Command
+        switch n->key()
+        case 'f' doremi Command::ModeFileEx
+        case 't' doremi Command::SplitHorizontal
+        case 'v' doremi Command::SplitVertical
         ;
         return Command::Nop
     ;

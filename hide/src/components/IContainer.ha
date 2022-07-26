@@ -63,6 +63,7 @@ pub
         n->add(_offset.y, _offset.x, _label)
         let i = 0
         foreach s in _content
+            if i >= _size.y do break
             n->add_until(_offset.y + i++, _offset.x, s, _size.x + _offset.x, false)
         ;
         n->col(_color, false)
