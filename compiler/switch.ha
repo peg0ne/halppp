@@ -36,7 +36,10 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
     if !is_default
         let next = get_next_or_exit(compiler_t->next(), "[Switch] Case unfinished")
         label = "case " + next.name
-        if next.is_id() && !compiler_t->has_enum(next.name) do display_err_message("[Switch] Enum member doesn't exist:" + next.name)
+        let name = String(next.name)
+        if next.is_id() && !name.starts_with("KEY_")
+            if !compiler_t->has_enum(next.name) do display_err_message("[Switch] Enum member doesn't exist:" + next.name)
+        ;
         if !next.valid_case() do display_err_message("Token not allowed in switch: ")
         if next.is_id() && try_get(compiler_t->peek(), Token::DblColon)
             label += "::"

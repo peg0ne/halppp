@@ -60,14 +60,70 @@ pub
     ;
     fn add_selector =>
         _selections.push_back(_selector)
-        try_move(Vector(1,0), &_selector)
+        try_move(Vector(0,1), &_selector)
+    ;
+    fn tab =>
+        if _text.size() == 0 do _text.push_back(" ")
+        _text.at(_selector.y) = "    " + _text.at(_selector.y)
+        sort(_selections.begin(), _selections.end(), &selection_comparer)
+        foreach s in _selections
+            _text.at(s.y) = "    " + _text.at(s.y)
+        ;
+    ;
+    fn untab =>
+        if _text.size() == 0 do return
+        let updated = _text.at(_selector.y)
+        for i until 4
+            if updated.size() == 0 do return
+            if none(updated[0], {' ', '\t'}) do return
+            updated = updated.substr(1)
+            _text.at(_selector.y) = updated
+        ;
+    ;
+    fn try_insert_text string text =>
+        insert_text(text, &_selector)
+        try_move(Vector(1, 0), &_selector)
+        foreach s in _selections do insert_text(text, &s)
+        for i until _selections.size() do try_move(Vector(1, 0), &_selections.at(i))
+    ;
+    fn insert_text string text, Vector *pos =>
+        if _text.size() == 0 do _text.push_back(" ")
+        let t = _text.at(pos->y)
+        let updated = t.substr(0, pos->x)
+        updated += text
+        updated += t.substr(pos->x)
+        _text.at(pos->y) = updated
+    ;
+    fn try_remove_ch =>
+        if _selector.x != 0
+            try_move(Vector(-1, 0), &_selector)
+            remove_ch(&_selector)
+        ;
+        sort(_selections.begin(), _selections.end(), &selection_comparer)
+        for i until _selections.size()
+            if _selections.at(i).x != 0
+                try_move(Vector(-1, 0), &_selections.at(i))
+                remove_ch(&_selections.at(i))
+            ;
+        ;
     ;
     fn try_delete_ch =>
         delete_ch(&_selector)
         sort(_selections.begin(), _selections.end(), &selection_comparer)
         foreach s in _selections do delete_ch(&s)
     ;
+    fn remove_ch Vector *pos =>
+        if _text.size() == 0 do return
+        let s = _text.at(pos->y)
+        let updated = ""
+        if s.size() == 0 do return
+        if pos->x >= s.size() && pos->x != 0 do return
+        updated += s.substr(0, pos->x)
+        updated += s.substr(pos->x + 1)
+        _text.at(pos->y) = updated
+    ;
     fn delete_ch Vector *pos =>
+        if _text.size() == 0 do return
         let s = _text.at(pos->y)
         let updated = ""
         if s.size() == 0 do return
@@ -77,6 +133,7 @@ pub
         _text.at(pos->y) = updated
     ;
     fn try_move Vector dir, Vector* pos =>
+        if _text.size() == 0 do return
         let y = pos->y
         let x = pos->x
         let h = max(1, (int)_text.size()) - 1
@@ -95,8 +152,7 @@ pub
     fn move Dir dir =>
         Vector vec
         switch dir
-        case Dir::Up dobr vec = Vector(0, -1)
-        case Dir::Down dobr vec = Vector(0, 1)
+             case Dir::Down dobr vec = Vector(0, 1)
         case Dir::Left dobr vec = Vector(-1, 0)
         case Dir::Right dobr vec = Vector(1, 0)
         ;
@@ -113,13 +169,8 @@ pub
     fn run Mode mode => Command
         let key = n->key()
         switch key
-        case ':' doremi Command::ModeCmdHan
-        case ' ' doremi run_space()
-        case 'j' dobr move(Dir::Up)
-        case 'k' dobr move(Dir::Down)
-        case 'l' dobr move(Dir::Right)
-        case 'h' dobr move(Dir::Left)
-        default do break
+        case '\t' dobr tab()
+        case KEY_BTAB dobr untab()
         ;
         switch mode
         case Mode::Normal doremi run_nor(key)
@@ -129,7 +180,22 @@ pub
         ;
         return Command::Nop
     ;
+    fn run_base int key => Command
+        switch key
+        case ':' doremi Command::ModeCmdHan
+        case ' ' doremi run_space()
+        case 'j' dobr move(Dir::Up)
+        case 'k' dobr move(Dir::Down)
+        case 'l' dobr move(Dir::Right)
+        case 'h' dobr move(Dir::Left)
+        case ';'  dobr _selections = {}
+        default do break
+        ;
+        return Command::Nop
+    ;
     fn run_nor int key => Command
+        let cmd = run_base(key)
+        if cmd != Command::Nop doremi cmd
         switch key
         case 'v' doremi Command::ModeVisual
         case 'i' doremi Command::ModeInsert
@@ -140,12 +206,17 @@ pub
     ;
     fn run_ins int key => Command
         switch key
-        case 'v' doremi Command::ModeVisual
         case 27 doremi Command::ModeNormal
+        case KEY_BACKSPACE dobr try_remove_ch()
+        default
+            string ch(1,key)
+            try_insert_text(ch)
         ;
         return Command::Nop
     ;
     fn run_vis int key => Command
+        let cmd = run_base(key)
+        if cmd != Command::Nop doremi cmd
         switch key
         case 'i' doremi Command::ModeInsert
         case 27 doremi Command::ModeNormal

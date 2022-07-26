@@ -20,6 +20,7 @@ class Model => MainContainer
     IContainer _line = IContainer(Fill::Flex)
 
     Model int argc, char **argv =>
+        curs_set(0)
         _top.SetColor(0)
         _status.SetColor(1)
         _grid.SetColor(6)

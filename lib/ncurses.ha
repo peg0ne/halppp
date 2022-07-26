@@ -8,7 +8,7 @@ class Ncurses
         setlocale(LC_ALL, "")
         win = initscr()
         noecho()
-        keypad(win, false)
+        keypad(win, true)
         if has_colors()
             start_color()
             init_pair(1, COLOR_RED, COLOR_BLACK)
@@ -99,7 +99,7 @@ pub
     fn h_line int y, int x, int len =>
         for i until len do add(y, x + i, "-")
     ;
-    fn key => char doremi getch()
+    fn key => auto doremi getch()
     fn stop =>
         curs_set(1)
         endwin()

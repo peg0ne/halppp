@@ -9,7 +9,7 @@ class Explorer => IContent
         this->n = n
     ;
 pub 
-    fn draw => do n->mark_until(_pos, 0, 6, _origin->Size().x)
+    fn draw => do n->mark_until(_pos, 0, 5, _origin->Size().x)
     fn set_visibility Mode mode => do _origin->SetActive(mode == Mode::FileEx)
     fn toggle => Command
         _origin->SetActive(!_origin->Active())
@@ -52,6 +52,7 @@ pub
     ;
     fn run => Command
         switch n->key()
+        case ' '  doremi search()
         case 'f'  doremi toggle()
         case 'j'  dobr move(Dir::Up)
         case 'k'  dobr move(Dir::Down)
@@ -60,5 +61,21 @@ pub
         default   do break
         ;
         return Command::Nop
+    ;
+    fn search => Command doremi search(false, None<int>())
+    fn search bool recurse, Option<int> key_opt => Command
+        let key = key_opt.is_none() ? n->key() : 0
+        select k from key_opt do key = k
+        let i = -1
+        foreach s in _text
+            i++
+            if s.size() == 0 do continue
+            if i <= _pos && !recurse do continue
+            if tolower(s[0]) == key
+                _pos = i
+                return Command::Nop
+            ;
+        ;
+        return recurse ? search(true, Some(key)) : Command::Nop
     ;
 ;
