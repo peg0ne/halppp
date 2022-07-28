@@ -42,7 +42,7 @@ pub
         switch key
         case 27     doremi exit()
         case '\n'   doremi try_parse()
-        case 127    doremi remove_ch()
+        case KEY_BACKSPACE doremi remove_ch()
         default     doremi add_ch(key)
         ;
         return Command::Nop

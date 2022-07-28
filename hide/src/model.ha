@@ -1,4 +1,4 @@
-get => enums/[movement, commands, rects, modes]
+get => enums/[movement, commands, rects, modes, textedit]
 get => components/[IContainer, IContent]
 get => components/[CommandLine, Editor, Explorer, ModeView]
 

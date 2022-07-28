@@ -32,10 +32,11 @@ pub
         move(Dir::Up)
         return cmd
     ;
-    fn move Dir dir =>  
+    fn move Dir dir => do move(dir, 1)
+    fn move Dir dir, int multiply =>  
         switch dir
-        case Dir::Up dobr _pos = clamp(_pos - 1, 0, _text.size() - 1)
-        case Dir::Down dobr _pos = clamp(_pos + 1, 0, _text.size() - 1)
+        case Dir::Up dobr _pos = clamp(_pos - (1 * multiply), 0, _text.size() - 1)
+        case Dir::Down dobr _pos = clamp(_pos + (1 * multiply), 0, _text.size() - 1)
         ;
     ;
     fn choose => Command
@@ -54,8 +55,12 @@ pub
         switch n->key()
         case ' '  doremi search()
         case 'f'  doremi toggle()
+        case KEY_UP
         case 'j'  dobr move(Dir::Up)
+        case KEY_DOWN
         case 'k'  dobr move(Dir::Down)
+        case KEY_PPAGE dobr move(Dir::Up, _origin->Size().y)
+        case KEY_NPAGE dobr move(Dir::Down, _origin->Size().y)
         case '\n' doremi choose()
         case 27   doremi toggle()
         default   do break

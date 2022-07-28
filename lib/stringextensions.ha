@@ -1,4 +1,4 @@
-inc => string, vector
+inc => string, vector, ctype.h
 use => std
 get => option, conditional
 
@@ -20,9 +20,29 @@ pub
     ;
     fn remove int at =>
         if len() == 0 do return
-        if at >= len() do return 
+        if at >= len() do return
         if at == 0 dore _value = substr(1)
         _value = substr(0, at) + substr(at + 1)
+    ;
+    fn remove_word int at => do remove_word(at, false)
+    fn remove_word int at, bool spacebreak =>
+        if at < 0 || len() <= 0 || at >= len() do return
+        let ch = _value.at(at)
+        remove(at)
+        if !isalpha(ch) do return
+        loop
+            if at < 0 || len() <= 0 || at >= len() do return
+            ch = _value.at(at)
+            if spacebreak && ch == ' ' do break
+            if !isalpha(ch) do return
+            remove(at)
+        ;
+        loop
+            if at < 0 || len() <= 0 || at >= len() do return
+            ch = _value.at(at)
+            if ch != ' ' do return
+            remove(at)
+        ;
     ;
     fn pop => string doremi substr(0, _value.size() - 1)
     fn to_upper => string
@@ -161,6 +181,54 @@ pub
     ;
     fn substr int start => string doremi _value.substr(start)
     fn substr int start, int end => string doremi _value.substr(start, end)
+    fn find int from, string key => Option<int>
+        if from + 1 >= len() do return None<int>()
+        let s = _value.substr(from + 1)
+        let found = s.find(key)
+        return found != -1 ? Some((int)found + 1) : None<int>()
+    ;
+    fn find_non_alpha int from, bool reverse => Option<int>
+        return reverse ? find_non_alpha_reverse(from) : find_non_alpha(from)
+    ;
+    fn find_non_alpha int from => Option<int>
+        if from >= len() do return None<int>()
+        let s = _value.substr(from)
+        for i until s.size()
+            if isalpha(s.at(i)) do continue
+            return Some(i)
+        ;
+        return None<int>()
+    ;
+    fn find_non_alpha_reverse int from => Option<int>
+        if from >= len() do return None<int>()
+        let s = _value.substr(0, from)
+        for i until s.size()
+            if isalpha(s.at(s.size() - 1 - i)) do continue
+            return Some(i)
+        ;
+        return None<int>()
+    ;
+    fn find_alpha int from, bool reverse => Option<int>
+        return reverse ? find_alpha_reverse(from) : find_alpha(from)
+    ;
+    fn find_alpha int from => Option<int>
+        if from >= len() do return None<int>()
+        let s = _value.substr(from)
+        for i until s.size()
+            if !isalpha(s.at(i)) do continue
+            return Some(i)
+        ;
+        return None<int>()
+    ;
+    fn find_alpha_reverse int from => Option<int>
+        if from >= len() do return None<int>()
+        let s = _value.substr(0, from)
+        for i until s.size()
+            if !isalpha(s.at(s.size() - 1 - i)) do continue
+            return Some(i)
+        ;
+        return None<int>()
+    ;
 ;
 named => stringutils
 fn is_char_number char ch => bool

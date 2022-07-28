@@ -1,4 +1,4 @@
-inc => ncurses.h, curses.h, wchar.h, locale.h, iostream
+inc => ncurses.h, curses.h, wchar.h, locale.h, iostream, cstring
 use => std
 compiler => "-lncursesw"
 
@@ -79,7 +79,11 @@ pub
     ;
     fn add int y, int x, char c => do add(y, x, c, false)
     fn add int y, int x, string s, bool is_bold =>
-        for i until s.size() do add(y, x + i, s[i], is_bold)
+        if is_bold do bold(true)
+        char ch[s.size() + 1]
+        strcpy(ch, s.c_str())
+        mvaddstr(y,x,ch)
+        if is_bold do bold(false)
     ;
     fn add int y, int x, string s => do add(y, x, s, false)
     fn add int y, int x, int s => do add(y, x, to_string(s), false)
@@ -87,11 +91,7 @@ pub
     fn add int y, int x, float s => do add(y, x, to_string(s), false)
     fn add int y, int x, double s => do add(y, x, to_string(s), false)
     fn add_until int y, int x, string s, int limit, bool is_bold =>
-        for i until s.size()
-            if s.at(i) == '\0' do break
-            if x + i >= limit do break
-            add(y, x + i, s.at(i), is_bold)
-        ;
+        add(y, x, s.substr(0,limit-x), is_bold)
     ;
     fn v_line int y, int x, int len =>
         for i until len do add(y + i, x, "|")

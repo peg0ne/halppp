@@ -22,4 +22,9 @@ struct Vector
         y -= other.y
         z -= other.z
     ;
+    fn multiply int amount =>
+        x *= amount
+        y *= amount
+        z *= amount
+    ;
 ;
