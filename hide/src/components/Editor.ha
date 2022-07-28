@@ -171,6 +171,10 @@ pub
         switch key
         case '\t' dobr tab()
         case KEY_BTAB dobr untab()
+        case KEY_PPAGE dobr page(Dir::Up)
+        case KEY_NPAGE dobr page(Dir::Down)
+        case KEY_HOME dobr home()
+        case KEY_END dobr end()
         ;
         switch mode
         case Mode::Normal doremi run_nor(key)
