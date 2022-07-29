@@ -2,6 +2,15 @@ inc => vector
 get => option
 use => std
 
+struct KeyValuePair<T,U>
+    T _key
+    U _value
+    KeyValuePair T key, U value =>
+        _key = key
+        _value = value
+    ;
+;
+
 class Dictionary<T,U>
     vector<T> _keys = {}
     vector<U> _values = {}

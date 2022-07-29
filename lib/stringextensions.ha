@@ -230,7 +230,6 @@ pub
         return None<int>()
     ;
 ;
-named => stringutils
 fn is_char_number char ch => bool
     switch ch
     case '0'

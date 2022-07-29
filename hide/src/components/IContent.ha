@@ -1,6 +1,6 @@
 class IContent
 protected
-    vector<string> _text = {}
+    List<string> _text = List<string>()
     IContainer *_origin
     Ncurses *n
 pub

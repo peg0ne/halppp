@@ -9,8 +9,8 @@ enum ContainerType
 class IContainer
 protected
     string _label = " "
-    vector<string> _content = {}
-    vector<IContainer*> _containers = {}
+    List<string> _content = List<string>()
+    List<IContainer*> _containers = List<IContainer*>()
     ContainerType _type = ContainerType::Base
     short _color = 0
     Fill _fill_x = Fill::Flex
@@ -52,10 +52,10 @@ pub
     fn SetOffset double x, double y => do _offset = Vector(x,y)
     fn SetColor short col => do _color = col
     fn SetLabel string label => do _label = label
-    fn SetContent vector<string> content => do _content = content
-    fn add IContainer* c => do _containers.push_back(c)
-    fn size => int doremi _containers.size()
-    fn containers => vector<IContainer*>* doremi &_containers
+    fn SetContent List<string> content => do _content = content
+    fn add IContainer* c => do _containers.add(c)
+    fn size => int doremi _containers.len()
+    fn containers => List<IContainer*>* doremi &_containers
     fn clear => do _containers = {}
     fn draw Ncurses *n =>
         if !is_active do return

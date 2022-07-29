@@ -1,6 +1,6 @@
 class Editor => IContent
     string _path = ""
-    vector<Vector> _selections = {}
+    List<Vector> _selections = List<Vector>()
     Vector _selector = Vector(0,0)
     IContainer *_header
     IContainer *_lines
@@ -43,8 +43,8 @@ pub
         _header->draw(n)
 
         //Lines
-        vector<string> vec = {}
-        for i until _text.size() do vec.push_back(to_string(i+1))
+        List<string> vec = List<string>()
+        for i until _text.size() do vec.add(to_string(i+1))
         _lines->SetContent(vec)
         _lines->draw(n)
 
@@ -55,26 +55,26 @@ pub
         //Selections
         if color != 6 do return
         let offset = _content->Offset()
-        n->mark(offset.y + _selector.y + 1, offset.x + _selector.x, 4)
+        n->mark(offset.y + _selector.y, offset.x + _selector.x, 4)
         foreach s in _selections
-            n->mark(offset.y + s.y + 1, offset.x + s.x, 5)
+            n->mark(offset.y + s.y, offset.x + s.x, 5)
         ;
     ;
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
     fn add_selector =>
-        _selections.push_back(_selector)
+        _selections.add(_selector)
         try_move(Vector(0,1), &_selector)
     ;
     fn text_editing TextEdit te => Command doremi text_editing(te, None<string>())
     fn text_editing TextEdit te, string text => Command doremi text_editing(te, Some(text))
     fn text_editing TextEdit te, Option<string> text_opt => Command
-        if _text.size() == 0 do _text.push_back("")
-        vector<Vector*> selections = {&_selector}
+        if _text.size() == 0 do _text.add("")
+        List<Vector*> selections = List<Vector*>({&_selector})
         let text = ""
         select t from text_opt do text = t
 
         for i until _selections.size()
-            selections.push_back(&_selections.at(i))
+            selections.add(_selections.at_ptr(i))
         ;
         sort_selections()
 
@@ -124,7 +124,7 @@ pub
         else do try_move(Vector(-4,0), pos)
     ;
     fn insert_text string text, Vector *pos =>
-        if _text.size() == 0 do _text.push_back(" ")
+        if _text.size() == 0 do _text.add(" ")
         let s = String(_text.at(pos->y))
         s.insert(text, pos->x)
         _text.at(pos->y) = s.to_string()
@@ -140,14 +140,7 @@ pub
         s.remove(pos->x)
         _text.at(pos->y) = s.to_string()
     ;
-    fn delete_line Vector *pos =>
-        vector<string> buf = {}
-        for i until _text.size()
-            if i == pos->y do continue
-            buf.push_back(_text.at(i))
-        ;
-        _text = buf
-    ;
+    fn delete_line Vector *pos => do _text.remove(pos->y)
     fn delete_word Vector *pos => do delete_word(pos, false)
     fn delete_word Vector *pos, bool spacebreak =>
         let s = String(_text.at(pos->y))
@@ -192,7 +185,7 @@ pub
         try_move(vec, &_selector)
         vector<Vector> buf = {}
         for i until _selections.size()
-            let s = &_selections.at(i)
+            let s = _selections.at_ptr(i)
             try_move(vec, s)
             if s->x == _selector.x && s->y == _selector.y do continue
             buf.push_back(_selections.at(i))
@@ -260,7 +253,7 @@ pub
         case 'e' dobr move_word(Dir::Right, true)
         case 'w' dobr move_word(Dir::Right)
         case 'b' dobr move_word(Dir::Left)
-        case ';' dobr _selections = {}
+        case ';' dobr _selections.clear()
         default do break
         ;
         return Command::Nop

@@ -5,7 +5,6 @@ get => EditorManager
 
 class Model => MainContainer
     Ncurses n = Ncurses()
-    Option<Editor*> _active = None<Editor*>()
     HorizontalLayout _top = HorizontalLayout(Fill::Flex)
     HorizontalLayout _status = HorizontalLayout(Fill::Static, Vector(0,1))
     Explorer _explorer = Explorer(&n)

@@ -44,6 +44,7 @@ pub
         ;
         _editors = editors
         _activeEditor = Some(get_last(&_editors))
+        _activeSpace = Some(get_last(&_editorspaces))
         return _editors.size() == 0 ? Command::Exit : Command::ModeNormal
     ;
     fn run Mode mode => Command
