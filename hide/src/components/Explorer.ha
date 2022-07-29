@@ -81,6 +81,6 @@ pub
                 return Command::Nop
             ;
         ;
-        return recurse ? search(true, Some(key)) : Command::Nop
+        return !recurse ? search(true, Some(key)) : Command::Nop
     ;
 ;

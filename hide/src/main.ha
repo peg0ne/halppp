@@ -1,5 +1,6 @@
 inc => vector
-get => ../../lib/[ncurses, option, bounds, math, files, stringextensions]
+get => ../../lib/[ncurses, option, bounds, dictionary]
+get => ../../lib/[math, files, stringextensions]
 get => model
 
 fn main =>
@@ -10,4 +11,5 @@ fn main =>
         model.render()
         if model.run() do break
     ;
+    n.stop()
 ;

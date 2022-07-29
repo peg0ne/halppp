@@ -55,6 +55,7 @@ pub
     fn SetContent vector<string> content => do _content = content
     fn add IContainer* c => do _containers.push_back(c)
     fn size => int doremi _containers.size()
+    fn containers => vector<IContainer*>* doremi &_containers
     fn clear => do _containers = {}
     fn draw Ncurses *n =>
         if !is_active do return

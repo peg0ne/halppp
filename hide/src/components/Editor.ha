@@ -25,6 +25,7 @@ class Editor => IContent
         this->n = n
     ;
 pub 
+    fn path => string doremi _path
     fn is_active => bool doremi _origin->Active()
     fn set_active bool active => do _origin->SetActive(active)
     fn open string path =>
@@ -43,7 +44,7 @@ pub
 
         //Lines
         vector<string> vec = {}
-        for i until _lines->Size().y do vec.push_back(to_string(i+1))
+        for i until _text.size() do vec.push_back(to_string(i+1))
         _lines->SetContent(vec)
         _lines->draw(n)
 
@@ -52,10 +53,11 @@ pub
         _content->draw(n)
 
         //Selections
+        if color != 6 do return
         let offset = _content->Offset()
-        n->mark(_selector.y + 1, offset.x + _selector.x, 4)
+        n->mark(offset.y + _selector.y + 1, offset.x + _selector.x, 4)
         foreach s in _selections
-            n->mark(s.y + 1, offset.x + s.x, 5)
+            n->mark(offset.y + s.y + 1, offset.x + s.x, 5)
         ;
     ;
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
@@ -278,6 +280,7 @@ pub
     fn run_ins int key => Command
         switch key
         case 27 doremi Command::ModeNormal
+        case '\b'
         case KEY_BACKSPACE dobr text_editing(TextEdit::RemoveChar)
         default dobr text_editing(TextEdit::Insert, string(1, key))
         ;
