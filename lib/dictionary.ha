@@ -6,7 +6,15 @@ class Dictionary<T,U>
     vector<T> _keys = {}
     vector<U> _values = {}
     Dictionary => do return
+pub
+    fn contains T key => bool
+        foreach k in _keys
+            if k == key doremi false
+        ;
+        return true
+    ;
     fn add T key, U value =>
+        if contains(key) do return
         _keys.push_back(key)
         _values.push_back(value)
     ;
