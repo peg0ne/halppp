@@ -193,8 +193,8 @@ pub
         _selections = buf
         return Command::Nop
     ;
-    fn move_word Dir dir => do move_word(dir, false)
-    fn move_word Dir dir, bool spacebreak =>
+    fn move_word Dir dir, Vector *pos,=> do move_word(dir, false)
+    fn move_word_impl Dir dir, Vector *pos, bool spacebreak =>
         loop
             let s = String(_text.at(_selector.y))
             let opt = s.find_alpha(_selector.x, dir == Dir::Left)
