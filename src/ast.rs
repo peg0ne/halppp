@@ -69,6 +69,10 @@ pub fn create(content: &String) -> Vec<AstToken> {
                 ast.push(AstToken::from_id(String::from("!=")));
             } else if is_pointer {
                 ast.push(AstToken::from_id(String::from("->")));
+            } else if is_more_than {
+                ast.push(AstToken::from_id(String::from(">=")));
+            } else if is_less_than {
+                ast.push(AstToken::from_id(String::from("<=")));
             } else {
                 ast.push(AstToken::from_char(c));
             }
