@@ -58,7 +58,9 @@ pub fn create(content: &String) -> Vec<AstToken> {
             let is_cool = c == '=' && next == &'>';
             let is_non_eq = c == '!' && next == &'=';
             let is_pointer = c == '-' && next == &'>';
-            if is_cool || is_non_eq || is_pointer {
+            let is_less_than = c == '<' && next == &'=';
+            let is_more_than = c == '>' && next == &'=';
+            if is_cool || is_non_eq || is_pointer || is_less_than || is_more_than {
                 peekable.next();
             }
             if is_cool {
