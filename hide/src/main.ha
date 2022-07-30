@@ -1,5 +1,5 @@
 inc => vector
-get => ../../lib/[ncurses, option, bounds, dictionary]
+get => ../../lib/[ncurses, option, bounds, dictionary, json]
 get => ../../lib/[math, files, stringextensions, list]
 get => model
 

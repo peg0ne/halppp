@@ -25,15 +25,36 @@ class Editor => IContent
         open(path)
         this->n = n
     ;
+    fn json_path => string doremi _path + ".json"
 pub 
+    fn content_change TextEdit edit => 
+        let j = load_json(json_path())
+        Json *entry = new Json()
+        entry->try_add("text", _text.at(_selector.y))
+        entry->try_add("type", to_string((int)edit))
+        entry->try_add("pos", to_string(_selector.y))
+        j.try_add("undo", "[]")
+        j.try_add("redo", "[]")
+        select undo from j.try_get("undo") do undo->add(entry)
+        write_json(json_path(), j)
+    ;
+    fn redo => do undo(false)
+    fn undo => do undo(true)
+    fn undo bool is_undo =>
+    ;
     fn path => string doremi _path
     fn is_active => bool doremi _origin->Active()
     fn set_active bool active => do _origin->SetActive(active)
     fn open string path =>
+        remove(json_path())
         _path = path
         _header->SetLabel("| " + _path)
         _text = readlines(_path)
         _content->SetContent(_text)
+    ;
+    fn close =>
+        set_active(false)
+        remove(json_path())
     ;
     fn draw => do draw(5)
     fn draw short color =>
@@ -306,6 +327,8 @@ pub
         case 'e' dobr move_word(Dir::Right, true)
         case 'w' dobr move_word(Dir::Right)
         case 'b' dobr move_word(Dir::Left)
+        case 'u' dobr undo()
+        case 'r' dobr redo()
         case ';' dobr _selections.clear()
         default do break
         ;

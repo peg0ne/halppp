@@ -23,7 +23,7 @@ pub
     fn close_editor => Command
         if _editors.size() == 1 doremi Command::Exit
         _origin->clear()
-        select a from _activeEditor do a->set_active(false)
+        select a from _activeEditor do a->close()
         vector<HorizontalLayout*> spaces = {}
         foreach space in _editorspaces
             let containers = space->containers()
