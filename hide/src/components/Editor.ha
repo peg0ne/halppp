@@ -114,12 +114,12 @@ pub
     fn tab Vector *pos =>
         let s = String(_text.at(pos->y))
         s.insert("    ", 0)
-        _text.at(pos->y) = s.to_string()
+        _text.set(pos->y, s.to_string())
         try_move(Vector(4,0), pos)
     ;
     fn untab Vector *pos =>
         let s = String(_text.at(pos->y))
-        _text.at(pos->y) = s.strip_front(4)
+        _text.set(pos->y, s.strip_front(4))
         if pos->x < 4 do try_move(Vector(-pos->x, 0), pos)
         else do try_move(Vector(-4,0), pos)
     ;
@@ -127,7 +127,7 @@ pub
         if _text.size() == 0 do _text.add(" ")
         let s = String(_text.at(pos->y))
         s.insert(text, pos->x)
-        _text.at(pos->y) = s.to_string()
+        _text.set(pos->y, s.to_string())
         try_move(Vector(1, 0), pos)
     ;
     fn remove_ch Vector *pos => do remove_ch(pos, false)
@@ -138,21 +138,25 @@ pub
         ;
         let s = String(_text.at(pos->y))
         s.remove(pos->x)
-        _text.at(pos->y) = s.to_string()
+        _text.set(pos->y, s.to_string())
     ;
-    fn delete_line Vector *pos => do _text.remove(pos->y)
+    fn delete_line Vector *pos =>
+        if _text.len() <= 1 do return
+        _text.remove(pos->y)
+    ;
     fn delete_word Vector *pos => do delete_word(pos, false)
     fn delete_word Vector *pos, bool spacebreak =>
         let s = String(_text.at(pos->y))
         s.remove_word(pos->x, spacebreak)
-        _text.at(pos->y) = s.to_string()
+        _text.set(pos->y, s.to_string())
+        try_move(Vector(0, 0), pos)
     ;
     fn change_case Vector *pos, TextEdit edit =>
         if _text.size() == 0 do return
         let ch = _text.at(pos->y).at(pos->x)
         switch edit
-        case TextEdit::Upper dobr _text.at(pos->y).at(pos->x) = toupper(ch)
-        case TextEdit::Lower dobr _text.at(pos->y).at(pos->x) = tolower(ch)
+        case TextEdit::Upper dobr _text.at_ptr(pos->y)->at(pos->x) = toupper(ch)
+        case TextEdit::Lower dobr _text.at_ptr(pos->y)->at(pos->x) = tolower(ch)
         ;
     ;
     fn try_move Vector dir, Vector* pos =>
@@ -193,30 +197,47 @@ pub
         _selections = buf
         return Command::Nop
     ;
-    fn move_word Dir dir, Vector *pos,=> do move_word(dir, false)
+    fn move_word Dir dir, => do move_word(dir, false)
+    fn move_word Dir dir, bool spacebreak =>
+        move_word_impl(dir, &_selector, spacebreak)
+        vector<Vector> buf = {}
+        for i until _selections.size()
+            let s = _selections.at_ptr(i)
+            move_word_impl(dir, s, spacebreak)
+            if s->x == _selector.x && s->y == _selector.y do continue
+            buf.push_back(_selections.at(i))
+        ;
+        _selections = buf
+    ;
     fn move_word_impl Dir dir, Vector *pos, bool spacebreak =>
         loop
-            let s = String(_text.at(_selector.y))
-            let opt = s.find_alpha(_selector.x, dir == Dir::Left)
+            let last_line = pos->y == _text.len() - 1
+            let last_char = pos->x == _text.at(pos->y).size() - 1
+            if last_line && last_char do return
+            let s = String(_text.at(pos->y))
+            let opt = s.find_alpha(pos->x, dir == Dir::Left)
             select f from opt
                 if f != 0 do break
-                elif dir == Dir::Right doco try_move(Vector(1, 0), &_selector)
-                else doco try_move(Vector(-1, 0), &_selector)
+                elif dir == Dir::Right doco try_move(Vector(1, 0), pos)
+                else doco try_move(Vector(-1, 0), pos)
             ;
             break
         ;
-        if spacebreak dore try_move(Vector(-1, 0), &_selector)
+        if spacebreak dore try_move(Vector(-1, 0), pos)
         loop
-            let s = String(_text.at(_selector.y))
-            let opt = s.find_non_alpha(_selector.x, dir == Dir::Left)
+            let last_line = pos->y == _text.len() - 1
+            let last_char = pos->x == _text.at(pos->y).size() - 1
+            if last_line && last_char do return
+            let s = String(_text.at(pos->y))
+            let opt = s.find_non_alpha(pos->x, dir == Dir::Left)
             select c from opt
                 if c != 0 do break
-                elif dir == Dir::Right doco try_move(Vector(1, 0), &_selector)
-                else doco try_move(Vector(-1, 0), &_selector)
+                elif dir == Dir::Right doco try_move(Vector(1, 0), pos)
+                else doco try_move(Vector(-1, 0), pos)
             ;
             break
         ;
-        if dir == Dir::Left do try_move(Vector(-1, 0), &_selector)
+        if dir == Dir::Left do try_move(Vector(-1, 0), pos)
     ;
     fn run Mode mode => Command
         let key = n->key()

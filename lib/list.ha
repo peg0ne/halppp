@@ -9,6 +9,7 @@ class List<T>
 pub
     fn at int at => T doremi _list.at(at)
     fn at_ptr int at => T* doremi &_list.at(at)
+    fn set int at, T val => do _list.at(at) = val
     fn first => Option<T> doremi at(0)
     fn last => Option<T> doremi at(len()-1)
     fn begin => auto doremi _list.begin()
