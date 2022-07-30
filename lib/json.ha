@@ -247,12 +247,39 @@ fn json_collect_name_json Peekable<char> *peekable => string
     return name
 ;
 
+fn json_collect_arr_json Peekable<char> *peekable => string
+    let value = ""
+    loop
+        select c from peekable->next()
+            switch c
+            case ']' doremi value
+            case '['
+                value += "["
+                value += json_collect_arr_json(peekable)
+                value += "]"
+                break
+            default
+                value += c
+                break
+            ;
+            continue
+        ;
+        break
+    ;
+    return value
+;
+
 fn json_collect_object_json Peekable<char> *peekable => string
     let value = ""
     loop
         select c from peekable->next()
             switch c
             case '}' doremi value
+            case '{'
+                value += "{"
+                value += json_collect_object_json(peekable)
+                value += "}"
+                break
             default
                 value += c
                 break
@@ -271,38 +298,18 @@ fn json_collect_value_json Peekable<char> *peekable => string
             switch c
             case ',' doremi value
             case '['
-                value = "["
-                value += json_collect_value_json(peekable)
+                value += "["
+                value += json_collect_arr_json(peekable)
                 value += "]"
-                loop
-                    select c from peekable->next()
-                        if isspace(c) do continue
-                        if c == ']' do continue
-                        if c == ',' do break
-                    ;
-                    break
-                ;
-                return value
+                break
             case '{'
                 value = "{"
                 value += json_collect_object_json(peekable)
                 value += "}"
-                loop
-                    select c from peekable->next()
-                        if isspace(c) do continue
-                    ;
-                    break
-                ;
-                return value
+                break
             case '"'
-                value = json_collect_name_json(peekable)
-                loop
-                    select c from peekable->next()
-                        if isspace(c) do continue
-                    ;
-                    break
-                ;
-                return value
+                value += json_collect_name_json(peekable)
+                break
             default
                 if isspace(c) doremi value
                 value += c
