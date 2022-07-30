@@ -32,7 +32,8 @@ pub
         Json *entry = new Json()
         entry->try_add("text", _text.at(_selector.y))
         entry->try_add("type", to_string((int)edit))
-        entry->try_add("pos", to_string(_selector.y))
+        entry->try_add("posy", to_string(_selector.y))
+        entry->try_add("posx", to_string(_selector.x))
         j.try_add("undo", "[]")
         j.try_add("redo", "[]")
         select undo from j.try_get("undo") do undo->add(entry)
@@ -41,15 +42,47 @@ pub
     fn redo => do undo(false)
     fn undo => do undo(true)
     fn undo bool is_undo =>
-        let first = is_undo ? "undo" : "redo"
-        let second = is_undo ? "redo" : "undo"
+        let getter = is_undo ? "undo" : "redo"
+        let setter = is_undo ? "redo" : "undo"
         let j = load_json(json_path())
-        select obj from j.try_get("undo")
+        select obj from j.try_get(getter)
             let last = obj->size() - 1
             select u from obj->try_get(last)
-                let text = u.try_get("text").value_or((string)"")
-                
+                let text = u->try_get("text").value_unsafe()->value_or((string)"")
+                let type = u->try_get("type").value_unsafe()->value_or(0.0)
+                let posy = u->try_get("posy").value_unsafe()->value_or(0.0)
+                let posx = u->try_get("posx").value_unsafe()->value_or(0.0)
+                select store from j.try_get(setter)
+                    obj->pop()
+                    store->add(u)
+                ;
+                write_json(json_path(), j)
+                undo_handler(text, (TextEdit)type, Vector(posx, posy), is_undo)
             ;
+        ;
+    ;
+    fn undo_handler string text, TextEdit type, Vector pos, bool is_undo =>
+        switch type
+        case TextEdit::Untab
+        case TextEdit::Insert
+        case TextEdit::RemoveChar
+        case TextEdit::DeleteChar
+        case TextEdit::DeleteWord
+        case TextEdit::Upper
+        case TextEdit::Lower
+        case TextEdit::DeleteWordExlusive
+        case TextEdit::Tab dobr _text.set(pos.y, text)
+        case TextEdit::DeleteLine
+            if is_undo dobr _text.insert(pos.y, text)
+            else dobr _text.remove(pos.y)
+        case TextEdit::InsertNl
+            if is_undo
+                _text.set(pos.y, text)
+                _text.remove(pos.y + 1)
+            ;
+            else do insert_nl(&pos, 0)
+            break
+        default do break
         ;
     ;
     fn path => string doremi _path
