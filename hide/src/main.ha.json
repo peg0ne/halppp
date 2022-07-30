@@ -1,0 +1,1 @@
+{"undo": [{"text": "inc => vector","type": 8.000000,"pos": 0.000000},{"text": "get => ../../lib/[ncurses, option, bounds, dictionary, json]","type": 8.000000,"pos": 0.000000},{"text": "get => ../../lib/[math, files, stringextensions, list]","type": 8.000000,"pos": 0.000000}],"redo": []}

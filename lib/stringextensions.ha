@@ -110,18 +110,22 @@ pub
     ;
     fn replace string from, string to => string
         string replaced = _value
+        size_t last = 0
         loop 
-            size_t start_pos = replaced.find(from)
+            size_t start_pos = replaced.find(from, last)
             if start_pos == -1 doremi replaced
             replaced.replace(start_pos, from.length(), to)
+            last = start_pos + 1
         ;
     ;
     fn replace string from, string to, int amount => string
         string replaced = _value
+        size_t last = 0
         for i until amount
-            size_t start_pos = replaced.find(from)
+            size_t start_pos = replaced.find(from, last)
             if start_pos == -1 doremi replaced
             replaced.replace(start_pos, from.length(), to)
+            last = start_pos + 1
         ;
         return replaced
     ;
@@ -228,6 +232,27 @@ pub
             return Some(i)
         ;
         return None<int>()
+    ;
+    fn escape => string
+        string buf = ""
+        foreach c in _value
+            if c == '"' do buf += '\\'
+            buf += c
+        ;
+        return String(buf).replace("\n", "\\n")
+    ;
+    fn unescape => string
+        let s = replace("\\n", "\n")
+        let buf = ""
+        let i = 0
+        foreach c in s
+            i++
+            if i < s.size() - 1 && s.at(i) == '"'
+                if c == '\\' do continue
+            ;
+            buf += c
+        ;
+        return buf
     ;
 ;
 fn is_char_number char ch => bool

@@ -52,3 +52,9 @@ fn list_files string path => vector<string>
     ;
     return files
 ;
+fn remove string path =>
+    char path_arr[path.size() + 1]
+    for i until path.size() do path_arr[i] = path.at(i)
+    path_arr[path.size()] = '\0'
+    remove(path_arr)
+;

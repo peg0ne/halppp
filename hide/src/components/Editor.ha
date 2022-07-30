@@ -41,6 +41,16 @@ pub
     fn redo => do undo(false)
     fn undo => do undo(true)
     fn undo bool is_undo =>
+        let first = is_undo ? "undo" : "redo"
+        let second = is_undo ? "redo" : "undo"
+        let j = load_json(json_path())
+        select obj from j.try_get("undo")
+            let last = obj->size() - 1
+            select u from obj->try_get(last)
+                let text = u.try_get("text").value_or((string)"")
+                
+            ;
+        ;
     ;
     fn path => string doremi _path
     fn is_active => bool doremi _origin->Active()
@@ -103,6 +113,7 @@ pub
     fn text_editing TextEdit te, string text => Command doremi text_editing(te, Some(text))
     fn text_editing TextEdit te, Option<string> text_opt => Command
         if _text.size() == 0 do _text.add("")
+        content_change(te)
         List<Vector*> selections = List<Vector*>({&_selector})
         let text = ""
         select t from text_opt do text = t
