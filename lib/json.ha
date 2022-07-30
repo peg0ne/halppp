@@ -28,7 +28,7 @@ class Json
     ;
     Json string name, string value =>
         _name = name
-        if value.size() == 0 do value += "null"
+        if value.size() == 0 do value += ""
         let val = String(value)
         if value == "null"
             _type = JsonType::Null
