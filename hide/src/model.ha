@@ -14,7 +14,6 @@ class Model => MainContainer
     IContainer _line = IContainer(Fill::Flex)
 
     Model int argc, char **argv =>
-        curs_set(0)
         _top.SetColor(0)
         _status.SetColor(1)
         _line.SetColor(3)
@@ -47,6 +46,7 @@ pub
     fn run => bool
         let mode = _mode_view.mode()
         let cmd = Command::Nop
+        curs_set(mode == Mode::Insert)
         //Mode Dependant run
         switch mode
         case Mode::FileEx dobr cmd = _explorer.run()

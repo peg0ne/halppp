@@ -16,14 +16,10 @@ class Json
     string _text
     double _number
     bool _boolean
-    vector<string> _text_arr
-    vector<double> _number_arr
-    vector<bool> _boolean_arr
-    vector<bool> _null_object_arr
-    vector<Json> _object_arr
     Json => do return
     Json string json_string =>
-        json_parse_json(json_string)
+        _value = json_parse_json(json_string)
+        _type = JsonType::Object
     ;
     Json string name, string value =>
         _name = name
@@ -42,9 +38,11 @@ class Json
         ;
         elif val.starts_with("[")
             _type = JsonType::Array
+            _value = json_parse_json_arr(value)
         ;
         elif val.starts_with("{")
             _type = JsonType::Object
+            _value = json_parse_json(value)
         ;
         else
             _type = JsonType::String
@@ -52,10 +50,40 @@ class Json
         ;
     ;
 pub
+    fn value_or<T> T value => T
+        return value
+    ;
+    fn value_or double value => double
+        if _type == JsonType::Number doremi _number
+        return value
+    ;
+    fn value_or string value => string
+        if _type == JsonType::String doremi _text
+        return value
+    ;
+    fn value_or bool value => bool
+        if _type == JsonType::Boolean doremi _boolean
+        return value
+    ;
+    fn try_get int at => Option<Json>
+        if _type != JsonType::Array doremi None<Json>()
+        if at < 0 || at >= _value.size() doremi None<Json>()
+        return Some(_value.at(at))
+    ;
+    fn try_get string name => Option<Json>
+        if _type == JsonType::Array doremi None<Json>()
+        foreach o in _value
+            if name == o.name() doremi o
+        ;
+        return None<Json>()
+    ;
     fn name => string doremi _name
+    fn type => JsonType doremi _type
     fn type_as_str => string doremi to_string(_type)
     fn value_as_str => string
         switch _type
+        case JsonType::Object doremi "{" + to_string(_value.size()) + "}"
+        case JsonType::Array doremi "[" + to_string(_value.size()) + "]"
         case JsonType::Number doremi to_string(_number)
         case JsonType::Boolean doremi _boolean ? "true" : "false"
         case JsonType::String doremi _text
@@ -63,12 +91,42 @@ pub
         default doremi ""
         ;
     ;
+    fn as_str => string
+        let buf = ""
+        let i = 0
+        if _name.size() != 0 do buf += "\"" + _name + "\": "
+        switch _type
+        case JsonType::Object
+            buf += "{"
+            foreach o in _value
+                buf += o.as_str()
+                i++
+                if i < _value.size() do buf += ","
+            ;
+            buf += "}"
+            break
+        case JsonType::Array
+            buf += "["
+            foreach o in _value
+                buf += o.as_str()
+                i++
+                if i < _value.size() do buf += ","
+            ;
+            buf += "]"
+            break
+        case JsonType::Number dobr buf += to_string(_number)
+        case JsonType::Boolean dobr buf += _boolean ? "true" : "false"
+        case JsonType::String dobr buf += "\"" + _text + "\""
+        case JsonType::Null dobr buf += "null"
+        default doremi ""
+        ;
+        return buf
+    ;
 ;
 
 fn json_parse_json string json_string => vector<Json>
     vector<Json> json = {}
     vector<char> chars = {}
-
     let s = String(json_string)
     json_string = s.strip()
     foreach ch in json_string do chars.push_back(ch)
@@ -77,12 +135,42 @@ fn json_parse_json string json_string => vector<Json>
     loop
         select j from json_parse_json_obj(&peekable)
             json.push_back(j)
-            println(j.name() + " >> " + j.type_as_str() + ": " + j.value_as_str())
             continue
         ;
         break
     ;
     return json
+;
+
+
+fn json_parse_json_arr string json_arr_string => vector<Json>
+    vector<Json> json = {}
+    vector<char> chars = {}
+    let s = String(json_arr_string)
+    json_arr_string = s.strip()
+    foreach ch in json_arr_string do chars.push_back(ch)
+    let peekable = Peekable<char>(chars)
+    if peekable.next().value_or(' ') != '[' doremi json
+    loop
+        select j from json_parse_json_arr(&peekable)
+            json.push_back(j)
+            continue
+        ;
+        break
+    ;
+    return json
+;
+
+fn json_parse_json_arr Peekable<char> *peekable => Option<Json>
+    loop
+        select c from peekable->peek()
+            if isspace(c) doco peekable->next()
+        ;
+        break
+    ;
+    let value = json_collect_value_json(peekable)
+    if value.size() == 0 doremi None<Json>()
+    return Some(Json("", value))
 ;
 
 fn json_parse_json_obj Peekable<char> *peekable => Option<Json>
@@ -216,13 +304,14 @@ fn json_collect_value_json Peekable<char> *peekable => string
     ;
     return value
 ;
-get => files
-fn tests =>
-    let js = ""
-    select s from read("test.json") do js = s
-    let j = Json(js)
-;
 
-fn main =>
-    tests()
+get => files
+fn load_json string path => Json
+    let content = ""
+    select s from read(path) doremi Json(s)
+    return Json()
+;
+fn write_json string path, Json content =>
+    if content.type() != JsonType::Object do return
+    write(content.as_str(), path)
 ;

@@ -9,6 +9,16 @@ fn ast_create string content => vector<AstToken>
         let last_known_index = peekable.index()
         if c_opt.is_none() dobr try_add_token(id, &ast, &peekable)
         let c = c_opt.value_or(' ')
+        if c == '('
+            let pairs = get_pair(&peekable, '(', ')')
+            id = try_add_token(id, &ast, &peekable)
+            doco try_add_token(pairs, &ast, &peekable)
+        ;
+        if c == '{'
+            let pairs = get_pair(&peekable, '{', '}')
+            id = try_add_token(id, &ast, &peekable)
+            doco try_add_token(pairs, &ast, &peekable)
+        ;
         if any(c, {CHAR_QUOTE, CHAR_SINGLE})
             let matched = get_matching(&peekable, c)
             id = try_add_token(id, &ast, &peekable)
@@ -84,6 +94,20 @@ fn try_get_dbl Peekable<char> *peekable, char ch => Option<string>
     peekable->next()
     string dbl(1, ch)
     return Some(dbl + dbl)
+;
+
+fn get_pair Peekable<char> *peekable, char ch, char endch => string
+    let escaped = false
+    string matching(1, ch)
+    loop
+        let c_opt = peekable->next()
+        if c_opt.is_none() doremi matching
+        let c = c_opt.value_or(' ')
+        string matchbuf(1, c)
+        if c == ch doco matching += get_pair(peekable, ch, endch)
+        matching += matchbuf
+        if c == endch doremi matching
+    ;
 ;
 
 fn get_matching Peekable<char> *peekable, char ch => string

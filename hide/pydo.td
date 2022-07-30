@@ -1,1 +1,1 @@
-{"remember-header":"\n REMEMBER\n --------","remember-items":[],"header":"\n TODO\n ----","tasks":[{"task":"undo/redo","completed":false},{"task":"open with arg","completed":false}],"completed-tasks":2,"unfinished-tasks":4}
+{"remember-header":"\n REMEMBER\n --------","remember-items":[],"header":"\n TODO\n ----","tasks":[{"task":"undo/redo","completed":false}],"completed-tasks":3,"unfinished-tasks":4}

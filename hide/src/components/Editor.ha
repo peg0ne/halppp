@@ -6,6 +6,7 @@ class Editor => IContent
     IContainer *_lines
     IContainer *_content
     HorizontalLayout *_base
+    Mode _current_mode = Mode::Normal
     Editor Ncurses *n, string path =>
         _header = new IContainer(Fill::Static, Vector(0,1))
         _lines = new IContainer(Fill::Static, Vector(5,0))
@@ -55,10 +56,13 @@ pub
         //Selections
         if color != 6 do return
         let offset = _content->Offset()
-        n->mark(offset.y + _selector.y, offset.x + _selector.x, 4)
+        let y = offset.y + _selector.y
+        let x = offset.x + _selector.x
         foreach s in _selections
             n->mark(offset.y + s.y, offset.x + s.x, 5)
         ;
+        if _current_mode == Mode::Insert do n->move_curs(y, x)
+        else do n->mark(y, x, 4)
     ;
     fn write_content =>
         let content = ""
@@ -183,25 +187,28 @@ pub
         case TextEdit::Lower dobr _text.at_ptr(pos->y)->at(pos->x) = tolower(ch)
         ;
     ;
-    fn try_move Vector dir, Vector* pos =>
+    fn try_move Vector dir, Vector* pos => do try_move(dir, pos, true)
+    fn try_move Vector dir, Vector* pos, bool can_line_swap =>
         if _text.size() == 0 do return
         let y = pos->y
         let x = pos->x
+        let is_insert = _current_mode == Mode::Insert
         let h = max(1, (int)_text.size()) - 1
         pos->y = clamp(y + dir.y, 0, h)
-        pos->x = clamp(x + dir.x, 0, (int)_text.at(pos->y).size() - 1)
-        let w = max(1, _text.at(pos->y).size()) - 1
-        if dir.x < 0 && y > 0 && x == 0
+        pos->x = clamp(x + dir.x, 0, (int)_text.at(pos->y).size() - 1 + is_insert)
+        let w = max(1, _text.at(pos->y).size()) - 1 + is_insert
+        if dir.x < 0 && y > 0 && x == 0 && can_line_swap
             pos->y--
-            pos->x = max(1, _text.at(pos->y).size()) - 1
+            pos->x = max(1, _text.at(pos->y).size()) - 1 + is_insert
         ;
-        elif dir.x > 0 && y < h && x == w
+        elif dir.x > 0 && y < h && x == w && can_line_swap
             pos->y++
             pos->x = 0
         ;
     ;
-    fn move Dir dir => Command doremi move(dir, 1)
-    fn move Dir dir, int multiply => Command
+    fn move Dir dir => Command doremi move(dir, 1, true)
+    fn move Dir dir, int multiply => Command doremi move(dir, multiply, true)
+    fn move Dir dir, int multiply, bool can_line_swap => Command
         Vector vec
         switch dir
         case Dir::Up dobr vec = Vector(0, -1)
@@ -210,11 +217,11 @@ pub
         case Dir::Right dobr vec = Vector(1, 0)
         ;
         vec.multiply(multiply)
-        try_move(vec, &_selector)
+        try_move(vec, &_selector, can_line_swap)
         vector<Vector> buf = {}
         for i until _selections.size()
             let s = _selections.at_ptr(i)
-            try_move(vec, s)
+            try_move(vec, s, can_line_swap)
             if s->x == _selector.x && s->y == _selector.y do continue
             buf.push_back(_selections.at(i))
         ;
@@ -264,6 +271,7 @@ pub
         if dir == Dir::Left do try_move(Vector(-1, 0), pos)
     ;
     fn run Mode mode => Command
+        _current_mode = mode
         let key = n->key()
         switch key
         case '\t'      doremi text_editing(TextEdit::Tab)
@@ -274,8 +282,8 @@ pub
         case KEY_UP    doremi move(Dir::Up)
         case KEY_NPAGE doremi move(Dir::Down, _content->Size().y)
         case KEY_PPAGE doremi move(Dir::Up, _content->Size().y)
-        case KEY_HOME  doremi move(Dir::Left, _content->Size().x)
-        case KEY_END   doremi move(Dir::Right, _content->Size().x)
+        case KEY_HOME  doremi move(Dir::Left, _content->Size().x, false)
+        case KEY_END   doremi move(Dir::Right, _content->Size().x, false)
         ;
         switch mode
         case Mode::Normal doremi run_nor(key)
@@ -308,7 +316,15 @@ pub
         if cmd != Command::Nop doremi cmd
         switch key
         case 'v' doremi Command::ModeVisual
-        case 'i' doremi Command::ModeInsert
+        case 'a'
+            _current_mode = Mode::Insert
+            move(Dir::Right)
+            draw(6)
+            return Command::ModeInsert
+        case 'i' 
+            _current_mode = Mode::Insert
+            draw(6)
+            return Command::ModeInsert
         case 'x' dobr text_editing(TextEdit::DeleteChar)
         case 'm' dobr add_selector()
         case 'd' dobr run_d()
@@ -317,7 +333,11 @@ pub
     ;
     fn run_ins int key => Command
         switch key
-        case 27 doremi Command::ModeNormal
+        case 27
+            move(Dir::Left)
+            _current_mode = Mode::Normal 
+            draw(6)
+            return Command::ModeNormal
         case '\n' dobr text_editing(TextEdit::InsertNl)
         case '\b'
         case KEY_BACKSPACE dobr text_editing(TextEdit::RemoveChar)

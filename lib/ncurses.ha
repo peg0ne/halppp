@@ -45,6 +45,7 @@ class Ncurses
         ;
     ;
 pub
+    fn move_curs int y, int x => do move(y, x)
     fn mark_until int y, int x, short color, int len =>
         mvchgat(y, x, len, A_BLINK, color, NULL)
     ;
