@@ -30,6 +30,10 @@ class Model => MainContainer
         _status.add(_mode_view.origin())
         _status.add(&_line)
 
+        if argc >= 2
+            _manager.open_file(argv[1])
+        ;
+
         update()
         draw(&n)
     ;
@@ -54,6 +58,11 @@ pub
         //Command with mode changes
         switch cmd
         case Command::CloseEditor dobr cmd = _manager.close_editor()
+        case Command::WriteEditor dobr cmd = _manager.write_editor()
+        case Command::WriteCloseEditor
+            _manager.write_editor()
+            cmd = _manager.close_editor()
+            break
         ;
         //Ye ol commands
         switch cmd

@@ -20,6 +20,14 @@ pub
             update("")
             return Command::CloseEditor
         ;
+        elif _line == ":w"
+            update("")
+            return Command::WriteEditor
+        ;
+        elif _line == ":wq"
+            update("")
+            return Command::WriteCloseEditor
+        ;
         update(":")
         return Command::Nop
     ;

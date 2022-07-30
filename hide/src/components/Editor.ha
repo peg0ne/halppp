@@ -60,7 +60,16 @@ pub
             n->mark(offset.y + s.y, offset.x + s.x, 5)
         ;
     ;
+    fn write_content =>
+        let content = ""
+        for i until _text.len()
+            content += _text.at(i)
+            if i < _text.len() - 1 do content += "\n"
+        ;
+        write(content, _path)
+    ;
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
+    fn sort_selections_rev => do sort(_selections.begin(), _selections.end(), &selection_comparer_rev)
     fn add_selector =>
         _selections.add(_selector)
         try_move(Vector(0,1), &_selector)
@@ -76,8 +85,8 @@ pub
         for i until _selections.size()
             selections.add(_selections.at_ptr(i))
         ;
-        sort_selections()
-
+        sort(selections.begin(), selections.end(), &selection_comparer_ptr)
+        let index = 0
         switch te
         case TextEdit::Tab
             foreach s in selections do tab(s)
@@ -88,6 +97,10 @@ pub
         case TextEdit::Insert
             foreach s in selections do insert_text(text, s)
             break
+        case TextEdit::InsertNl
+            sort(selections.begin(), selections.end(), &selection_comparer_rev_ptr)
+            foreach s in selections do insert_nl(s, index++)
+            break
         case TextEdit::RemoveChar
             foreach s in selections do remove_ch(s, true)
             break
@@ -96,6 +109,10 @@ pub
             break
         case TextEdit::DeleteLine
             foreach s in selections do delete_line(s)
+            move(Dir::Down)
+            move(Dir::Up)
+            move(Dir::Left, 1000)
+            move(Dir::Right)
             break
         case TextEdit::DeleteWord
             foreach s in selections do delete_word(s, true)
@@ -123,6 +140,14 @@ pub
         if pos->x < 4 do try_move(Vector(-pos->x, 0), pos)
         else do try_move(Vector(-4,0), pos)
     ;
+    fn insert_nl Vector *pos, int amount =>
+        pos->y += amount
+        let s = String(_text.at(pos->y))
+        _text.set(pos->y, s.substr(0, pos->x))
+        _text.insert(pos->y + 1, s.substr(pos->x))
+        pos->y++
+        pos->x = 0
+    ;
     fn insert_text string text, Vector *pos =>
         if _text.size() == 0 do _text.add(" ")
         let s = String(_text.at(pos->y))
@@ -149,7 +174,6 @@ pub
         let s = String(_text.at(pos->y))
         s.remove_word(pos->x, spacebreak)
         _text.set(pos->y, s.to_string())
-        try_move(Vector(0, 0), pos)
     ;
     fn change_case Vector *pos, TextEdit edit =>
         if _text.size() == 0 do return
@@ -294,6 +318,7 @@ pub
     fn run_ins int key => Command
         switch key
         case 27 doremi Command::ModeNormal
+        case '\n' dobr text_editing(TextEdit::InsertNl)
         case '\b'
         case KEY_BACKSPACE dobr text_editing(TextEdit::RemoveChar)
         default dobr text_editing(TextEdit::Insert, string(1, key))
@@ -331,4 +356,22 @@ fn selection_comparer Vector &lhs, Vector &rhs => bool
     if lhs.y < rhs.y doremi false
     if lhs.y > rhs.y doremi true
     return lhs.x > rhs.x
+;
+
+fn selection_comparer_rev Vector &lhs, Vector &rhs => bool
+    if lhs.y > rhs.y doremi false
+    if lhs.y < rhs.y doremi true
+    return lhs.x > rhs.x
+;
+
+fn selection_comparer_ptr Vector* &lhs, Vector* &rhs => bool
+    if lhs->y < rhs->y doremi false
+    if lhs->y > rhs->y doremi true
+    return lhs->x > rhs->x
+;
+
+fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
+    if lhs->y > rhs->y doremi false
+    if lhs->y < rhs->y doremi true
+    return lhs->x > rhs->x
 ;

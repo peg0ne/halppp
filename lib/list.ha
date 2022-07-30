@@ -19,6 +19,19 @@ pub
     fn add T ele => do _list.push_back(ele)
     fn pop => do remove(len()-1)
     fn clear => do _list.clear()
+    fn as_vec_ptr => vector<T>* doremi &_list
+    fn insert int at, T element =>
+        if len() == 0 do add(element)
+        vector<T> buf = {}
+        let i = 0
+        foreach ele in _list
+            if i == at do buf.push_back(element)
+            buf.push_back(ele)
+            i++
+        ;
+        clear()
+        _list = buf
+    ;
     fn remove int index =>
         if len() == 0 do return
         vector<T> buf = {}

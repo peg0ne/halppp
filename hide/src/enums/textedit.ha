@@ -2,6 +2,7 @@ enum TextEdit
     Tab,
     Untab,
     Insert,
+    InsertNl,
     RemoveChar,
     DeleteChar,
     DeleteWord,
@@ -10,3 +11,4 @@ enum TextEdit
     Upper,
     Lower,
 ;
+

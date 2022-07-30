@@ -16,6 +16,10 @@ pub
         ;
         select a from _activeEditor do a->open(path)
     ;
+    fn write_editor => Command
+        select a from _activeEditor do a->write_content()
+        return Command::ModeNormal
+    ;
     fn close_editor => Command
         if _editors.size() == 1 doremi Command::Exit
         _origin->clear()

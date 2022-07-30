@@ -1,5 +1,5 @@
 enum Command
-    Exit,
+    Exit, 
     ModeNormal,
     ModeVisual,
     ModeInsert,
@@ -7,7 +7,10 @@ enum Command
     ModeCmdHan,
     SelectFile,
     CloseEditor,
+    WriteEditor,
+    WriteCloseEditor,
     SplitVertical,
     SplitHorizontal,
     Nop,
 ;
+
