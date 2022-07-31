@@ -2,6 +2,7 @@ class Editor => IContent
     string _path = ""
     List<Vector> _selections = List<Vector>()
     Vector _selector = Vector(0,0)
+    Vector _offset = Vector(0,0)
     IContainer *_header
     IContainer *_lines
     IContainer *_content
@@ -26,7 +27,6 @@ class Editor => IContent
         this->n = n
     ;
     fn json_path => string doremi _path + ".json"
-pub 
     fn content_change TextEdit edit => 
         let j = load_json(json_path())
         Json *entry = new Json()
@@ -85,6 +85,7 @@ pub
         default do break
         ;
     ;
+pub 
     fn path => string doremi _path
     fn is_active => bool doremi _origin->Active()
     fn set_active bool active => do _origin->SetActive(active)
@@ -99,9 +100,25 @@ pub
         set_active(false)
         remove(json_path())
     ;
+    fn get_internal_offset => Vector
+        let offset = Vector(0,0)
+        let size = _content->Size()
+        let x = size.x - 1
+        let y = size.y - 1
+        if _selector.y > y - _offset.y
+            offset.y = _selector.y - y
+        ;
+        if _selector.x > x - _offset.x
+            offset.x = _selector.x - x
+        ;
+        _offset = offset
+        return _offset
+    ;
     fn draw => do draw(5)
     fn draw short color =>
         if !is_active() do return
+        let is_current = color == 6
+        let internal_offset = get_internal_offset()
         //Header
         _header->SetColor(color)
         _header->SetLabel("| " + _path)
@@ -109,19 +126,27 @@ pub
 
         //Lines
         List<string> vec = List<string>()
-        for i until _text.size() do vec.add(to_string(i+1))
+        for i until _text.size() do vec.add(to_string(i+1+internal_offset.y))
         _lines->SetContent(vec)
         _lines->draw(n)
 
         //Content
-        _content->SetContent(_text)
+        List<string> buf = List<string>()
+        for i until _text.size()
+            if i < internal_offset.y do continue
+            let text = _text.at(i)
+            if internal_offset.x >= text.size() doco buf.add("")
+            text = text.substr(internal_offset.x)
+            buf.add(text)
+        ;
+        _content->SetContent(buf)
         _content->draw(n)
 
         //Selections
-        if color != 6 do return
+        if !is_current do return
         let offset = _content->Offset()
-        let y = offset.y + _selector.y
-        let x = offset.x + _selector.x
+        let y = offset.y + _selector.y - internal_offset.y
+        let x = offset.x + _selector.x - internal_offset.x
         foreach s in _selections
             n->mark(offset.y + s.y, offset.x + s.x, 5)
         ;
@@ -347,8 +372,8 @@ pub
         case KEY_UP    doremi move(Dir::Up)
         case KEY_NPAGE doremi move(Dir::Down, _content->Size().y)
         case KEY_PPAGE doremi move(Dir::Up, _content->Size().y)
-        case KEY_HOME  doremi move(Dir::Left, _content->Size().x, false)
-        case KEY_END   doremi move(Dir::Right, _content->Size().x, false)
+        case KEY_HOME  doremi move(Dir::Left, 100000, false)
+        case KEY_END   doremi move(Dir::Right, 100000, false)
         ;
         switch mode
         case Mode::Normal doremi run_nor(key)
