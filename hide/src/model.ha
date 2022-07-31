@@ -1,7 +1,7 @@
 get => enums/[movement, commands, rects, modes, textedit]
 get => components/[IContainer, IContent]
-get => components/[CommandLine, Explorer, ModeView]
 get => EditorManager
+get => components/[Explorer, CommandLine, ModeView]
 
 class Model => MainContainer
     Ncurses n = Ncurses()
@@ -18,6 +18,7 @@ class Model => MainContainer
         _status.SetColor(1)
         _line.SetColor(3)
         _line.SetLabel(" << [f] $ [0,0]")
+        
 
         add(&_top)
         add(&_status)
@@ -50,7 +51,7 @@ pub
         //Mode Dependant run
         switch mode
         case Mode::FileEx dobr cmd = _explorer.run()
-        case Mode::CmdHan dobr cmd = _command_line.run()
+        case Mode::CmdHan dobr cmd = _command_line.run(&_manager)
         case Mode::Normal 
         case Mode::Visual 
         case Mode::Insert dobr cmd = _manager.run(mode)
@@ -81,3 +82,6 @@ pub
         return false
     ;
 ;
+
+
+

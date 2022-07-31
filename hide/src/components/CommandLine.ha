@@ -10,23 +10,32 @@ pub
     fn update string line =>
         _line = line
         _origin->SetLabel(_line)
+        _origin->draw(n)
     ;
     fn exit => Command
         update("")
         return Command::ModeNormal
     ;
-    fn try_parse => Command
-        if _line == ":q" 
+    fn try_parse EditorManager *manager => Command
+        let s = String(_line)
+        s.remove(0)
+        _line = s.to_string()
+        if _line == "q" 
             update("")
             return Command::CloseEditor
         ;
-        elif _line == ":w"
+        elif _line == "w"
             update("")
             return Command::WriteEditor
         ;
-        elif _line == ":wq"
+        elif _line == "wq"
             update("")
             return Command::WriteCloseEditor
+        ;
+        select num from s.to_num()
+            update("")
+            manager->move_to(num)
+            return Command::ModeNormal
         ;
         update(":")
         return Command::Nop
@@ -44,12 +53,12 @@ pub
         update(_line)
         return Command::Nop
     ;
-    fn run => Command
+    fn run EditorManager *manager => Command
         if _line.size() == 0 do update(":")
         let key = n->key()
         switch key
         case 27     doremi exit()
-        case '\n'   doremi try_parse()
+        case '\n'   doremi try_parse(manager)
         case '\b'
         case KEY_BACKSPACE doremi remove_ch()
         default     doremi add_ch(key)
@@ -57,3 +66,5 @@ pub
         return Command::Nop
     ;
 ;
+
+

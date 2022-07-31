@@ -123,6 +123,12 @@ pub
         set_active(false)
         remove(json_path())
     ;
+    fn move_to int pos =>
+        let diff = (pos - 1) - _selector.y
+        let dir = diff > 0 ? Dir::Down : Dir::Up
+        if dir == Dir::Up do diff *= -1
+        move(dir, diff, false)
+    ;
     fn get_internal_offset => Vector
         let size = _content->Size()
         let x = size.x - 1
@@ -571,6 +577,7 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
 
 
 

@@ -11,10 +11,12 @@ enum Command
     WriteCloseEditor,
     SplitVertical,
     SplitHorizontal,
+    MoveCursor,
     EditorLeft,
     EditorRight,
     EditorUp,
     EditorDown,
     Nop,
 ;
+
 

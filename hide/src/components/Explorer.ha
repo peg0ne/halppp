@@ -1,6 +1,7 @@
 class Explorer => IContent
     string _path = "."
     int _pos = 0
+    int _offset = 0
     Vector _global_size = Vector(COLS,LINES)
     Explorer Ncurses *n =>
         _text = list_files(_path)
@@ -9,10 +10,28 @@ class Explorer => IContent
         _origin->SetContent(_text)
         this->n = n
     ;
+    fn get_internal_offset => int
+        let size = _origin->Size()
+        let y = size.y - 1
+        if _pos > y + _offset
+            _offset = _pos - y
+        ;
+        if _pos < _offset
+            _offset = _pos
+        ;
+        return _offset
+    ;
 pub 
     fn draw =>
+        let offset = get_internal_offset()
+        List<string> buf = List<string>()
+        for i until _text.size()
+            if i < offset do continue
+            buf.add(_text.at(i))
+        ;
+        _origin->SetContent(buf)
         _origin->draw(n)
-        n->mark_until(_pos, 0, 5, _origin->Size().x)
+        n->mark_until(_pos - offset, 0, 5, _origin->Size().x)
     ;
     fn set_visibility Mode mode => do _origin->SetActive(mode == Mode::FileEx)
     fn toggle => Command
@@ -47,11 +66,13 @@ pub
     fn choose => Command
         let p = _text.at(_pos)
         if p == "." doremi Command::Nop
-        if p == ".." && _path != "."
-            while _path.back() != '/' do _path.pop_back()
-            _path.pop_back()
-            return move_and_reset(Command::Nop)
-        ;
+        //Lets remove this for now
+        //if p == ".." && _path != "."
+        //    while _path.back() != '/' do _path.pop_back()
+        //    _path.pop_back()
+        //    update()
+        //    return move_and_reset(Command::Nop)
+        //;
         _path += "/" + _text.at(_pos)
         update()
         return move_and_reset(_text.size() == 0 ? Command::SelectFile : Command::Nop)
@@ -98,3 +119,5 @@ pub
         return !recurse ? search(true, Some(key)) : Command::Nop
     ;
 ;
+
+

@@ -98,6 +98,9 @@ pub
         ;
         select a from _activeEditor do a->open(path)
     ;
+    fn move_to int pos =>
+        select a from _activeEditor do a->move_to(pos)
+    ;
     fn write_editor => Command
         select a from _activeEditor do a->write_content()
         return Command::ModeNormal
@@ -177,3 +180,5 @@ pub
     ;
     fn get_at<T> vector<T> *vec, int at => T doremi vec->at(at)
 ;
+
+
