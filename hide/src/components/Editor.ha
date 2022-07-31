@@ -15,6 +15,7 @@ class Editor => IContent
         _content = new IContainer()
         _base = new HorizontalLayout()
         _origin = new VerticalLayout()
+        _highlighter = Some(Highlighter(path))
 
         _lines->SetColor(3)
         _header->SetColor(5)
@@ -94,6 +95,7 @@ pub
     fn open string path =>
         remove(json_path())
         _path = path
+        _highlighter = Some(Highlighter(path))
         _header->SetLabel("| " + _path)
         _text = readlines(_path)
         _content->SetContent(_text)
