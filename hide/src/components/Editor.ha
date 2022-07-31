@@ -512,6 +512,7 @@ pub
             return Command::ModeNormal
         case '\n' dobr text_editing(TextEdit::InsertNl)
         case '\b'
+        case 127
         case KEY_BACKSPACE dobr text_editing(TextEdit::RemoveChar)
         default dobr text_editing(TextEdit::Insert, string(1, key))
         ;
@@ -577,6 +578,7 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
 
 
 

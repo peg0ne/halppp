@@ -60,11 +60,13 @@ pub
         case 27     doremi exit()
         case '\n'   doremi try_parse(manager)
         case '\b'
+        case 127
         case KEY_BACKSPACE doremi remove_ch()
         default     doremi add_ch(key)
         ;
         return Command::Nop
     ;
 ;
+
 
 
