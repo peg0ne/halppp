@@ -88,6 +88,7 @@ class Editor => IContent
     ;
 pub 
     fn path => string doremi _path
+    fn Offset => Vector doremi _origin->Offset()
     fn is_active => bool doremi _origin->Active()
     fn set_active bool active => do _origin->SetActive(active)
     fn open string path =>
@@ -461,6 +462,10 @@ pub
         case 'f' doremi Command::ModeFileEx
         case 't' doremi Command::SplitHorizontal
         case 'v' doremi Command::SplitVertical
+        case 'h' doremi Command::EditorLeft
+        case 'l' doremi Command::EditorRight
+        case 'j' doremi Command::EditorUp
+        case 'k' doremi Command::EditorDown
         ;
         return Command::Nop
     ;

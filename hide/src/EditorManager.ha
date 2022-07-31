@@ -9,6 +9,87 @@ class EditorManager => IContent
         _origin = new VerticalLayout(Fill::Flex)
         add_space()
     ;
+    fn activate Dir dir =>
+        switch dir
+        case Dir::Left
+        case Dir::Right dobr activate_h(dir)
+        case Dir::Up
+        case Dir::Down dobr activate_v(dir)
+        ;
+    ;
+    fn activate_v Dir dir =>
+        let i = 0
+        if _editors.size() < 2 do return
+        if _editorspaces.size() < 2 do return
+        select index from find_active_in_space()
+        select active from _activeSpace
+        foreach space in _editorspaces
+            if space->Offset().eq(active->Offset())
+                switch dir
+                case Dir::Up
+                    if i == 0 dobr i = _editorspaces.size() - 1
+                    else dobr i--
+                case Dir::Down
+                    if i == _editorspaces.size() - 1 dobr i = 0
+                    else dobr i++
+                ;
+
+                let active = _editorspaces.at(i)
+                _activeSpace = Some(active)
+                if index >= active->size()
+                    index = active->size() - 1
+                ;
+                
+                let editor = active->containers()->at(index)
+                _activeEditor = find_editor_from_offset(editor->Offset())
+                return
+            ;
+            i++
+        ;;;
+    ;
+    fn activate_h Dir dir =>
+        if _editors.size() < 2 do return
+        select index from find_active_in_space()
+        select space from _activeSpace
+    
+        let size = space->containers()->size()
+
+        switch dir
+        case Dir::Left
+            if index == 0 dobr index = size - 1
+            else dobr index--
+        case Dir::Right
+            if index >= size - 1 dobr index = 0
+            else dobr index++
+        ;
+        let editor = space->containers()->at(index)
+        _activeEditor = find_editor_from_offset(editor->Offset())
+
+        ;;
+    ;
+    fn find_editor_from_offset Vector offset => Option<Editor*>
+        select space from _activeSpace
+        foreach editor in _editors
+            if editor->Offset().eq(offset) doremi Some(editor)
+        ;;
+        return None<Editor*>()
+    ;
+    fn find_active_in_space => Option<int>
+        select active from _activeEditor doremi find_editor_in_space(active->path())
+        return None<int>()
+    ;    
+    fn find_editor_in_space string path => Option<int>
+        select editor from try_find_editor(path)
+        select space from _activeSpace
+        let editors = space->containers()
+        let size = editors->size()
+        for i until size
+            let e = editors->at(i)
+            let offset = e->Offset()
+            if offset.eq(editor->Offset()) doremi Some(i)
+        ;;;
+        return None<int>()
+    ;
 pub
     fn open_file string path =>
         select editor from try_find_editor(path)
@@ -52,8 +133,15 @@ pub
         return _editors.size() == 0 ? Command::Exit : Command::ModeNormal
     ;
     fn run Mode mode => Command
-        select a from _activeEditor doremi a->run(mode)
-        return Command::Nop
+        let cmd = Command::Nop
+        select a from _activeEditor do cmd = a->run(mode)
+        switch cmd
+        case Command::EditorLeft dobr activate(Dir::Left)
+        case Command::EditorRight dobr activate(Dir::Right)
+        case Command::EditorUp dobr activate(Dir::Up)
+        case Command::EditorDown dobr activate(Dir::Down)
+        ;
+        return cmd
     ;
     fn draw =>
         foreach editor in _editors do editor->draw()

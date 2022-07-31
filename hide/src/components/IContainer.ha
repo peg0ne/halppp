@@ -61,7 +61,7 @@ pub
         if !is_active do return
         n->col(_color)
         n->invis_box(_offset.y, _offset.x, _size.y, _size.x)
-        n->add(_offset.y, _offset.x, _label)
+        n->add_until(_offset.y, _offset.x, _label, _size.x + _offset.x, true)
         let i = 0
         foreach s in _content
             if i >= _size.y do break

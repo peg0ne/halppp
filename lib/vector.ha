@@ -22,6 +22,12 @@ struct Vector
         y -= other.y
         z -= other.z
     ;
+    fn eq Vector other => bool
+        if x != other.x doremi false
+        if y != other.y doremi false
+        if z != other.z doremi false
+        return true
+    ;
     fn multiply int amount =>
         x *= amount
         y *= amount
