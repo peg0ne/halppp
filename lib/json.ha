@@ -52,6 +52,12 @@ class Json
             _type = JsonType::Object
             _value = json_parse_json(value)
         ;
+        elif val.starts_with("\"")
+            _type = JsonType::String
+            val.remove(0)
+            val.pop()
+            _text = val.to_string()
+        ;
         else
             _type = JsonType::String
             _text = value
@@ -349,3 +355,5 @@ fn write_json string path, Json content =>
     let s = content.as_str()
     write(s, path)
 ;
+
+
