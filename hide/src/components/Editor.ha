@@ -145,6 +145,9 @@ pub
         ;
         _content->SetContent(buf)
         _content->draw(n)
+        select highlighter from _highlighter
+            highlighter.highlight(_content, n)
+        ;
 
         //Selections
         if !is_current do return
