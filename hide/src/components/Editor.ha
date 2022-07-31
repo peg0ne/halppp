@@ -3,6 +3,7 @@ class Editor => IContent
     List<Vector> _selections = List<Vector>()
     Vector _selector = Vector(0,0)
     Vector _offset = Vector(0,0)
+    Vector _global_size = Vector(COLS,LINES)
     IContainer *_header
     IContainer *_lines
     IContainer *_content
@@ -148,7 +149,9 @@ pub
         let y = offset.y + _selector.y - internal_offset.y
         let x = offset.x + _selector.x - internal_offset.x
         foreach s in _selections
-            n->mark(offset.y + s.y, offset.x + s.x, 5)
+            n->mark(
+                offset.y + s.y - internal_offset.y,
+                offset.x + s.x - internal_offset.x, 5)
         ;
         if _current_mode == Mode::Insert do n->move_curs(y, x)
         else do n->mark(y, x, 4)
@@ -361,7 +364,13 @@ pub
     fn run Mode mode => Command doremi run(mode, false)
     fn run Mode mode, bool internal_run => Command
         _current_mode = mode
-        draw(6)
+        if internal_run 
+            draw(6)
+            if _global_size.x != COLS || _global_size.y != LINES
+                _global_size = Vector(COLS,LINES)
+                return Command::Nop
+            ;
+        ;
         let cmd = Command::Nop
         let key = n->key()
         switch key

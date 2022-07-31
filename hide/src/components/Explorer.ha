@@ -1,6 +1,7 @@
 class Explorer => IContent
     string _path = "."
     int _pos = 0
+    Vector _global_size = Vector(COLS,LINES)
     Explorer Ncurses *n =>
         _text = list_files(_path)
         _origin = new IContainer(Fill::Static, Vector(25,0))
@@ -9,7 +10,10 @@ class Explorer => IContent
         this->n = n
     ;
 pub 
-    fn draw => do n->mark_until(_pos, 0, 5, _origin->Size().x)
+    fn draw =>
+        _origin->draw(n)
+        n->mark_until(_pos, 0, 5, _origin->Size().x)
+    ;
     fn set_visibility Mode mode => do _origin->SetActive(mode == Mode::FileEx)
     fn toggle => Command
         _origin->SetActive(!_origin->Active())
@@ -51,21 +55,30 @@ pub
         update()
         return move_and_reset(_text.size() == 0 ? Command::SelectFile : Command::Nop)
     ;
-    fn run => Command
+    fn run => Command doremi run(false)
+    fn run bool internal_run => Command
+        if internal_run 
+            draw()
+            if _global_size.x != COLS || _global_size.y != LINES
+                _global_size = Vector(COLS,LINES)
+                return Command::Nop
+            ;
+        ;
+        let cmd = Command::Nop
         switch n->key()
-        case ' '  doremi search()
-        case 'f'  doremi toggle()
+        case ' '  dobr cmd = search()
+        case 'f'  dobr cmd = toggle()
         case KEY_UP
         case 'j'  dobr move(Dir::Up)
         case KEY_DOWN
         case 'k'  dobr move(Dir::Down)
         case KEY_PPAGE dobr move(Dir::Up, _origin->Size().y)
         case KEY_NPAGE dobr move(Dir::Down, _origin->Size().y)
-        case '\n' doremi choose()
-        case 27   doremi toggle()
+        case '\n' dobr cmd = choose()
+        case 27   dobr cmd = toggle()
         default   do break
         ;
-        return Command::Nop
+        return cmd == Command::Nop ? run(true) : cmd
     ;
     fn search => Command doremi search(false, None<int>())
     fn search bool recurse, Option<int> key_opt => Command
