@@ -167,9 +167,9 @@ pub
         _selections.add(_selector)
         try_move(Vector(0,1), &_selector)
     ;
-    fn text_editing TextEdit te => Command doremi text_editing(te, None<string>())
-    fn text_editing TextEdit te, string text => Command doremi text_editing(te, Some(text))
-    fn text_editing TextEdit te, Option<string> text_opt => Command
+    fn text_editing TextEdit te => do text_editing(te, None<string>())
+    fn text_editing TextEdit te, string text => do text_editing(te, Some(text))
+    fn text_editing TextEdit te, Option<string> text_opt =>
         if _text.size() == 0 do _text.add("")
         content_change(te)
         List<Vector*> selections = List<Vector*>({&_selector})
@@ -220,7 +220,6 @@ pub
             break
         default do break
         ;
-        return Command::Nop
     ;
     fn tab Vector *pos =>
         let s = String(_text.at(pos->y))
@@ -296,9 +295,9 @@ pub
             pos->x = 0
         ;
     ;
-    fn move Dir dir => Command doremi move(dir, 1, true)
-    fn move Dir dir, int multiply => Command doremi move(dir, multiply, true)
-    fn move Dir dir, int multiply, bool can_line_swap => Command
+    fn move Dir dir => do move(dir, 1, true)
+    fn move Dir dir, int multiply => do move(dir, multiply, true)
+    fn move Dir dir, int multiply, bool can_line_swap =>
         Vector vec
         switch dir
         case Dir::Up dobr vec = Vector(0, -1)
@@ -316,7 +315,6 @@ pub
             buf.push_back(_selections.at(i))
         ;
         _selections = buf
-        return Command::Nop
     ;
     fn move_word Dir dir, => do move_word(dir, false)
     fn move_word Dir dir, bool spacebreak =>
@@ -360,28 +358,31 @@ pub
         ;
         if dir == Dir::Left do try_move(Vector(-1, 0), pos)
     ;
-    fn run Mode mode => Command
+    fn run Mode mode => Command doremi run(mode, false)
+    fn run Mode mode, bool internal_run => Command
         _current_mode = mode
+        draw(6)
+        let cmd = Command::Nop
         let key = n->key()
         switch key
-        case '\t'      doremi text_editing(TextEdit::Tab)
-        case KEY_BTAB  doremi text_editing(TextEdit::Untab)
-        case KEY_LEFT  doremi move(Dir::Left)
-        case KEY_RIGHT doremi move(Dir::Right)
-        case KEY_DOWN  doremi move(Dir::Down)
-        case KEY_UP    doremi move(Dir::Up)
-        case KEY_NPAGE doremi move(Dir::Down, _content->Size().y)
-        case KEY_PPAGE doremi move(Dir::Up, _content->Size().y)
-        case KEY_HOME  doremi move(Dir::Left, 100000, false)
-        case KEY_END   doremi move(Dir::Right, 100000, false)
+        case '\t'      dobr text_editing(TextEdit::Tab)
+        case KEY_BTAB  dobr text_editing(TextEdit::Untab)
+        case KEY_LEFT  dobr move(Dir::Left)
+        case KEY_RIGHT dobr move(Dir::Right)
+        case KEY_DOWN  dobr move(Dir::Down)
+        case KEY_UP    dobr move(Dir::Up)
+        case KEY_NPAGE dobr move(Dir::Down, _content->Size().y)
+        case KEY_PPAGE dobr move(Dir::Up, _content->Size().y)
+        case KEY_HOME  dobr move(Dir::Left, 100000, false)
+        case KEY_END   dobr move(Dir::Right, 100000, false)
         ;
-        switch mode
-        case Mode::Normal doremi run_nor(key)
-        case Mode::Insert doremi run_ins(key)
-        case Mode::Visual doremi run_vis(key)
+        switch _current_mode
+        case Mode::Normal dobr cmd = run_nor(key)
+        case Mode::Insert dobr cmd = run_ins(key)
+        case Mode::Visual dobr cmd = run_vis(key)
         default do break
         ;
-        return Command::Nop
+        return cmd == Command::Nop ? run(_current_mode, true) : cmd
     ;
     fn run_base int key => Command
         switch key
@@ -456,9 +457,9 @@ pub
     ;
     fn run_d => Command
         switch n->key()
-        case 'd' doremi text_editing(TextEdit::DeleteLine)
-        case 'w' doremi text_editing(TextEdit::DeleteWord)
-        case 'e' doremi text_editing(TextEdit::DeleteWordExlusive)
+        case 'd' dobr text_editing(TextEdit::DeleteLine)
+        case 'w' dobr text_editing(TextEdit::DeleteWord)
+        case 'e' dobr text_editing(TextEdit::DeleteWordExlusive)
         ;
         return Command::Nop
     ;

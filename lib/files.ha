@@ -50,6 +50,7 @@ fn list_files string path => vector<string>
         while (diread = readdir(dir)) != nullptr do files.push_back(diread->d_name)
         closedir(dir)
     ;
+    sort(files.begin(), files.end())
     return files
 ;
 fn remove string path =>
