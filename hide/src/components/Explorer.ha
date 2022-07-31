@@ -22,6 +22,7 @@ pub
     fn update =>
         _text = list_files(_path)
         _origin->SetContent(_text)
+        draw()
     ;
     fn get_fp => string
         string fp = _path.substr(2)

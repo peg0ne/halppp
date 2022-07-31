@@ -28,12 +28,15 @@ class Json
     ;
     Json string name, string value =>
         _name = name
-        if value.size() == 0 do value += ""
         let val = String(value)
-        if value == "null"
+        if value == ""
+            _type = JsonType::String
+            _text = " "
+        ;
+        elif value == "null"
             _type = JsonType::Null
         ;
-        if any(value, {"false", "true"})
+        elif any(value, {"false", "true"})
             _type = JsonType::Boolean
             _boolean = value == "true"
         ;
@@ -62,7 +65,17 @@ pub
         if _type != JsonType::Array do return
         _value.push_back(new Json("", value))
     ;
+    fn add int value =>
+        if _type != JsonType::Array do return
+        _value.push_back(new Json("", value))
+    ;
     fn try_add string name, string value =>
+        if _type != JsonType::Object do return
+        if try_get(name).is_none()
+            _value.push_back(new Json(name, value))
+        ;
+    ;
+    fn try_add string name, int value =>
         if _type != JsonType::Object do return
         if try_get(name).is_none()
             _value.push_back(new Json(name, value))
@@ -140,7 +153,10 @@ pub
             buf += String(_text).escape()
             buf += "\""
             break
-        case JsonType::Number dobr buf += to_string(_number)
+        case JsonType::Number
+            s = String(to_string(_number)).replace(",",".")
+            buf += s
+            break
         case JsonType::Boolean dobr buf += _boolean ? "true" : "false"
         case JsonType::Null dobr buf += "null"
         default doremi ""

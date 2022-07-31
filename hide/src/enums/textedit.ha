@@ -8,7 +8,11 @@ enum TextEdit
     DeleteWord,
     DeleteWordExlusive,
     DeleteLine,
+    PasteLine,
+    PasteWord,
     Upper,
     Lower,
 ;
+
+
 

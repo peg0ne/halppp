@@ -8,8 +8,9 @@ class Editor => IContent
     IContainer *_lines
     IContainer *_content
     HorizontalLayout *_base
+    vector<string> *_shared_buffer
     Mode _current_mode = Mode::Normal
-    Editor Ncurses *n, string path =>
+    Editor Ncurses *n, string path, vector<string> *shared_buffer =>
         _header = new IContainer(Fill::Static, Vector(0,1))
         _lines = new IContainer(Fill::Static, Vector(5,0))
         _content = new IContainer()
@@ -25,6 +26,7 @@ class Editor => IContent
         _base->add(_content)
         _origin->add(_header)
         _origin->add(_base)
+        _shared_buffer = shared_buffer
         open(path)
         this->n = n
     ;
@@ -33,12 +35,23 @@ class Editor => IContent
         let j = load_json(json_path())
         Json *entry = new Json()
         entry->try_add("text", _text.at(_selector.y))
-        entry->try_add("type", to_string((int)edit))
-        entry->try_add("posy", to_string(_selector.y))
-        entry->try_add("posx", to_string(_selector.x))
+        entry->try_add("type", (int)edit)
+        entry->try_add("posy", _selector.y)
+        entry->try_add("posx", _selector.x)
         j.try_add("undo", "[]")
         j.try_add("redo", "[]")
-        select undo from j.try_get("undo") do undo->add(entry)
+        select undo from j.try_get("undo")
+            undo->add(entry)
+            sort_selections()
+            foreach selection in _selections
+                Json *sel_entry = new Json()
+                sel_entry->try_add("text", _text.at(selection.y))
+                sel_entry->try_add("type", (int)edit)
+                sel_entry->try_add("posy", selection.y)
+                sel_entry->try_add("posx", selection.x)
+                undo->add(sel_entry)
+            ;
+        ;
         write_json(json_path(), j)
     ;
     fn redo => do undo(false)
@@ -64,6 +77,7 @@ class Editor => IContent
         ;
     ;
     fn undo_handler string text, TextEdit type, Vector pos, bool is_undo =>
+        _selector = pos
         switch type
         case TextEdit::Untab
         case TextEdit::Insert
@@ -73,7 +87,11 @@ class Editor => IContent
         case TextEdit::Upper
         case TextEdit::Lower
         case TextEdit::DeleteWordExlusive
+        case TextEdit::PasteWord
         case TextEdit::Tab dobr _text.set(pos.y, text)
+        case TextEdit::PasteLine
+            if !is_undo dobr _text.insert(pos.y+1, text)
+            else dobr _text.remove(pos.y+1)
         case TextEdit::DeleteLine
             if is_undo dobr _text.insert(pos.y, text)
             else dobr _text.remove(pos.y)
@@ -82,7 +100,7 @@ class Editor => IContent
                 _text.set(pos.y, text)
                 _text.remove(pos.y + 1)
             ;
-            else do insert_nl(&pos, 0)
+            else do insert_nl(&_selector, 0)
             break
         default do break
         ;
@@ -99,23 +117,28 @@ pub
         _header->SetLabel("| " + _path)
         _text = readlines(_path)
         _content->SetContent(_text)
+        remove(json_path())
     ;
     fn close =>
         set_active(false)
         remove(json_path())
     ;
     fn get_internal_offset => Vector
-        let offset = Vector(0,0)
         let size = _content->Size()
         let x = size.x - 1
         let y = size.y - 1
-        if _selector.y > y - _offset.y
-            offset.y = _selector.y - y
+        if _selector.y > y + _offset.y
+            _offset.y = _selector.y - y
         ;
-        if _selector.x > x - _offset.x
-            offset.x = _selector.x - x
+        if _selector.x > x + _offset.x
+            _offset.x = _selector.x - x
         ;
-        _offset = offset
+        if _selector.x < _offset.x
+            _offset.x = _selector.x
+        ;
+        if _selector.y < _offset.y
+            _offset.y = _selector.y
+        ;
         return _offset
     ;
     fn draw => do draw(5)
@@ -184,7 +207,6 @@ pub
         List<Vector*> selections = List<Vector*>({&_selector})
         let text = ""
         select t from text_opt do text = t
-
         for i until _selections.size()
             selections.add(_selections.at_ptr(i))
         ;
@@ -222,6 +244,13 @@ pub
             break
         case TextEdit::DeleteWordExlusive
             foreach s in selections do delete_word(s)
+            break
+        case TextEdit::PasteLine
+            sort(selections.begin(), selections.end(), &selection_comparer_rev_ptr)
+            foreach s in selections do paste_line(s)
+            break
+        case TextEdit::PasteWord
+            foreach s in selections do paste_word(s)
             break
         case TextEdit::Upper
         case TextEdit::Lower
@@ -269,7 +298,27 @@ pub
     ;
     fn delete_line Vector *pos =>
         if _text.len() <= 1 do return
+        _shared_buffer->clear()
+        _shared_buffer->push_back(_text.at(pos->y))
         _text.remove(pos->y)
+    ;
+    fn yank_line Vector *pos =>
+        if _text.len() == 0 do return
+        _shared_buffer->clear()
+        _shared_buffer->push_back(_text.at(pos->y))
+    ;
+    fn paste_line Vector *pos =>
+        if _shared_buffer->size() == 0 do return
+        let buf = _shared_buffer->at(0)
+        _text.insert(++pos->y, buf)
+    ;
+    fn paste_word Vector *pos =>
+        if _shared_buffer->size() == 0 do return
+        let buf = _shared_buffer->at(0)
+        let s = String(_text.at(pos->y))
+        if pos->x == 0 do s.insert(buf, pos->x) 
+        else do s.insert(buf, ++pos->x)
+        _text.set(pos->y, s.to_string())
     ;
     fn delete_word Vector *pos => do delete_word(pos, false)
     fn delete_word Vector *pos, bool spacebreak =>
@@ -379,6 +428,17 @@ pub
         ;
         let cmd = Command::Nop
         let key = n->key()
+        if !run_all(key)
+            switch _current_mode
+            case Mode::Normal dobr cmd = run_nor(key)
+            case Mode::Insert dobr cmd = run_ins(key)
+            case Mode::Visual dobr cmd = run_vis(key)
+            default do break
+            ;
+        ;
+        return cmd == Command::Nop ? run(_current_mode, true) : cmd
+    ;
+    fn run_all int key => bool
         switch key
         case '\t'      dobr text_editing(TextEdit::Tab)
         case KEY_BTAB  dobr text_editing(TextEdit::Untab)
@@ -390,14 +450,9 @@ pub
         case KEY_PPAGE dobr move(Dir::Up, _content->Size().y)
         case KEY_HOME  dobr move(Dir::Left, 100000, false)
         case KEY_END   dobr move(Dir::Right, 100000, false)
+        default doremi false
         ;
-        switch _current_mode
-        case Mode::Normal dobr cmd = run_nor(key)
-        case Mode::Insert dobr cmd = run_ins(key)
-        case Mode::Visual dobr cmd = run_vis(key)
-        default do break
-        ;
-        return cmd == Command::Nop ? run(_current_mode, true) : cmd
+        return true
     ;
     fn run_base int key => Command
         switch key
@@ -414,6 +469,8 @@ pub
         case 'b' dobr move_word(Dir::Left)
         case 'u' dobr undo()
         case 'r' dobr redo()
+        case 'p' dobr text_editing(TextEdit::PasteLine)
+        case 'P' dobr text_editing(TextEdit::PasteWord)
         case ';' dobr _selections.clear()
         default do break
         ;
@@ -436,6 +493,7 @@ pub
         case 'x' dobr text_editing(TextEdit::DeleteChar)
         case 'm' dobr add_selector()
         case 'd' dobr run_d()
+        case 'y' dobr run_y()
         ;
         return Command::Nop
     ;
@@ -482,6 +540,12 @@ pub
         ;
         return Command::Nop
     ;
+    fn run_y => Command
+        switch n->key()
+        case 'y' dobr yank_line(&_selector)
+        ;
+        return Command::Nop
+    ;
 ;
 
 fn selection_comparer Vector &lhs, Vector &rhs => bool
@@ -507,3 +571,10 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
+
+
+
+
+
+

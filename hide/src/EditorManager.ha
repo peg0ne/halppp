@@ -4,6 +4,7 @@ class EditorManager => IContent
     vector<HorizontalLayout*> _editorspaces = {} 
     Option<HorizontalLayout*> _activeSpace = None<HorizontalLayout*>()
     Option<Editor*> _activeEditor = None<Editor*>()
+    vector<string> _shared_buffer = {}
     EditorManager Ncurses *n =>
         this->n = n
         _origin = new VerticalLayout(Fill::Flex)
@@ -148,7 +149,7 @@ pub
         select a from _activeEditor do a->draw(6)
     ;
     fn add_editor =>
-        _editors.push_back(new Editor(n, (string)""))
+        _editors.push_back(new Editor(n, (string)"", &_shared_buffer))
         select active from _activeSpace
             let editor = get_last(&_editors)
             _activeEditor = Some(editor)
