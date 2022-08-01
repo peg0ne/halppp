@@ -75,6 +75,12 @@ pub
         if _type != JsonType::Array do return
         _value.push_back(new Json("", value))
     ;
+    fn try_add_str string name, string value =>
+        if _type != JsonType::Object do return
+        if try_get(name).is_none()
+            _value.push_back(new Json(name, "\"" + value + "\""))
+        ;
+    ;
     fn try_add string name, string value =>
         if _type != JsonType::Object do return
         if try_get(name).is_none()
@@ -355,5 +361,6 @@ fn write_json string path, Json content =>
     let s = content.as_str()
     write(s, path)
 ;
+
 
 
