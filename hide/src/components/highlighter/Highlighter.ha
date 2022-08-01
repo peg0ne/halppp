@@ -68,7 +68,7 @@ pub
         ;
     ;
     fn highlight_pairs Ncurses *n, string line, string match, string end, int y, int x =>
-        //h_pairs_imp(n, line, match, end, Vector(x,y), 0, 0)
+        h_pairs_imp(n, line, match, end, Vector(x,y), 0, 0)
     ;
     fn h_pairs_imp Ncurses *n, string line, string match, string end, Vector xy, int depth, int start => Option<int>
         vector<short> colors = {1,2,3,7,8,9}
@@ -103,6 +103,7 @@ pub
         return Some((int)next_end)
     ;
 ;
+
 
 
 
