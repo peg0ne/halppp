@@ -5,8 +5,10 @@ class EditorManager => IContent
     Option<HorizontalLayout*> _activeSpace = None<HorizontalLayout*>()
     Option<Editor*> _activeEditor = None<Editor*>()
     vector<string> _shared_buffer = {}
-    EditorManager Ncurses *n =>
+    IContainer *_status_line
+    EditorManager Ncurses *n, IContainer *status_line =>
         this->n = n
+        _status_line = status_line
         _origin = new VerticalLayout(Fill::Flex)
         add_space()
     ;
@@ -152,7 +154,7 @@ pub
         select a from _activeEditor do a->draw(6)
     ;
     fn add_editor =>
-        _editors.push_back(new Editor(n, (string)"", &_shared_buffer))
+        _editors.push_back(new Editor(n, (string)"", &_shared_buffer, _status_line))
         select active from _activeSpace
             let editor = get_last(&_editors)
             _activeEditor = Some(editor)
@@ -180,5 +182,4 @@ pub
     ;
     fn get_at<T> vector<T> *vec, int at => T doremi vec->at(at)
 ;
-
 

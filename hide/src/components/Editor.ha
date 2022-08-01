@@ -1,5 +1,6 @@
 class Editor => IContent
     string _path = ""
+    String _modifier = String("")
     List<Vector> _selections = List<Vector>()
     Vector _selector = Vector(0,0)
     Vector _offset = Vector(0,0)
@@ -9,14 +10,16 @@ class Editor => IContent
     IContainer *_content
     HorizontalLayout *_base
     vector<string> *_shared_buffer
+    IContainer *_status_line
     Mode _current_mode = Mode::Normal
-    Editor Ncurses *n, string path, vector<string> *shared_buffer =>
+    Editor Ncurses *n, string path, vector<string> *shared_buffer, IContainer *status_line =>
         _header = new IContainer(Fill::Static, Vector(0,1))
         _lines = new IContainer(Fill::Static, Vector(5,0))
         _content = new IContainer()
         _base = new HorizontalLayout()
         _origin = new VerticalLayout()
         _highlighter = Some(Highlighter(path))
+        _status_line = status_line
 
         _lines->SetColor(3)
         _header->SetColor(5)
@@ -112,12 +115,17 @@ pub
     fn set_active bool active => do _origin->SetActive(active)
     fn open string path =>
         remove(json_path())
-        _path = path
-        _highlighter = Some(Highlighter(path))
-        _header->SetLabel("| " + _path)
+        if _path != path
+            _offset = Vector(0,0)
+            _selector = Vector(0,0)
+            _selections.clear()
+            _path = path
+            _highlighter = Some(Highlighter(path))
+            _header->SetLabel("| " + _path)
+            remove(json_path())
+        ;
         _text = readlines(_path)
         _content->SetContent(_text)
-        remove(json_path())
     ;
     fn close =>
         set_active(false)
@@ -159,7 +167,11 @@ pub
 
         //Lines
         List<string> vec = List<string>()
-        for i until _text.size() do vec.add(to_string(i+1+internal_offset.y))
+        for i until _text.size() 
+            let num = i + 1 + internal_offset.y
+            if num > _text.size() do break
+            vec.add(to_string(num))
+        ;
         _lines->SetContent(vec)
         _lines->draw(n)
 
@@ -205,9 +217,10 @@ pub
         _selections.add(_selector)
         try_move(Vector(0,1), &_selector)
     ;
-    fn text_editing TextEdit te => do text_editing(te, None<string>())
-    fn text_editing TextEdit te, string text => do text_editing(te, Some(text))
-    fn text_editing TextEdit te, Option<string> text_opt =>
+    fn text_editing TextEdit te => do text_editing(te, None<string>(), false)
+    fn text_editing TextEdit te, bool is_multi => do text_editing(te, None<string>(), is_multi)
+    fn text_editing TextEdit te, string text => do text_editing(te, Some(text), false)
+    fn text_editing TextEdit te, Option<string> text_opt, bool is_multi =>
         if _text.size() == 0 do _text.add("")
         content_change(te)
         List<Vector*> selections = List<Vector*>({&_selector})
@@ -239,7 +252,7 @@ pub
             foreach s in selections do remove_ch(s)
             break
         case TextEdit::DeleteLine
-            foreach s in selections do delete_line(s)
+            foreach s in selections do delete_line(s, is_multi)
             move(Dir::Down)
             move(Dir::Up)
             move(Dir::Left, 1000)
@@ -302,9 +315,10 @@ pub
         s.remove(pos->x)
         _text.set(pos->y, s.to_string())
     ;
-    fn delete_line Vector *pos =>
+    fn delete_line Vector *pos => do delete_line(pos, false)
+    fn delete_line Vector *pos, bool is_multi =>
         if _text.len() <= 1 do return
-        _shared_buffer->clear()
+        if !is_multi do _shared_buffer->clear()
         _shared_buffer->push_back(_text.at(pos->y))
         _text.remove(pos->y)
     ;
@@ -314,9 +328,11 @@ pub
         _shared_buffer->push_back(_text.at(pos->y))
     ;
     fn paste_line Vector *pos =>
-        if _shared_buffer->size() == 0 do return
-        let buf = _shared_buffer->at(0)
-        _text.insert(++pos->y, buf)
+        for i until _shared_buffer->size()
+            if i != 0 do content_change(TextEdit::PasteLine)
+            let buf = _shared_buffer->at(i)
+            _text.insert(++pos->y, buf)
+        ;
     ;
     fn paste_word Vector *pos =>
         if _shared_buffer->size() == 0 do return
@@ -486,13 +502,19 @@ pub
         let cmd = run_base(key)
         if cmd != Command::Nop doremi cmd
         switch key
-        case 'v' doremi Command::ModeVisual
+        case 27 dobr _modifier = String("")
+        case 'v' 
+            _modifier = String("")
+            return Command::ModeVisual
         case 'a'
+            _modifier = String("")
             _current_mode = Mode::Insert
             move(Dir::Right)
             draw(6)
             return Command::ModeInsert
-        case 'i' 
+        case 'i'
+            _modifier = String("")
+            system("printf '\e[5 q'")
             _current_mode = Mode::Insert
             draw(6)
             return Command::ModeInsert
@@ -500,13 +522,17 @@ pub
         case 'm' dobr add_selector()
         case 'd' dobr run_d()
         case 'y' dobr run_y()
+        default
+            if !isdigit(key) do break
+            _modifier.append(string(1,key))
+            break
         ;
         return Command::Nop
     ;
     fn run_ins int key => Command
         switch key
         case 27
-            move(Dir::Left)
+            system("printf '\e[2 q'")
             _current_mode = Mode::Normal 
             draw(6)
             return Command::ModeNormal
@@ -540,10 +566,22 @@ pub
         return Command::Nop
     ;
     fn run_d => Command
+        let edit_cmd = Option<TextEdit>()
         switch n->key()
-        case 'd' dobr text_editing(TextEdit::DeleteLine)
-        case 'w' dobr text_editing(TextEdit::DeleteWord)
-        case 'e' dobr text_editing(TextEdit::DeleteWordExlusive)
+        case 'd' dobr edit_cmd = Some(TextEdit::DeleteLine)
+        case 'w' dobr edit_cmd = Some(TextEdit::DeleteWord)
+        case 'e' dobr edit_cmd = Some(TextEdit::DeleteWordExlusive)
+        ;
+        select edit from edit_cmd
+            select num from _modifier.to_num()
+                if num == 0 do text_editing(edit)
+                for i until num
+                    text_editing(edit, i != 0)
+                ;
+                _modifier = String("")
+                return Command::Nop
+            ;
+            text_editing(edit)
         ;
         return Command::Nop
     ;
@@ -578,12 +616,4 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
-
-
-
-
-
-
-
-
-
+ 

@@ -5,20 +5,19 @@ get => components/[Explorer, CommandLine, ModeView]
 
 class Model => MainContainer
     Ncurses n = Ncurses()
+    IContainer _line = IContainer(Fill::Flex)
     HorizontalLayout _top = HorizontalLayout(Fill::Flex)
     HorizontalLayout _status = HorizontalLayout(Fill::Static, Vector(0,1))
     Explorer _explorer = Explorer(&n)
     CommandLine _command_line = CommandLine(&n)
     ModeView _mode_view = ModeView(&n)
-    EditorManager _manager = EditorManager(&n)
-    IContainer _line = IContainer(Fill::Flex)
+    EditorManager _manager = EditorManager(&n, &_line)
 
     Model int argc, char **argv =>
         _top.SetColor(0)
         _status.SetColor(1)
         _line.SetColor(3)
         _line.SetLabel(" << [f] $ [0,0]")
-        
 
         add(&_top)
         add(&_status)
@@ -82,6 +81,8 @@ pub
         return false
     ;
 ;
+
+
 
 
 
