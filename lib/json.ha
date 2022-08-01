@@ -335,7 +335,9 @@ fn json_collect_value_json Peekable<char> *peekable => string
                 value += "}"
                 break
             case '"'
+                value += "\""
                 value += json_collect_name_json(peekable)
+                value += "\""
                 break
             default
                 if isspace(c) doremi value
@@ -360,6 +362,7 @@ fn write_json string path, Json content =>
     let s = content.as_str()
     write(s, path)
 ;
+
 
 
 
