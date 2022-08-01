@@ -31,7 +31,7 @@ class Json
         let val = String(value)
         if value == ""
             _type = JsonType::String
-            _text = " "
+            _text = ""
         ;
         elif value == "null"
             _type = JsonType::Null
@@ -55,11 +55,12 @@ class Json
         elif val.starts_with("\"")
             _type = JsonType::String
             val.remove(0)
-            _text = val.pop()
+            let s = val.pop()
+            _text = String(s).unescape()
         ;
         else
             _type = JsonType::String
-            _text = value
+            _text = String(value).unescape()
         ;
     ;
 pub
@@ -260,6 +261,7 @@ fn json_collect_name_json Peekable<char> *peekable => string
                 break
             case '"'
                 if !is_escaped doremi name
+                is_escaped = false
                 name += c
                 break
             default
