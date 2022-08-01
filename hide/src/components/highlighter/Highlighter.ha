@@ -70,24 +70,34 @@ pub
     fn highlight_pairs Ncurses *n, string line, string match, string end, int y, int x =>
         h_pairs_imp(n, line, match, end, Vector(x,y), 0, 0)
     ;
+
     fn h_pairs_imp Ncurses *n, string line, string match, string end, Vector xy, int depth, int start => Option<int>
         vector<short> colors = {1,2,3,7,8,9}
+        //Try find first
         if start >= line.size() doremi None<int>()
         let first = line.find(match, start)
         if first == -1 doremi None<int>()
         if first + 1 >= line.size() doremi None<int>()
         n->mark(xy.y, xy.x + first, colors[depth % colors.size()])
+
+        //Find end and next start
         let next = line.find(match, first + 1)
         let next_end = line.find(end, first + 1)
         if next_end == -1 doremi None<int>()
+        
+        //if next start is more than next end
+        //it's not nested so we can mark safely and keep look for more
         elif next > next_end
             n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
             h_pairs_imp(n, line, match, end, xy, 0, first + 1)
         ;
+        //else if next start is less than next end
+        //It's nested and well need to keep checking until we find the end fo nesting
         elif next < next_end 
             let keep = h_pairs_imp(n, line, match, end, xy, depth + 1, first + 1)
             loop
                 select find from keep
+                    if find + 1 >= line.size() doremi None<int>()
                     next_end = line.find(end, find + 1)
                     let next_start = line.find(match, find + 1)
                     if next_end < next_start
@@ -103,6 +113,7 @@ pub
         return Some((int)next_end)
     ;
 ;
+
 
 
 

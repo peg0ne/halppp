@@ -55,8 +55,7 @@ class Json
         elif val.starts_with("\"")
             _type = JsonType::String
             val.remove(0)
-            val.pop()
-            _text = val.to_string()
+            _text = val.pop()
         ;
         else
             _type = JsonType::String
@@ -361,6 +360,7 @@ fn write_json string path, Json content =>
     let s = content.as_str()
     write(s, path)
 ;
+
 
 
 
