@@ -186,46 +186,6 @@
             "color": 2
         },
         {
-            "token": "0",
-            "color": 2
-        },
-        {
-            "token": "1",
-            "color": 2
-        },
-        {
-            "token": "2",
-            "color": 2
-        },
-        {
-            "token": "3",
-            "color": 2
-        },
-        {
-            "token": "4",
-            "color": 2
-        },
-        {
-            "token": "5",
-            "color": 2
-        },
-        {
-            "token": "6",
-            "color": 2
-        },
-        {
-            "token": "7",
-            "color": 2
-        },
-        {
-            "token": "8",
-            "color": 2
-        },
-        {
-            "token": "9",
-            "color": 2
-        },
-        {
             "token": "\"",
             "color": 2
         },
@@ -339,5 +299,6 @@
         },
     ]
 } 
+
 
 
