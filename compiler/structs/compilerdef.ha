@@ -2,16 +2,48 @@ struct Compiler
     Program *program
     Peekable<AstToken> ast
     vector<string> arguments = {}
+    List<string> current_text = List<string>({"\033[0m>>"})
     Compiler Program *p, Peekable<AstToken> ast =>
         this->program = p
         this->ast = ast
     ;
+    fn to_err_message => string
+        while current_text.len() < 7
+            select n from next(true) do continue
+            break
+        ;
+        string s = "\n"
+        foreach line in current_text
+            s += line + "\n"
+        ;
+        return s
+    ;
     fn size => int doremi ast.size()
-    fn next => Option<AstToken> doremi ast.next()
-    // fn next => Option<AstToken>
-    //     println(ast.peek().value_or(AstToken()).to_string())
-    //     return ast.next()
-    // ;
+    fn next => Option<AstToken> doremi next(false)
+    fn next bool is_err => Option<AstToken>
+        //println(ast.peek().value_or(AstToken()).to_string())
+        let len = current_text.len()
+        if len == 0 do current_text.add("\033[0m>> ")
+        select peeked from ast.peek()
+            if peeked.token == Token::NewLine
+                if !is_err && len > 3 do current_text.remove(0)
+                current_text.add("\033[0m>> ")
+            ;
+            else
+                select last from current_text.last()
+                    if !is_err
+                        last += "\033[034m" + peeked.name + "\033[0m "
+                    ;
+                    else
+                        last += "\033[031m" + peeked.name + "\033[0m "
+                    ;
+                    let vec = current_text.as_vec_ptr()
+                    vec->at(len - 1) = last
+                ;
+            ;
+        ;
+        return ast.next()
+    ;
     fn peek => Option<AstToken> doremi ast.peek()
     fn prev => Option<AstToken> doremi ast.prev()
     fn add_fn Function function => do program->functions.push_back(function)
@@ -89,3 +121,7 @@ struct Compiler
         return false
     ;
 ;
+
+
+
+

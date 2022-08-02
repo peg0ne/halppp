@@ -68,9 +68,10 @@ fn construct_args Compiler *compiler_t, Option<string> type_name => VariableNBoo
         else
             if !variable.has_type() doco variable.v_type = next.name
             if !variable.has_id() doco variable.id = next.name
-            display_err_message(VAR_ERR_COM + variable.id)
+            display_err_message(VAR_ERR_COM + compiler_t->to_err_message())
         ;
     ;
     if !variable.has_minimum() && !is_end do display_err_message(VAR_ERR_INC + variable.id)
     return VariableNBool(variable, is_end)
 ;
+

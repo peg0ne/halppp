@@ -1,5 +1,5 @@
 inc => string
-get => ../lib/[peekable, print, stringextensions, conditional, clap]
+get => ../lib/[peekable, print, stringextensions, conditional, clap, list]
 get => consts/[strings, tokens, errors]
 get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
@@ -126,5 +126,6 @@ fn validate_compiled Compiler compiler, bool is_main =>
     if !has_main && is_main do display_hint_message("Main function is not present!")
     if has_main && !is_main do display_hint_message("Main function not in main file")
 ;
+
 
 

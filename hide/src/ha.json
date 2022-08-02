@@ -214,6 +214,10 @@
             "color": 2
         },
         {
+            "token": " while ",
+            "color": 2
+        },
+        {
             "token": " if ",
             "color": 2
         },
@@ -294,11 +298,12 @@
             "color": 3
         },
         {
-            "token": "glob ",
+            "token": "glob",
             "color": 3
         },
     ]
 } 
+
 
 
 
