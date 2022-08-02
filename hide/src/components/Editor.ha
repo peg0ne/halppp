@@ -517,10 +517,23 @@ pub
             _current_mode = Mode::Insert
             draw(6)
             return Command::ModeInsert
+        case 'C'
+            text_editing(TextEdit::DeleteFrom)
+            system("printf '\e[5 q'")
+            _current_mode = Mode::Insert
+            draw(6)
+            return Command::ModeInsert
+        case 'c'
+            run_d()
+            system("printf '\e[5 q'")
+            _current_mode = Mode::Insert
+            draw(6)
+            return Command::ModeInsert
         case 'x' dobr text_editing(TextEdit::DeleteChar)
         case 'm' dobr add_selector()
         case 'D' dobr text_editing(TextEdit::DeleteFrom)
         case 'd' dobr run_d()
+        case 's' dobr run_s()
         case 'y' dobr run_y()
         default
             if !isdigit(key) do break
@@ -591,6 +604,14 @@ pub
         ;
         return Command::Nop
     ;
+    fn run_s => Command
+        switch n->key()
+        case 's' do break
+        case 'w' do break
+        case 'l' do break
+        ;
+        return Command::Nop
+    ;
 ;
 
 fn selection_comparer Vector &lhs, Vector &rhs => bool
@@ -617,6 +638,9 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     return lhs->x > rhs->x
 ;
  
+
+
+
 
 
 
