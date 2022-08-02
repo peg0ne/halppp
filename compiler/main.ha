@@ -3,12 +3,12 @@ get => ../lib/[peekable, print, stringextensions, conditional, clap, list]
 get => consts/[strings, tokens, errors]
 get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
-get => message, utils, fileutil
 get => structs/[variabledef, enumdef]
 get => structs/[importsdef, globaldef, structdef]
 get => structs/[fordef, conditiondef, selectdef, expressiondef]
 get => structs/[functiondef, classdef]
 get => structs/[programdef, compilerdef]
+get => message, utils, fileutil
 get => ast, imports, enums, foreacher, expressions
 get => switch, selects, conditions, variable, template
 get => functions, classes, globals
@@ -53,9 +53,9 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     vector<string> incs = {}
     string args = EMPTY
     loop
-        let next = get_next_or_exit(compiler_t.next(), "Compiler failed to do unexpected EOF")
+        let next = get_next_or_exit(&compiler_t, "Compiler failed to do unexpected EOF")
         if !next.is_base()
-            display_err_message("Token not allowed in base: " + to_string(next.token))
+            display_err_message("Token not allowed in base: " + to_string(next.token), compiler_t.to_err_message())
         ;
         if next.is_terminator() do break
         elif next.is_nl() do continue
@@ -65,10 +65,10 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             headers += classdef.to_cpp_h()
         ;
         elif next.token == Token::Named
-            if is_named do display_err_message("[Named] cannot have nested namespaces")
+            if is_named do display_err_message("[Named] cannot have nested namespaces", compiler_t.to_err_message())
             is_named = true
-            get_arrow_or_exit(compiler_t.next(), "[Named] missing => in declaration");
-            let id = get_id_or_exit(compiler_t.next(), "[Named] cannot create namespace without Id");
+            get_arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
+            let id = get_id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
             output += "namespace " + id + "\n{\n"
         ;
         elif next.token == Token::Function
@@ -107,11 +107,11 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             ;
         ;
         elif next.token == Token::Compiler
-            get_arrow_or_exit(compiler_t.next(), "[Compiler] Missing start of compiler intent [=>]: " + next.name)
-            args = get_or_exit(compiler_t.next(), Token::String, "[Compiler] Missing value of compiler intent [TString]: " + next.name)
+            get_arrow_or_exit(&compiler_t, "[Compiler] Missing start of compiler intent [=>]: " + next.name)
+            args = get_or_exit(&compiler_t, Token::String, "[Compiler] Missing value of compiler intent [TString]: " + next.name)
             compiler_t.add_arg(args)
         ;
-        else do display_err_message("Token not handled: " + next.name)
+        else do display_err_message("Token not handled: " + next.name, compiler_t.to_err_message())
     ;
     if is_named do output += "\n}\n"
     validate_compiled(compiler_t, is_main)
@@ -126,6 +126,9 @@ fn validate_compiled Compiler compiler, bool is_main =>
     if !has_main && is_main do display_hint_message("Main function is not present!")
     if has_main && !is_main do display_hint_message("Main function not in main file")
 ;
+
+
+
 
 
 

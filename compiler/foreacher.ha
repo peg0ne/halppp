@@ -1,11 +1,11 @@
 fn for_construct Compiler *compiler_t, bool is_foreach => Expression
     let for_def = For(is_foreach)
     let mid_checker = is_foreach ? Token::In : Token::Until
-    for_def.iterator = get_id_or_exit(compiler_t->next(), "[For] For loop is not closed")
-    get_or_exit(compiler_t->next(), mid_checker, "[For] Missing keyword: " + to_string(mid_checker))
+    for_def.iterator = get_id_or_exit(compiler_t, "[For] For loop is not closed")
+    get_or_exit(compiler_t, mid_checker, "[For] Missing keyword: " + to_string(mid_checker))
     for_def.until = compiler_t->next().value_or(AstToken("NONE")).name
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[For] For loop is not closed")
+        let x = get_next_or_exit(compiler_t, "[For] For loop is not closed")
         if x.is_do()
             for_def.lines.push_back(expression_construct(compiler_t, x))
             return Expression(for_def)
@@ -14,7 +14,7 @@ fn for_construct Compiler *compiler_t, bool is_foreach => Expression
         for_def.until += x.name
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[For] For loop is not closed")
+        let x = get_next_or_exit(compiler_t, "[For] For loop is not closed")
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token

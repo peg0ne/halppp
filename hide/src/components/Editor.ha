@@ -483,8 +483,8 @@ pub
         case 'k' dobr move(Dir::Down)
         case 'l' dobr move(Dir::Right)
         case 'h' dobr move(Dir::Left)
-        case 'a' dobr text_editing(TextEdit::Lower)
-        case 'A' dobr text_editing(TextEdit::Upper)
+        case 'm' dobr text_editing(TextEdit::Lower)
+        case 'M' dobr text_editing(TextEdit::Upper)
         case 'e' dobr move_word(Dir::Right, true)
         case 'w' dobr move_word(Dir::Right)
         case 'b' dobr move_word(Dir::Left)
@@ -638,6 +638,7 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     return lhs->x > rhs->x
 ;
  
+
 
 
 

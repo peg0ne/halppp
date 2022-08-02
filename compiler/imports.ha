@@ -1,12 +1,12 @@
 fn imports_construct Compiler *compiler_t => vector<string>
-    get_arrow_or_exit(compiler_t->next(), "[Import]: Missing [=>] in declaration")
+    get_arrow_or_exit(compiler_t, "[Import]: Missing [=>] in declaration")
     return imports_construct_impl(compiler_t)
 ;
 fn imports_construct_impl Compiler *compiler_t => vector<string>
     vector<string> imports = {}
     string id = EMPTY
     loop
-        let next = get_next_or_exit(compiler_t->next(), "[Import]: Import declaration invalid")
+        let next = get_next_or_exit(compiler_t, "[Import]: Import declaration invalid")
         if any(next.token, {Token::Eof, Token::NewLine, Token::Comma, Token::RBrack})
             if id.size() > 0 && !imports_check_duplicate(imports, id) do imports.push_back(id)
             id = EMPTY
@@ -20,7 +20,7 @@ fn imports_construct_impl Compiler *compiler_t => vector<string>
             ;
             id = EMPTY
         ;
-        elif next.is_base() do display_err_message("[Import]: Token not allowed: " + next.name)
+        elif next.is_base() do display_err_message("[Import]: Token not allowed: " + next.name, compiler_t->to_err_message())
         else do id += next.name
         if any(next.token, {Token::Eof, Token::NewLine, Token::RBrack}) do break
     ;
@@ -52,7 +52,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
                 remove.push_back(i)
             ;
             break
-        default dobr display_err_message("[" + to_string(next.token) + "]: Unhandled import")
+        default dobr display_err_message("[" + to_string(next.token) + "]: Unhandled import", compiler_t->to_err_message())
         ;
     ;
     vector<string> import_buf = {}
@@ -68,7 +68,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
     case Token::Use dobr compiler_t->add_use(import)
     case Token::Include dobr compiler_t->add_inc(import)
     case Token::Get dobr compiler_t->add_get(import)
-    default dobr display_err_message("[" + to_string(next.token) + "]: Unhandled import")
+    default dobr display_err_message("[" + to_string(next.token) + "]: Unhandled import", compiler_t->to_err_message())
     ;
     return import
 ;

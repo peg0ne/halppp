@@ -7,21 +7,24 @@ struct FpFn
         this->f_n = f_n
     ;
 ;
-fn get_next_or_exit Option<AstToken> next, string s => AstToken
-    if next.is_none() do display_err_message(s)
+fn get_next_or_exit Compiler *compiler_t, string s => AstToken
+    let next = compiler_t->next()
+    if next.is_none() do display_err_message(s, compiler_t->to_err_message())
     return next.value_or(AstToken())
 ;
-fn try_get Option<AstToken> peek, Token token => bool
+fn try_get Compiler *compiler_t, Token token => bool
+    let peek = compiler_t->peek()
     if peek.is_none() doremi false
     return peek.value_or(AstToken()).token == token
 ;
-fn get_or_exit Option<AstToken> next, Token token, string s => string
-    if next.is_none() || next.value_or(AstToken()).token != token do display_err_message(s)
+fn get_or_exit Compiler *compiler_t, Token token, string s => string
+    let next = compiler_t->next()
+    if next.is_none() || next.value_or(AstToken()).token != token do display_err_message(s, compiler_t->to_err_message())
     return next.value_or(AstToken()).name
 ;
-fn get_id_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, Token::Id, s)
-fn get_arrow_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, Token::CoolArrow, s)
-fn get_eq_or_exit Option<AstToken> next, string s => string doremi get_or_exit(next, Token::Equals, s)
+fn get_id_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Id, s)
+fn get_eq_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Equals, s)
+fn get_arrow_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::CoolArrow, s)
 fn get_folder_and_name string file_path => FpFn
     string file_name = EMPTY
     string reversed = EMPTY
@@ -40,3 +43,6 @@ fn get_folder_and_name string file_path => FpFn
     file_name = reversed
     return FpFn(folder_path, file_name)
 ;
+
+
+

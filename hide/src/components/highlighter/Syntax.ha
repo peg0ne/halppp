@@ -39,9 +39,11 @@ struct SyntaxBox
     SyntaxBox Json *box =>
         select s from box->try_get("start")
             start = s->value_or((string)"")
+            if start == "\\\"" do start = "\""
         ;
         select e from box->try_get("end")
             end = e->value_or((string)"")
+            if end == "\\\"" do end = "\""
         ;
         select m from box->try_get("mark_inner")
             mark_inner = m->value_or(false)
@@ -156,3 +158,4 @@ pub
         return asts
     ;
 ;    
+

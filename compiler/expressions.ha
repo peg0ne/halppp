@@ -12,7 +12,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
         default dobr expression = first.name
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[Expression] Expression ended unexpectedly")
+        let x = get_next_or_exit(compiler_t, "[Expression] Expression ended unexpectedly")
         if any(x.token, {Token::Eof, Token::NewLine}) dobr expression += doing
         if any(x.token, {Token::Number, Token::Id}) do expression += " "
         if x.is_do() do expression += "\n"
@@ -31,12 +31,12 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
 ;
 
 fn get_let_expr Compiler *compiler_t => Expression
-    let id = get_id_or_exit(compiler_t->next(), "[Let] Required id after let")
-    get_or_exit(compiler_t->next(), Token::Equals,"[Let] Required equals after id")
+    let id = get_id_or_exit(compiler_t, "[Let] Required id after let")
+    get_or_exit(compiler_t, Token::Equals,"[Let] Required equals after id")
     string expression = EMPTY
     string value = EMPTY
     loop
-        let x = get_next_or_exit(compiler_t->next(), "LET exception")
+        let x = get_next_or_exit(compiler_t, "LET exception")
         if any(x.token, {Token::Eof, Token::NewLine}) do break
         value += x.name
     ;

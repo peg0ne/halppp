@@ -1,10 +1,10 @@
 fn select_construct Compiler *compiler_t => Expression
     let select_def = Select()
-    select_def.value_name = get_id_or_exit(compiler_t->next(), "[Select] is not closed")
-    get_or_exit(compiler_t->next(), Token::From, "[Select] Missing keyword: from")
+    select_def.value_name = get_id_or_exit(compiler_t, "[Select] is not closed")
+    get_or_exit(compiler_t, Token::From, "[Select] Missing keyword: from")
     select_def.optional_value = compiler_t->next().value_or(AstToken("NONE")).name
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[Select] is not closed")
+        let x = get_next_or_exit(compiler_t, "[Select] is not closed")
         if x.is_do()
             select_def.lines.push_back(expression_construct(compiler_t, x))
             return Expression(select_def)
@@ -13,7 +13,7 @@ fn select_construct Compiler *compiler_t => Expression
         select_def.optional_value += x.name
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[Select] is not closed")
+        let x = get_next_or_exit(compiler_t, "[Select] is not closed")
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token
@@ -27,3 +27,5 @@ fn select_construct Compiler *compiler_t => Expression
     ;
     return Expression(select_def)
 ;
+
+

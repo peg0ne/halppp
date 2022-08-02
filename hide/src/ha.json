@@ -205,13 +205,13 @@
             "colors": [3],
             "start": "\"",
             "end": "\"",
-            "mark_inner": false
+            "mark_inner": true
         },
         {
             "colors": [8],
             "start": "'",
             "end": "'",
-            "mark_inner": false
+            "mark_inner": true
         }
     ],
     "custom": [

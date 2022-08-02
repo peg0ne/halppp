@@ -2,16 +2,16 @@ enum ConditionError
     Closed,
 ;
 
-fn co_err ConditionError err => string doremi co_err(err, EMPTY, false)
-fn co_err ConditionError err, string opt => string doremi co_err(err, opt, false)
-fn co_err ConditionError err, string opt, bool display => string
+fn co_err ConditionError err => string doremi co_err(err, EMPTY, false, "")
+fn co_err ConditionError err, string opt => string doremi co_err(err, opt, false, "")
+fn co_err ConditionError err, string opt, bool display, string recap => string
     string msg = "[Condition] "
     switch err
     case ConditionError::Closed dobr msg += "Condition is not closed "
     default do break
     ;
     msg += opt
-    if display do display_err_message(msg)
+    if display do display_err_message(msg, recap)
     return msg
 ;
 
@@ -24,7 +24,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_left = "true"
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), co_err(ConditionError::Closed))
+        let x = get_next_or_exit(compiler_t, co_err(ConditionError::Closed))
         if x.is_do()
             cond.add_expr(expression)
             cond.lines.push_back(expression_construct(compiler_t, x))
@@ -41,7 +41,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_right += x.name + " "
     ;
     loop
-        let x = get_next_or_exit(compiler_t->next(), co_err(ConditionError::Closed))
+        let x = get_next_or_exit(compiler_t, co_err(ConditionError::Closed))
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token
@@ -55,3 +55,4 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
     ;
     return Expression(cond)
 ;
+

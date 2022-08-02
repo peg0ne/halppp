@@ -10,7 +10,7 @@ fn get_variables Compiler *compiler_t => vector<Variable>
     vector<Variable> variables = {}
     let variable = Variable()
     loop
-        let x = get_next_or_exit(compiler_t->next(), "[Global]: Unexpected end of global")
+        let x = get_next_or_exit(compiler_t, "[Global]: Unexpected end of global")
         switch x.token
             case Token::Eof
             case Token::SemiColon doremi variables
@@ -21,20 +21,20 @@ fn get_variables Compiler *compiler_t => vector<Variable>
             default
                 if !variable.has_type() dobr variable.v_type = x.name
                 elif !variable.has_id() dobr variable.id = x.name
-                display_err_message("[Global]: Variable is already finished")
+                display_err_message("[Global]: Variable is already finished", compiler_t->to_err_message())
         ;
     ;
 ;
-
 fn try_add_variable Compiler *compiler_t, Global *global, Variable variable =>
     if !variable.has_minimum() do return
     foreach v in global->variables
         if v.v_type == variable.v_type
-            display_err_message("[Global]: Multiple declarations of same value")
+            display_err_message("[Global]: Multiple declarations of same value", compiler_t->to_err_message())
         ;
     ;
     if compiler_t->has_glob(variable.v_type)
-        display_err_message("[Global]: Multiple declarations of same value")
+        display_err_message("[Global]: Multiple declarations of same value", compiler_t->to_err_message())
     ;
     global->variables.push_back(variable)
 ;
+
