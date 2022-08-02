@@ -1,309 +1,237 @@
 {
     "name": "halppp",
-    "ast": [
+    "base": {
+        "color": 1,
+        "tokens": [
+            "get ",
+            "inc ",
+            "use ",
+            "named ",
+            "compiler ",
+            "class ",
+            "struct ",
+            "enum ",
+            "fn ",
+            "glob",
+            ";"
+        ]
+    },
+    "conditions": {
+        "color": 1,
+        "tokens": [
+            "select ",
+            "if ",
+            "elif ",
+            " else",
+            "switch ",
+            "while ",
+            " loop",
+            "for ",
+            "foreach "
+        ]
+    },
+    "constants": {
+        "color": 9,
+        "tokens": [
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "."
+        ]
+    },
+    "operators": {
+        "color": 8,
+        "tokens": [
+            "<",
+            ">",
+            "=",
+            "+",
+            "-",
+            "?",
+            ":",
+            "!",
+            "/",
+            "*",
+            "%",
+            "|",
+            "&",
+            "^",
+            "~",
+            ","
+        ]
+    },
+    "keywords": {
+        "color": 2,
+        "bold": true,
+        "tokens": [
+            " new ",
+            " from ",
+            " in ",
+            " until ",
+            " do ",
+            " dore ",
+            " doco ",
+            " dobr ",
+            " doremi ",
+            " let ",
+            " auto ",
+            " break",
+            " return",
+            " continue",
+            "case ",
+            " default",
+            " catch",
+            " const ",
+            " delete ",
+            " this",
+            " extern ",
+            "private",
+            "pub",
+            "public",
+            "protected",
+            " throw ",
+            " try ",
+            " register ",
+            " typedef ",
+            " friend ",
+            " union ",
+            " goto ",
+            "unsigned ",
+            "signed ",
+            "virtual ",
+            " void ",
+            " volatile "
+        ]
+    },
+    "names": {
+        "color": 7,
+        "tokens": [
+            "read(",
+            "readlines(",
+            "write(",
+            "env(",
+            "list_files(",
+            "remove(",
+            "any(",
+            "none(",
+            "all(",
+            "over(",
+            "under(",
+            "anyless(",
+            "load_json(",
+            "write_json(",
+            "to_string(",
+            "max(",
+            "clamp(",
+            "add(",
+            "box(",
+            "col(",
+            "clear(",
+            "clearLn(",
+            "clearScr(",
+            "add_until(",
+            "key(",
+            "stop(",
+            "start(",
+            "next(",
+            "peek(",
+            "size(",
+            "len(",
+            "print(",
+            "println("
+        ]
+    },
+    "types": {
+        "color": 2,
+        "tokens": [
+            "bool",
+            "int",
+            "short",
+            "double",
+            "float",
+            "long",
+            "wchar_t",
+            "char",
+            "string",
+            "String",
+            "Ncurses",
+            "Json",
+            "JsonType",
+            "List",
+            "vector",
+            "Vector",
+            "Bounds",
+            "Clap",
+            "Option",
+            "Some",
+            "None",
+            "Dictionary",
+            "KeyValuePair",
+            "Peekable",
+            "IContainer",
+            "VerticalLayout",
+            "HorizontalLayout"
+        ]
+    },
+    "boxing": [
         {
-            "token": "?",
-            "color": 1
+            "colors": [7,8,9,1,2,3],
+            "start": "[",
+            "end": "]"
         },
         {
-            "token": ":",
-            "color": 1
+            "colors": [7,8,9,1,2,3],
+            "start": "{",
+            "end": "}"
         },
         {
-            "token": ";",
-            "color": 1
+            "colors": [7,8,9,1,2,3],
+            "start": "(",
+            "end": ")"
         },
         {
-            "token": ".",
-            "color": 1
+            "colors": [7,8,9,1,2,3],
+            "start": "<",
+            "end": ">"
         },
         {
-            "token": "/",
-            "color": 1
+            "colors": [3],
+            "start": "\"",
+            "end": "\"",
+            "mark_inner": false
         },
         {
-            "token": "'",
-            "color": 1,
+            "colors": [8],
+            "start": "'",
+            "end": "'",
+            "mark_inner": false
+        }
+    ],
+    "custom": [
+        {
+            "color": 8,
+            "upper": true,
+            "lower": false,
+            "extras": ["_"]
         },
         {
-            "token": "(",
-            "color": 1,
-        },
-        {
-            "token": ")",
-            "color": 1,
-        },
-        {
-            "token": "$",
-            "color": 1,
-        },
-        {
-            "token": " main ",
-            "color": 1,
-        },
-        {
-            "token": "!",
-            "color": 1,
-        },
-        {
-            "token": "bool",
-            "color": 1,
-        },
-        {
-            "token": "short",
-            "color": 1,
-        },
-        {
-            "token": "int",
-            "color": 1,
-        },
-        {
-            "token": "new",
-            "color": 1,
-        },
-        {
-            "token": "char",
-            "color": 1,
-        },
-        {
-            "token": "as_str",
-            "color": 1,
-        },
-        {
-            "token": "to_string",
-            "color": 1,
-        },
-        {
-            "token": "string",
-            "color": 1,
-        },
-        {
-            "token": "vector",
-            "color": 1,
-        },
-        {
-            "token": "Vector",
-            "color": 1,
-        },
-        {
-            "token": "Peekable",
-            "color": 1,
-        },
-        {
-            "token": "List",
-            "color": 1,
-        },
-        {
-            "token": "Option",
-            "color": 1,
-        },
-        {
-            "token": "Ncurses",
-            "color": 1,
-        },
-        {
-            "token": "pub",
-            "color": 1
-        },
-        {
-            "token": "private",
-            "color": 1
-        },
-        {
-            "token": "protected",
-            "color": 1
-        },
-        {
-            "token": " return",
-            "color": 1
-        },
-        {
-            "token": " continue",
-            "color": 1
-        },
-        {
-            "token": " break",
-            "color": 1
-        },
-        {
-            "token": "true",
-            "color": 1,
-        },
-        {
-            "token": "false",
-            "color": 1,
-        },
-        {
-            "token": " let ",
-            "color": 1
-        },
-        {
-            "token": "Some",
-            "color": 1
-        },
-        {
-            "token": "None",
-            "color": 1
-        },
-        {
-            "token": "*",
             "color": 2,
+            "upper": false,
+            "lower": true,
+            "extras": ["_"]
         },
         {
-            "token": "&",
-            "color": 2,
-        },
-        {
-            "token": "+",
-            "color": 2,
-        },
-        {
-            "token": "-",
-            "color": 2,
-        },
-        {
-            "token": "=",
-            "color": 2,
-        },
-        {
-            "token": "<",
-            "color": 2,
-        },
-        {
-            "token": "%",
-            "color": 2
-        },
-        {
-            "token": "|",
-            "color": 1,
-        },
-        {
-            "token": ">",
-            "color": 2,
-        },
-        {
-            "token": ",",
-            "color": 2
-        },
-        {
-            "token": "\"",
-            "color": 2
-        },
-        {
-            "token": " for ",
-            "color": 2
-        },
-        {
-            "token": " foreach ",
-            "color": 2
-        },
-        {
-            "token": " loop",
-            "color": 2
-        },
-        {
-            "token": " switch ",
-            "color": 2
-        },
-        {
-            "token": " case",
-            "color": 2
-        },
-        {
-            "token": " default",
-            "color": 2
-        },
-        {
-            "token": " while ",
-            "color": 2
-        },
-        {
-            "token": " if ",
-            "color": 2
-        },
-        {
-            "token": " elif ",
-            "color": 2
-        },
-        {
-            "token": " else",
-            "color": 2
-        },
-        {
-            "token": " select ",
-            "color": 2
-        },
-        {
-            "token": " do ",
-            "color": 3
-        },
-        {
-            "token": " dobr ",
-            "color": 3
-        },
-        {
-            "token": " doco ",
-            "color": 3
-        },
-        {
-            "token": " dore ",
-            "color": 3
-        },
-        {
-            "token": " doremi ",
-            "color": 3
-        },
-        {
-            "token": " from ",
-            "color": 3
-        },
-        {
-            "token": " in ",
-            "color": 3
-        },
-        {
-            "token": " until ",
-            "color": 3
-        },
-        {
-            "token": "get ",
-            "color": 3
-        },
-        {
-            "token": "inc ",
-            "color": 3
-        },
-        {
-            "token": "use ",
-            "color": 3
-        },
-        {
-            "token": "compiler ",
-            "color": 3
-        },
-        {
-            "token": "fn ",
-            "color": 3
-        },
-        {
-            "token": "class ",
-            "color": 3
-        },
-        {
-            "token": "struct ",
-            "color": 3
-        },
-        {
-            "token": "enum ",
-            "color": 3
-        },
-        {
-            "token": "glob",
-            "color": 3
-        },
+            "color": 9,
+            "upper": true,
+            "lower": true,
+            "extras": []
+        }
     ]
-} 
-
-
-
-
+}
