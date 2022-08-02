@@ -21,7 +21,8 @@ pub
     fn clear => do _list.clear()
     fn as_vec_ptr => vector<T>* doremi &_list
     fn insert int at, T element =>
-        if len() == 0 do add(element)
+        if len() == 0 dore add(element)
+        if at >= len() dore add(element)
         vector<T> buf = {}
         let i = 0
         foreach ele in _list
@@ -50,3 +51,4 @@ fn to_string<T> List<T> list => string
     foreach l in list do s += to_string(l) + ","
     return s + "]"
 ;
+

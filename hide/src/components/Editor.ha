@@ -82,16 +82,6 @@ class Editor => IContent
     fn undo_handler string text, TextEdit type, Vector pos, bool is_undo =>
         _selector = pos
         switch type
-        case TextEdit::Untab
-        case TextEdit::Insert
-        case TextEdit::RemoveChar
-        case TextEdit::DeleteChar
-        case TextEdit::DeleteWord
-        case TextEdit::Upper
-        case TextEdit::Lower
-        case TextEdit::DeleteWordExlusive
-        case TextEdit::PasteWord
-        case TextEdit::Tab dobr _text.set(pos.y, text)
         case TextEdit::PasteLine
             if !is_undo dobr _text.insert(pos.y+1, text)
             else dobr _text.remove(pos.y+1)
@@ -105,7 +95,7 @@ class Editor => IContent
             ;
             else do insert_nl(&_selector, 0)
             break
-        default do break
+        default dobr _text.set(pos.y, text)
         ;
     ;
 pub 
@@ -258,6 +248,9 @@ pub
             move(Dir::Left, 1000)
             move(Dir::Right)
             break
+        case TextEdit::DeleteFrom
+            foreach s in selections do delete_from(s)
+            break
         case TextEdit::DeleteWord
             foreach s in selections do delete_word(s, true)
             break
@@ -347,6 +340,12 @@ pub
         let s = String(_text.at(pos->y))
         s.remove_word(pos->x, spacebreak)
         _text.set(pos->y, s.to_string())
+    ;
+    fn delete_from Vector *pos =>
+        let s = _text.at(pos->y)
+        _shared_buffer->clear()
+        _shared_buffer->push_back(_text.at(pos->y).substr(pos->x))
+        _text.set(pos->y, _text.at(pos->y).substr(0, pos->x))
     ;
     fn change_case Vector *pos, TextEdit edit =>
         if _text.size() == 0 do return
@@ -520,6 +519,7 @@ pub
             return Command::ModeInsert
         case 'x' dobr text_editing(TextEdit::DeleteChar)
         case 'm' dobr add_selector()
+        case 'D' dobr text_editing(TextEdit::DeleteFrom)
         case 'd' dobr run_d()
         case 'y' dobr run_y()
         default
@@ -617,6 +617,8 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     return lhs->x > rhs->x
 ;
  
+
+
 
 
 
