@@ -355,6 +355,7 @@ pub
     ;
     fn change_case Vector *pos, TextEdit edit =>
         if _text.size() == 0 do return
+        if _text.at(pos->y).size() == 0 do return
         let ch = _text.at(pos->y).at(pos->x)
         switch edit
         case TextEdit::Upper dobr _text.at_ptr(pos->y)->at(pos->x) = toupper(ch)
@@ -489,8 +490,8 @@ pub
         case 'k' dobr move(Dir::Down)
         case 'l' dobr move(Dir::Right)
         case 'h' dobr move(Dir::Left)
-        case 'm' dobr text_editing(TextEdit::Lower)
-        case 'M' dobr text_editing(TextEdit::Upper)
+        case 'n' dobr text_editing(TextEdit::Lower)
+        case 'N' dobr text_editing(TextEdit::Upper)
         case 'e' dobr move_word(Dir::Right, true)
         case 'w' dobr move_word(Dir::Right)
         case 'b' dobr move_word(Dir::Left)
@@ -644,6 +645,9 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     return lhs->x > rhs->x
 ;
  
+
+
+
 
 
 
