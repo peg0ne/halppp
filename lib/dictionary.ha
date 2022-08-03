@@ -18,9 +18,9 @@ class Dictionary<T,U>
 pub
     fn contains T key => bool
         foreach k in _keys
-            if k == key doremi false
+            if k == key doremi true
         ;
-        return true
+        return false
     ;
     fn add T key, U value =>
         if contains(key) do return
@@ -30,7 +30,7 @@ pub
     fn try_get_value T key => Option<U>
         let i = 0
         loop
-            if _keys.size() <= i do return None<U>()
+            if i >= _keys.size() do return None<U>()
             if _keys.at(i) == key do return Some(_values.at(i))
             i++
         ;

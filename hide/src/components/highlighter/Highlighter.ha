@@ -10,74 +10,31 @@ pub
     fn highlight IContainer* container, Ncurses *n =>
         let content = container->GetContent()
         let y = 0
-        let ast = _syntax.ast()
         let boxes = _syntax.boxing()
         let custom = _syntax.custom()
         let offset = container->Offset()
         foreach line in content
             if y >= container->Size().y do break
-            foreach part in ast
-                foreach token in part.tokens
-                    let last = 0
-                    loop
-                        let found = line.find(token, last)
-                        if found == -1 do break
-                        last = found + 1
-                        n->mark_until(
-                            y + offset.y,
-                            found + offset.x,
-                            part.color, 
-                            token.size())
-                    ;
+            foreach part in custom
+                let matches = re(line, part.expr, part.capture)
+                foreach match in matches
+                    n->mark_until(
+                        y + offset.y,
+                        match.position + offset.x,
+                        part.color, 
+                        match.match.size())
                 ;
             ;
             foreach box in boxes
-                if box.mark_inner
-                    highlight_matched(n, line, box.start, y + offset.y, offset.x, box.colors)
-                ;
-                else
-                    highlight_pairs(n, line, box.start, box.end, y + offset.y, offset.x, box.colors)
-                ;
+                highlight_pairs(n, line, box.start, box.end, y + offset.y, offset.x, box.colors)
             ;
             y++
         ;
     ;
-    fn highlight_numbers Ncurses *n, string line, int y, int x, short color =>
-        vector<string> nums = {"0","1","2","3","4","5","6","7","8","9"}
-        foreach num in nums
-            let last = 0
-            loop
-                let found = line.find(num, last)
-                if found == -1 do break
-                last = found + 1
-                n->mark(y, found + x, color)
-            ;
-        ;
-    ;
-    fn highlight_matched Ncurses *n, string line, string match, int y, int x, vector<short> colors =>
-        let color = colors.size() > 0 ? colors[0] : 1
-        let last = 0
-        let prev = -1
-        loop
-            let found = line.find(match, last)
-            if found == -1 do break
-            last = found + 1
-            if prev != -1
-                n->mark_until(
-                    y,
-                    prev + x,
-                    color,
-                    last - prev)
-                prev = -1
-                continue
-            ;
-            prev = found
-        ;
-    ;
+    
     fn highlight_pairs Ncurses *n, string line, string match, string end, int y, int x, vector<short> colors =>
         h_pairs_imp(n, line, match, end, Vector(x,y), 0, 0, colors)
     ;
-
     fn h_pairs_imp Ncurses *n, string line, string match, string end, Vector xy, int depth, int start, vector<short> colors => Option<int>
         //Try find first
         if colors.size() <= 0 do colors = {1}

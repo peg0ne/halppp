@@ -18,7 +18,7 @@ class Editor => IContent
         _content = new IContainer()
         _base = new HorizontalLayout()
         _origin = new VerticalLayout()
-        _highlighter = Some(Highlighter(path))
+        _highlighter = Some(new Highlighter(path))
         _status_line = status_line
 
         _lines->SetColor(3)
@@ -110,7 +110,7 @@ pub
             _selector = Vector(0,0)
             _selections.clear()
             _path = path
-            _highlighter = Some(Highlighter(path))
+            _highlighter = Some(new Highlighter(path))
             _header->SetLabel("| " + _path)
             remove(json_path())
         ;
@@ -150,6 +150,7 @@ pub
         if !is_active() do return
         let is_current = color == 6
         let internal_offset = get_internal_offset()
+
         //Header
         _header->SetColor(color)
         _header->SetLabel("| " + _path)
@@ -174,24 +175,29 @@ pub
             text = text.substr(internal_offset.x)
             buf.add(text)
         ;
+
         _content->SetContent(buf)
         _content->draw(n)
         select highlighter from _highlighter
-            highlighter.highlight(_content, n)
+            highlighter->highlight(_content, n)
         ;
 
+        mark_selections(is_current, internal_offset)
+    ;
+    fn mark_selections bool is_current, Vector internal_offset =>
         //Selections
-        if !is_current do return
-        let offset = _content->Offset()
-        let y = offset.y + _selector.y - internal_offset.y
-        let x = offset.x + _selector.x - internal_offset.x
-        foreach s in _selections
-            n->mark(
-                offset.y + s.y - internal_offset.y,
-                offset.x + s.x - internal_offset.x, 5)
+        if is_current
+            let offset = _content->Offset()
+            let y = offset.y + _selector.y - internal_offset.y
+            let x = offset.x + _selector.x - internal_offset.x
+            foreach s in _selections
+                n->mark(
+                    offset.y + s.y - internal_offset.y,
+                    offset.x + s.x - internal_offset.x, 5)
+            ;
+            if _current_mode == Mode::Insert do n->move_curs(y, x)
+            else do n->mark(y, x, 4)
         ;
-        if _current_mode == Mode::Insert do n->move_curs(y, x)
-        else do n->mark(y, x, 4)
     ;
     fn write_content =>
         let content = ""

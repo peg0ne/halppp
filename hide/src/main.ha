@@ -1,6 +1,6 @@
 inc => vector
 get => ../../lib/[ncurses, option, bounds, dictionary, json]
-get => ../../lib/[math, files, stringextensions, list]
+get => ../../lib/[math, files, stringextensions, list, regex]
 get => model
 
 fn main =>

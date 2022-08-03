@@ -1,7 +1,7 @@
 get => highlighter/[Syntax, Highlighter]
 class IContent
 protected
-    Option<Highlighter> _highlighter = None<Highlighter>()
+    Option<Highlighter*> _highlighter = None<Highlighter*>()
     List<string> _text = List<string>()
     IContainer *_origin
     Ncurses *n

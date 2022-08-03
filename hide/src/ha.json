@@ -1,185 +1,5 @@
 {
     "name": "halppp",
-    "base": {
-        "color": 1,
-        "tokens": [
-            "get ",
-            "inc ",
-            "use ",
-            "named ",
-            "compiler ",
-            "class ",
-            "struct ",
-            "enum ",
-            "fn ",
-            "glob",
-            ";"
-        ]
-    },
-    "conditions": {
-        "color": 1,
-        "tokens": [
-            "select ",
-            "if ",
-            "elif ",
-            " else",
-            "switch ",
-            "while ",
-            " loop",
-            "for ",
-            "foreach "
-        ]
-    },
-    "constants": {
-        "color": 9,
-        "tokens": [
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "."
-        ]
-    },
-    "operators": {
-        "color": 8,
-        "tokens": [
-            "<",
-            ">",
-            "=",
-            "+",
-            "-",
-            "?",
-            ":",
-            "!",
-            "/",
-            "*",
-            "%",
-            "|",
-            "&",
-            "^",
-            "~",
-            ","
-        ]
-    },
-    "keywords": {
-        "color": 2,
-        "bold": true,
-        "tokens": [
-            " new ",
-            " from ",
-            " in ",
-            " until ",
-            " do ",
-            " dore ",
-            " doco ",
-            " dobr ",
-            " doremi ",
-            " let ",
-            " auto ",
-            " break",
-            " return",
-            " continue",
-            "case ",
-            " default",
-            " catch",
-            " const ",
-            " delete ",
-            " this",
-            " extern ",
-            "private",
-            "pub",
-            "public",
-            "protected",
-            " throw ",
-            " try ",
-            " register ",
-            " typedef ",
-            " friend ",
-            " union ",
-            " goto ",
-            "unsigned ",
-            "signed ",
-            "virtual ",
-            " void ",
-            " volatile "
-        ]
-    },
-    "names": {
-        "color": 7,
-        "tokens": [
-            "read(",
-            "readlines(",
-            "write(",
-            "env(",
-            "list_files(",
-            "remove(",
-            "any(",
-            "none(",
-            "all(",
-            "over(",
-            "under(",
-            "anyless(",
-            "load_json(",
-            "write_json(",
-            "to_string(",
-            "max(",
-            "clamp(",
-            "add(",
-            "box(",
-            "col(",
-            "clear(",
-            "clearLn(",
-            "clearScr(",
-            "add_until(",
-            "key(",
-            "stop(",
-            "start(",
-            "next(",
-            "peek(",
-            "size(",
-            "len(",
-            "print(",
-            "println("
-        ]
-    },
-    "types": {
-        "color": 2,
-        "tokens": [
-            "bool",
-            "int",
-            "short",
-            "double",
-            "float",
-            "long",
-            "wchar_t",
-            "char",
-            "string",
-            "String",
-            "Ncurses",
-            "Json",
-            "JsonType",
-            "List",
-            "vector",
-            "Vector",
-            "Bounds",
-            "Clap",
-            "Option",
-            "Some",
-            "None",
-            "Dictionary",
-            "KeyValuePair",
-            "Peekable",
-            "IContainer",
-            "VerticalLayout",
-            "HorizontalLayout"
-        ]
-    },
     "boxing": [
         {
             "colors": [7,8,9,1,2,3],
@@ -200,38 +20,64 @@
             "colors": [7,8,9,1,2,3],
             "start": "<",
             "end": ">"
-        },
-        {
-            "colors": [3],
-            "start": "\"",
-            "end": "\"",
-            "mark_inner": true
-        },
-        {
-            "colors": [8],
-            "start": "'",
-            "end": "'",
-            "mark_inner": true
         }
     ],
     "custom": [
         {
             "color": 8,
-            "upper": true,
-            "lower": false,
-            "extras": ["_"]
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-Z_]*)($|\W)"
         },
         {
             "color": 2,
-            "upper": false,
-            "lower": true,
-            "extras": ["_"]
+            "capture": 2,
+            "expr": "(^|\W)([a-z][a-z_]*)($|\W)"
         },
         {
             "color": 9,
-            "upper": true,
-            "lower": true,
-            "extras": []
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][a-z][A-z]*)($|\W)"
+        },
+        {
+            "color": 2,
+            "capture": 2,
+            "expr": "(^|\W)(bool|int|short|double|float|long|wchar_t|char|string)($|\W)"
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "expr": "([0-9][0-9.]*)"
+        },
+        {
+            "color": 2,
+            "bold": true,
+            "capture": 2,
+            "expr": "(^|\W)(new|from|in|until|do|dore|doco|dobr|doremi|let|auto|break|return|continue|case|default|catch|const|delete|this|extern|private|pub|public|protected|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(^|\W)"
+        },
+        {
+            "color": 8,
+            "capture": 1,
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|,)"
+        },
+        {
+            "color": 1,
+            "capture": 2,
+            "expr": "(^|\W)(if|else|elif|select|switch|while|loop|for|foreach)($|\W)"
+        },
+        {
+            "color": 1,
+            "capture": 2,
+            "expr": "(^|\W)(get|inc|use|named|compiler|class|struct|enum|fn|glob|;)($|\W)"
+        },
+        {
+            "color": 3,
+            "capture": 1,
+            "expr": "\"(.*)\""
+        },
+        {
+            "color": 8,
+            "capture": 1,
+            "expr": "('.*')"
         }
     ]
 }
