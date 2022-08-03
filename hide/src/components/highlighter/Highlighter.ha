@@ -22,7 +22,8 @@ pub
                         y + offset.y,
                         match.position + offset.x,
                         part.color, 
-                        match.match.size())
+                        match.match.size(),
+                        part.bold)
                 ;
             ;
             foreach box in boxes
