@@ -108,7 +108,7 @@ pub
         return Command::ModeNormal
     ;
     fn close_editor => Command
-        if _editors.size() == 1 doremi Command::Exit
+        if _editors.size() == 0 doremi Command::Exit
         _origin->clear()
         select a from _activeEditor do a->close()
         vector<HorizontalLayout*> spaces = {}
@@ -134,9 +134,10 @@ pub
             else do delete editor
         ;
         _editors = editors
+        if _editors.size() == 0 doremi Command::Exit
         _activeEditor = Some(get_last(&_editors))
         _activeSpace = Some(get_last(&_editorspaces))
-        return _editors.size() == 0 ? Command::Exit : Command::ModeNormal
+        return Command::ModeNormal
     ;
     fn run Mode mode => Command
         let cmd = Command::Nop
@@ -182,4 +183,6 @@ pub
     ;
     fn get_at<T> vector<T> *vec, int at => T doremi vec->at(at)
 ;
+
+
 
