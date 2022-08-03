@@ -11,9 +11,14 @@ pub
     Peekable vector<T> values =>
         _values = values
     ;
+    Peekable string text =>
+        foreach c in text
+            _values.push_back(c)
+        ;
+    ;
     fn index => int doremi _index
     fn size => int doremi _values.size()
-    fn is_end => bool doremi _index > _values.size() - 2
+    fn is_end => bool doremi _index > _values.size() - 1
     fn is_begin => bool doremi _index == 0
     fn at int at => Option<T> doremi Some(_values.at(at))
     fn prev => Option<T> doremi !is_begin() ? at(--_index) : None<T>()
@@ -21,3 +26,4 @@ pub
     fn next => Option<T> doremi !is_end() ? at(_index++) : None<T>()
     fn peek => Option<T> doremi !is_end() ? at(_index) : None<T>()
 ;
+
