@@ -27,8 +27,10 @@ fn to_char_arr string s, char *buf => char*
     buf[s.size()] = '\0'
     return buf
 ;
-fn compile_program CompilerPath paths, vector<string> arguments =>
-    string base_cmd= "g++ " + paths.output
+fn compile_program CompilerPath paths, vector<string> arguments, bool is_release =>
+    string base_cmd= "g++ "
+    base_cmd += is_release ? "-O3" : "-Wall"
+    base_cmd += paths.output
     for i until arguments.size() do base_cmd += " " + arguments.at(i)
     println("compiling: " + base_cmd)
     char cmd[base_cmd.size() + 1]

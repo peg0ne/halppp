@@ -12,6 +12,7 @@ get => message, utils, fileutil
 get => ast, imports, enums, foreacher, expressions
 get => switch, selects, conditions, variable, template
 get => functions, classes, globals
+compiler => "-O3"
 
 struct CompileOutput
     string output = EMPTY
@@ -36,7 +37,7 @@ fn main =>
     let p = Program()
     let output = compile_main(paths, &p)
     write_program(output.content(), paths)
-    if !clap.has("-t") do compile_program(paths, output.arguments)
+    if !clap.has("-t") do compile_program(paths, output.arguments, clap.has("-r"))
 ;
 
 fn compile_main CompilerPath paths, Program *p => CompileOutput doremi compile(paths, p, true)
