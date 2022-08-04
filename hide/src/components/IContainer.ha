@@ -60,15 +60,20 @@ pub
     fn clear => do _containers = {}
     fn draw Ncurses *n =>
         if !is_active do return
-        n->col(_color)
-        n->invis_box(_offset.y, _offset.x, _size.y, _size.x)
+        n->col(_color < 0 ? -_color : _color)
+        if _color >= 0
+            n->invis_box(_offset.y, _offset.x, _size.y, _size.x)
+        ;
+        else
+            n->box(_offset.y-1, _offset.x-1, _size.y+2, _size.x+2)
+        ;
         n->add_until(_offset.y, _offset.x, _label, _size.x + _offset.x, true)
         let i = 0
         foreach s in _content
             if i >= _size.y do break
             n->add_until(_offset.y + i++, _offset.x, s, _size.x + _offset.x, false)
         ;
-        n->col(_color, false)
+        n->col(_color < 0 ? -_color : _color, false)
     ;
 ;
 
@@ -99,6 +104,11 @@ class VerticalLayout => GroupedContainer
         _fill_x = f
         _fill_y = f
         _size = s
+    ;
+    VerticalLayout Vector s, Vector o =>
+        _type = ContainerType::Vertical
+        _size = s
+        _offset = o
     ;
     pub fn draw Ncurses *n =>
         if !is_active do return
@@ -195,9 +205,15 @@ class MainContainer => VerticalLayout
     MainContainer =>
         _type = ContainerType::Main
         _size = Vector(COLS, LINES)
+        _offset = Vector(0,0)
+    ;
+    MainContainer Vector padding =>
+        _type = ContainerType::Main
+        _size = Vector(COLS - (padding.x * 2), LINES - (padding.y * 2))
+        _offset = padding
     ;
     pub fn update =>
-        _size = Vector(COLS, LINES)
+        _size = Vector(COLS - (_offset.x * 2), LINES - (_offset.y * 2))
         ((VerticalLayout*)this)->update()
     ;
     pub fn draw Ncurses *n =>
@@ -224,4 +240,9 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
         break
     ;
 ;
+
+
+
+
+
 

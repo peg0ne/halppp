@@ -16,6 +16,7 @@ class Dictionary<T,U>
     vector<U> _values = {}
     Dictionary => do return
 pub
+    fn keys => vector<T> doremi _keys
     fn contains T key => bool
         foreach k in _keys
             if k == key doremi true

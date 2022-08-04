@@ -279,7 +279,9 @@ pub
     ;
     fn find => do find(false)
     fn find bool is_reverse =>
+        if _text.size() == 0 do return
         let s = _text.at(_selector.y)
+        if s.size() == 0 do return
         let matches = re(s, R"(([A-z_]*))", 1)
         let matching = ""
         foreach match in matches
@@ -292,6 +294,7 @@ pub
     ;
     fn find string matching => do find(matching, false)
     fn find string matching, bool is_reverse =>
+        if _text.size() == 0 do return
         if matching == "" do return
         let y = 0
         let reg = regex("(^|\\W)(" + matching + ")($|\\W)")
@@ -407,9 +410,9 @@ pub
         _text.set(pos->y, _text.at(pos->y).substr(0, pos->x))
     ;
     fn yank_from =>
-        let s = _text.at(pos->y)
+        let s = _text.at(_selector.y)
         _shared_buffer->clear()
-        _shared_buffer->push_back(_text.at(pos->y).substr(pos->x))
+        _shared_buffer->push_back(_text.at(_selector.y).substr(_selector.x))
     ;
     fn change_case Vector *pos, TextEdit edit =>
         if _text.size() == 0 do return
@@ -643,6 +646,7 @@ pub
         case 'l' doremi Command::EditorRight
         case 'j' doremi Command::EditorUp
         case 'k' doremi Command::EditorDown
+        case 'p' doremi command_pallete()
         ;
         return Command::Nop
     ;
@@ -714,6 +718,97 @@ pub
         ;
         return Command::Nop
     ;
+    fn command_pallete => Command
+        let pos = 0
+        let search = ""
+        let commands = Dictionary<string, Command>()
+        let textedits = Dictionary<string, TextEdit>()
+        let buf = List<string>()
+        let pallete_found = IContainer()
+        let pallete_search = IContainer(Fill::Static, Vector(0, 1))
+        let pallete_window = VerticalLayout(
+            Vector(COLS/2, 10),
+            Vector(COLS/4, LINES/4))
+        
+        commands.add(" exit", Command::Exit)
+        commands.add(" mode normal", Command::ModeNormal)
+        commands.add(" mode insert", Command::ModeInsert)
+        commands.add(" mode visual", Command::ModeVisual)
+        commands.add(" mode file explorer", Command::ModeFileEx)
+        commands.add(" mode file explorer", Command::ModeCmdHan)
+        commands.add(" editor write", Command::WriteEditor)
+        commands.add(" editor close", Command::CloseEditor)
+        commands.add(" editor write and close", Command::WriteCloseEditor)
+        commands.add(" editor split horizontal", Command::SplitHorizontal)
+        commands.add(" editor split vertical", Command::SplitVertical)
+        commands.add(" editor move left", Command::EditorLeft)
+        commands.add(" editor move right", Command::EditorRight)
+        commands.add(" editor move up", Command::EditorUp)
+        commands.add(" editor move down", Command::EditorDown)
+        
+        textedits.add(" tab", TextEdit::Tab)
+        textedits.add(" untab", TextEdit::Untab)
+        textedits.add(" insert new line", TextEdit::InsertNl)
+        textedits.add(" remove char behind cursor", TextEdit::RemoveChar)
+        textedits.add(" remove char under cursor", TextEdit::DeleteChar)
+        textedits.add(" remove word", TextEdit::DeleteWord)
+        textedits.add(" remove word without removing extra space", TextEdit::DeleteWordExlusive)
+        textedits.add(" remove line", TextEdit::DeleteLine)
+        textedits.add(" remove from cursor to end", TextEdit::DeleteFrom)
+        textedits.add(" paste line/lines from buffer below", TextEdit::PasteLine)
+        textedits.add(" paste line/lines from buffer on to current lien", TextEdit::PasteWord)
+        textedits.add(" lower case", TextEdit::Lower)
+        textedits.add(" upper case", TextEdit::Upper)
+
+        pallete_window.SetColor(-3)
+        pallete_search.SetColor(2)
+        pallete_window.add(&pallete_search)
+        pallete_window.add(&pallete_found)
+
+        let match = ""
+        loop
+            pallete_search.SetLabel(" " + search)
+            buf.clear()
+            foreach command in commands.keys()
+                if command.find(search) == -1 do continue
+                buf.add(command)
+            ;
+            foreach edit in textedits.keys()
+                if edit.find(search) == -1 do continue
+                buf.add(edit)
+            ;
+            pallete_found.SetContent(buf)
+            pallete_window.draw(n)
+            n->mark_until((LINES/4) + 1 + pos, COLS/4, 4, COLS/2)
+            let key = n->key()
+            switch key
+            case KEY_DOWN dobr pos++
+            case KEY_UP dobr pos--
+            case 27 doremi Command::Nop
+            case '\n'
+                match = pallete_found.GetContent().at(pos)
+                select value from commands.try_get_value(match) doremi value
+                select value from textedits.try_get_value(match)
+                    text_editing(value)
+                    return Command::Nop
+                ;
+                break
+            case '\b'
+            case 127
+            case KEY_BACKSPACE
+                if search.size() == 0 do break
+                search.pop_back()
+                break
+            default
+                if !isalpha(key) do break
+                search += key
+                break
+            ;
+            if pos < 0 do pos = 0
+            if pos > buf.size() - 1 do pos = buf.size() - 1
+        ;
+        return Command::Nop
+    ;
 ;
 
 fn selection_comparer Vector &lhs, Vector &rhs => bool
@@ -740,6 +835,10 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     return lhs->x > rhs->x
 ;
  
+
+
+
+
 
 
 
