@@ -277,6 +277,58 @@ pub
         default do break
         ;
     ;
+    fn find => do find(false)
+    fn find bool is_reverse =>
+        let s = _text.at(_selector.y)
+        let matches = re(s, R"(([A-z_]*))", 1)
+        let matching = ""
+        foreach match in matches
+            if match.position > _selector.x do continue
+            if match.match.size() + match.position < _selector.x do continue
+            matching = match.match
+            break
+        ;
+        find(matching, is_reverse)
+    ;
+    fn find string matching => do find(matching, false)
+    fn find string matching, bool is_reverse =>
+        if matching == "" do return
+        let y = 0
+        let reg = regex("(^|\\W)(" + matching + ")($|\\W)")
+        let s = _text.at(_selector.y)
+        let matches = re(s, reg, 2)
+        foreach match in matches
+            if match.position <= _selector.x && !is_reverse do continue
+            elif match.position == _selector.x do continue
+            _selector.x = match.position
+            return
+        ;
+        if !is_reverse
+            foreach line in _text
+                if y <= _selector.y doco y++
+                matches = re(line, reg, 2)
+                if matches.size() > 0
+                    _selector.x = matches[0].position
+                    _selector.y = y
+                    return
+                ;
+                y++
+            ;
+        ;
+        else
+            y = _text.size() - 1
+            for i until _text.size()
+                if y >= _selector.y doco y--
+                matches = re(_text.at(y), reg, 2)
+                if matches.size() > 0
+                    _selector.x = matches[matches.size()-1].position
+                    _selector.y = y
+                    return
+                ;
+                y--
+            ;
+        ;
+    ;
     fn tab Vector *pos =>
         let s = String(_text.at(pos->y))
         s.insert("    ", 0)
@@ -497,6 +549,8 @@ pub
         case 'b' dobr move_word(Dir::Left)
         case 'u' dobr undo()
         case 'r' dobr redo()
+        case 'f' dobr find()
+        case 'F' dobr find(true)
         case 'p' dobr text_editing(TextEdit::PasteLine)
         case 'P' dobr text_editing(TextEdit::PasteWord)
         case ';' dobr _selections.clear()
@@ -612,10 +666,33 @@ pub
         return Command::Nop
     ;
     fn run_s => Command
-        switch n->key()
-        case 's' do break
-        case 'w' do break
-        case 'l' do break
+        let search = ""
+        loop
+            n->clearLn(LINES - 1)
+            n->add(LINES - 1, 0, "search: " + search)
+            let key = n->key()
+            switch key
+            case '\n' 
+                find(search)
+                n->clearLn(LINES - 1)
+                doremi Command::Nop
+            case 27
+                n->clearLn(LINES - 1)
+                doremi Command::Nop
+            case '\b'
+            case 127
+            case KEY_BACKSPACE 
+                if search.size() == 0
+                    n->clearLn(LINES - 1)
+                    return Command::Nop
+                ;
+                search.pop_back()
+                break
+            default
+                if !isalpha(key) do break
+                search += key
+                break
+            ;
         ;
         return Command::Nop
     ;
@@ -645,6 +722,7 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     return lhs->x > rhs->x
 ;
  
+
 
 
 
