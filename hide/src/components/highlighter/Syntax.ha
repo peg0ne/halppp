@@ -57,7 +57,12 @@ class Syntax
     
     Syntax => do return
     Syntax string type =>
-        _definition = load_json(type + ".json")
+        let home = "."
+        select home_opt from env("HOME")
+            home = home_opt
+        ;
+        let config = home + "/.config/hide/"
+        _definition = load_json(config + type + ".json")
         select name from _definition.try_get("name")
             _name = name->value_or((string)"")
         ;
@@ -82,4 +87,7 @@ pub
     fn boxing => vector<SyntaxBox> doremi _boxings
     fn custom => vector<SyntaxCustom> doremi _customs
 ;    
+
+
+
 

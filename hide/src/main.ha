@@ -13,3 +13,7 @@ fn main =>
     ;
     n.stop()
 ;
+
+compiler => "&& mkdir -p $HOME/.config/hide"
+compiler => "&& cp ../.config/json.json $HOME/.config/hide"
+compiler => "&& cp ../.config/ha.json $HOME/.config/hide"
