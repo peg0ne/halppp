@@ -38,7 +38,7 @@ pub
     ;
     fn h_pairs_imp Ncurses *n, string line, string match, string end, Vector xy, int depth, int start, vector<short> colors => Option<int>
         //Try find first
-        if colors.size() <= 0 do colors = {1}
+        if colors.size() <= 0 do return None<int>()
         if start >= line.size() doremi None<int>()
         let first = line.find(match, start)
         if first == -1 doremi None<int>()
@@ -62,6 +62,7 @@ pub
             let keep = h_pairs_imp(n, line, match, end, xy, depth + 1, first + 1, colors)
             loop
                 select find from keep
+                    if find == -1 doremi None<int>()
                     if find + 1 >= line.size() doremi None<int>()
                     next_end = line.find(end, find + 1)
                     let next_start = line.find(match, find + 1)
@@ -78,6 +79,7 @@ pub
         return Some((int)next_end)
     ;
 ;
+
 
 
 
