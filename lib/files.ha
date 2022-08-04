@@ -5,10 +5,11 @@ fn read string path => Option<string>
     string content, linebuf
     ifstream reader(path)
     if !reader doremi None<string>()
-    while !reader.eof()
+    while !reader.eof() || !reader.fail()
         getline(reader, linebuf)
         content += linebuf + "\n"
     ;
+    if content == "" doremi None<string>()
     return Some(content)
 ;
 fn readlines string path => vector<string>
@@ -38,6 +39,40 @@ fn env string env_var => Option<string>
     let e = getenv(env_var_arr)
     if e == NULL doremi None<string>()
     return Some((string)e)
+;
+fn list_reg_files string path => vector<string>
+    vector<string> files = {}
+    char path_arr[path.size() + 1]
+    for i until path.size() do path_arr[i] = path.at(i)
+    path_arr[path.size()] = '\0'
+    DIR *dir
+    struct dirent *diread
+    if (dir = opendir(path_arr)) != nullptr
+        while (diread = readdir(dir)) != nullptr
+            if diread->d_type != DT_REG do continue
+            files.push_back(diread->d_name)
+        ;
+        closedir(dir)
+    ;
+    sort(files.begin(), files.end())
+    return files
+;
+fn list_dirs string path => vector<string>
+    vector<string> files = {}
+    char path_arr[path.size() + 1]
+    for i until path.size() do path_arr[i] = path.at(i)
+    path_arr[path.size()] = '\0'
+    DIR *dir
+    struct dirent *diread
+    if (dir = opendir(path_arr)) != nullptr
+        while (diread = readdir(dir)) != nullptr
+            if diread->d_type != DT_DIR do continue
+            files.push_back(diread->d_name)
+        ;
+        closedir(dir)
+    ;
+    sort(files.begin(), files.end())
+    return files
 ;
 fn list_files string path => vector<string>
     vector<string> files = {}

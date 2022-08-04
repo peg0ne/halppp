@@ -163,6 +163,11 @@ class HorizontalLayout => GroupedContainer
         _fill_y = f
         _size = s
     ;
+    HorizontalLayout Vector s, Vector o =>
+        _type = ContainerType::Horizontal
+        _size = s
+        _offset = o
+    ;
     pub fn draw Ncurses *n =>
         if !is_active do return
         update()
@@ -240,6 +245,7 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
         break
     ;
 ;
+
 
 
 

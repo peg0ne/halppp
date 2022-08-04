@@ -1,3 +1,4 @@
+get => Lgrep
 class Editor => IContent
     string _path = ""
     String _modifier = String("")
@@ -647,6 +648,9 @@ pub
         case 'j' doremi Command::EditorUp
         case 'k' doremi Command::EditorDown
         case 'p' doremi command_pallete()
+        case 's' 
+            select fp from Lgrep(n) do open(fp)
+            break
         ;
         return Command::Nop
     ;
@@ -804,8 +808,9 @@ pub
                 search += key
                 break
             ;
-            if pos < 0 do pos = 0
+            if pos > 10 do pos = 10
             if pos > buf.size() - 1 do pos = buf.size() - 1
+            if pos < 0 do pos = 0
         ;
         return Command::Nop
     ;
@@ -834,23 +839,4 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
