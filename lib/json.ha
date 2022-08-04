@@ -21,6 +21,10 @@ class Json
         _value = json_parse_json(json_string)
         _type = JsonType::Object
     ;
+    Json string name, JsonType type =>
+        _name = name
+        _type = type
+    ;
     Json string name, double value =>
         _name = name
         _type = JsonType::Number
@@ -79,6 +83,11 @@ pub
         if _type != JsonType::Object do return
         if try_get(name).is_none()
             _value.push_back(new Json(name, "\"" + value + "\""))
+        ;
+    ;
+    fn try_add string name, JsonType type =>
+        if try_get(name).is_none()
+            _value.push_back(new Json(name, type))
         ;
     ;
     fn try_add string name, string value =>
@@ -364,6 +373,9 @@ fn write_json string path, Json content =>
     let s = content.as_str()
     write(s, path)
 ;
+
+
+
 
 
 

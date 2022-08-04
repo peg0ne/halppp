@@ -5,10 +5,11 @@ fn read string path => Option<string>
     string content, linebuf
     ifstream reader(path)
     if !reader doremi None<string>()
-    while !reader.eof() || !reader.fail()
+    while !reader.eof()
         getline(reader, linebuf)
         content += linebuf + "\n"
     ;
+    reader.close()
     if content == "" doremi None<string>()
     return Some(content)
 ;
@@ -94,3 +95,4 @@ fn remove string path =>
     path_arr[path.size()] = '\0'
     remove(path_arr)
 ;
+

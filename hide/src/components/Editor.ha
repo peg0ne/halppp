@@ -42,8 +42,8 @@ class Editor => IContent
         entry->try_add("type", (int)edit)
         entry->try_add("posy", _selector.y)
         entry->try_add("posx", _selector.x)
-        j.try_add("undo", "[]")
-        j.try_add("redo", "[]")
+        j.try_add("undo", JsonType::Array)
+        j.try_add("redo", JsonType::Array)
         select undo from j.try_get("undo")
             undo->add(entry)
             sort_selections()
@@ -650,7 +650,7 @@ pub
         case 'p' doremi command_pallete()
         case 's' 
             select fp from Lgrep(n) do open(fp)
-            break
+            doremi Command::ModeNormal
         ;
         return Command::Nop
     ;
@@ -839,4 +839,8 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
+
+
+
 

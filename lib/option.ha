@@ -20,8 +20,4 @@ pub
 ;
 
 fn Some<T> T value => Option<T> doremi Option<T>(value)
-fn Some string value => Option<string>
-    if value == "" doremi None<string>()
-    return Option<string>(value)
-;
 fn None<T> => Option<T> doremi Option<T>()
