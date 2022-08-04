@@ -67,16 +67,25 @@ class Editor => IContent
         select obj from j.try_get(getter)
             let last = obj->size() - 1
             select u from obj->try_get(last)
-                let text = u->try_get("text").value_unsafe()->value_or((string)"")
-                let type = u->try_get("type").value_unsafe()->value_or(0.0)
-                let posy = u->try_get("posy").value_unsafe()->value_or(0.0)
-                let posx = u->try_get("posx").value_unsafe()->value_or(0.0)
+                select text_obj from u->try_get("text")
+                select type_obj from u->try_get("type")
+                select posy_obj from u->try_get("posy")
+                select posx_obj from u->try_get("posx")
                 select store from j.try_get(setter)
-                    obj->pop()
-                    store->add(u)
-                ;
+                    Json *entry = new Json()
+                    let text = text_obj->value_or((string)"")
+                    let type = type_obj->value_or(0.0)
+                    let posy = posy_obj->value_or(0.0)
+                    let posx = posx_obj->value_or(0.0)
+                    entry->add(new Json("text", text))
+                    entry->add(new Json("type", type))
+                    entry->add(new Json("posy", posy))
+                    entry->add(new Json("posx", posx))
+                    store->add(entry)
+                    undo_handler(text, (TextEdit)type, Vector(posx, posy), is_undo)
+                ;;;;;
+                obj->pop()
                 write_json(json_path(), j)
-                undo_handler(text, (TextEdit)type, Vector(posx, posy), is_undo)
             ;
         ;
     ;
@@ -839,6 +848,7 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
 
 
 
