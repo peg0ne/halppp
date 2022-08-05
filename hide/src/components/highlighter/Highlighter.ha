@@ -13,37 +13,50 @@ pub
         let boxes = _syntax.boxing()
         let custom = _syntax.custom()
         let offset = container->Offset()
+        let size = container->Size()
+        let end = size.x + offset.x
         foreach line in content
-            if y >= container->Size().y do break
+            if y >= size.y do break
             foreach part in custom
                 let matches = re(line, part.expr, part.capture)
                 foreach match in matches
+                    let start = match.position + offset.x
+                    let len = match.match.size()
+                    if start > end do continue
+                    if start + len > end
+                        len = end - start
+                    ;
                     n->mark_until(
                         y + offset.y,
-                        match.position + offset.x,
+                        start,
                         part.color, 
-                        match.match.size(),
+                        len,
                         part.bold)
                 ;
             ;
             foreach box in boxes
-                highlight_pairs(n, line, box.start, box.end, y + offset.y, offset.x, box.colors)
+                highlight_pairs(n, line, box.start,
+                    box.end,
+                    y + offset.y,
+                    offset.x, box.colors, end)
             ;
             y++
         ;
     ;
     
-    fn highlight_pairs Ncurses *n, string line, string match, string end, int y, int x, vector<short> colors =>
-        h_pairs_imp(n, line, match, end, Vector(x,y), 0, 0, colors)
+    fn highlight_pairs Ncurses *n, string line, string match, string end, int y, int x, vector<short> colors, int max_x =>
+        h_pairs_imp(n, line, match, end, Vector(x,y), 0, 0, colors, max_x)
     ;
-    fn h_pairs_imp Ncurses *n, string line, string match, string end, Vector xy, int depth, int start, vector<short> colors => Option<int>
+    fn h_pairs_imp Ncurses *n, string line, string match, string end, Vector xy, int depth, int start, vector<short> colors, int max_x => Option<int>
         //Try find first
         if colors.size() <= 0 do return None<int>()
         if start >= line.size() doremi None<int>()
         let first = line.find(match, start)
         if first == -1 doremi None<int>()
         if first + 1 >= line.size() doremi None<int>()
-        n->mark(xy.y, xy.x + first, colors[depth % colors.size()])
+        if xy.x + first < max_x
+            n->mark(xy.y, xy.x + first, colors[depth % colors.size()])
+        ;
 
         //Find end and next start
         let next = line.find(match, first + 1)
@@ -53,13 +66,15 @@ pub
         //if next start is more than next end
         //it's not nested so we can mark safely and keep look for more
         elif next > next_end
-            n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
-            h_pairs_imp(n, line, match, end, xy, 0, first + 1, colors)
+            if xy.x + next_end < max_x
+                n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
+            ;
+            h_pairs_imp(n, line, match, end, xy, 0, first + 1, colors, max_x)
         ;
         //else if next start is less than next end
         //It's nested and well need to keep checking until we find the end fo nesting
         elif next < next_end 
-            let keep = h_pairs_imp(n, line, match, end, xy, depth + 1, first + 1, colors)
+            let keep = h_pairs_imp(n, line, match, end, xy, depth + 1, first + 1, colors, max_x)
             loop
                 select find from keep
                     if find == -1 doremi None<int>()
@@ -67,10 +82,12 @@ pub
                     next_end = line.find(end, find + 1)
                     let next_start = line.find(match, find + 1)
                     if next_end < next_start
-                        n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
+                        if xy.x + next_end < max_x
+                            n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
+                        ;
                         break
                     ;
-                    keep = h_pairs_imp(n, line, match, end, xy, depth + 1, find + 1, colors)
+                    keep = h_pairs_imp(n, line, match, end, xy, depth + 1, find + 1, colors, max_x)
                     continue
                 ;
                 break
@@ -79,6 +96,8 @@ pub
         return Some((int)next_end)
     ;
 ;
+
+
 
 
 

@@ -8,7 +8,8 @@ enum ContainerType
 
 class IContainer
 protected
-    string _label = " "
+    string _label = ""
+    Option<string> _fill_str = None<string>()
     List<string> _content = List<string>()
     List<IContainer*> _containers = List<IContainer*>()
     ContainerType _type = ContainerType::Base
@@ -27,6 +28,12 @@ protected
         _fill_x = f
         _fill_y = f
         _size = s
+    ;
+    IContainer Fill f, Vector s, string fill_str =>
+        _fill_x = f
+        _fill_y = f
+        _size = s
+        _fill_str = fill_str
     ;
     IContainer Vector s, Vector o =>
         _size = s
@@ -66,6 +73,9 @@ pub
         ;
         else
             n->box(_offset.y-1, _offset.x-1, _size.y+2, _size.x+2)
+        ;
+        select filling from _fill_str
+            for i until _size.y do n->add(_offset.y + i, _offset.x, filling)
         ;
         n->add_until(_offset.y, _offset.x, _label, _size.x + _offset.x, true)
         let i = 0
@@ -245,6 +255,11 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
         break
     ;
 ;
+
+
+
+
+
 
 
 

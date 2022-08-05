@@ -724,8 +724,8 @@ pub
                 search.pop_back()
                 break
             default
-                if !isalpha(key) do break
-                search += key
+                if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do search += key
+                elif isalpha(key) do search += key
                 break
             ;
         ;
@@ -797,9 +797,12 @@ pub
             switch key
             case KEY_DOWN dobr pos++
             case KEY_UP dobr pos--
+            case KEY_PPAGE dobr pos-=1000
+            case KEY_NPAGE dobr pos+=1000
             case 27 doremi Command::Nop
             case '\n'
-                match = pallete_found.GetContent().at(pos)
+                if pos >= buf.size() do break
+                match = buf.at(pos)
                 select value from commands.try_get_value(match) doremi value
                 select value from textedits.try_get_value(match)
                     text_editing(value)
@@ -813,12 +816,12 @@ pub
                 search.pop_back()
                 break
             default
-                if !isalpha(key) do break
-                search += key
+                if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do search += key
+                elif isalpha(key) do search += key
                 break
             ;
-            if pos > 10 do pos = 10
             if pos > buf.size() - 1 do pos = buf.size() - 1
+            if pos > 8 do pos = 8
             if pos < 0 do pos = 0
         ;
         return Command::Nop
@@ -848,6 +851,12 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
+
+
+
+
+
 
 
 
