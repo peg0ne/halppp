@@ -1,5 +1,5 @@
 {
-    "name": "halppp",
+    "name": "rust",
     "boxing": [
         {
             "colors": [7,8,9,1,2,3],
@@ -59,7 +59,7 @@
             "color": 3,
             "bold": true,
             "capture": 2,
-            "expr": "(^|\W)(true|false|new|from|in|until|do|dore|doco|dobr|doremi|let|auto|break|return|continue|case|default|catch|const|delete|this|extern|private|pub|public|protected|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)($|\W)"
+            "expr": "(^|\W)(crate|true|false|new|from|in|until|let|break|return|continue|case|default|catch|const|delete|this|extern|private|pub|public|protected|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)($|\W)"
         },
         {
             "color": 8,
@@ -69,12 +69,12 @@
         {
             "color": 1,
             "capture": 2,
-            "expr": "(^|\W)(if|else|elif|select|switch|while|loop|for|foreach)($|\W)"
+            "expr": "(^|\W)(if|else|else if|elif|match|select|switch|while|loop|for|foreach)($|\W)"
         },
         {
             "color": 1,
             "capture": 2,
-            "expr": "(^|\W)(get|inc|use|named|compiler|class|struct|enum|fn|glob|;)($|\W)"
+            "expr": "(^|\W)(mod|use|class|struct|enum|mut|fn|;)($|\W)"
         },
         {
             "color": 3,
@@ -93,4 +93,3 @@
         }
     ]
 }
-
