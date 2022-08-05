@@ -1,5 +1,5 @@
 get => enums/[movement, commands, rects, modes, textedit]
-get => components/[IContainer, IContent]
+get => components/IContent
 get => EditorManager
 get => components/[Explorer, CommandLine, ModeView]
 
@@ -81,3 +81,4 @@ pub
         return false
     ;
 ;
+

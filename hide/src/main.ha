@@ -1,5 +1,5 @@
 inc => vector
-get => ncurses, option, bounds, dictionary, json
+get => ncurses, option, bounds, dictionary, json, IContainer
 get => math, files, stringextensions, list, regex
 get => model
 
@@ -17,4 +17,5 @@ fn main =>
 compiler => "&& mkdir -p $HOME/.config/hide"
 compiler => "&& cp ../.config/json.json $HOME/.config/hide"
 compiler => "&& cp ../.config/ha.json $HOME/.config/hide"
+
 

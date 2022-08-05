@@ -1,3 +1,4 @@
+get => rects, option, list, vector, ncurses
 enum ContainerType
     Base,
     Grouped,
@@ -255,6 +256,8 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
         break
     ;
 ;
+
+
 
 
 
