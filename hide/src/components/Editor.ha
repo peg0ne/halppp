@@ -587,6 +587,7 @@ pub
             return Command::ModeVisual
         case 'a'
             _modifier = String("")
+            system("printf '\e[5 q'")
             _current_mode = Mode::Insert
             move(Dir::Right)
             draw(6)
@@ -616,6 +617,7 @@ pub
         case 's' dobr run_s()
         case 'Y' dobr yank_from()
         case 'y' dobr run_y()
+        case 'z' dobr run_z()
         default
             if !isdigit(key) do break
             _modifier.append(string(1,key))
@@ -699,6 +701,21 @@ pub
         ;
         yank_line(&_selector)
         return Command::Nop
+    ;
+    fn run_z => Command
+        switch n->key()
+        case '.'
+            _offset = Vector(_offset.x, _selector.y - _content->Size().y / 2)
+            break
+        case 't'
+            _offset = Vector(_offset.x, _selector.y)
+            break
+        case 'b'
+            _offset = Vector(_offset.x, _selector.y - _content->Size().y)
+            break
+        ;
+        if _offset.y < 0 do _offset.y = 0
+        return Command::ModeNormal
     ;
     fn run_s => Command
         let search = ""
@@ -851,6 +868,19 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

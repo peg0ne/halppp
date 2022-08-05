@@ -32,6 +32,11 @@ pub
             update("")
             return Command::WriteCloseEditor
         ;
+        elif s.starts_with("touch ")
+            write(" ", _line.substr(6))
+            update("")
+            return Command::ModeNormal
+        ;
         select num from s.to_num()
             update("")
             manager->move_to(num)
@@ -67,6 +72,9 @@ pub
         return Command::Nop
     ;
 ;
+
+
+
 
 
 
