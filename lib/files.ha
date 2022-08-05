@@ -1,4 +1,4 @@
-inc => fstream, stdlib.h, vector, dirent.h, algorithm
+inc => fstream, stdlib.h, vector, dirent.h, algorithm, unistd.h, sys/stat.h
 get => option, conditional
 
 fn read string path => Option<string>
@@ -32,6 +32,24 @@ fn write string content, string path =>
     ofstream file(path)
     file << content
     file.close()
+;
+fn system string command => bool
+    char command_arr[command.size() + 1]
+    for i until command.size() do command_arr[i] = command.at(i)
+    command_arr[command.size()] = '\0'
+    return !system(command_arr)
+;
+fn makedir string name => bool
+    char name_arr[name.size() + 1]
+    for i until name.size() do name_arr[i] = name.at(i)
+    name_arr[name.size()] = '\0'
+    return !mkdir(name_arr, S_IRWXU)
+;
+fn changedir string name => bool
+    char name_arr[name.size() + 1]
+    for i until name.size() do name_arr[i] = name.at(i)
+    name_arr[name.size()] = '\0'
+    return chdir(name_arr) >= 0
 ;
 fn env string env_var => Option<string>
     char env_var_arr[env_var.size() + 1]
@@ -95,5 +113,9 @@ fn remove string path =>
     path_arr[path.size()] = '\0'
     remove(path_arr)
 ;
+
+
+
+
 
 
