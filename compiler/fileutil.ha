@@ -7,9 +7,14 @@ fn get_file_path int argc, char **argv => string
     while argv[1][i] != '\0' do fp.push_back(argv[1][i++])
     return fp
 ;
-fn get_content CompilerPath paths => string 
+fn get_content CompilerPath paths, bool can_be_lib => string
     string content, linebuf
     ifstream reader(paths.current)
+    if !reader && can_be_lib
+        select home from env("HOME")
+            reader = ifstream(home + "/.local/lib/halppp/" + paths.current)
+        ;
+    ;
     if !reader do display_err_message("Couldn't open file\nExiting...", "")
     while !reader.eof()
         getline(reader, linebuf)
@@ -38,4 +43,5 @@ fn compile_program CompilerPath paths, vector<string> arguments, bool is_release
     system(to_char_arr(base_cmd, cmd))
     remove(to_char_arr(paths.main_path_cpp, cpp_path))
 ;
+
 

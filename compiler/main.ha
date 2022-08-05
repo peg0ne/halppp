@@ -1,5 +1,5 @@
 inc => string
-get => ../lib/[peekable, print, stringextensions, conditional, clap, list]
+get => ../lib/[peekable, print, stringextensions, conditional, clap, list, files]
 get => consts/[strings, tokens, errors]
 get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
@@ -48,7 +48,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     string headers = EMPTY
     string fnheaders = EMPTY
     let is_named = false
-    let content = get_content(paths)
+    let content = get_content(paths, !is_main)
     let ast = ast_create(content)
     let compiler_t = Compiler(p, ast)
     vector<string> incs = {}
@@ -127,9 +127,5 @@ fn validate_compiled Compiler compiler, bool is_main =>
     if !has_main && is_main do display_hint_message("Main function is not present!")
     if has_main && !is_main do display_hint_message("Main function not in main file")
 ;
-
-
-
-
 
 

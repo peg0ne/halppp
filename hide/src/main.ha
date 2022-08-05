@@ -1,6 +1,6 @@
 inc => vector
-get => ../../lib/[ncurses, option, bounds, dictionary, json]
-get => ../../lib/[math, files, stringextensions, list, regex]
+get => ncurses, option, bounds, dictionary, json
+get => math, files, stringextensions, list, regex
 get => model
 
 fn main =>
@@ -17,3 +17,4 @@ fn main =>
 compiler => "&& mkdir -p $HOME/.config/hide"
 compiler => "&& cp ../.config/json.json $HOME/.config/hide"
 compiler => "&& cp ../.config/ha.json $HOME/.config/hide"
+

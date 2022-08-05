@@ -1,4 +1,4 @@
-inc => fstream, stdlib.h, vector, dirent.h
+inc => fstream, stdlib.h, vector, dirent.h, algorithm
 get => option, conditional
 
 fn read string path => Option<string>
@@ -95,4 +95,5 @@ fn remove string path =>
     path_arr[path.size()] = '\0'
     remove(path_arr)
 ;
+
 
