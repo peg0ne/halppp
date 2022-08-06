@@ -49,6 +49,10 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     string fnheaders = EMPTY
     let is_named = false
     let content = get_content(paths, !is_main)
+    if is_main
+        let extras = "\nfn to_string string value => string doremi value\n" 
+        content = extras + content
+    ;
     let ast = ast_create(content)
     let compiler_t = Compiler(p, ast)
     vector<string> incs = {}
@@ -127,5 +131,7 @@ fn validate_compiled Compiler compiler, bool is_main =>
     if !has_main && is_main do display_hint_message("Main function is not present!")
     if has_main && !is_main do display_hint_message("Main function not in main file")
 ;
+
+
 
 

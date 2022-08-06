@@ -9,8 +9,8 @@ fn lgrep => vector<string>
         if String(dir).ends_with("/..") do continue
         let new_files = list_reg_files(dir)
         let new_dirs = list_dirs(dir)
-        foreach f in new_files do files.push_back(dir + "/" + f)
-        foreach d in new_dirs do dirs.push_back(dir + "/" + d)
+        foreach f in new_files do files.push_back($"{dir}/{f}")
+        foreach d in new_dirs do dirs.push_back($"{dir}/{d}")
     ;
     return files
 ;
@@ -76,6 +76,7 @@ fn Lgrep Ncurses* n => Option<string>
         if pos < 0 do pos = 0
     ;
 ;
+
 
 
 

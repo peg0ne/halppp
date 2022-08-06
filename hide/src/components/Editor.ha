@@ -34,7 +34,7 @@ class Editor => IContent
         open(path)
         this->n = n
     ;
-    fn json_path => string doremi _path + ".json"
+    fn json_path => string doremi $"{_path}.json"
     fn content_change TextEdit edit => 
         let j = load_json(json_path())
         Json *entry = new Json()
@@ -121,7 +121,7 @@ pub
             _selections.clear()
             _path = path
             _highlighter = Some(new Highlighter(path))
-            _header->SetLabel("| " + _path)
+            _header->SetLabel($"| {_path}")
             remove(json_path())
         ;
         _text = readlines(_path)
@@ -163,7 +163,7 @@ pub
 
         //Header
         _header->SetColor(color)
-        _header->SetLabel("| " + _path)
+        _header->SetLabel($"| {_path}")
         _header->draw(n)
 
         //Lines
@@ -307,7 +307,7 @@ pub
         if _text.size() == 0 do return
         if matching == "" do return
         let y = 0
-        let reg = regex("(^|\\W)(" + matching + ")($|\\W)")
+        let reg = regex($"(^|\\W)({matching})($|\\W)")
         let s = _text.at(_selector.y)
         let matches = re(s, reg, 2)
         foreach match in matches
@@ -868,6 +868,9 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
+
+
 
 
 

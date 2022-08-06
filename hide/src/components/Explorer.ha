@@ -66,14 +66,7 @@ pub
     fn choose => Command
         let p = _text.at(_pos)
         if p == "." doremi Command::Nop
-        //Lets remove this for now
-        //if p == ".." && _path != "."
-        //    while _path.back() != '/' do _path.pop_back()
-        //    _path.pop_back()
-        //    update()
-        //    return move_and_reset(Command::Nop)
-        //;
-        _path += "/" + _text.at(_pos)
+        _path += $"/{_text.at(_pos)}"
         update()
         return move_and_reset(_text.size() == 0 ? Command::SelectFile : Command::Nop)
     ;
@@ -119,5 +112,6 @@ pub
         return !recurse ? search(true, Some(key)) : Command::Nop
     ;
 ;
+
 
 

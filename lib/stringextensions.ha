@@ -255,6 +255,7 @@ pub
         return buf
     ;
 ;
+
 fn is_char_number char ch => bool
     switch ch
     case '0'
@@ -286,3 +287,4 @@ fn char_to_number char ch => Option<int>
     default doremi None<int>()
     ;
 ;
+
