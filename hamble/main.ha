@@ -96,5 +96,10 @@ fn main =>
     elif clap.has("watch") doremi 0
     elif clap.has("pack") doremi 0
     elif clap.has("validate") doremi 0
+    else do halp("No Arguments")
 ;
+
+
+
+
 
