@@ -10,7 +10,7 @@ class ModeView => IContent
 pub 
     fn set Mode mode =>
         _mode = mode
-        _line = "  " + to_string(mode) + "  "
+        _line = $"  {mode}  "
         _origin->SetLabel(_line)
     ;
     fn mode => Mode doremi _mode

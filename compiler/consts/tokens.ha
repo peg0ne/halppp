@@ -57,6 +57,7 @@ glob
     TOKEN_MORETHAN ">"
     TOKEN_MORETHANOREQUALS ">="
     TOKEN_NAMED "named"
+    TOKEN_NEW "new"
     TOKEN_NEWLINE "\n"
     TOKEN_NINE "9"
     TOKEN_NONEQUALITY "!="

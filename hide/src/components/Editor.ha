@@ -6,18 +6,14 @@ class Editor => IContent
     Vector _selector = Vector(0,0)
     Vector _offset = Vector(0,0)
     Vector _global_size = Vector(COLS,LINES)
-    IContainer *_header
-    IContainer *_lines
-    IContainer *_content
-    HorizontalLayout *_base
+    IContainer *_header = new IContainer(Fill::Static, Vector(0,1))
+    IContainer *_lines = new IContainer(Fill::Static, Vector(5,0))
+    IContainer *_content = new IContainer()
+    HorizontalLayout *_base = new HorizontalLayout()
     vector<string> *_shared_buffer
     IContainer *_status_line
     Mode _current_mode = Mode::Normal
     Editor Ncurses *n, string path, vector<string> *shared_buffer, IContainer *status_line =>
-        _header = new IContainer(Fill::Static, Vector(0,1))
-        _lines = new IContainer(Fill::Static, Vector(5,0))
-        _content = new IContainer()
-        _base = new HorizontalLayout()
         _origin = new VerticalLayout()
         _highlighter = Some(new Highlighter(path))
         _status_line = status_line
@@ -165,6 +161,14 @@ pub
         _header->SetColor(color)
         _header->SetLabel($"| {_path}")
         _header->draw(n)
+
+        //Status
+        vector<string> progress = {"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"}
+        let percent = (double)_selector.y / (double)(_text.size() - 1)
+        int current = 7*percent
+        let cp = progress[min(current,7)]
+        _status_line->SetLabel($" ◁ {_path} $ [{_selector.x},{_selector.y + 1}] {cp}{cp}")
+        _status_line->draw(n)
 
         //Lines
         List<string> vec = List<string>()
@@ -868,6 +872,8 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
+
+
 
 
 

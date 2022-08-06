@@ -24,6 +24,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
             case Token::Doremi dobr expression += "return "
             case Token::Let dobr expression += "auto"
             case Token::Return dobr expression += "return "
+            case Token::New dobr expression += "new "
             default dobr expression += x.name
         ;
     ;
@@ -39,6 +40,7 @@ fn get_let_expr Compiler *compiler_t => Expression
         let x = get_next_or_exit(compiler_t, "LET exception")
         if any(x.token, {Token::Eof, Token::NewLine}) do break
         value += x.name
+        if x.token == Token::New do value += " "
     ;
     let token = Token_t(value)
     if token.is_bool() do expression = "bool "
@@ -50,3 +52,5 @@ fn get_let_expr Compiler *compiler_t => Expression
     expression += id + " = " + value
     return Expression(expression)
 ;
+
+

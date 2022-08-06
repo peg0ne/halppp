@@ -53,6 +53,7 @@ enum Token
     MacroDefinition,
     MoreThan,
     MoreThanOrEquals,
+    New,
     Named,
     NewLine,
     NonEquality,
@@ -137,6 +138,7 @@ struct Token_t
         elif s == TOKEN_MORETHAN dore t = Token::MoreThan
         elif s == TOKEN_MORETHANOREQUALS dore t = Token::MoreThanOrEquals
         elif s == TOKEN_NAMED dore t = Token::Named
+        elif s == TOKEN_NEW dore t = Token::New
         elif s == TOKEN_NEWLINE dore t = Token::NewLine
         elif s == TOKEN_NONEQUALITY dore t = Token::NonEquality
         elif s == TOKEN_OR dore t = Token::Or
