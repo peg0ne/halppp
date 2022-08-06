@@ -19,6 +19,11 @@ fn ast_create string content => vector<AstToken>
             id = try_add_token(id, &ast, &peekable)
             doco try_add_token(pairs, &ast, &peekable)
         ;
+        if c == '$' && peekable.peek().value_or('"')
+            let concat = get_concat(&peekable) 
+            id = try_add_token(id, &ast, &peekable)
+            doco try_add_token(concat, &ast, &peekable)
+        ;
         if any(c, {CHAR_QUOTE, CHAR_SINGLE})
             let matched = get_matching(&peekable, c)
             id = try_add_token(id, &ast, &peekable)
@@ -124,6 +129,26 @@ fn get_matching Peekable<char> *peekable, char ch => string
     ;
 ;
 
+fn get_concat Peekable<char> *peekable => string
+    peekable->next()
+    let concat = "\""
+    let escaped = false
+    loop
+        let c_opt = peekable->next()
+        if c_opt.is_none() doremi concat
+        let c = c_opt.value_or(' ')
+        if c == '{' && !escaped
+            concat += "\" + to_string("
+        ;
+        elif c == '}' && !escaped
+            concat += ") + \""
+        ;
+        else do concat += c
+        if c == '"' && !escaped doremi concat
+        escaped = !escaped && c == '\\'
+    ;
+;
+
 fn collect_num Peekable<char> *peekable, char ch => AstToken
     string num(1, ch)
     let is_float = false
@@ -143,3 +168,10 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
         num += numbuf
     ;
 ;
+
+
+
+
+
+
+
