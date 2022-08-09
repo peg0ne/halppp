@@ -16,4 +16,3 @@ fn main =>
 
 compiler => "&& mkdir -p $HOME/.config/hide"
 compiler => "&& cp ../.config/*.json $HOME/.config/hide"
-

@@ -219,7 +219,7 @@ pub
             content += _text.at(i)
             if i < _text.len() - 1 do content += "\n"
         ;
-        write(content, _path)
+        write(String(content).strip(), _path)
     ;
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
     fn sort_selections_rev => do sort(_selections.begin(), _selections.end(), &selection_comparer_rev)
@@ -263,10 +263,7 @@ pub
             break
         case TextEdit::DeleteLine
             foreach s in selections do delete_line(s, is_multi)
-            move(Dir::Down)
-            move(Dir::Up)
-            move(Dir::Left, 1000)
-            move(Dir::Right)
+            move(Dir::Right, 0)
             break
         case TextEdit::DeleteFrom
             foreach s in selections do delete_from(s)
@@ -388,6 +385,7 @@ pub
         if _text.len() <= 1 do return
         if !is_multi do _shared_buffer->clear()
         _shared_buffer->push_back(_text.at(pos->y))
+        if pos->y == _text.len() - 1 dore _text.set(pos->y, " ")
         _text.remove(pos->y)
     ;
     fn yank_line Vector *pos => do yank_line(pos, false)
@@ -872,33 +870,3 @@ fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
     if lhs->y < rhs->y doremi true
     return lhs->x > rhs->x
 ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

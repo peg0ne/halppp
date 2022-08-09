@@ -55,4 +55,3 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
     ;
     return Expression(cond)
 ;
-

@@ -51,4 +51,3 @@ fn to_string<T> List<T> list => string
     foreach l in list do s += to_string(l) + ","
     return s + "]"
 ;
-

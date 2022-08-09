@@ -81,7 +81,3 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
     compiler_t->add_class(class_def)
     return class_def
 ;
-
-
-
-

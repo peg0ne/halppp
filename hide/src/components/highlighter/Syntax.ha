@@ -86,9 +86,4 @@ pub
     fn type => SyntaxType doremi _type
     fn boxing => vector<SyntaxBox> doremi _boxings
     fn custom => vector<SyntaxCustom> doremi _customs
-;    
-
-
-
-
-
+;

@@ -113,9 +113,3 @@ fn remove string path =>
     path_arr[path.size()] = '\0'
     remove(path_arr)
 ;
-
-
-
-
-
-

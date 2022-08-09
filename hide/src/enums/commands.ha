@@ -18,5 +18,3 @@ enum Command
     EditorDown,
     Nop,
 ;
-
-

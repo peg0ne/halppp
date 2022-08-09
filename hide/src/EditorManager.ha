@@ -183,6 +183,3 @@ pub
     ;
     fn get_at<T> vector<T> *vec, int at => T doremi vec->at(at)
 ;
-
-
-

@@ -43,5 +43,3 @@ fn compile_program CompilerPath paths, vector<string> arguments, bool is_release
     system(to_char_arr(base_cmd, cmd))
     remove(to_char_arr(paths.main_path_cpp, cpp_path))
 ;
-
-

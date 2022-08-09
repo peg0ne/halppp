@@ -287,4 +287,3 @@ fn char_to_number char ch => Option<int>
     default doremi None<int>()
     ;
 ;
-

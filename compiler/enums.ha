@@ -74,4 +74,3 @@ fn enums_construct Compiler *compiler_t => Enum
     compiler_t->add_enum(enumerator)
     return enumerator
 ;
-

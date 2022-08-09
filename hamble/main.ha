@@ -98,8 +98,3 @@ fn main =>
     elif clap.has("validate") doremi 0
     else do halp("No Arguments")
 ;
-
-
-
-
-

@@ -56,6 +56,3 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
     compiler_t->add_fn(function)
     return function
 ;
-
-
-

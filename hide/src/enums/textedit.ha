@@ -14,7 +14,3 @@ enum TextEdit
     Upper,
     Lower,
 ;
-
-
-
-

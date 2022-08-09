@@ -26,4 +26,3 @@ pub
     fn next => Option<T> doremi !is_end() ? at(_index++) : None<T>()
     fn peek => Option<T> doremi !is_end() ? at(_index) : None<T>()
 ;
-

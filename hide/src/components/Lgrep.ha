@@ -76,15 +76,3 @@ fn Lgrep Ncurses* n => Option<string>
         if pos < 0 do pos = 0
     ;
 ;
-
-
-
-
-
-
-
-
-
-
-
-

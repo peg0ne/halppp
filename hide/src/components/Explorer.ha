@@ -112,6 +112,3 @@ pub
         return !recurse ? search(true, Some(key)) : Command::Nop
     ;
 ;
-
-
-

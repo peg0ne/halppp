@@ -37,4 +37,3 @@ fn try_add_variable Compiler *compiler_t, Global *global, Variable variable =>
     ;
     global->variables.push_back(variable)
 ;
-
