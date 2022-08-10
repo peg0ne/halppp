@@ -135,7 +135,7 @@ fn get_matching Peekable<char> *peekable, char ch => string
 
 fn get_concat Peekable<char> *peekable => string
     peekable->next()
-    let concat = "\""
+    string concat = "\""
     let escaped = false
     loop
         let c_opt = peekable->next()
