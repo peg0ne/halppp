@@ -31,6 +31,11 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
         function.add_args(Variable("argc", "int"))
         function.add_args(Variable("argv[]", "char*"))
         function.return_value = Some(Variable("", "int"))
+        select peeked from compiler_t->peek()
+            if peeked.token != Token::NewLine
+                display_err_message("Return value invalid on main function", compiler_t->to_err_message())
+            ;
+        ;
     ;
     else
         peeked_opt = compiler_t->peek()

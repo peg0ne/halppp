@@ -1,1 +1,13 @@
-{"remember-header":"\n REMEMBER\n --------","remember-items":[],"header":"\n TODO\n ----","tasks":[{"task":"Add Complex conditionals such as =!=","completed":false},{"task":"Handle inheritance between classes and structs","completed":false},{"task":"Handle premade libs","completed":false}],"completed-tasks":16,"unfinished-tasks":19}
+{
+    "remember-header": "\n REMEMBER\n --------",
+    "remember-items": [],
+    "header": "\n TODO\n ----",
+    "tasks": [
+        {
+            "task": "Add Complex conditionals such as =!=",
+            "completed": false
+        }
+    ],
+    "completed-tasks": 18,
+    "unfinished-tasks": 19
+}
