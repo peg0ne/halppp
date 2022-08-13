@@ -164,7 +164,7 @@ pub
 
         //Status
         vector<string> progress = {"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"}
-        let percent = (double)_selector.y / (double)(_text.size() - 1)
+        let percent = _text.size() - 1 == 0 ? 1 : (double)_selector.y / (double)(_text.size() - 1)
         int current = 7*percent
         let cp = progress[min(current,7)]
         _status_line->SetLabel($" ◁ {_path} $ [{_selector.x},{_selector.y + 1}] {cp}{cp}")
