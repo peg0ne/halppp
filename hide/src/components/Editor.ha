@@ -286,6 +286,9 @@ pub
         case TextEdit::Lower
             foreach s in selections do change_case(s, te)
             break
+        case TextEdit::CommentToggle
+            foreach s in selections do comment_toggle(s)
+            break
         default do break
         ;
     ;
@@ -435,6 +438,15 @@ pub
         case TextEdit::Upper dobr _text.at_ptr(pos->y)->at(pos->x) = toupper(ch)
         case TextEdit::Lower dobr _text.at_ptr(pos->y)->at(pos->x) = tolower(ch)
         ;
+    ;
+    fn comment_toggle Vector *pos =>
+        if _text.size() == 0 do return
+        if _text.at(pos->y).size() == 0 dore _text.set(pos->y, "//")
+        let stringified = String(_text.at(pos->y))
+        if stringified.starts_with("//")
+            _text.set(pos->y, stringified.replace("//", "", 1))
+        ;
+        else do _text.set(pos->y, "//" + stringified.to_string())
     ;
     fn try_move Vector dir, Vector* pos => do try_move(dir, pos, true)
     fn try_move Vector dir, Vector* pos, bool can_line_swap =>
@@ -661,6 +673,7 @@ pub
         case 'l' doremi Command::EditorRight
         case 'j' doremi Command::EditorUp
         case 'k' doremi Command::EditorDown
+        case 'c' dobr text_editing(TextEdit::CommentToggle)
         case 'p' doremi command_pallete()
         case 's' 
             select fp from Lgrep(n) do open(fp)
@@ -792,6 +805,7 @@ pub
         textedits.add(" paste line/lines from buffer on to current lien", TextEdit::PasteWord)
         textedits.add(" lower case", TextEdit::Lower)
         textedits.add(" upper case", TextEdit::Upper)
+        textedits.add(" toggle comment", TextEdit::CommentToggle)
 
         pallete_window.SetColor(-3)
         pallete_search.SetColor(2)
