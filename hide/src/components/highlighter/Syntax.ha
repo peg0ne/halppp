@@ -29,6 +29,7 @@ struct SyntaxCustom
     short color = 0
     int capture = 0
     bool bold = false
+    bool dim = false
     regex expr
     SyntaxCustom => do return
     SyntaxCustom Json *custom =>
@@ -40,6 +41,9 @@ struct SyntaxCustom
         ;
         select is_bold from custom->try_get("bold")
             bold = is_bold->value_or(false)
+        ;
+        select is_dim from custom->try_get("dim")
+            dim = is_dim->value_or(false)
         ;
         select expression from custom->try_get("expr")
             expr = regex(expression->value_or((string)""))

@@ -23,6 +23,19 @@ pub
         let end = size.x + offset.x
         foreach line in content
             if y >= size.y do break
+            if _syntax.name() == "halppp" && String(line).strip() == ";"
+                let found = line.find(";")
+                for i until size.y
+                    if y-(i+1) < 0 do break
+                    let above = content.at(y-(i+1))
+                    if found >= above.size() || above.at(found) == ' '
+                        attron(A_DIM)
+                        n->add(y + offset.y - (i + 1), found + offset.x, '.')
+                        attroff(A_DIM)
+                    ;
+                    else do break
+                ;
+            ;
             foreach part in custom
                 let matches = re(line, part.expr, part.capture)
                 foreach match in matches
@@ -37,7 +50,8 @@ pub
                         start,
                         part.color, 
                         len,
-                        part.bold)
+                        part.bold,
+                        part.dim)
                 ;
             ;
             foreach box in boxes

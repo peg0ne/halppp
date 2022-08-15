@@ -53,9 +53,11 @@ class Ncurses
     ;
 pub
     fn move_curs int y, int x => do move(y, x)
-    fn mark_until int y, int x, short color, int len => do mark_until(y, x, color, len, false)
-    fn mark_until int y, int x, short color, int len, bool is_bold =>
-        if is_bold do mvchgat(y, x, len, A_BOLD, color, NULL)
+    fn mark_until int y, int x, short color, int len => do mark_until(y, x, color, len, false, false)
+    fn mark_until int y, int x, short color, int len, bool is_bold => do mark_until(y, x, color, len, is_bold, false)
+    fn mark_until int y, int x, short color, int len, bool is_bold, bool is_dim =>
+        if is_dim do mvchgat(y, x, len, A_DIM, color, NULL)
+        elif is_bold do mvchgat(y, x, len, A_BOLD, color, NULL)
         else do mvchgat(y, x, len, A_NORMAL, color, NULL)
     ;
     fn mark int y, int x, short color => do mark_until(y, x, color, 1)
