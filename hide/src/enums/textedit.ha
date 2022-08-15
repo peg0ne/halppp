@@ -13,4 +13,5 @@ enum TextEdit
     PasteWord,
     Upper,
     Lower,
+    CommentToggle,
 ;
