@@ -194,6 +194,7 @@ pub
         _content->draw(n)
         select highlighter from _highlighter
             highlighter->highlight(_content, n)
+            highlighter->highlight(_status_line, n, true, -2)
         ;
 
         mark_selections(is_current, internal_offset)

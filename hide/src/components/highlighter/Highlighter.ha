@@ -7,13 +7,19 @@ class Highlighter
         _syntax = Syntax(type)
     ;
 pub
-    fn highlight IContainer* container, Ncurses *n =>
+    fn highlight IContainer* container, Ncurses *n => do highlight(container, n, false, 0)
+    fn highlight IContainer* container, Ncurses *n, bool is_label, int x_offset =>
         let content = container->GetContent()
+        if is_label
+            content.clear()
+            content.add(container->Label())
+        ;
         let y = 0
         let boxes = _syntax.boxing()
         let custom = _syntax.custom()
         let offset = container->Offset()
         let size = container->Size()
+        offset.x += x_offset
         let end = size.x + offset.x
         foreach line in content
             if y >= size.y do break

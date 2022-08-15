@@ -40,8 +40,13 @@
         },
         {
             "color": 2,
-            "capture": 1,
+            "capture": 2,
             "expr": "(^|\W)([A-z_]*)\("
+        },
+        {
+            "color": 2,
+            "capture": 1,
+            "expr": "fn ([A-z_]*)\W"
         },
         {
             "color": 1,
