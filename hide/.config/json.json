@@ -26,8 +26,8 @@
         },
         {
             "color": 2,
-            "capture": 2,
-            "expr": "(^|\W)(true|false|null)($|\W)"
+            "capture": 1,
+            "expr": "(?:^|\W)(true|false|null)(?=$|\W)"
         },
         {
             "color": 3,
@@ -36,4 +36,3 @@
         }
     ]
 }
-
