@@ -224,10 +224,26 @@ pub
     ;
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
     fn sort_selections_rev => do sort(_selections.begin(), _selections.end(), &selection_comparer_rev)
-    fn add_selector bool is_word = true =>
+    fn add_selector bool is_word = false =>
         _selections.add(_selector)
         if !is_word do try_move(Vector(0,1), &_selector)
         else do find()
+    ;
+    fn select_line =>
+        for i until _selections.size()
+            if _selections.at(_selections.size() - 1 - i).y == _selector.y
+                _selections.remove(_selections.size() - 1 - i)
+            ;
+        ;
+        let line = _text.at(_selector.y)
+        for i until line.size()
+            _selections.add(Vector(i, _selector.y))
+        ;
+        if _selector.y >= _text.size() - 1
+            _selector.x = line.size() - 1
+            _selections.pop()
+        ;
+        else do _selector = Vector(0, _selector.y + 1)
     ;
     fn text_editing TextEdit te => do text_editing(te, None<string>(), false)
     fn text_editing TextEdit te, bool is_multi => do text_editing(te, None<string>(), is_multi)
@@ -663,6 +679,7 @@ pub
         switch key
         case 'i' doremi Command::ModeInsert
         case 27  doremi Command::ModeNormal
+        case 'x' dobr select_line()
         ;
         return Command::Nop
     ;
