@@ -224,9 +224,10 @@ pub
     ;
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
     fn sort_selections_rev => do sort(_selections.begin(), _selections.end(), &selection_comparer_rev)
-    fn add_selector =>
+    fn add_selector bool is_word = true =>
         _selections.add(_selector)
-        try_move(Vector(0,1), &_selector)
+        if !is_word do try_move(Vector(0,1), &_selector)
+        else do find()
     ;
     fn text_editing TextEdit te => do text_editing(te, None<string>(), false)
     fn text_editing TextEdit te, bool is_multi => do text_editing(te, None<string>(), is_multi)
@@ -626,6 +627,7 @@ pub
             draw(6)
             return Command::ModeInsert
         case 'x' dobr text_editing(TextEdit::DeleteChar)
+        case 'M' dobr add_selector(true)
         case 'm' dobr add_selector()
         case 'D' dobr text_editing(TextEdit::DeleteFrom)
         case 'd' dobr run_d()
