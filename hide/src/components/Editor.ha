@@ -230,20 +230,22 @@ pub
         else do find()
     ;
     fn select_line =>
+        let line = _text.at(_selector.y)
+        if line.size() == 0 do return
+        if _selector.x == line.size() - 1 && _selector.y < _text.size() - 1
+            _selector.y++
+            line = _text.at(_selector.y)
+            if line.size() == 0 do return
+        ;
         for i until _selections.size()
             if _selections.at(_selections.size() - 1 - i).y == _selector.y
                 _selections.remove(_selections.size() - 1 - i)
             ;
         ;
-        let line = _text.at(_selector.y)
         for i until line.size()
             _selections.add(Vector(i, _selector.y))
         ;
-        if _selector.y >= _text.size() - 1
-            _selector.x = line.size() - 1
-            _selections.pop()
-        ;
-        else do _selector = Vector(0, _selector.y + 1)
+        _selector.x = line.size() - 1
     ;
     fn text_editing TextEdit te => do text_editing(te, None<string>(), false)
     fn text_editing TextEdit te, bool is_multi => do text_editing(te, None<string>(), is_multi)
@@ -679,6 +681,10 @@ pub
         switch key
         case 'i' doremi Command::ModeInsert
         case 27  doremi Command::ModeNormal
+        case 'd' 
+            text_editing(TextEdit::DeleteChar)
+            _selections.clear()
+            break
         case 'x' dobr select_line()
         ;
         return Command::Nop
