@@ -22,7 +22,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
         function.templates = template_construct(compiler_t)
     ;
     loop
-        let vnb = construct_args(compiler_t)
+        let vnb = construct_args(compiler_t, true)
         if !vnb.variable.has_minimum() do break
         function.add_args(vnb.variable)
         if vnb.is_end do break
