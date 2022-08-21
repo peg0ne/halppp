@@ -113,7 +113,9 @@ fn get_pair Peekable<char> *peekable, char ch, char endch => string
             continue
         ;
         string matchbuf(1, c)
-        if c == ch doco matching += get_pair(peekable, ch, endch)
+        if c == '\'' doco matching += get_matching(peekable, '\'')
+        elif c == '"' doco matching += get_matching(peekable, '"')
+        elif c == ch doco matching += get_pair(peekable, ch, endch)
         matching += matchbuf
         if c == endch doremi matching
     ;
