@@ -210,6 +210,7 @@ pub
                     offset.y + s.y - internal_offset.y,
                     offset.x + s.x - internal_offset.x, 5)
             ;
+            n->mark_until(y, offset.x - 5, 2, 5, true)
             if _current_mode == Mode::Insert do n->move_curs(y, x)
             else do n->mark(y, x, 4)
         ;
