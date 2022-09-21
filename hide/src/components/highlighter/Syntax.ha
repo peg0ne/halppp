@@ -55,6 +55,7 @@ class Syntax
     SyntaxType _type = SyntaxType::Plain
     Json _definition = Json()
 
+    bool _is_complete = false
     string _name = "plain"
     vector<SyntaxBox> _boxings = {}
     vector<SyntaxCustom> _customs = {}
@@ -69,6 +70,7 @@ class Syntax
         _definition = load_json($"{config}{type}.json")
         select name from _definition.try_get("name")
             _name = name->value_or((string)"")
+            _is_complete = true
         ;
         select boxings from _definition.try_get("boxing")
             for i until boxings->size()
@@ -86,6 +88,7 @@ class Syntax
         ;
     ;
 pub
+    fn is_complete => _is_complete
     fn name => string doremi _name
     fn type => SyntaxType doremi _type
     fn boxing => vector<SyntaxBox> doremi _boxings
