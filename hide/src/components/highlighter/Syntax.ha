@@ -88,7 +88,7 @@ class Syntax
         ;
     ;
 pub
-    fn is_complete => _is_complete
+    fn is_complete => bool doremi _is_complete
     fn name => string doremi _name
     fn type => SyntaxType doremi _type
     fn boxing => vector<SyntaxBox> doremi _boxings
