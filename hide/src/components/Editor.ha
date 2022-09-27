@@ -312,11 +312,12 @@ pub
         default do break
         ;
     ;
-    fn find => do find(false)
-    fn find bool is_reverse =>
-        if _text.size() == 0 do return
+    fn find => string doremi find(false, true)
+    fn find bool is_reverse => string doremi find(is_reverse, true)
+    fn find bool is_reverse, bool should_move => string
+        if _text.size() == 0 do return ""
         let s = _text.at(_selector.y)
-        if s.size() == 0 do return
+        if s.size() == 0 do return ""
         let matches = re(s, R"(([A-z_]*))", 1)
         let matching = ""
         foreach match in matches
@@ -325,7 +326,8 @@ pub
             matching = match.match
             break
         ;
-        find(matching, is_reverse)
+        if should_move do find(matching, is_reverse)
+        return matching
     ;
     fn find string matching => do find(matching, false)
     fn find string matching, bool is_reverse =>
@@ -387,12 +389,46 @@ pub
         pos->y++
         pos->x = 0
     ;
-    fn insert_text string text, Vector *pos =>
+    fn insert_text string text, Vector *pos, bool suggestions = true =>
         if _text.size() == 0 do _text.add(" ")
         let s = String(_text.at(pos->y))
         s.insert(text, pos->x)
         _text.set(pos->y, s.to_string())
         try_move(Vector(1, 0), pos)
+        if !suggestions do return
+        let suggestion = find(false, false)
+        let reg = regex($"(^|\\W)({suggestion}\\w*)")
+        let offset = _content->Offset()
+        let y = offset.y + _selector.y - _offset.y
+        let x = offset.x + _selector.x - _offset.x
+        vector<string> unique_matches = {}
+        foreach line in _text
+            let matches = re(line, reg, 2)
+            foreach match in matches
+                if match.match == suggestion do continue
+                let found_already = false
+                foreach um in unique_matches
+                    if um == match.match do found_already = true
+                ;
+                if found_already do continue
+                unique_matches.push_back(match.match)
+            ;
+        ;
+        if unique_matches.size() == 0 do return
+        let selected = 0
+        loop
+            let matching_index = 0
+            foreach um in unique_matches
+                n->col(selected == matching_index ? 4 : 5)
+                n->add(y + matching_index++, x, um)
+                n->col(selected == matching_index ? 4 : 5, false)
+            ;
+            switch n->key()
+            case '\n' dore insert_text(unique_matches[selected], &_selector, false)
+            case KEY_UP dobr selected = max(selected - 1, 0)
+            case KEY_DOWN dobr selected = clamp(selected + 1, 0, unique_matches.size() - 1)
+            ;
+        ;
     ;
     fn remove_ch Vector *pos => do remove_ch(pos, false)
     fn remove_ch Vector *pos, bool should_move =>

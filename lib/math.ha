@@ -5,6 +5,5 @@ fn clamp double value, double min, double max => double
     if value < min doremi min
     return value
 ;
-fn max double v_one, double v_two => double
-    return v_one > v_two ? v_one : v_two
-;
+fn max double v_one, double v_two => double doremi v_one > v_two ? v_one : v_two
+fn min double v_one, double v_two => double doremi v_one < v_two ? v_one : v_two
