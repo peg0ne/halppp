@@ -1,0 +1,100 @@
+{
+    "name": "bash",
+    "boxing": [
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "[",
+            "end": "]"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "{",
+            "end": "}"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "(",
+            "end": ")"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "<",
+            "end": ">"
+        }
+    ],
+    "custom": [
+        {
+            "color": 8,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-Z_]*)"
+        },
+        {
+            "color": 0,
+            "capture": 2,
+            "expr": "(^|\W)([a-z_]*)"
+        },
+        {
+            "color": 9,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-z][A-z]*)"
+        },
+        {
+            "color": 2,
+            "capture": 2,
+            "expr": "(^|\W)([A-z_]*)\("
+        },
+        {
+            "color": 1,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(bool|int|short|double|float|long|char|string)(?=$|\W)"
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "bold": true,
+            "expr": "([0-9][0-9.]*)"
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "bold": true,
+            "expr": "(?:^|\W)(true|false|null)(?=$|\W)"
+        },
+        {
+            "color": 3,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(echo|read|new|from|break|return|continue|default|catch|const|delete|this|throw|try|register|void|ls|mkdir|touch|cat|grep)(?=$|\W)"
+        },
+        {
+            "color": 8,
+            "capture": 1,
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|,|\$)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
+            "expr": "(?:^|\W)(if|else|elif|fi|case|esac|for|then|select|until|while|do|done|in|function|time|coproc)(?=$|\W)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
+            "expr": "(?:^|\W)(import|class|struct|enum|def|;)(?=$|\W)"
+
+        },
+        {
+            "color": 3,
+            "capture": 1,
+            "expr": "\"([^\"]*)\""
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "expr": "('[^']')"
+        },
+        {
+            "color": 4,
+            "capture": 1,
+            "expr": "(#.*)"
+        }

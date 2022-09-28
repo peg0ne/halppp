@@ -9,6 +9,7 @@ class Highlighter
 pub
     fn highlight IContainer* container, Ncurses *n => do highlight(container, n, false, 0)
     fn highlight IContainer* container, Ncurses *n, bool is_label, int x_offset =>
+        if !_syntax.is_complete() do return
         let content = container->GetContent()
         if is_label
             content.clear()
