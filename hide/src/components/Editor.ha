@@ -397,10 +397,14 @@ pub
         try_move(Vector(1, 0), pos)
         if !suggestions do return
         let suggestion = find(false, false)
-        let reg = regex($"(^|\\W)({suggestion}\\w*)")
+        foreach ch in suggestion
+            if !isalpha(ch) && ch != '_' do return
+        ;
+        let reg = regex($"(^|\\W)({suggestion}[\\w_]*)")
         let offset = _content->Offset()
         let y = offset.y + _selector.y - _offset.y
         let x = offset.x + _selector.x - _offset.x
+        let width = 0
         vector<string> unique_matches = {}
         foreach line in _text
             let matches = re(line, reg, 2)
@@ -412,21 +416,37 @@ pub
                 ;
                 if found_already do continue
                 unique_matches.push_back(match.match)
+                if match.match.size() > width do width = match.match.size()
             ;
         ;
         if unique_matches.size() == 0 do return
+        draw()
         let selected = 0
         loop
             let matching_index = 0
             foreach um in unique_matches
                 n->col(selected == matching_index ? 4 : 5)
-                n->add(y + matching_index++, x, um)
+                n->add(y + matching_index + 1, x, um)
+                for i until width - um.size()
+                    n->add(y + matching_index + 1, x + um.size() + i, ' ')
+                ;
                 n->col(selected == matching_index ? 4 : 5, false)
+                matching_index++
             ;
-            switch n->key()
-            case '\n' dore insert_text(unique_matches[selected], &_selector, false)
+            let key = n->key()
+            switch key
+            case 27 do return
+            case '\n'
+                insert_text(String(unique_matches[selected]).replace(suggestion, ""), &_selector, false)
+                move_word(Dir::Right, true)
+                _selector.x++
+                return
             case KEY_UP dobr selected = max(selected - 1, 0)
-            case KEY_DOWN dobr selected = clamp(selected + 1, 0, unique_matches.size() - 1)
+            case KEY_DOWN dobr selected = min(selected + 1, unique_matches.size() - 1)
+            case '\b'
+            case 127
+            case KEY_BACKSPACE dore text_editing(TextEdit::RemoveChar)
+            default dore text_editing(TextEdit::Insert, string(1, key))
             ;
         ;
     ;
