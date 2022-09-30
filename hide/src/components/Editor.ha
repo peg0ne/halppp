@@ -508,6 +508,11 @@ pub
         else do s.insert(buf, ++pos->x)
         _text.set(pos->y, s.to_string())
     ;
+    fn shift_line Dir dir =>
+        text_editing(TextEdit::DeleteLine)
+        if dir == Dir::Up do move(Dir::Up, 2)
+        text_editing(TextEdit::PasteLine)
+    ;
     fn delete_word Vector *pos => do delete_word(pos, false)
     fn delete_word Vector *pos, bool spacebreak =>
         let s = String(_text.at(pos->y))
@@ -659,6 +664,8 @@ pub
         case KEY_PPAGE dobr move(Dir::Up, _content->Size().y)
         case KEY_HOME  dobr move(Dir::Left, 100000, false)
         case KEY_END   dobr move(Dir::Right, 100000, false)
+        case 558       dobr shift_line(Dir::Up)
+        case 517       dobr shift_line(Dir::Down)
         default doremi false
         ;
         return true
