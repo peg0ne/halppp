@@ -446,7 +446,9 @@ pub
             ;
             let key = n->key()
             switch key
+            case KEY_BTAB
             case 27 do return
+            case '\t'
             case '\n'
                 insert_text(String(unique_matches[selected]).replace(suggestion, ""), &_selector, false)
                 move_word(Dir::Right, true)
@@ -455,7 +457,11 @@ pub
             case KEY_UP dobr selected = max(selected - 1, 0)
             case KEY_DOWN dobr selected = min(selected + 1, max_size - 1)
             case KEY_LEFT dore move(Dir::Left)
-            case KEY_RIGHT dore move(Dir::Right) 
+            case KEY_RIGHT dore move(Dir::Right)
+            case KEY_HOME dore move(Dir::Left, 100000, false)
+            case KEY_END dore move(Dir::Right, 100000, false)
+            case KEY_PPAGE dobr selected = 0
+            case KEY_NPAGE dobr selected = max_size - 1
             case '\b'
             case 127
             case KEY_BACKSPACE dore text_editing(TextEdit::RemoveChar)
