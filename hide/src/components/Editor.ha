@@ -509,6 +509,7 @@ pub
         _text.set(pos->y, s.to_string())
     ;
     fn shift_line Dir dir =>
+        if _selections.size() > 0 do return
         text_editing(TextEdit::DeleteLine)
         if dir == Dir::Up do move(Dir::Up, 2)
         text_editing(TextEdit::PasteLine)
