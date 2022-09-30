@@ -116,8 +116,9 @@ pub
         curs_set(1)
         endwin()
     ;
-    fn start =>
+    fn start bool nonblock = false =>
         win = initscr()
         curs_set(0)
+        if nonblock do nodelay(win, TRUE)
     ;
 ;
