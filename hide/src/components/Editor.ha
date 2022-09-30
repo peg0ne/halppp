@@ -395,8 +395,9 @@ pub
         s.insert(text, pos->x)
         _text.set(pos->y, s.to_string())
         try_move(Vector(1, 0), pos)
-        if !suggestions || text == " " do return
+        if !suggestions || text == " " || _selections.size() > 0 do return
         let suggestion = find(false, false)
+        if suggestion.size() == 0 do return
         foreach ch in suggestion
             if !isalpha(ch) && ch != '_' do return
         ;
@@ -422,15 +423,23 @@ pub
         if unique_matches.size() == 0 do return
         draw()
         let selected = 0
-        let max_size = min(unique_matches.size() - 1, _content->Size().y - 1 - y)
+        let max_size = min(unique_matches.size(), _content->Size().y - 1 - y)
         loop
             let matching_index = 0
             foreach um in unique_matches
                 if matching_index + 1 + y >= _content->Size().y do break
                 n->col(selected == matching_index ? 4 : 5)
-                n->add(y + matching_index + 1, x, um)
+                n->add_until(
+                    y + matching_index + 1,
+                    x, um,
+                    _content->Size().x + offset.x,
+                    false)
                 for i until width - um.size()
-                    n->add(y + matching_index + 1, x + um.size() + i, ' ')
+                    if x + um.size() + i >= _content->Size().x + offset.x do break
+                    n->add(
+                        y + matching_index + 1,
+                        x + um.size() + i,
+                        " ")
                 ;
                 n->col(selected == matching_index ? 4 : 5, false)
                 matching_index++
