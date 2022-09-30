@@ -335,6 +335,8 @@ fn json_collect_value_json Peekable<char> *peekable => string
         select c from peekable->next()
             switch c
             case ',' doremi value
+            case '}' doremi value
+            case ']' doremi value
             case '['
                 value += "["
                 value += json_collect_arr_json(peekable)
