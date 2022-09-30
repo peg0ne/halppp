@@ -395,7 +395,7 @@ pub
         s.insert(text, pos->x)
         _text.set(pos->y, s.to_string())
         try_move(Vector(1, 0), pos)
-        if !suggestions do return
+        if !suggestions || text == " " do return
         let suggestion = find(false, false)
         foreach ch in suggestion
             if !isalpha(ch) && ch != '_' do return
@@ -422,9 +422,11 @@ pub
         if unique_matches.size() == 0 do return
         draw()
         let selected = 0
+        let max_size = min(unique_matches.size() - 1, _content->Size().y - 1 - y)
         loop
             let matching_index = 0
             foreach um in unique_matches
+                if matching_index + 1 + y >= _content->Size().y do break
                 n->col(selected == matching_index ? 4 : 5)
                 n->add(y + matching_index + 1, x, um)
                 for i until width - um.size()
@@ -442,7 +444,9 @@ pub
                 _selector.x++
                 return
             case KEY_UP dobr selected = max(selected - 1, 0)
-            case KEY_DOWN dobr selected = min(selected + 1, unique_matches.size() - 1)
+            case KEY_DOWN dobr selected = min(selected + 1, max_size - 1)
+            case KEY_LEFT dore move(Dir::Left)
+            case KEY_RIGHT dore move(Dir::Right) 
             case '\b'
             case 127
             case KEY_BACKSPACE dore text_editing(TextEdit::RemoveChar)
