@@ -79,6 +79,19 @@ fn run string type => int
     return 1
 ;
 
+fn watch => int doremi watch("")
+fn watch string type => int
+    let key = ""
+    loop
+        run(type)
+        system("clear")
+        println("=0.o= Do you want to exit? (y/n)")
+        cin >> key
+        if key == "y" doremi 1
+    ;
+    return 0
+;
+
 fn main =>
     let clap = Clap(argc, argv)
     select name from clap.peek("init")
@@ -93,7 +106,10 @@ fn main =>
         select type from clap.peek("run") doremi run(type)
         return run()
     ;
-    elif clap.has("watch") doremi 0
+    elif clap.has("watch")
+        select type from clap.peek("watch") doremi watch(type)
+        return watch()
+    ;
     elif clap.has("pack") doremi 0
     elif clap.has("validate") doremi 0
     else do halp("No Arguments")
