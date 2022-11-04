@@ -391,6 +391,13 @@ pub
     ;
     fn insert_text string text, Vector *pos, bool suggestions = true =>
         if _text.size() == 0 do _text.add(" ")
+        if any(text, {"(", "<", "{"})
+            switch text[0]
+            case '(' dobr text += ')'
+            case '<' dobr text += '>'
+            case '{' dobr text += '}'
+            ;
+        ;
         let s = String(_text.at(pos->y))
         s.insert(text, pos->x)
         _text.set(pos->y, s.to_string())
