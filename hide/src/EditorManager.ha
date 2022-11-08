@@ -6,6 +6,7 @@ class EditorManager => IContent
     Option<Editor*> _activeEditor = None<Editor*>()
     vector<string> _shared_buffer = {}
     IContainer *_status_line
+    CommandPallete _command_pallete = CommandPallete()
     EditorManager Ncurses *n, IContainer *status_line =>
         this->n = n
         _status_line = status_line
@@ -155,7 +156,7 @@ pub
         select a from _activeEditor do a->draw(6)
     ;
     fn add_editor =>
-        _editors.push_back(new Editor(n, (string)"", &_shared_buffer, _status_line))
+        _editors.push_back(new Editor(n, (string)"", &_shared_buffer, _status_line, &_command_pallete))
         select active from _activeSpace
             let editor = get_last(&_editors)
             _activeEditor = Some(editor)

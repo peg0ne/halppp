@@ -1,4 +1,4 @@
-get => Lgrep
+get => Lgrep, CommandPallete
 class Editor => IContent
     string _path = ""
     String _modifier = String("")
@@ -12,11 +12,13 @@ class Editor => IContent
     HorizontalLayout *_base = new HorizontalLayout()
     vector<string> *_shared_buffer
     IContainer *_status_line
+    CommandPallete *_command_pallete
     Mode _current_mode = Mode::Normal
-    Editor Ncurses *n, string path, vector<string> *shared_buffer, IContainer *status_line =>
+    Editor Ncurses *n, string path, vector<string> *shared_buffer, IContainer *status_line, CommandPallete *command_pallete =>
         _origin = new VerticalLayout()
         _highlighter = Some(new Highlighter(path))
         _status_line = status_line
+        _command_pallete = command_pallete
 
         _lines->SetColor(3)
         _header->SetColor(5)
@@ -704,6 +706,7 @@ pub
     ;
     fn run_nor int key => Command
         let cmd = run_base(key)
+        int _ = 0
         if cmd != Command::Nop doremi cmd
         switch key
         case 27 dobr _modifier = String("")
@@ -712,26 +715,26 @@ pub
             return Command::ModeVisual
         case 'a'
             _modifier = String("")
-            system("printf '\e[5 q'")
+            _ = system("printf '\e[5 q'")
             _current_mode = Mode::Insert
             move(Dir::Right)
             draw(6)
             return Command::ModeInsert
         case 'i'
             _modifier = String("")
-            system("printf '\e[5 q'")
+            _ = system("printf '\e[5 q'")
             _current_mode = Mode::Insert
             draw(6)
             return Command::ModeInsert
         case 'C'
             text_editing(TextEdit::DeleteFrom)
-            system("printf '\e[5 q'")
+            _ = system("printf '\e[5 q'")
             _current_mode = Mode::Insert
             draw(6)
             return Command::ModeInsert
         case 'c'
             run_d()
-            system("printf '\e[5 q'")
+            _ = system("printf '\e[5 q'")
             _current_mode = Mode::Insert
             draw(6)
             return Command::ModeInsert
@@ -752,9 +755,10 @@ pub
         return Command::Nop
     ;
     fn run_ins int key => Command
+        int _ = 0
         switch key
         case 27
-            system("printf '\e[2 q'")
+            _ = system("printf '\e[2 q'")
             _current_mode = Mode::Normal 
             draw(6)
             return Command::ModeNormal
@@ -781,6 +785,7 @@ pub
         return Command::Nop
     ;
     fn run_space => Command
+        let result = TextEditOrCommand(Command::Nop)
         switch n->key()
         case 'f' doremi Command::ModeFileEx
         case 't' doremi Command::SplitHorizontal
@@ -790,7 +795,11 @@ pub
         case 'j' doremi Command::EditorUp
         case 'k' doremi Command::EditorDown
         case 'c' dobr text_editing(TextEdit::CommentToggle)
-        case 'p' doremi command_pallete()
+        case 'p'
+            result = _command_pallete->show(n)
+            select edit from result.textedit do text_editing(edit)
+            select command from result.command doremi command
+            return Command::Nop
         case 's' 
             select fp from Lgrep(n) do open(fp)
             doremi Command::ModeNormal
@@ -877,102 +886,6 @@ pub
                 elif isalpha(key) do search += key
                 break
             ;
-        ;
-        return Command::Nop
-    ;
-    fn command_pallete => Command
-        let pos = 0
-        let search = ""
-        let commands = Dictionary<string, Command>()
-        let textedits = Dictionary<string, TextEdit>()
-        let buf = List<string>()
-        let pallete_found = IContainer()
-        let pallete_search = IContainer(Fill::Static, Vector(0, 1))
-        let pallete_window = VerticalLayout(
-            Vector(COLS/2, 10),
-            Vector(COLS/4, LINES/4))
-        
-        commands.add(" exit", Command::Exit)
-        commands.add(" mode normal", Command::ModeNormal)
-        commands.add(" mode insert", Command::ModeInsert)
-        commands.add(" mode visual", Command::ModeVisual)
-        commands.add(" mode file explorer", Command::ModeFileEx)
-        commands.add(" mode file explorer", Command::ModeCmdHan)
-        commands.add(" editor write", Command::WriteEditor)
-        commands.add(" editor close", Command::CloseEditor)
-        commands.add(" editor write and close", Command::WriteCloseEditor)
-        commands.add(" editor split horizontal", Command::SplitHorizontal)
-        commands.add(" editor split vertical", Command::SplitVertical)
-        commands.add(" editor move left", Command::EditorLeft)
-        commands.add(" editor move right", Command::EditorRight)
-        commands.add(" editor move up", Command::EditorUp)
-        commands.add(" editor move down", Command::EditorDown)
-        
-        textedits.add(" tab", TextEdit::Tab)
-        textedits.add(" untab", TextEdit::Untab)
-        textedits.add(" insert new line", TextEdit::InsertNl)
-        textedits.add(" remove char behind cursor", TextEdit::RemoveChar)
-        textedits.add(" remove char under cursor", TextEdit::DeleteChar)
-        textedits.add(" remove word", TextEdit::DeleteWord)
-        textedits.add(" remove word without removing extra space", TextEdit::DeleteWordExlusive)
-        textedits.add(" remove line", TextEdit::DeleteLine)
-        textedits.add(" remove from cursor to end", TextEdit::DeleteFrom)
-        textedits.add(" paste line/lines from buffer below", TextEdit::PasteLine)
-        textedits.add(" paste line/lines from buffer on to current lien", TextEdit::PasteWord)
-        textedits.add(" lower case", TextEdit::Lower)
-        textedits.add(" upper case", TextEdit::Upper)
-        textedits.add(" toggle comment", TextEdit::CommentToggle)
-
-        pallete_window.SetColor(-3)
-        pallete_search.SetColor(2)
-        pallete_window.add(&pallete_search)
-        pallete_window.add(&pallete_found)
-
-        let match = ""
-        loop
-            pallete_search.SetLabel(" " + search)
-            buf.clear()
-            foreach command in commands.keys()
-                if command.find(search) == -1 do continue
-                buf.add(command)
-            ;
-            foreach edit in textedits.keys()
-                if edit.find(search) == -1 do continue
-                buf.add(edit)
-            ;
-            pallete_found.SetContent(buf)
-            pallete_window.draw(n)
-            n->mark_until((LINES/4) + 1 + pos, COLS/4, 4, COLS/2)
-            let key = n->key()
-            switch key
-            case KEY_DOWN dobr pos++
-            case KEY_UP dobr pos--
-            case KEY_PPAGE dobr pos-=1000
-            case KEY_NPAGE dobr pos+=1000
-            case 27 doremi Command::Nop
-            case '\n'
-                if pos >= buf.size() do break
-                match = buf.at(pos)
-                select value from commands.try_get_value(match) doremi value
-                select value from textedits.try_get_value(match)
-                    text_editing(value)
-                    return Command::Nop
-                ;
-                break
-            case '\b'
-            case 127
-            case KEY_BACKSPACE
-                if search.size() == 0 do break
-                search.pop_back()
-                break
-            default
-                if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do search += key
-                elif isalpha(key) do search += key
-                break
-            ;
-            if pos > buf.size() - 1 do pos = buf.size() - 1
-            if pos > 8 do pos = 8
-            if pos < 0 do pos = 0
         ;
         return Command::Nop
     ;
