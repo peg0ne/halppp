@@ -1,3 +1,4 @@
+get => textediting/[Edits, Sorting]
 get => Lgrep, CommandPallete
 class Editor => IContent
     string _path = ""
@@ -372,22 +373,17 @@ pub
         ;
     ;
     fn tab Vector *pos =>
-        let s = String(_text.at(pos->y))
-        s.insert("    ", 0)
-        _text.set(pos->y, s.to_string())
+        insert_snippet(&_text, new Vector(0, pos->y), "    ")
         try_move(Vector(4,0), pos)
     ;
     fn untab Vector *pos =>
-        let s = String(_text.at(pos->y))
-        _text.set(pos->y, s.strip_front(4))
+        strip_front(&_text, pos, 4)
         if pos->x < 4 do try_move(Vector(-pos->x, 0), pos)
         else do try_move(Vector(-4,0), pos)
     ;
     fn insert_nl Vector *pos, int amount =>
         pos->y += amount
-        let s = String(_text.at(pos->y))
-        _text.set(pos->y, s.substr(0, pos->x))
-        _text.insert(pos->y + 1, s.substr(pos->x))
+        insert_newline(&_text, pos)
         pos->y++
         pos->x = 0
     ;
@@ -400,10 +396,7 @@ pub
             case '{' dobr text += '}'
             ;
         ;
-        let s = String(_text.at(pos->y))
-        s.insert(text, pos->x)
-        _text.set(pos->y, s.to_string())
-        try_move(Vector(1, 0), pos)
+        insert_snippet(&_text, pos, text)
         if !suggestions || text == " " || _selections.size() > 0 do return
         let suggestion = find(false, false)
         if suggestion.size() == 0 do return
@@ -484,17 +477,13 @@ pub
             if pos->x == 0 do return
             try_move(Vector(-1, 0), pos)
         ;
-        let s = String(_text.at(pos->y))
-        s.remove(pos->x)
-        _text.set(pos->y, s.to_string())
+        remove_char(&_text, pos)
     ;
     fn delete_line Vector *pos => do delete_line(pos, false)
     fn delete_line Vector *pos, bool is_multi =>
-        if _text.len() <= 1 do return
         if !is_multi do _shared_buffer->clear()
         _shared_buffer->push_back(_text.at(pos->y))
-        if pos->y == _text.len() - 1 dore _text.set(pos->y, " ")
-        _text.remove(pos->y)
+        remove_line(&_text, pos)
     ;
     fn yank_line Vector *pos => do yank_line(pos, false)
     fn yank_line Vector *pos, bool is_multi =>
@@ -505,17 +494,13 @@ pub
     fn paste_line Vector *pos =>
         for i until _shared_buffer->size()
             if i != 0 do content_change(TextEdit::PasteLine)
-            let buf = _shared_buffer->at(i)
-            _text.insert(++pos->y, buf)
+            insert_line(&_text, ++pos->y, _shared_buffer->at(i))
         ;
     ;
     fn paste_word Vector *pos =>
         if _shared_buffer->size() == 0 do return
-        let buf = _shared_buffer->at(0)
-        let s = String(_text.at(pos->y))
-        if pos->x == 0 do s.insert(buf, pos->x) 
-        else do s.insert(buf, ++pos->x)
-        _text.set(pos->y, s.to_string())
+        if pos->x != 0 do pos->x++
+        insert_snippet(&_text, pos, _shared_buffer->at(0))
     ;
     fn shift_line Dir dir =>
         if _selections.size() > 0 do return
@@ -524,16 +509,12 @@ pub
         text_editing(TextEdit::PasteLine)
     ;
     fn delete_word Vector *pos => do delete_word(pos, false)
-    fn delete_word Vector *pos, bool spacebreak =>
-        let s = String(_text.at(pos->y))
-        s.remove_word(pos->x, spacebreak)
-        _text.set(pos->y, s.to_string())
-    ;
+    fn delete_word Vector *pos, bool spacebreak => do remove_word(&_text, pos, spacebreak)
     fn delete_from Vector *pos =>
         let s = _text.at(pos->y)
         _shared_buffer->clear()
         _shared_buffer->push_back(_text.at(pos->y).substr(pos->x))
-        _text.set(pos->y, _text.at(pos->y).substr(0, pos->x))
+        remove_until(&_text, pos)
     ;
     fn yank_from =>
         let s = _text.at(_selector.y)
@@ -541,23 +522,12 @@ pub
         _shared_buffer->push_back(_text.at(_selector.y).substr(_selector.x))
     ;
     fn change_case Vector *pos, TextEdit edit =>
-        if _text.size() == 0 do return
-        if _text.at(pos->y).size() == 0 do return
-        let ch = _text.at(pos->y).at(pos->x)
         switch edit
-        case TextEdit::Upper dobr _text.at_ptr(pos->y)->at(pos->x) = toupper(ch)
-        case TextEdit::Lower dobr _text.at_ptr(pos->y)->at(pos->x) = tolower(ch)
+        case TextEdit::Upper dobr to_case(&_text, pos, true)
+        case TextEdit::Lower dobr to_case(&_text, pos, false)
         ;
     ;
-    fn comment_toggle Vector *pos =>
-        if _text.size() == 0 do return
-        if _text.at(pos->y).size() == 0 dore _text.set(pos->y, "//")
-        let stringified = String(_text.at(pos->y))
-        if stringified.starts_with("//")
-            _text.set(pos->y, stringified.replace("//", "", 1))
-        ;
-        else do _text.set(pos->y, "//" + stringified.to_string())
-    ;
+    fn comment_toggle Vector *pos => do commenting(&_text, pos)
     fn try_move Vector dir, Vector* pos => do try_move(dir, pos, true)
     fn try_move Vector dir, Vector* pos, bool can_line_swap =>
         if _text.size() == 0 do return
@@ -889,28 +859,4 @@ pub
         ;
         return Command::Nop
     ;
-;
-
-fn selection_comparer Vector &lhs, Vector &rhs => bool
-    if lhs.y < rhs.y doremi false
-    if lhs.y > rhs.y doremi true
-    return lhs.x > rhs.x
-;
-
-fn selection_comparer_rev Vector &lhs, Vector &rhs => bool
-    if lhs.y > rhs.y doremi false
-    if lhs.y < rhs.y doremi true
-    return lhs.x > rhs.x
-;
-
-fn selection_comparer_ptr Vector* &lhs, Vector* &rhs => bool
-    if lhs->y < rhs->y doremi false
-    if lhs->y > rhs->y doremi true
-    return lhs->x > rhs->x
-;
-
-fn selection_comparer_rev_ptr Vector* &lhs, Vector* &rhs => bool
-    if lhs->y > rhs->y doremi false
-    if lhs->y < rhs->y doremi true
-    return lhs->x > rhs->x
 ;
