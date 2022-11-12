@@ -397,6 +397,7 @@ pub
             ;
         ;
         insert_snippet(&_text, pos, text)
+        try_move(Vector(1, 0), pos)
         if !suggestions || text == " " || _selections.size() > 0 do return
         let suggestion = find(false, false)
         if suggestion.size() == 0 do return
