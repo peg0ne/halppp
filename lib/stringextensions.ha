@@ -18,6 +18,12 @@ pub
         updated += _value.substr(at)
         _value = updated
     ;
+    fn remove_back int amount =>
+        for i until amount
+            if i >= len() do return
+            remove(len() - 1)
+        ;
+    ;
     fn remove int at =>
         if len() == 0 do return
         if at >= len() do return
