@@ -1,6 +1,7 @@
 inc => string
 use => std
 get => print, files, clap
+get => Manual
 
 fn halp string info =>
     println("<-" + info + "->")
@@ -10,6 +11,7 @@ fn halp string info =>
     println("    -r - creates a release build")
     println("    -t - transpiles into c++")
     println("run Optional(-r) - build binary and run")
+    println("man - opens manual")
     println("pack - pack into a hamble package (not implemented)")
 ;
 
@@ -92,6 +94,12 @@ fn watch string type => int
     return 0
 ;
 
+fn manual => int
+    let man = Manual()
+    man.run()
+    return 1
+;
+
 fn main =>
     let clap = Clap(argc, argv)
     select name from clap.peek("init")
@@ -109,6 +117,9 @@ fn main =>
     elif clap.has("watch")
         select type from clap.peek("watch") doremi watch(type)
         return watch()
+    ;
+    elif clap.has("man")
+        return manual()
     ;
     elif clap.has("pack") doremi 0
     elif clap.has("validate") doremi 0
