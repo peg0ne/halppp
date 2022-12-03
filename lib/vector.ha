@@ -1,13 +1,13 @@
 struct Vector
-    int x = 0
-    int y = 0
-    int z = 0
+    double x = 0.0
+    double y = 0.0
+    double z = 0.0
     Vector => do return
-    Vector int x, int y =>
+    Vector double x, double y =>
         this->x = x
         this->y = y
     ;
-    Vector int x, int y, int z =>
+    Vector double x, double y, double z =>
         this->x = x
         this->y = y
         this->z = z
@@ -28,7 +28,7 @@ struct Vector
         if z != other.z doremi false
         return true
     ;
-    fn multiply int amount =>
+    fn multiply double amount =>
         x *= amount
         y *= amount
         z *= amount
