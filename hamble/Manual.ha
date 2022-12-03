@@ -2,7 +2,9 @@ get => ncurses, list, stringextensions, math
 class Manual
     Ncurses n = Ncurses()
     int current = 0
+    int currentMan = 0
     int skip = 0
+    int skipMan = 0
     Option<int> selected = None<int>()
     List<string> files = List<string>()
     List<string> content = List<string>()
@@ -25,15 +27,15 @@ class Manual
             if !line.starts_with("enum")
                 line.remove_back(1)
                 n.col(2)
-                n.add_until(i - skip, 0, "-", COLS, false)
+                n.add_until(i - skipMan, 0, "-", COLS, false)
                 n.col(2, false)
-                n.add_until(i++ - skip, 1, line.to_string(), COLS, false)
+                n.add_until(i++ - skipMan, 1, line.to_string(), COLS, false)
             ;
             else
                 n.col(1)
-                n.add_until(i - skip, 0, "enum", COLS, false)
+                n.add_until(i - skipMan, 0, "enum", COLS, false)
                 n.col(1, false)
-                n.add_until(i++ - skip, 5, line.replace("enum ", ""), COLS, false)
+                n.add_until(i++ - skipMan, 5, line.replace("enum ", ""), COLS, false)
             ;
         ;
     ;
@@ -54,22 +56,22 @@ class Manual
         ;
         if col != 0
             n.col(col)
-            n.add_until(i - skip, 0, "-", COLS, false)
+            n.add_until(i - skipMan, 0, "-", COLS, false)
             n.col(col, false)
         ;
         else
             n.col(1)
-            n.add_until(i - skip, 0, "fn", COLS, false)
+            n.add_until(i - skipMan, 0, "fn", COLS, false)
             n.col(1, false)
             print_line = String(print_line.replace("fn ", ""))
         ;
-        n.add_until(i++ - skip, col != 0 ? 2 : 3, print_line.to_string(), COLS, false)
+        n.add_until(i++ - skipMan, col != 0 ? 2 : 3, print_line.to_string(), COLS, false)
         if line.contains(" do ") doremi i
         if line.contains(" dore ") doremi i
         if line.contains(" doremi ") doremi i
         loop
             if i >= lines->size() doremi i
-            skip++
+            skipMan++
             if col == 0
                 if String(lines->at(i)).starts_with(";") doremi i
                 i++
@@ -91,15 +93,15 @@ class Manual
                 elif String(stripped).starts_with("fn ")
                     i = draw_fn(i, lines, 1)
                 ;
-                else do i++; skip++
+                else do i++; skipMan++
             ;
             else
                 let stripped = String(line.replace("class ", "")).strip()
                 class_name = line.split()[1]
                 n.col(1)
-                n.add_until(i - skip, 0, "class", COLS, false)
+                n.add_until(i - skipMan, 0, "class", COLS, false)
                 n.col(1, false)
-                n.add_until(i++ - skip, 6, stripped, COLS, false)
+                n.add_until(i++ - skipMan, 6, stripped, COLS, false)
             ;
         ;
     ;
@@ -117,15 +119,15 @@ class Manual
                 elif String(stripped).starts_with("fn ")
                     i = draw_fn(i, lines, 1)
                 ;
-                else do i++; skip++
+                else do i++; skipMan++
             ;
             else
                 let stripped = String(line.replace("struct ", "")).strip()
                 struct_name = line.split()[1]
                 n.col(1)
-                n.add_until(i - skip, 0, "struct", COLS, false)
+                n.add_until(i - skipMan, 0, "struct", COLS, false)
                 n.col(1, false)
-                n.add_until(i++ - skip, 7, stripped, COLS, false)
+                n.add_until(i++ - skipMan, 7, stripped, COLS, false)
             ;
         ;
     ;
@@ -133,8 +135,9 @@ class Manual
         n.clearScr()
         select s from selected
             let lines = readlines($"../lib/{files.at(s)}.ha")
+            content = List<string>(lines)
             let i = 0
-            skip = current
+            skipMan = currentMan
             while i < lines.size()
                 let line = String(lines[i])
                 if line.starts_with("enum")
@@ -149,7 +152,7 @@ class Manual
                 elif line.starts_with("fn")
                     i = draw_fn(i, &lines, 0)
                 ;
-                else do skip++
+                else do skipMan++
                 i++
             ;
             return
@@ -161,19 +164,38 @@ pub
     fn run =>
         draw_content()
         loop
-            let max = files.len() - 1 < LINES - 1 ? files.len() - 1 : LINES - 1
+            let max = files.len() < LINES ? files.len() - 1 : LINES - 1
+            let maxMan = content.len() - skipMan < LINES ? 0 : content.len() - skipMan - LINES
+
             switch n.key()
             case 'j'
-            case KEY_UP dobr current = clamp(current - 1, 0, max)
+            case KEY_UP 
+                select s from selected
+                    currentMan = clamp(currentMan - 1, 0, maxMan)
+                    break
+                ;
+                current = clamp(current - 1, 0, max)
+                break
             case 'k'
-            case KEY_DOWN dobr current = clamp(current + 1, 0, max)
+            case KEY_DOWN 
+                select s from selected
+                    currentMan = clamp(currentMan + 1, 0, maxMan + 1)
+                    break
+                ;
+                current = clamp(current + 1, 0, max)
+                break
             case 'a'
+                if selected.is_some() do break
                 selected = Some(current)
-                current = 0
+                currentMan = 0
+                skipMan = 0
+                skip = 0
                 break
             case 'b'
+                if selected.is_none() do break
                 selected = None<int>()
-                current = 0
+                currentMan = 0
+                skip = 0
                 break
             case 'q' dore n.stop()
             ;
