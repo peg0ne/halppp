@@ -160,14 +160,22 @@ class Manual
         foreach i, f in files do n.add(i, 0, $"- {f}")
         n.mark_until(current, 0, 5, COLS)
     ;
+    fn search_content char key =>
+        foreach i, f in files
+            if f.size() <= 0 do continue
+            if f[0] != key do continue
+            if i == current do continue
+            else dore current = i
+        ;
+    ;
 pub
     fn run =>
         draw_content()
         loop
             let max = files.len() < LINES ? files.len() - 1 : LINES - 1
             let maxMan = content.len() - skipMan < LINES ? 0 : content.len() - skipMan - LINES
-
-            switch n.key()
+            let key = n.key()
+            switch key
             case 'j'
             case KEY_UP 
                 select s from selected
@@ -198,6 +206,10 @@ pub
                 skip = 0
                 break
             case 'q' dore n.stop()
+            default
+                if selected.is_some() do break
+                search_content(key)
+                break
             ;
             draw_content()
         ;
