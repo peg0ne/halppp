@@ -1,6 +1,6 @@
 inc => regex
 use => std
-get => vector
+get => vectorint
 
 struct RegexMatch
     string match
