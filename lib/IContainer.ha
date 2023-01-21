@@ -1,4 +1,4 @@
-get => rects, option, list, vectorint, ncurses
+get => rects, option, list, vector, ncurses
 enum ContainerType
     Base,
     Grouped,
@@ -56,8 +56,8 @@ pub
     fn Label => string doremi _label
     fn Active => bool doremi is_active
     fn SetActive bool active => do is_active = active
-    fn SetSize double x, double y => do _size = Vector(x,y)
-    fn SetOffset double x, double y => do _offset = Vector(x,y)
+    fn SetSize int x, int y => do _size = Vector(x,y)
+    fn SetOffset int x, int y => do _offset = Vector(x,y)
     fn SetColor short col => do _color = col
     fn SetLabel string label => do _label = label
     fn SetContent List<string> content => do _content = content

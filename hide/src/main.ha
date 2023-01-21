@@ -1,5 +1,5 @@
 inc => vector
-get => ncurses, option, boundsint, dictionary, json, IContainer
+get => ncurses, option, bounds, dictionary, json, IContainer
 get => math, files, stringextensions, list, regex
 get => model
 
