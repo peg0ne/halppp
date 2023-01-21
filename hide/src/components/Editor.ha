@@ -334,10 +334,12 @@ pub
         if should_move do find(matching, is_reverse)
         return matching
     ;
-    fn find string matching => do find(matching, false)
-    fn find string matching, bool is_reverse =>
-        if _text.size() == 0 do return
-        if matching == "" do return
+    fn find string matching => bool doremi find(matching, "", false, false)
+    fn find string matching, string replace => bool doremi find(matching, replace, false, true)
+    fn find string matching, bool is_reverse => bool doremi find(matching, "", is_reverse, false)
+    fn find string matching, string replace, bool is_reverse, bool is_replace => bool
+        if _text.size() == 0 do return false
+        if matching == "" do return false
         let y = 0
         let reg = regex($"(^|\\W)({matching})($|\\W)")
         let s = _text.at(_selector.y)
@@ -346,7 +348,14 @@ pub
             if match.position <= _selector.x && !is_reverse do continue
             elif match.position == _selector.x do continue
             _selector.x = match.position
-            return
+            if is_replace
+                for i until matching.size()
+                    remove_ch(&_selector)
+                ;
+                insert_text(replace, &_selector, false)
+                return true
+            ;
+            return false
         ;
         if !is_reverse
             foreach line in _text
@@ -355,7 +364,14 @@ pub
                 if matches.size() > 0
                     _selector.x = matches[0].position
                     _selector.y = y
-                    return
+                    if is_replace
+                        for i until matching.size()
+                            remove_ch(&_selector)
+                        ;
+                        insert_text(replace, &_selector, false)
+                        return true
+                    ;
+                    return false
                 ;
                 y++
             ;
@@ -368,11 +384,19 @@ pub
                 if matches.size() > 0
                     _selector.x = matches[matches.size()-1].position
                     _selector.y = y
-                    return
+                    if is_replace
+                        for i until matching.size()
+                            remove_ch(&_selector)
+                        ;
+                        insert_text(replace, &_selector, false)
+                        return true
+                    ;
+                    return false
                 ;
                 y--
             ;
         ;
+        return false
     ;
     fn tab Vector *pos =>
         insert_snippet(&_text, new Vector(0, pos->y), "    ")
@@ -717,6 +741,7 @@ pub
         case 'D' dobr text_editing(TextEdit::DeleteFrom)
         case 'd' dobr run_d()
         case 's' dobr run_s()
+        case 'r' dobr run_r()
         case 'Y' dobr yank_from()
         case 'y' dobr run_y()
         case 'z' dobr run_z()
@@ -861,5 +886,60 @@ pub
             ;
         ;
         return Command::Nop
+    ;
+    fn run_r => Command
+        let search = ""
+        let replace = ""
+        let step = 0
+        loop
+            n->clearLn(LINES - 1)
+            n->add(LINES - 1, 0, $"replace: {search} - {replace}" )
+            let key = n->key()
+            switch key
+            case '\n'
+                if step == 1
+                    while find(search, replace) do continue
+                    n->clearLn(LINES - 1)
+                    return Command::Nop
+                ;
+                step++
+                break
+            case 27
+                n->clearLn(LINES - 1)
+                doremi Command::Nop
+            case '\b'
+            case 127
+            case KEY_BACKSPACE
+                if search.size() == 0
+                    n->clearLn(LINES - 1)
+                    return Command::Nop
+                ;
+                if step == 1 && replace.size() == 0
+                    step--
+                    break
+                ;
+                switch step
+                case 0
+                    search.pop_back()
+                    break
+                case 1
+                    replace.pop_back()
+                    break
+                ;
+                break
+            default
+                switch step
+                case 0
+                    if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do search += key
+                    elif isalpha(key) do search += key
+                    break
+                case 1
+                    if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do replace += key
+                    elif isalpha(key) do replace += key
+                    break
+                ;
+                break
+            ;
+        ;
     ;
 ;
