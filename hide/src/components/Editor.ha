@@ -140,6 +140,8 @@ pub
         let size = _content->Size()
         let x = size.x - 1
         let y = size.y - 1
+        if _selector.x < 0 do _selector.x = 0
+        if _selector.y < 0 do _selector.y = 0
         if _selector.y > y + _offset.y
             _offset.y = _selector.y - y
         ;
@@ -170,7 +172,7 @@ pub
         let percent = _text.size() - 1 == 0 ? 1 : (double)_selector.y / (double)(_text.size() - 1)
         int current = 7*percent
         let cp = progress[min(current,7)]
-        _status_line->SetLabel($" ◁ {_path} $ [{(int)_selector.x},{(int)_selector.y + 1}] {cp}{cp}")
+        _status_line->SetLabel($" ◁ {_path} $ [{_selector.x},{_selector.y + 1}] {cp}{cp}")
         _status_line->draw(n)
 
         //Lines
@@ -178,7 +180,7 @@ pub
         for i until _text.size() 
             let num = i + 1 + internal_offset.y
             if num > _text.size() do break
-            vec.add(to_string((int)num))
+            vec.add(to_string(num))
         ;
         _lines->SetContent(vec)
         _lines->draw(n)

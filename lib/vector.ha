@@ -1,7 +1,7 @@
 struct Vector
-    int x = 0.0
-    int y = 0.0
-    int z = 0.0
+    int x = 0
+    int y = 0
+    int z = 0
     Vector => do return
     Vector int x, int y =>
         this->x = x
