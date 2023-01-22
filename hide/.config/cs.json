@@ -1,0 +1,95 @@
+{
+    "name": "c#",
+    "boxing": [
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "[",
+            "end": "]"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "{",
+            "end": "}"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "(",
+            "end": ")"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "<",
+            "end": ">"
+        }
+    ],
+    "custom": [
+        {
+            "color": 8,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-Z_]*)"
+        },
+        {
+            "color": 0,
+            "capture": 2,
+            "expr": "(^|\W)([a-z_]*)"
+        },
+        {
+            "color": 9,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-z][A-z]*)"
+        },
+        {
+            "color": 2,
+            "capture": 2,
+            "expr": "(^|\W)([A-z_]*)\("
+        },
+        {
+            "color": 1,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(bool|int|short|double|float|long|char|string)(?=$|\W)"
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "bold": true,
+            "expr": "([0-9][0-9.]*)"
+        },
+        {
+            "color": 3,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(true|false|new|from|in|until|var|break|return|continue|case|default|catch|const|delete|this|extern|private|public|protected|throw|try|goto|unsigned|signed|virtual|void)(?=$|\W)"
+        },
+        {
+            "color": 8,
+            "capture": 1,
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|,)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
+            "expr": "(?:^|\W)(if|else|else if|select|switch|while|for|foreach)(?=$|\W)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
+            "expr": "(?:^|\W)(using|namespace|abstract|interface|class|struct|enum|async|;|.)(?=$|\W)"
+        },
+        {
+            "color": 3,
+            "capture": 1,
+            "expr": "\"(.*)\""
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "expr": "('.*')"
+        },
+        {
+            "color": 0,
+            "capture": 1,
+            "expr": "(//.*)"
+        }
+    ]
+}
