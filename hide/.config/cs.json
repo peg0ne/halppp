@@ -69,7 +69,7 @@
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(if|else|else if|select|switch|while|for|foreach)(?=$|\W)"
+            "expr": "(?:^|\W)(await|if|else|else if|select|switch|while|for|foreach)(?=$|\W)"
         },
         {
             "color": 1,
