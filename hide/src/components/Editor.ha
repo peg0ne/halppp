@@ -741,7 +741,7 @@ pub
         case 'D' dobr text_editing(TextEdit::DeleteFrom)
         case 'd' dobr run_d()
         case 's' dobr run_s()
-        case 'r' dobr run_r()
+        case 'R' dobr run_r()
         case 'Y' dobr yank_from()
         case 'y' dobr run_y()
         case 'z' dobr run_z()
