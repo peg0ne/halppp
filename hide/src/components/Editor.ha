@@ -436,6 +436,16 @@ pub
         let x = offset.x + _selector.x - _offset.x
         let width = 0
         vector<string> unique_matches = {}
+        select highlighter from _highlighter
+            let wordlist = highlighter->wordlist()
+            foreach word in wordlist
+                let stringified = String(word)
+                if !stringified.starts_with(suggestion) do continue
+
+                unique_matches.push_back(stringified.to_string())
+                if stringified.len() > width do width = stringified.len()
+            ;
+        ;
         foreach line in _text
             let matches = re(line, reg, 2)
             foreach match in matches

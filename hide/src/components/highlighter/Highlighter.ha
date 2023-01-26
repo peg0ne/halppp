@@ -7,6 +7,7 @@ class Highlighter
         _syntax = Syntax(type)
     ;
 pub
+    fn wordlist => vector<string> doremi _syntax.wordlist()
     fn highlight IContainer* container, Ncurses *n => do highlight(container, n, false, 0)
     fn highlight IContainer* container, Ncurses *n, bool is_label, int x_offset =>
         if !_syntax.is_complete() do return

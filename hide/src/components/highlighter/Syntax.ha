@@ -59,6 +59,7 @@ class Syntax
     string _name = "plain"
     vector<SyntaxBox> _boxings = {}
     vector<SyntaxCustom> _customs = {}
+    vector<string> _wordlist = {}
     
     Syntax => do return
     Syntax string type =>
@@ -86,8 +87,17 @@ class Syntax
                 ;
             ;
         ;
+        select wl from _definition.try_get("wordlist")
+            for i until wl->size()
+                select w from wl->try_get(i)
+                    let word = w->value_or((string)"")
+                    _wordlist.push_back(word)
+                ;
+            ;
+        ;
     ;
 pub
+    fn wordlist => vector<string> doremi _wordlist
     fn is_complete => bool doremi _is_complete
     fn name => string doremi _name
     fn type => SyntaxType doremi _type
