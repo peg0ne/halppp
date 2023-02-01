@@ -253,6 +253,15 @@ pub
         ;
         _selector.x = line.size() - 1
     ;
+    fn select_word =>
+        _selections.clear()
+        let x = _selector.x
+        move_word_impl(Dir::Right, &_selector, true)
+        for i until _selector.x - x
+            _selections.add(Vector(_selector.x - i, _selector.y))
+        ;
+        _selector.x = x
+    ;
     fn text_editing TextEdit te => do text_editing(te, None<string>(), false)
     fn text_editing TextEdit te, bool is_multi => do text_editing(te, None<string>(), is_multi)
     fn text_editing TextEdit te, string text => do text_editing(te, Some(text), false)
@@ -789,6 +798,7 @@ pub
             _selections.clear()
             break
         case 'x' dobr select_line()
+        case 'W' dobr select_word()
         ;
         return Command::Nop
     ;
