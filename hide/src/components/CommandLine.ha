@@ -37,6 +37,16 @@ pub
             update("")
             return Command::ModeNormal
         ;
+        elif s.starts_with("mkdir ")
+            write(" ", _line.substr(6))
+            update("")
+            return Command::ModeNormal
+        ;
+        elif s.starts_with("!")
+            system(_line.substr(1))
+            update("")
+            return Command::ModeNormal
+        ;
         select num from s.to_num()
             update("")
             manager->move_to(num)
