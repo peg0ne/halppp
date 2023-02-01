@@ -5,6 +5,12 @@ struct Class
     vector<Function> functions = {}
     vector<Variable> variables = {}
     vector<string> templates = {}
+    fn contains Variable v => bool
+        foreach var in variables
+            if var.id == v.id doremi true
+        ;
+        return false
+    ;
     fn to_cpp_start => string
         string class_str = templates.size() > 0 ? TEMPLATE : EMPTY
         for i until templates.size()

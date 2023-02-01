@@ -5,6 +5,7 @@ enum ClassError
     Inheritance,
     NoId,
     NoInheritor,
+    DoubleDeclaration,
 ;
 
 fn c_err ClassError err => string doremi c_err(err, EMPTY, false, "")
@@ -18,6 +19,7 @@ fn c_err ClassError err, string opt, bool display, string recap => string
     case ClassError::Inheritance dobr msg += "Invalid inheritance of: "
     case ClassError::NoId        dobr msg += "Invalid class declaration"
     case ClassError::NoInheritor dobr msg += "Invalid Inheritor Token\nExpected Id for inheritance for class: "
+    case ClassError::DoubleDeclaration dobr msg += "Duplicate instance of variable: "
     default do break
     ;
     msg += opt
@@ -67,6 +69,9 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
             ;
             let vnb = construct_args(compiler_t, Some(next.name))
             vnb.variable.variable_state = variable_state
+            if class_def.contains(vnb.variable)
+                c_err(ClassError::DoubleDeclaration, vnb.variable.id, true, compiler_t->to_err_message())
+            ;
             doco class_def.variables.push_back(vnb.variable)
         ;
         elif any(next.token, {Token::Eof, Token::SemiColon, Token::Class}) do break
