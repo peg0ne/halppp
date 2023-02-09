@@ -3,18 +3,21 @@ struct Compiler
     Peekable<AstToken> ast
     vector<string> arguments = {}
     List<string> current_text = List<string>({"\033[0m>>"})
-    Compiler Program *p, Peekable<AstToken> ast =>
+    int current_line = 0
+    Compiler Program *p, Peekable<AstToken> ast, int extra_lines =>
         this->program = p
         this->ast = ast
+        this->current_line -= extra_lines
     ;
     fn to_err_message => string
+        let current = current_line - 2
         while current_text.len() < 7
             select n from next(true) do continue
             break
         ;
         string s = "\n"
         foreach line in current_text
-            s += line + "\n"
+            s += $"{current++} {line}\n"
         ;
         return s
     ;
@@ -28,6 +31,7 @@ struct Compiler
             if peeked.token == Token::NewLine
                 if !is_err && len > 3 do current_text.remove(0)
                 current_text.add("\033[0m>> ")
+                current_line++
             ;
             else
                 select last from current_text.last()
@@ -121,7 +125,3 @@ struct Compiler
         return false
     ;
 ;
-
-
-
-

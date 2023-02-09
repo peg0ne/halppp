@@ -27,4 +27,12 @@ struct Variable
         base += new_line
         return base
     ;
+    fn to_cpp int indent, string new_line => string
+        string spacing = EMPTY
+        for i until indent do spacing += TAB
+        string base = spacing + v_type + SPACE + id
+        select v from v_value do base += ASSIGNMENT + v
+        base += new_line
+        return base
+    ;
 ;

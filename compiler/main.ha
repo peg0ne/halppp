@@ -49,13 +49,15 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     string fnheaders = EMPTY
     let is_named = false
     let content = get_content(paths, !is_main)
+    let extralines = 0
     if is_main
+        extralines = 5
         string extras = "\nfn to_string string value => string doremi value\n" 
         extras += "\ninc => string\nuse => std\n"
         content = extras + content
     ;
     let ast = ast_create(content)
-    let compiler_t = Compiler(p, ast)
+    let compiler_t = Compiler(p, ast, extralines)
     vector<string> incs = {}
     string args = EMPTY
     loop

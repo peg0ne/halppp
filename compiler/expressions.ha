@@ -34,6 +34,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
 fn get_let_expr Compiler *compiler_t => Expression
     let id = get_id_or_exit(compiler_t, "[Let] Required id after let")
     get_or_exit(compiler_t, Token::Equals,"[Let] Required equals after id")
+    string variable_type = EMPTY
     string expression = EMPTY
     string value = EMPTY
     loop
@@ -43,12 +44,13 @@ fn get_let_expr Compiler *compiler_t => Expression
         if x.token == Token::New do value += " "
     ;
     let token = Token_t(value)
-    if token.is_bool() do expression = "bool "
-    elif token.is_num() do expression = "int "
-    elif token.is_float() do expression = "float "
-    elif token.is_char() do expression = "char "
-    elif token.is_string() do expression = "string "
-    else do expression = "auto "
+    if token.is_bool() do variable_type = "bool "
+    elif token.is_num() do variable_type = "int "
+    elif token.is_float() do variable_type = "float "
+    elif token.is_char() do variable_type = "char "
+    elif token.is_string() do variable_type = "string "
+    else do variable_type = "auto "
+    let v = Variable(id, variable_type, Some(value), VariableState::Private)
     expression += id + " = " + value
-    return Expression(expression)
+    return Expression(v)
 ;

@@ -13,6 +13,7 @@ fn validate_function Function function, Compiler *compiler_t =>
 
 fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function
     let function = Function(state)
+    vector<Variable> variables = {}
     if !constr
         function.id = get_id_or_exit(compiler_t, "[FunctionError]: No Function Id")
     ;
@@ -52,7 +53,19 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
             case Token::Condition dobr function.add_expr(condition_construct(compiler_t, x.name))
             case Token::Switch dobr function.add_expr(switch_construct(compiler_t))
             case Token::Select dobr function.add_expr(select_construct(compiler_t))
-            default dobr function.add_expr(expression_construct(compiler_t, x))
+            default
+                let expr = expression_construct(compiler_t, x)
+                function.add_expr(expr)
+                select declaration from expr.e_declaration
+                    foreach v in variables
+                        if v.id == declaration.id
+                            display_err_message("Multiple declarations with same name in function", compiler_t->to_err_message())
+                        ;
+                    ;
+                    variables.push_back(declaration)
+                ;
+                
+                break
         ;
         if x.is_do() do break
     ;
