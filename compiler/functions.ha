@@ -11,9 +11,10 @@ fn validate_function Function function, Compiler *compiler_t =>
     ;
 ;
 
-fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function
+fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function doremi function_construct(compiler_t, state, constr, {})
+fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables => Function
     let function = Function(state)
-    vector<Variable> variables = {}
+    let variables_in_func = {}
     if !constr
         function.id = get_id_or_exit(compiler_t, "[FunctionError]: No Function Id")
     ;
@@ -57,9 +58,14 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
                 let expr = expression_construct(compiler_t, x)
                 function.add_expr(expr)
                 select declaration from expr.e_declaration
-                    foreach v in variables
+                    foreach v in variables_in_func
                         if v.id == declaration.id
                             display_err_message("Multiple declarations with same name in function", compiler_t->to_err_message())
+                        ;
+                    ;
+                    foreach v in variables
+                        if v.id == declaration.id
+                            display_err_message("Variable already declared in class", compiler_t->to_err_message())
                         ;
                     ;
                     foreach v in function.arguments
@@ -67,7 +73,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
                             display_err_message("Variable already declared in function arguments", compiler_t->to_err_message())
                         ;
                     ;
-                    variables.push_back(declaration)
+                    variables_in_func.push_back(declaration)
                 ;
                 
                 break

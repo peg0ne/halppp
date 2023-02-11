@@ -58,12 +58,12 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
     loop
         let next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def.id))
         if next.token == Token::Function
-            let function = function_construct(compiler_t, variable_state, false)
+            let function = function_construct(compiler_t, variable_state, false, class_def.variables)
             doco class_def.functions.push_back(function)
         ;
         elif any(next.token, {Token::Id, Token::Type})
             if next.name == class_def.id
-                let function = function_construct(compiler_t, VariableState::Public, true)
+                let function = function_construct(compiler_t, VariableState::Public, true, class_def.variables)
                 function.return_value = Some(Variable(EMPTY, class_def.id))
                 doco class_def.functions.push_back(function)
             ;
