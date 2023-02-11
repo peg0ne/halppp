@@ -26,6 +26,7 @@ struct AstToken
     fn is_terminator => bool doremi t.is_terminator()
     fn is_base => bool doremi t.is_base()
     fn is_do => bool doremi t.is_do()
+    fn is_adv_conditional => bool doremi t.is_adv_conditional()
     fn is_conditional => bool doremi t.is_conditional()
     fn is_conditional_sep => bool doremi t.is_conditional_sep()
     fn valid_case => bool doremi t.valid_case()

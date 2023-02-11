@@ -205,7 +205,7 @@ struct Token_t
         default doremi false
         ;
     ;
-    fn is_conditional => bool
+    fn is_adv_conditional => bool
         switch t
         case Token::AllEquals
         case Token::AllLessOrEquals
@@ -213,7 +213,12 @@ struct Token_t
         case Token::AllMoreOrEquals 
         case Token::AllMoreThan
         case Token::AllNotEquals
-        case Token::AnyEquals
+        case Token::AnyEquals doremi true
+        default doremi false
+        ;
+    ;
+    fn is_conditional => bool
+        switch t
         case Token::Equality
         case Token::LessThan
         case Token::LessThanOrEquals

@@ -14,7 +14,7 @@ fn validate_function Function function, Compiler *compiler_t =>
 fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function doremi function_construct(compiler_t, state, constr, {})
 fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables => Function
     let function = Function(state)
-    let variables_in_func = {}
+    vector<Variable> variables_in_func = {}
     if !constr
         function.id = get_id_or_exit(compiler_t, "[FunctionError]: No Function Id")
     ;

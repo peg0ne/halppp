@@ -17,7 +17,9 @@ struct Compiler
         ;
         string s = "\n"
         foreach line in current_text
-            s += $"{current++} {line}\n"
+            let nr = to_string(current)
+            s += nr + line + "\n"
+            current++
         ;
         return s
     ;
