@@ -499,8 +499,7 @@ pub
             case '\t'
             case '\n'
                 insert_text(String(unique_matches[selected]).replace(suggestion, ""), &_selector, false)
-                move_word(Dir::Right, true)
-                _selector.x++
+                move(Dir::Right, unique_matches[selected].size(), true)
                 return
             case KEY_UP dobr selected = max(selected - 1, 0)
             case KEY_DOWN dobr selected = min(selected + 1, max_size - 1)
