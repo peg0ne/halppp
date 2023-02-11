@@ -62,6 +62,11 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
                             display_err_message("Multiple declarations with same name in function", compiler_t->to_err_message())
                         ;
                     ;
+                    foreach v in function.arguments
+                        if v.id == declaration.id
+                            display_err_message("Variable already declared in function arguments", compiler_t->to_err_message())
+                        ;
+                    ;
                     variables.push_back(declaration)
                 ;
                 
