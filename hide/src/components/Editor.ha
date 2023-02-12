@@ -498,8 +498,8 @@ pub
             case 27 do return
             case '\t'
             case '\n'
-                insert_text(String(unique_matches[selected]).replace(suggestion, ""), &_selector, false)
-                move(Dir::Right, unique_matches[selected].size(), true)
+                insert_text(String(unique_matches[selected]).replace(suggestion, "", 1), &_selector, false)
+                move(Dir::Right, unique_matches[selected].size() - suggestion.size() - 1, true)
                 return
             case KEY_UP dobr selected = max(selected - 1, 0)
             case KEY_DOWN dobr selected = min(selected + 1, max_size - 1)
