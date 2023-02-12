@@ -35,6 +35,11 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
             cond.add_expr(expression)
             doco expression = ConditionalExpression()
         ;
+        if x.is_adv_conditional()
+            adv_conditional_construct(compiler_t, &expression, x)
+            cond.add_expr(expression)
+            doco expression = ConditionalExpression()
+        ;
         if x.is_conditional() doco expression.operator_value = x.name
         if x.is_nl() dobr cond.add_expr(expression)
         if expression.operator_value.size() == 0 doco expression.value_left += x.name + " "
@@ -54,4 +59,36 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         ;
     ;
     return Expression(cond)
+;
+
+fn adv_conditional_construct Compiler *compiler_t, ConditionalExpression *expr, AstToken token =>
+    let separator = "&& "
+    switch token.token
+        case Token::AllEquals dobr expr->operator_value = "=="
+        case Token::AllLessOrEquals dobr expr->operator_value = "<="
+        case Token::AllLessThan dobr expr->operator_value = "<"
+        case Token::AllMoreOrEquals dobr expr->operator_value = ">="
+        case Token::AllMoreThan dobr expr->operator_value = ">"
+        case Token::AllNotEquals dobr expr->operator_value = "!="
+        case Token::AnyEquals
+            expr->operator_value = "=="
+            separator = "|| "
+            break
+        default dobr display_err_message("UNKOWN TOKEN", compiler_t->to_err_message())
+    ;
+    let op = expr->operator_value + " "
+    let left = expr->value_left + " "
+    let is_first = true
+    loop
+        let x = compiler_t->peek().value_or(' ')
+        if compiler_t->peek().is_none() do return
+        if x.is_do() do return
+        if x.is_conditional_sep() do return
+        if x.is_nl() do return
+        if x.name == ":" doco compiler_t->next()
+        if !is_first do expr->value_right += separator + left + op
+        expr->value_right += x.name + " "
+        compiler_t->next()
+        is_first = false
+    ;
 ;

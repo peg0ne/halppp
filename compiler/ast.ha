@@ -29,6 +29,23 @@ fn ast_create string content => vector<AstToken>
             id = try_add_token(id, &ast, &peekable)
             doco try_add_token(matched, &ast, &peekable)
         ;
+        if id.size() == 0 && c == '='
+            let peeked = peekable.peek().value_or(' ')
+            let third = peekable.at(peekable.index() + 1).value_or(' ')
+            let is_valid = peekable.peek().is_some() && peekable.at(peekable.index() + 1).is_some()
+            let is_part_of_adv = peeked == '&' || peeked == '<' || peeked == '!' || peeked == '|'
+            let is_end_of_adv = third == '='
+            if is_valid && is_part_of_adv && is_end_of_adv
+                string part_one(1, c)
+                string part_two(1, peeked)
+                string part_three(1, third)
+                let combined = part_one + part_two + part_three
+                id = try_add_token(combined, &ast, &peekable)
+                peekable.next()
+                peekable.next()
+                continue
+            ;
+        ;
         elif is_char_number_t(c)
             let num = collect_num(&peekable, c)
             id = try_add_token(id, &ast, &peekable)
