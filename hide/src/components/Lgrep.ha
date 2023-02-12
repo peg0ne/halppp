@@ -4,7 +4,7 @@ fn lgrep => vector<string>
     let current = 0
     while (current++) < dirs.size()
         let dir = dirs.at(current-1)
-        if any(dir, {".", ".."}) do continue
+        if dir =|= ".": ".." do continue
         if String(dir).ends_with("/.") do continue
         if String(dir).ends_with("/..") do continue
         let new_files = list_reg_files(dir)
@@ -67,7 +67,7 @@ fn Lgrep Ncurses* n => Option<string>
             search.pop_back()
             break
         default
-            if any(key, {'.', '/', ' '}) do search += key
+            if key =|= '.': '/': ' ' do search += key
             elif isalpha(key) do search += key
             break
         ;

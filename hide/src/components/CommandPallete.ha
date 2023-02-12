@@ -97,7 +97,7 @@ pub
                 search.pop_back()
                 break
             default
-                if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do search += key
+                if key =|= ',': ' ': '/': ':': '.': '_': '-' : '<' : '>' do search += key
                 elif isalpha(key) do search += key
                 break
             ;

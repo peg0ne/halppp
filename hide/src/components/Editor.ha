@@ -424,7 +424,7 @@ pub
     ;
     fn insert_text string text, Vector *pos, bool suggestions = true =>
         if _text.size() == 0 do _text.add(" ")
-        if any(text, {"(", "<", "{"})
+        if text =|= "(" : "<" : "{"
             switch text[0]
             case '(' dobr text += ')'
             case '<' dobr text += '>'
@@ -899,7 +899,7 @@ pub
                 search.pop_back()
                 break
             default
-                if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do search += key
+                if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
                 elif isalpha(key) do search += key
                 break
             ;
@@ -949,11 +949,11 @@ pub
             default
                 switch step
                 case 0
-                    if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do search += key
+                    if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
                     elif isalpha(key) do search += key
                     break
                 case 1
-                    if any(key, {',', ' ', '/', ':', '.', '_', '-', '<', '>'}) do replace += key
+                    if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
                     elif isalpha(key) do replace += key
                     break
                 ;
