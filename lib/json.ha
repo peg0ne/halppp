@@ -184,6 +184,12 @@ pub
         ;
         return buf
     ;
+    fn destruct =>
+        foreach v in _value
+            v->destruct()
+            delete(v)
+        ;
+    ;
 ;
 
 fn json_parse_json string json_string => vector<Json*>

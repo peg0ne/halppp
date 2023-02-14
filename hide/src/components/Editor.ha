@@ -56,6 +56,7 @@ class Editor => IContent
             ;
         ;
         write_json(json_path(), j)
+        j.destruct()
     ;
     fn redo => do undo(false)
     fn undo => do undo(true)
@@ -82,6 +83,8 @@ class Editor => IContent
                     entry->add(new Json("posx", posx))
                     store->add(entry)
                     undo_handler(text, (TextEdit)type, Vector(posx, posy), is_undo)
+                    entry->destruct()
+                    delete(entry)
                 ;;;;;
                 obj->pop()
                 write_json(json_path(), j)
@@ -119,6 +122,7 @@ pub
             _selector = Vector(0,0)
             _selections.clear()
             _path = path
+            select h from _highlighter do delete(h)
             _highlighter = Some(new Highlighter(path))
             _header->SetLabel($"| {_path}")
             remove(json_path())
@@ -414,7 +418,9 @@ pub
         return false
     ;
     fn tab Vector *pos =>
-        insert_snippet(&_text, new Vector(0, pos->y), "    ")
+        let v = new Vector(0, pos->y)
+        insert_snippet(&_text, v, "    ")
+        delete(v)
         try_move(Vector(4,0), pos)
     ;
     fn untab Vector *pos =>
