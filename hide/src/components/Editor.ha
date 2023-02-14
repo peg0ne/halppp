@@ -126,9 +126,15 @@ pub
         _text = readlines(_path)
         _content->SetContent(_text)
     ;
-    fn close =>
+    fn close => Editor*
         set_active(false)
         remove(json_path())
+        delete(_header)
+        delete(_lines)
+        delete(_content)    
+        delete(_base)
+        select h from _highlighter do delete(h)
+        return this
     ;
     fn move_to int pos =>
         let diff = (pos - 1) - _selector.y

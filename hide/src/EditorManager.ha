@@ -111,7 +111,8 @@ pub
     fn close_editor => Command
         if _editors.size() == 0 doremi Command::Exit
         _origin->clear()
-        select a from _activeEditor do a->close()
+        let closed = None<Editor*>()
+        select a from _activeEditor do Some(a->close())
         vector<HorizontalLayout*> spaces = {}
         foreach space in _editorspaces
             let containers = space->containers()
@@ -125,6 +126,10 @@ pub
             if buf.size() == 0 do continue
             foreach editor in buf do space->add(editor)
             spaces.push_back(space)
+        ;
+        select e from closed
+            delete(e->origin())
+            delete(e)
         ;
         _editorspaces = spaces
         _origin->clear()

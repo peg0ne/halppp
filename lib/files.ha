@@ -39,6 +39,23 @@ fn system string command => bool
     command_arr[command.size()] = '\0'
     return !system(command_arr)
 ;
+fn system_output string command => vector<string>
+    vector<string> output = {}
+    char command_arr[command.size() + 1]
+    for i until command.size() do command_arr[i] = command.at(i)
+    command_arr[command.size()] = '\0'
+
+    FILE* fp
+    char buffer[1064]
+    if (fp = popen(command_arr, "r")) == NULL
+        return output
+    ;
+    while fgets(buffer, sizeof(buffer), fp)
+        output.push_back(buffer)
+    ;
+    pclose(fp)
+    return output
+;
 fn makedir string name => bool
     char name_arr[name.size() + 1]
     for i until name.size() do name_arr[i] = name.at(i)

@@ -60,7 +60,10 @@ pub
     fn SetOffset int x, int y => do _offset = Vector(x,y)
     fn SetColor short col => do _color = col
     fn SetLabel string label => do _label = label
-    fn SetContent List<string> content => do _content = content
+    fn SetContent List<string> content =>
+        _content.clear()
+        _content = content
+    ;
     fn GetContent => List<string> doremi _content
     fn add IContainer* c => do _containers.add(c)
     fn size => int doremi _containers.len()
