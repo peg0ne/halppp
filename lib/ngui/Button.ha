@@ -8,6 +8,13 @@ class Button => IContainer
         this->_size = Vector(0,3)
         this->_label = "Button"
     ;
+    Button int width =>
+        this->_type = ContainerType::Base
+        this->_fill_x = Fill::Static
+        this->_fill_y = Fill::Static
+        this->_size = Vector(width, 3)
+        this->_label = "Button"
+    ;
 pub
     fn hover => do _selected = true
     fn unhover => do _selected = false

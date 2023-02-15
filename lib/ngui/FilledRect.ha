@@ -4,6 +4,12 @@ class FilledRect => IContainer
     FilledRect char fill =>
         this->_fill = fill
     ;
+    FilledRect char fill, Vector size =>
+        this->_fill_x = size.x != 0 ? Fill::Static : Fill::Flex
+        this->_fill_y = size.y != 0 ? Fill::Static : Fill::Flex
+        this->_fill = fill
+        this->_size = size
+    ;
 pub
     fn draw NCurses *n =>
         n->col(_color)
