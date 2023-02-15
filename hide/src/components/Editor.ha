@@ -483,21 +483,28 @@ pub
         if unique_matches.size() == 0 do return
         draw()
         let selected = 0
-        let max_size = min(unique_matches.size(), _content->Size().y - 1 - y)
+        let reverse = false
+        let space_below = _content->Size().y - 1 - y
+        if space_below < 5
+            space_below = LINES / 2
+            reverse = true
+        ;
+        let max_size = min(unique_matches.size(), space_below)
         loop
             let matching_index = 0
+            let positioned_y = reverse ? y - max_size : y
             foreach um in unique_matches
-                if matching_index + 1 + y >= _content->Size().y do break
+                if matching_index + 1 + positioned_y >= _content->Size().y do break
                 n->col(selected == matching_index ? 4 : 5)
                 n->add_until(
-                    y + matching_index + 1,
+                    positioned_y + matching_index + 1,
                     x, um,
                     _content->Size().x + offset.x,
                     false)
                 for i until width - um.size()
                     if x + um.size() + i >= _content->Size().x + offset.x do break
                     n->add(
-                        y + matching_index + 1,
+                        positioned_y + matching_index + 1,
                         x + um.size() + i,
                         " ")
                 ;
