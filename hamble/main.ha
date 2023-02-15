@@ -1,9 +1,9 @@
 inc => string
 use => std
-get => print, files, clap
+get => print, files, clap, stringextensions
 get => Manual
 
-fn halp string info =>
+fn halp string info => bool
     println("<-" + info + "->")
     println("HAMBLE")
     println("init <name> - initialize base repository")
@@ -13,6 +13,7 @@ fn halp string info =>
     println("run Optional(-r) - build binary and run")
     println("man - opens manual")
     println("pack - pack into a hamble package (not implemented)")
+    return false
 ;
 
 fn hamble_base string name => string
@@ -94,6 +95,25 @@ fn watch string type => int
     return 0
 ;
 
+fn custom string argument => bool
+    if !is_hamble_dir() doremi halp("Not a valid argument")
+    let lines = readlines("hamble.haml")
+    bool isCommand = false
+    foreach line in lines
+        String l = String(line)
+        if l.starts_with("[commands]") do isCommand = true
+        if l.starts_with("[rules]") do isCommand = false
+        if l.starts_with("[dependencies]") do isCommand = false
+        if !isCommand || !l.starts_with(argument) do continue
+        for i until argument.size() + 1
+            l.remove(0)
+        ;
+        system(l.to_string())
+        doremi true
+    ;
+    return halp("Unkown command")
+;
+
 fn manual => int
     let man = Manual()
     man.run()
@@ -121,7 +141,11 @@ fn main =>
     elif clap.has("man")
         return manual()
     ;
+    elif clap.has("do") 
+        select type from clap.peek("do") doremi custom(type)
+        return halp("No custom command supplied")
+    ;
     elif clap.has("pack") doremi 0
     elif clap.has("validate") doremi 0
-    else do halp("No Arguments")
+    else doremi halp("No argument")
 ;
