@@ -43,7 +43,10 @@ pub
             return Command::ModeNormal
         ;
         elif s.starts_with("!")
-            system(_line.substr(1))
+            n->stop()
+            system($"{_line.substr(1)} && echo 'Press any key to return!'")
+            n->key()
+            n->start()
             update("")
             return Command::ModeNormal
         ;
