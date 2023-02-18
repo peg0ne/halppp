@@ -1,15 +1,16 @@
 inc => ncurses.h, curses.h, wchar.h, locale.h, iostream, cstring
 use => std
+get => vector
 compiler => "-lncursesw"
 
 class Ncurses
     WINDOW *win
-    Ncurses =>
+    Ncurses bool ignore_colors = false =>
         setlocale(LC_ALL, "")
         win = initscr()
         noecho()
         keypad(win, true)
-        if has_colors()
+        if !ignore_colors && has_colors()
             start_color()
             init_pair(1, COLOR_RED, COLOR_BLACK)
             init_pair(2, COLOR_YELLOW, COLOR_BLACK)
@@ -120,5 +121,11 @@ pub
         win = initscr()
         curs_set(0)
         if nonblock do nodelay(win, TRUE)
+    ;
+    fn init_pair_adv short pair, short fg_p, Vector fg, short bg_p, Vector bg =>
+        if !has_colors() do return
+        init_color(fg_p, (short)fg.x, (short)fg.y, (short)fg.z)
+        init_color(bg_p, (short)bg.x, (short)bg.y, (short)bg.z)
+        init_pair(pair, fg_p, bg_p)
     ;
 ;
