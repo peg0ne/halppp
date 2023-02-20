@@ -9,9 +9,9 @@ class Model => MainContainer
     HorizontalLayout _top = HorizontalLayout(Fill::Flex)
     HorizontalLayout _status = HorizontalLayout(Fill::Static, Vector(0,1))
     Explorer _explorer = Explorer(&n)
-    CommandLine _command_line = CommandLine(&n)
     ModeView _mode_view = ModeView(&n)
     EditorManager _manager = EditorManager(&n, &_line)
+    CommandLine _command_line = CommandLine(&n, &_manager)
 
     Model int argc, char **argv =>
         _top.SetColor(0)

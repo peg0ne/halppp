@@ -156,6 +156,13 @@ pub
         ;
         return cmd
     ;
+    fn set_syntax string syntax =>
+        select a from _activeEditor
+            n->add(0,0,syntax)
+            n->key()
+            a->set_syntax(syntax)
+        ;
+    ;
     fn draw =>
         foreach editor in _editors do editor->draw()
         select a from _activeEditor do a->draw(6)

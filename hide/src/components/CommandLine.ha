@@ -1,10 +1,12 @@
 class CommandLine => IContent
     string _line = ""
-    CommandLine Ncurses *n =>
+    EditorManager *_editorManager
+    CommandLine Ncurses *n, EditorManager *editorManager =>
         _origin = new IContainer(Fill::Static, Vector(0,1))
         _origin->SetColor(3)
         _origin->SetLabel(_line)
         this->n = n
+        _editorManager = editorManager
     ;
 pub 
     fn update string line =>
@@ -39,6 +41,11 @@ pub
         ;
         elif s.starts_with("mkdir ")
             write(" ", _line.substr(6))
+            update("")
+            return Command::ModeNormal
+        ;
+        elif s.starts_with("syntax ")
+            _editorManager->set_syntax(_line.substr(7))
             update("")
             return Command::ModeNormal
         ;

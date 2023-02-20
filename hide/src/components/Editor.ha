@@ -115,6 +115,10 @@ pub
     fn Offset => Vector doremi _origin->Offset()
     fn is_active => bool doremi _origin->Active()
     fn set_active bool active => do _origin->SetActive(active)
+    fn set_syntax string syntax =>
+        select h from _highlighter do delete(h)
+        _highlighter = Some(new Highlighter($"temp.{syntax}"))
+    ;
     fn open string path =>
         remove(json_path())
         if _path != path
