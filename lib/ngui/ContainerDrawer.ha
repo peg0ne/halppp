@@ -6,6 +6,7 @@ fn draw_container_impl IContainer* c, Ncurses *n =>
     case ContainerType::Vertical dobr ((VerticalLayout*)c)->draw(n)
     case ContainerType::Horizontal dobr ((HorizontalLayout*)c)->draw(n)
     case ContainerType::Main dobr ((MainContainer*)c)->draw(n)
+    case ContainerType::Grid dobr ((GridLayout*)c)->draw(n)
     default 
         n->add(2,0,c->Label())
         n->add(1,0,(int)c->Type())

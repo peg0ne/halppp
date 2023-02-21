@@ -4,4 +4,5 @@ enum ContainerType
     Vertical,
     Horizontal,
     Main,
+    Grid,
 ;
