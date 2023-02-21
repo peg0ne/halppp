@@ -1,4 +1,4 @@
-get => ../IContainer
+get => IContainer
 class FilledRect => IContainer
     string _fill = " "
     FilledRect string fill =>

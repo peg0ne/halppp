@@ -1,4 +1,4 @@
-get => ../IContainer
+get => IContainer
 class Button => IContainer
     bool _selected = false
     Button =>
