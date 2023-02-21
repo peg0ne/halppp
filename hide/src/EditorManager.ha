@@ -158,8 +158,6 @@ pub
     ;
     fn set_syntax string syntax =>
         select a from _activeEditor
-            n->add(0,0,syntax)
-            n->key()
             a->set_syntax(syntax)
         ;
     ;
