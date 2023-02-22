@@ -791,7 +791,7 @@ pub
         case 'Y' dobr yank_from()
         case 'y' dobr run_y()
         case 'z' dobr run_z()
-        case '1' dobr _num_diff = !_num_diff
+        case 'o' dobr _num_diff = !_num_diff
         default
             if !isdigit(key) do break
             _modifier.append(string(1,key))
