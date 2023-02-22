@@ -2,6 +2,7 @@ get => textediting/[Edits, Sorting]
 get => Lgrep, CommandPallete
 class Editor => IContent
     string _path = ""
+    bool _num_diff = false
     String _modifier = String("")
     List<Vector> _selections = List<Vector>()
     Vector _selector = Vector(0,0)
@@ -193,6 +194,10 @@ pub
         List<string> vec = List<string>()
         for i until _text.size() 
             let num = i + 1 + internal_offset.y
+            if _num_diff && num != _selector.y + 1
+                num = _selector.y - num + 1
+                if num < 0 do num *= -1
+            ;
             if num > _text.size() do break
             vec.add(to_string(num))
         ;
@@ -786,6 +791,7 @@ pub
         case 'Y' dobr yank_from()
         case 'y' dobr run_y()
         case 'z' dobr run_z()
+        case '1' dobr _num_diff = !_num_diff
         default
             if !isdigit(key) do break
             _modifier.append(string(1,key))
