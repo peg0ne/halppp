@@ -1,5 +1,5 @@
 {
-    "name": "bash",
+    "name": "halppp",
     "boxing": [
         {
             "colors": [7,8,9,1,2,3],
@@ -47,7 +47,7 @@
             "color": 1,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(bool|int|short|double|float|long|char|string)(?=$|\W)"
+            "expr": "(?:^|\W)(seq|array|bool|int|short|double|float|long|char|string)(?=$|\W)"
         },
         {
             "color": 9,
@@ -59,13 +59,13 @@
             "color": 9,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(true|false|null)(?=$|\W)"
+            "expr": "(?:^|\W)(True|False|null)(?=$|\W)"
         },
         {
             "color": 3,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(echo|eval|export|source|read|new|from|break|return|continue|default|catch|const|delete|this|throw|try|register|void|ls|mkdir|touch|cat|grep)(?=$|\W)"
+            "expr": "(?:^|\W)(var|new|from|and|not|in|until|break|return|continue|case|default|catch|const|delete|this|throw|try|register|void|)(?=$|\W)"
         },
         {
             "color": 8,
@@ -75,12 +75,12 @@
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(if|else|elif|fi|case|esac|for|then|select|until|while|do|done|in|function|time|coproc)(?=$|\W)"
+            "expr": "(?:^|\W)(if|else|elif|select|switch|while|loop|for|foreach)(?=$|\W)"
         },
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(import|class|struct|enum|def|;)(?=$|\W)"
+            "expr": "(?:^|\W)(import|class|struct|enum|proc|def|async|;)(?=$|\W)"
 
         },
         {
@@ -94,7 +94,9 @@
             "expr": "('[^']')"
         },
         {
-            "color": 4,
+            "color": 0,
             "capture": 1,
             "expr": "(#.*)"
         }
+    ]
+}
