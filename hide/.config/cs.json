@@ -47,7 +47,7 @@
             "color": 1,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(bool|int|short|double|float|long|char|string)(?=$|\W)"
+            "expr": "(?:^|\W)(static|bool|int|short|double|float|long|char|string)(?=$|\W)"
         },
         {
             "color": 9,

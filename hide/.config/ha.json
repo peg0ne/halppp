@@ -172,6 +172,12 @@
         "struct",
         "enum",
         "fn",
-        "glob"
+        "glob",
+        "ncurses",
+        "ngui",
+        "stringextensions",
+        "print",
+        "math",
+        "regex"
     ]
 }

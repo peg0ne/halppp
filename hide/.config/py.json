@@ -80,7 +80,7 @@
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(import|class|struct|enum|def|async|;)(?=$|\W)"
+            "expr": "(?:^|\W)(global|import|class|struct|enum|def|async|;)(?=$|\W)"
 
         },
         {
@@ -98,5 +98,22 @@
             "capture": 1,
             "expr": "(#.*)"
         }
+    ],
+    "wordlist": [
+        "False",
+        "True",
+        "None",
+        "from",
+        "import",
+        "if:",
+        "elif:",
+        "else:",
+        "async",
+        "def",
+        "return",
+        "global",
+        "startswith",
+        "split",
+        "append"
     ]
 }

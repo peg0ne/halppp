@@ -74,7 +74,7 @@
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(mod|use|class|struct|enum|mut|fn|;)(?=$|\W)"
+            "expr": "(?:^|\W)(impl|mod|use|class|struct|enum|mut|fn|;)(?=$|\W)"
         },
         {
             "color": 3,
@@ -91,5 +91,25 @@
             "capture": 1,
             "expr": "(//.*)"
         }
+    ],
+    "wordlist": [
+        "mod",
+        "use",
+        "crate",
+        "fn",
+        "let",
+        "mut",
+        "bool",
+        "match",
+        "println",
+        "loop",
+        "pub",
+        "enum",
+        "impl",
+        "struct",
+        "Vec",
+        "derive",
+        "Debug",
+        "Clone"
     ]
 }
