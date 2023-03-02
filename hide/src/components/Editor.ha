@@ -547,7 +547,14 @@ pub
     fn remove_ch Vector *pos => do remove_ch(pos, false)
     fn remove_ch Vector *pos, bool should_move =>
         if should_move
-            if pos->x == 0 do return
+            if pos->x == 0
+                if pos->y == 0 || _selections.len() != 0 do return
+                text_editing(TextEdit::DeleteLine)
+                move(Dir::Up, 1)
+                move(Dir::Right, 100000, false)
+                text_editing(TextEdit::PasteWord)
+                return
+            ;
             try_move(Vector(-1, 0), pos)
         ;
         remove_char(&_text, pos)
