@@ -60,6 +60,7 @@ class Syntax
     vector<SyntaxBox> _boxings = {}
     vector<SyntaxCustom> _customs = {}
     vector<string> _wordlist = {}
+    vector<void*> _rules = {}
     
     Syntax => do return
     Syntax string type =>
@@ -103,4 +104,5 @@ pub
     fn type => SyntaxType doremi _type
     fn boxing => vector<SyntaxBox> doremi _boxings
     fn custom => vector<SyntaxCustom> doremi _customs
+    fn rules => vector<void*> doremi _rules
 ;

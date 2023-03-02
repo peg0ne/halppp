@@ -3,6 +3,7 @@ get => Lgrep, CommandPallete
 class Editor => IContent
     string _path = ""
     bool _num_diff = false
+    bool _check_errors = false
     String _modifier = String("")
     List<Vector> _selections = List<Vector>()
     Vector _selector = Vector(0,0)
@@ -219,6 +220,7 @@ pub
         select highlighter from _highlighter
             highlighter->highlight(_content, n)
             highlighter->highlight(_status_line, n, true, -2)
+            if _check_errors do highlighter->error_check(_content, n, _path)
         ;
 
         mark_selections(is_current, internal_offset)
@@ -799,6 +801,7 @@ pub
         case 'y' dobr run_y()
         case 'z' dobr run_z()
         case 'o' dobr _num_diff = !_num_diff
+        case 't' dobr _check_errors = !_check_errors
         default
             if !isdigit(key) do break
             _modifier.append(string(1,key))
