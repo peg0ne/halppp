@@ -179,5 +179,39 @@
         "print",
         "math",
         "regex"
+    ],
+    "rules": [
+        {
+            "type": "starts_with",
+            "value": "get =>",
+            "regex": "[\s,]([\w/.]*)",
+            "validate": "file_exists",
+            "validation_value": "capture_value",
+            "capture": 1,
+        },
+        {
+            "type": "contains",
+            "value": "for ",
+            "regex": "for\s*\w*\s*(\w*)",
+            "validate": "equals",
+            "validation_value": "until",
+            "capture": 1,
+        },
+        {
+            "type": "contains",
+            "value": "foreach ",
+            "regex": "foreach\s*\w*\s*(?:,\s*\w*)?\s*(\w*)",
+            "validate": "equals",
+            "validation_value": "in",
+            "capture": 1,
+        },
+        {
+            "type": "contains",
+            "value": "select ",
+            "regex": "select\s*\w*\s*(\w*)",
+            "validate": "equals",
+            "validation_value": "from",
+            "capture": 1,
+        }
     ]
 }

@@ -51,6 +51,36 @@ struct SyntaxCustom
     ;
 ;
 
+struct SyntaxRule
+    string type
+    string value
+    regex expr
+    int capture
+    string validation_type
+    string validation_value
+    SyntaxRule => do return
+    SyntaxRule Json *rule =>
+        select type_value from rule->try_get("type")
+            type = type_value->value_or((string)"")
+        ;
+        select value_string from rule->try_get("value")
+            value = value_string->value_or((string)"")
+        ;
+        select expression from rule->try_get("regex")
+            expr = regex(expression->value_or((string)""))
+        ;
+        select cap from rule->try_get("capture")
+            capture = cap->value_or(0.0)
+        ;
+        select validater from rule->try_get("validate")
+            validation_type = validater->value_or((string)"")
+        ;
+        select validater_val from rule->try_get("validation_value")
+            validation_value = validater_val->value_or((string)"")
+        ;
+    ;
+;
+
 class Syntax
     SyntaxType _type = SyntaxType::Plain
     Json _definition = Json()
@@ -60,7 +90,7 @@ class Syntax
     vector<SyntaxBox> _boxings = {}
     vector<SyntaxCustom> _customs = {}
     vector<string> _wordlist = {}
-    vector<void*> _rules = {}
+    vector<SyntaxRule> _rules = {}
     
     Syntax => do return
     Syntax string type =>
@@ -96,6 +126,13 @@ class Syntax
                 ;
             ;
         ;
+        select rules from _definition.try_get("rules")
+            for i until rules->size()
+                select rule from rules->try_get(i)
+                    _rules.push_back(SyntaxRule(rule))
+                ;
+            ;
+        ;
     ;
 pub
     fn wordlist => vector<string> doremi _wordlist
@@ -104,5 +141,5 @@ pub
     fn type => SyntaxType doremi _type
     fn boxing => vector<SyntaxBox> doremi _boxings
     fn custom => vector<SyntaxCustom> doremi _customs
-    fn rules => vector<void*> doremi _rules
+    fn rules => vector<SyntaxRule> doremi _rules
 ;
