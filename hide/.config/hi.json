@@ -1,0 +1,111 @@
+{
+    "name": "halppp",
+    "boxing": [
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "[",
+            "end": "]"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "{",
+            "end": "}"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "(",
+            "end": ")"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "<",
+            "end": ">"
+        }
+    ],
+    "custom": [
+        {
+            "color": 8,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-Z_]*)"
+        },
+        {
+            "color": 0,
+            "capture": 2,
+            "expr": "(^|\W)([a-z_]*)"
+        },
+        {
+            "color": 9,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-z][A-z]*)"
+        },
+        {
+            "color": 2,
+            "capture": 2,
+            "expr": "(^|\W)([A-z_]*)\("
+        },
+        {
+            "color": 2,
+            "capture": 1,
+            "expr": "fn ([A-z_]*)\W"
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "bold": true,
+            "expr": "([0-9][0-9.]*)"
+        },
+        {
+            "color": 8,
+            "capture": 1,
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|,|\$)"
+        },
+        {
+            "color": 2,
+            "capture": 1,
+            "expr": "(?:^|\W)(if|let)(?=$|\W)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
+            "expr": "(?:^|\W)(exit|read|print|printnobr)(?=$|\W)"
+        },
+        {
+            "color": 3,
+            "capture": 1,
+            "expr": "\"([^\"]*)\""
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "expr": "('[^']')"
+        },
+        {
+            "color": 0,
+            "capture": 1,
+            "dim": true,
+            "expr": "(//.*)"
+        }
+    ],
+    "wordlist": [
+        "if",
+        "print",
+        "exit",
+        "eval",
+        "let",
+        "printnobr",
+        "RED",
+        "REDBG",
+        "GREEN",
+        "GREENBG",
+        "BLUE",
+        "BLUEBG",
+        "YELLOW",
+        "YELLOWBG",
+        "MAGENTA",
+        "MAGENTABG",
+        "CYAN",
+        "CYANBG",
+        "read",
+        "RESET"
+    ]
+}
