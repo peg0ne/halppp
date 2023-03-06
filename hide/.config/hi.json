@@ -69,13 +69,13 @@
             "color": 2,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(tonum|filer|filew)(?=$|\W)"
+            "expr": "(?:^|\W)(tonum|filer|filew|sys)(?=$|\W)"
         },
         {
             "color": 1,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(exit|read|print|printnobr)(?=$|\W)"
+            "expr": "(?:^|\W)(fn|return|exit|read|print|printnobr)(?=$|\W)"
         },
         {
             "color": 3,
