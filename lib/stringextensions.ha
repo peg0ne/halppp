@@ -162,6 +162,7 @@ pub
             ;
             return None<double>()
         ;
+        if dec == 0.0 doremi Some(num)
         for i until dec_len do dec *= 0.1
         return Some(num + dec)
     ;
