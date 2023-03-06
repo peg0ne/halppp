@@ -28,11 +28,31 @@ pub
         _keys.push_back(key)
         _values.push_back(value)
     ;
+    fn set T key, U value =>
+        if !contains(key) do return
+        let i = 1
+        loop
+            if i >= _keys.size() doremi None<U>()
+            if _keys.at(i) == key
+                _values[i] = value
+                return
+            ;
+            i++
+        ;
+    ;
     fn try_get_value T key => Option<U>
         let i = 0
         loop
-            if i >= _keys.size() do return None<U>()
-            if _keys.at(i) == key do return Some(_values.at(i))
+            if i >= _keys.size() doremi None<U>()
+            if _keys.at(i) == key doremi Some(_values.at(i))
+            i++
+        ;
+    ;
+    fn try_get_value_ptr T key => Option<U*>
+        let i = 0
+        loop
+            if i >= _keys.size() doremi None<U*>()
+            if _keys.at(i) == key doremi Some(&_values[i])
             i++
         ;
     ;
