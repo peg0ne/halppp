@@ -24,19 +24,20 @@
     ],
     "custom": [
         {
+            "color": 9,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-z][A-z]*)"
+        },
+        {
             "color": 8,
             "capture": 2,
+            "bold": true,
             "expr": "(^|\W)([A-Z][A-Z_]*)"
         },
         {
             "color": 0,
             "capture": 2,
             "expr": "(^|\W)([a-z_]*)"
-        },
-        {
-            "color": 9,
-            "capture": 2,
-            "expr": "(^|\W)([A-Z][A-z][A-z]*)"
         },
         {
             "color": 2,
@@ -65,8 +66,15 @@
             "expr": "(?:^|\W)(if|let)(?=$|\W)"
         },
         {
+            "color": 2,
+            "capture": 1,
+            "bold": true,
+            "expr": "(?:^|\W)(tonum|filer|filew)(?=$|\W)"
+        },
+        {
             "color": 1,
             "capture": 1,
+            "bold": true,
             "expr": "(?:^|\W)(exit|read|print|printnobr)(?=$|\W)"
         },
         {
@@ -106,6 +114,9 @@
         "CYAN",
         "CYANBG",
         "read",
-        "RESET"
+        "RESET",
+        "filer",
+        "filew",
+        "tonum"
     ]
 }
