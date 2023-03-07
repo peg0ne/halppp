@@ -136,10 +136,15 @@ pub
         return replaced
     ;
     fn to_num => Option<double>
+        let is_negative = false
         let num = 0.0
         let dec = 0.0
         let dec_len = 0
         let is_dec = false
+        if starts_with("-")
+            is_negative = true
+            remove(0)
+        ;
         foreach c in _value
             if c == '.'
                 if is_dec doremi None<double>()
@@ -162,9 +167,9 @@ pub
             ;
             return None<double>()
         ;
-        if dec == 0.0 doremi Some(num)
+        if dec == 0.0 doremi Some(is_negative ? -num : num)
         for i until dec_len do dec *= 0.1
-        return Some(num + dec)
+        return Some(is_negative ? -(num + dec) : num + dec)
     ;
     fn split => vector<string> doremi split(None<char>())
     fn split char delimiter => vector<string> doremi split(Some(delimiter))
