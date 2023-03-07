@@ -46,8 +46,8 @@
         },
         {
             "color": 2,
-            "capture": 1,
-            "expr": "fn ([A-z_]*)\W"
+            "capture": 2,
+            "expr": "(cfn|fn) ([A-z_]*)\W"
         },
         {
             "color": 9,
@@ -75,7 +75,7 @@
             "color": 1,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(fn|return|exit|read|print|printnobr)(?=$|\W)"
+            "expr": "(?:^|\W)(cfn|fn|return|exit|read|print|printnobr)(?=$|\W)"
         },
         {
             "color": 3,
