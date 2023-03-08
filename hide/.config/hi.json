@@ -58,7 +58,7 @@
         {
             "color": 8,
             "capture": 1,
-            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|at|,|\$)"
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|at|len|,|\$)"
         },
         {
             "color": 2,
@@ -75,7 +75,7 @@
             "color": 1,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(cfn|fn|return|exit|read|print|printnobr)(?=$|\W)"
+            "expr": "(?:^|\W)(cfn|fn|return|exit|read|print|printnobr|argc|argv)(?=$|\W)"
         },
         {
             "color": 3,
