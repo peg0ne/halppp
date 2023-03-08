@@ -58,7 +58,7 @@
         {
             "color": 8,
             "capture": 1,
-            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|at|len|,|\$)"
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~| at | len|,|\$)"
         },
         {
             "color": 2,
@@ -69,7 +69,7 @@
             "color": 2,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(tonum|filer|filew|sys|eval)(?=$|\W)"
+            "expr": "(?:^|\W)(tonum|filer|import|filew|sys|eval)(?=$|\W)"
         },
         {
             "color": 1,
