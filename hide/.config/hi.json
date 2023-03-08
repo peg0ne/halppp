@@ -58,18 +58,18 @@
         {
             "color": 8,
             "capture": 1,
-            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|,|\$)"
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|at|,|\$)"
         },
         {
             "color": 2,
             "capture": 1,
-            "expr": "(?:^|\W)(if|let)(?=$|\W)"
+            "expr": "(?:^|\W)(if|let|loop)(?=$|\W)"
         },
         {
             "color": 2,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(tonum|filer|filew|sys)(?=$|\W)"
+            "expr": "(?:^|\W)(tonum|filer|filew|sys|eval)(?=$|\W)"
         },
         {
             "color": 1,
