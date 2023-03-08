@@ -58,10 +58,8 @@ pub
     ;
     fn steal Dictionary<T, U> other =>
         foreach key in other.keys()
-            loop
-                select val from other.try_get_value(key)
-                    add(key, val)
-                ;
+            select val from other.try_get_value(key)
+                add(key, val)
             ;
         ;
     ;
