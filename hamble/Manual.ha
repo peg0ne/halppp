@@ -10,13 +10,15 @@ class Manual
     List<string> content = List<string>()
     Manual =>
         n.start()
-        let found = list_reg_files("../lib")
-        foreach f in found
-            let s = String(f)
-            s.remove_back(3)
-            if s.starts_with(".") do continue
-            if s.len() == 0 do continue
-            files.add(s.to_string())
+        select home from env("HOME")
+            let found = list_reg_files($"{home}/.local/lib/halppp")
+            foreach f in found
+                let s = String(f)
+                s.remove_back(3)
+                if s.starts_with(".") do continue
+                if s.len() == 0 do continue
+                files.add(s.to_string())
+            ;
         ;
     ;
     fn draw_enum int i, vector<string> *lines => int
@@ -134,28 +136,30 @@ class Manual
     fn draw_content =>
         n.clearScr()
         select s from selected
-            let lines = readlines($"../lib/{files.at(s)}.ha")
-            content = List<string>(lines)
-            let i = 0
-            skipMan = currentMan
-            while i < lines.size()
-                let line = String(lines[i])
-                if line.starts_with("enum")
-                    i = draw_enum(i, &lines)
+            select home from env("HOME")
+                let lines = readlines($"{home}/.local/lib/halppp/{files.at(s)}.ha")
+                content = List<string>(lines)
+                let i = 0
+                skipMan = currentMan
+                while i < lines.size()
+                    let line = String(lines[i])
+                    if line.starts_with("enum")
+                        i = draw_enum(i, &lines)
+                    ;
+                    elif line.starts_with("class")
+                        i = draw_class(i, &lines)
+                    ;
+                    elif line.starts_with("struct")
+                        i = draw_struct(i, &lines)
+                    ;
+                    elif line.starts_with("fn")
+                        i = draw_fn(i, &lines, 0)
+                    ;
+                    else do skipMan++
+                    i++
                 ;
-                elif line.starts_with("class")
-                    i = draw_class(i, &lines)
-                ;
-                elif line.starts_with("struct")
-                    i = draw_struct(i, &lines)
-                ;
-                elif line.starts_with("fn")
-                    i = draw_fn(i, &lines, 0)
-                ;
-                else do skipMan++
-                i++
+                return
             ;
-            return
         ;
         foreach i, f in files do n.add(i, 0, $"- {f}")
         n.mark_until(current, 0, 5, COLS)
