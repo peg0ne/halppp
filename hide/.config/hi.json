@@ -69,7 +69,7 @@
             "color": 2,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(tonum|filer|import|filew|sys|eval)(?=$|\W)"
+            "expr": "(?:^|\W)(random|tonum|filer|import|filew|sys|eval)(?=$|\W)"
         },
         {
             "color": 1,
