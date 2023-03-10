@@ -46,7 +46,8 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     ;
     loop
         let x = get_next_or_exit(compiler_t, "Function is not closed " + function.id)
-        if any(x.token, {Token::SemiColon, Token::Function, Token::Eof}) do break
+        if any(x.token, {Token::SemiColon, Token::Eof}) do break
+        if x.token == Token::Function dobr display_err_message("Function above is not closed " + function.id, compiler_t->to_err_message())
         if x.is_nl() do continue
         switch x.token
             case Token::Foreach
