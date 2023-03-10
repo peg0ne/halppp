@@ -63,7 +63,7 @@
         {
             "color": 2,
             "capture": 1,
-            "expr": "(?:^|\W)(if|let|loop)(?=$|\W)"
+            "expr": "(?:^|\W)(if|let|loop|for)(?=$|\W)"
         },
         {
             "color": 2,
@@ -75,7 +75,7 @@
             "color": 1,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(cfn|fn|return|exit|read|print|printnobr|argc|argv)(?=$|\W)"
+            "expr": "(?:^|\W)(cfn|fn|break|return|exit|read|print|printnobr|argc|argv)(?=$|\W)"
         },
         {
             "color": 3,
