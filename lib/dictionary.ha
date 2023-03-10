@@ -23,6 +23,21 @@ pub
         ;
         return false
     ;
+    fn remove T key =>
+        vector<T> keys = {}
+        vector<U> values = {}
+        if !contains(key) do return
+        let i = 0
+        loop
+            if i >= _keys.size() do break
+            if _keys.at(i) == key doco i++
+            keys.push_back(_keys.at(i))
+            values.push_back(_values.at(i))
+            i++
+        ;
+        _keys = keys
+        _values = values
+    ;
     fn add T key, U value =>
         if contains(key) do return
         _keys.push_back(key)
@@ -30,7 +45,7 @@ pub
     ;
     fn set T key, U value =>
         if !contains(key) do return
-        let i = 1
+        let i = 0
         loop
             if i >= _keys.size() doremi None<U>()
             if _keys.at(i) == key
