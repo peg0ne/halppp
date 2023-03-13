@@ -9,12 +9,8 @@ struct SyntaxBox
     string end = ""
     SyntaxBox => do return
     SyntaxBox Json *box =>
-        select s from box->try_get("start")
-            start = s->value_or((string)"")
-        ;
-        select e from box->try_get("end")
-            end = e->value_or((string)"")
-        ;
+        start = box->try_get_value_of("start", (string)"")
+        end = box->try_get_value_of("end", (string)"")
         select cs from box->try_get("colors")
             for i until cs->size()
                 select c from cs->try_get(i)
@@ -33,21 +29,11 @@ struct SyntaxCustom
     regex expr
     SyntaxCustom => do return
     SyntaxCustom Json *custom =>
-        select col from custom->try_get("color")
-            color = col->value_or(0.0)
-        ;
-        select cap from custom->try_get("capture")
-            capture = cap->value_or(0.0)
-        ;
-        select is_bold from custom->try_get("bold")
-            bold = is_bold->value_or(false)
-        ;
-        select is_dim from custom->try_get("dim")
-            dim = is_dim->value_or(false)
-        ;
-        select expression from custom->try_get("expr")
-            expr = regex(expression->value_or((string)""))
-        ;
+        color = custom->try_get_value_of("color", 0.0)
+        capture = custom->try_get_value_of("capture", 0.0)
+        bold = custom->try_get_value_of("bold", false)
+        dim = custom->try_get_value_of("dim", false)
+        expr = regex(custom->try_get_value_of("expr", (string)"*"))
     ;
 ;
 
@@ -60,24 +46,12 @@ struct SyntaxRule
     string validation_value
     SyntaxRule => do return
     SyntaxRule Json *rule =>
-        select type_value from rule->try_get("type")
-            type = type_value->value_or((string)"")
-        ;
-        select value_string from rule->try_get("value")
-            value = value_string->value_or((string)"")
-        ;
-        select expression from rule->try_get("regex")
-            expr = regex(expression->value_or((string)""))
-        ;
-        select cap from rule->try_get("capture")
-            capture = cap->value_or(0.0)
-        ;
-        select validater from rule->try_get("validate")
-            validation_type = validater->value_or((string)"")
-        ;
-        select validater_val from rule->try_get("validation_value")
-            validation_value = validater_val->value_or((string)"")
-        ;
+        type = rule->try_get_value_of("type", (string)"")
+        value = rule->try_get_value_of("value", (string)"")
+        expr = regex(rule->try_get_value_of("regex", (string)"*"))
+        capture = rule->try_get_value_of("capture", 0.0)
+        validation_type = rule->try_get_value_of("validate", (string)"")
+        validation_value = rule->try_get_value_of("validation_value", (string)"")
     ;
 ;
 
