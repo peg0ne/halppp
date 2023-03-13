@@ -464,8 +464,9 @@ pub
         ;
         let reg = regex($"(^|\\W)({suggestion}[\\w_]*)")
         let offset = _content->Offset()
-        let y = offset.y + _selector.y - _offset.y
-        let x = offset.x + _selector.x - _offset.x
+        let internal_offset = get_internal_offset()
+        let y = _selector.y - internal_offset.y
+        let x = offset.x + _selector.x - internal_offset.x
         let width = 0
         vector<string> unique_matches = {}
         select highlighter from _highlighter
@@ -497,7 +498,7 @@ pub
         let reverse = false
         let space_below = _content->Size().y - 1 - y
         if space_below < 5
-            space_below = LINES / 2
+            space_below = _content->Size().y / 2
             reverse = true
         ;
         let max_size = min(unique_matches.size(), space_below)
@@ -508,14 +509,14 @@ pub
                 if matching_index + 1 + positioned_y >= _content->Size().y do break
                 n->col(selected == matching_index ? 4 : 5)
                 n->add_until(
-                    positioned_y + matching_index + 1,
+                    offset.y + positioned_y + matching_index - reverse + 1,
                     x, um,
                     _content->Size().x + offset.x,
                     false)
                 for i until width - um.size()
                     if x + um.size() + i >= _content->Size().x + offset.x do break
                     n->add(
-                        positioned_y + matching_index + 1,
+                        offset.y + positioned_y + matching_index - reverse + 1,
                         x + um.size() + i,
                         " ")
                 ;
