@@ -119,6 +119,11 @@ pub
     ;
     fn size => int doremi _value.size()
     fn pop => do _value.pop_back()
+    fn try_get_value_of<T> string name, T value => T
+        if _type == JsonType::Array doremi value
+        select j from try_get(name) doremi j->value_or(value)
+        return value
+    ;
     fn try_get int at => Option<Json*>
         if _type != JsonType::Array doremi None<Json*>()
         if at < 0 || at >= _value.size() doremi None<Json*>()
