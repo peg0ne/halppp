@@ -39,7 +39,7 @@ class Editor => IContent
     fn content_change TextEdit edit => 
         let j = load_json(json_path())
         Json *entry = new Json()
-        entry->try_add_str("text", _text.at(_selector.y))
+        entry->try_add("text", _text.at(_selector.y))
         entry->try_add("type", (int)edit)
         entry->try_add("posy", _selector.y)
         entry->try_add("posx", _selector.x)
@@ -50,7 +50,7 @@ class Editor => IContent
             sort_selections()
             foreach selection in _selections
                 Json *sel_entry = new Json()
-                sel_entry->try_add_str("text", _text.at(selection.y))
+                sel_entry->try_add("text", _text.at(selection.y))
                 sel_entry->try_add("type", (int)edit)
                 sel_entry->try_add("posy", selection.y)
                 sel_entry->try_add("posx", selection.x)
