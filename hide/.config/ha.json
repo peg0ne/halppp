@@ -192,7 +192,7 @@
         {
             "type": "contains",
             "value": "for ",
-            "regex": "for\s*\w*\s*(\w*)",
+            "regex": "for\s*\w*\s*(\S*)",
             "validate": "equals",
             "validation_value": "until",
             "capture": 1,
@@ -200,7 +200,7 @@
         {
             "type": "contains",
             "value": "foreach ",
-            "regex": "foreach\s*\w*\s*(?:,\s*\w*)?\s*(\w*)",
+            "regex": "foreach\s*\w*\s*(?:,\s*\w*)?\s*(\S*)",
             "validate": "equals",
             "validation_value": "in",
             "capture": 1,
@@ -208,7 +208,7 @@
         {
             "type": "contains",
             "value": "select ",
-            "regex": "select\s*\w*\s*(\w*)",
+            "regex": "select\s*\w*\s*(\S*)",
             "validate": "equals",
             "validation_value": "from",
             "capture": 1,
