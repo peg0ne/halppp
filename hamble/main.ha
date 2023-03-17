@@ -52,6 +52,7 @@ fn build string type => int
     ;
     if type == "halp"
         system("halp src/main.ha")
+        system("mkdir bin")
         system("mv src/main bin/main")
         return 1
     ;
@@ -62,10 +63,12 @@ fn build string type => int
     ;
     elif type == "-r"
         system("halppp main.ha -r")
+        system("mkdir bin")
         system("mv main ../bin/main")
     ;
     else 
         system("halppp main.ha")
+        system("mkdir bin")
         system("mv main ../bin/main")
     ;
     return 1
