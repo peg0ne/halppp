@@ -40,7 +40,7 @@ pub
             return Command::ModeNormal
         ;
         elif s.starts_with("mkdir ")
-            write(" ", _line.substr(6))
+            makedir(_line.substr(6))
             update("")
             return Command::ModeNormal
         ;
