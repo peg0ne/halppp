@@ -47,7 +47,7 @@ pub
         if !contains(key) do return
         let i = 0
         loop
-            if i >= _keys.size() doremi None<U>()
+            if i >= _keys.size() do return
             if _keys.at(i) == key
                 _values[i] = value
                 return
