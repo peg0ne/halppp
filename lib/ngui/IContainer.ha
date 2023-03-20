@@ -1,5 +1,5 @@
 get => ../[rects, option, list, vector, ncurses]
-get => ContainerEnums
+get => ContainerEnums, NGuiOutline
 class IContainer
 protected
     string _label = ""
@@ -13,6 +13,8 @@ protected
     Vector _size = Vector(0,0)
     Vector _offset = Vector(0,0)
     bool is_active = true
+    bool is_outline = false
+    NGuiOutline outline = NGuiOutline()
     IContainer => do return
     IContainer Fill f =>
         _fill_x = f
@@ -57,11 +59,26 @@ pub
         _content.clear()
         _content = content
     ;
+    fn ToggleOutline => do is_outline = !is_outline
     fn GetContent => List<string> doremi _content
     fn add IContainer* c => do _containers.add(c)
     fn size => int doremi _containers.len()
     fn containers => List<IContainer*>* doremi &_containers
     fn clear => do _containers = {}
+    fn draw_outline Ncurses *n =>
+        if is_outline
+            n->add(_offset.y-1, _offset.x-1, outline.lu_corner)
+            for i until _size.x do n->add(_offset.y-1, _offset.x+i, outline.horizontal)
+            n->add(_offset.y-1, _offset.x-1 + _size.x + 1, outline.ru_corner)
+            for i until _size.y
+                n->add(_offset.y+i, _offset.x-1, outline.vertical)
+                n->add(_offset.y+i, _offset.x-1 + _size.x + 1, outline.vertical)
+            ;
+            n->add(_offset.y-1 + _size.y + 1, _offset.x-1, outline.ld_corner)
+            for i until _size.x do n->add(_offset.y-1 + _size.y + 1, _offset.x+i, outline.horizontal)
+            n->add(_offset.y-1 + _size.y + 1, _offset.x-1 + _size.x + 1, outline.rd_corner)
+        ;
+    ;
     fn draw Ncurses *n =>
         if !is_active do return
         n->col(_color < 0 ? -_color : _color)
