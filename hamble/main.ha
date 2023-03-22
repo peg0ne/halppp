@@ -50,9 +50,14 @@ fn build string type => int
         println("This is not a valid project to build from")
         return 0
     ;
+    let files = list_files(".")
+    let bin_exists = false
+    foreach file in files
+        if file == "bin" dobr bin_exists = true
+    ;
     if type == "halp"
         system("halp src/main.ha")
-        system("mkdir bin")
+        if !bin_exists do system("mkdir bin")
         system("mv src/main bin/main")
         return 1
     ;
@@ -63,12 +68,12 @@ fn build string type => int
     ;
     elif type == "-r"
         system("halppp main.ha -r")
-        system("mkdir bin")
+        if !bin_exists do system("mkdir ../bin")
         system("mv main ../bin/main")
     ;
     else 
         system("halppp main.ha")
-        system("mkdir bin")
+        if !bin_exists do system("mkdir ../bin")
         system("mv main ../bin/main")
     ;
     return 1
