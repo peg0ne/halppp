@@ -11,6 +11,7 @@ fn halp string info => bool
     println("    -r - creates a release build")
     println("    -t - transpiles into c++")
     println("run Optional(-r) - build binary and run")
+    println("do <CUSTOM COMMAND>")
     println("man - opens manual")
     println("pack - pack into a hamble package (not implemented)")
     return false
