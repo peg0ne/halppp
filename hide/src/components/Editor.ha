@@ -716,6 +716,7 @@ pub
         return cmd == Command::Nop ? run(_current_mode, true) : cmd
     ;
     fn run_all int key => bool
+        MEVENT event
         switch key
         case '\t'      dobr text_editing(TextEdit::Tab)
         case KEY_BTAB  dobr text_editing(TextEdit::Untab)
@@ -729,6 +730,28 @@ pub
         case KEY_END   dobr move(Dir::Right, 100000, false)
         case 558       dobr shift_line(Dir::Up)
         case 517       dobr shift_line(Dir::Down)
+        case KEY_MOUSE
+            if getmouse(&event) != OK do break
+            if event.bstate & (BUTTON1_CLICKED)
+                if event.x < _content->Offset().x do break
+                if event.y < _content->Offset().y do break
+                if _text.size() == 0 do break
+                _selections.clear()
+                _selector.x = event.x - _content->Offset().x + _offset.x
+                _selector.y = event.y - _content->Offset().y + _offset.y
+                move(Dir::Down, 0)
+            ;
+            if event.bstate & (BUTTON4_PRESSED)
+                move(Dir::Up)
+                _offset = Vector(_offset.x, _selector.y - _content->Size().y / 2)
+                if _offset.y < 0 do _offset.y = 0
+            ;
+            if event.bstate & (BUTTON5_PRESSED)
+                move(Dir::Down)
+                _offset = Vector(_offset.x, _selector.y - _content->Size().y / 2)
+                if _offset.y < 0 do _offset.y = 0
+            ;
+            break
         default doremi false
         ;
         return true

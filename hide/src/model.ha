@@ -14,6 +14,7 @@ class Model => MainContainer
     CommandLine _command_line = CommandLine(&n, &_manager)
 
     Model int argc, char **argv =>
+        mousemask(ALL_MOUSE_EVENTS, NULL)
         _top.SetColor(0)
         _status.SetColor(1)
         _line.SetColor(3)
