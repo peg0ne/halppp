@@ -82,16 +82,12 @@ pub
     fn draw Ncurses *n =>
         if !is_active do return
         n->col(_color < 0 ? -_color : _color)
-        if _color >= 0
-            n->invis_box(_offset.y, _offset.x, _size.y, _size.x)
-        ;
-        else
-            n->box(_offset.y-1, _offset.x-1, _size.y+2, _size.x+2)
-        ;
+        if _color >= 0 do n->invis_box(_offset, _size)
+        else do n->box(_offset - Vector(1,1), _size + Vector(2,2))
         select filling from _fill_str
             for i until _size.y do n->add(_offset.y + i, _offset.x, filling)
         ;
-        n->add_until(_offset.y, _offset.x, _label, _size.x + _offset.x, true)
+        n->add_until(_offset, _label, _size.x + _offset.x, true)
         let i = 0
         foreach s in _content
             if i >= _size.y do break
