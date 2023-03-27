@@ -6,6 +6,13 @@ class String
     string _value
     String string value => do this->_value = value
 pub
+    fn + string text => String doremi String(_value + text)
+    fn + char ch => String doremi String(_value + string(1, ch))
+    fn [ int at => char doremi _value.at(at)
+    fn == string other => bool doremi _value == other
+    fn != string other => bool doremi _value != other
+    fn == String other => bool doremi _value == other.to_string()
+    fn != String other => bool doremi _value != other.to_string()
     fn to_string => string doremi _value
     fn len => long doremi _value.size()
     fn at int at => auto doremi _value.at(at)

@@ -16,7 +16,33 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     let function = Function(state)
     vector<Variable> variables_in_func = {}
     if !constr
-        function.id = get_id_or_exit(compiler_t, "[FunctionError]: No Function Id")
+        let func_id = get_next_or_exit(compiler_t, "[FunctionError]: No Function Id")
+        if func_id.token == Token::Id do function.id = func_id.name
+        else
+            switch func_id.token
+            case Token::And
+            case Token::Or
+            case Token::Sum
+            case Token::Sub
+            case Token::Bang
+            case Token::Asterix
+            case Token::DblLessThan
+            case Token::DblMoreThan
+            case Token::Equality
+            case Token::NonEquality
+            case Token::ForwardSlash
+            case Token::LessThan
+            case Token::LessThanOrEquals
+            case Token::MoreThan
+            case Token::MoreThanOrEquals
+                function.id = "operator" + func_id.name
+                break
+            case Token::LBrack
+                function.id = "operator[]"
+                break
+            default dobr display_err_message("Expected id or operator but got: " + func_id.name, compiler_t->to_err_message())
+            ;
+        ;
     ;
     let peeked_opt = compiler_t->peek()
     if peeked_opt.is_none() do display_err_message("Error when trying to parse function: " + function.id, compiler_t->to_err_message())

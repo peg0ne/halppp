@@ -54,6 +54,12 @@ class Json
         this->_values = values
     ;
 pub
+    fn [ string id => Option<Json*>
+        foreach value in _values
+            if value->name() == id doremi value
+        ;
+        return None<Json*>()
+    ;
     fn add Json *value => do _values.push_back(value)
     fn add<T> T value => do _values.push_back(new Json("", value))
     fn try_add<T> string name, T value =>

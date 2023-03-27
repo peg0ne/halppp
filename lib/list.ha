@@ -7,6 +7,7 @@ class List<T>
     List => do return
     List vector<T> list => do _list = list
 pub
+    fn [ int at => T doremi _list[at]
     fn at int at => T doremi _list.at(at)
     fn at_ptr int at => T* doremi &_list.at(at)
     fn set int at, T val => do _list.at(at) = val
