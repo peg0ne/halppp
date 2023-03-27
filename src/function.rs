@@ -1,34 +1,56 @@
 use crate::{
     condition,
     enums::{Token, VariableState},
-    expression, foreach, selects,
+    expression, foreach,
     message::display_err_message,
-    structs::{Compiler, Function, Variable, Expression},
-    utils::{get_id_or_exit, get_next_or_exit},
+    selects,
+    structs::{Compiler, Expression, Function, Variable},
+    switch, template,
+    utils::get_next_or_exit,
     variable,
-    template,
-    switch,
 };
 
-pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constructor: bool) -> Function {
+pub fn construct(
+    compiler: &mut Compiler,
+    variable_state: VariableState,
+    constructor: bool,
+) -> Function {
     let mut function = Function::new(variable_state);
     if !constructor {
-        function.id = get_id_or_exit(compiler.next(), "[FunctionError]: No Function Id");
+        let func_id = get_next_or_exit(compiler.next(), "[FunctionError]: No Function Id");
+        let new_id = match func_id.token {
+            Token::Id => func_id.name.to_owned(),
+            Token::And => "operator".to_owned() + func_id.name.as_str(),
+            Token::Sum => "operator".to_owned() + func_id.name.as_str(),
+            Token::Sub => "operator".to_owned() + func_id.name.as_str(),
+            Token::Equality => "operator".to_owned() + func_id.name.as_str(),
+            Token::NonEquality => "operator".to_owned() + func_id.name.as_str(),
+            Token::LBrack => "operator[]".to_owned(),
+            _ => "".to_owned(),
+        };
+        if new_id == "" {
+            display_err_message(format!("Expected id or operator got: {}", func_id.name).as_str())
+        }
+        function.id = new_id;
     }
     match compiler.peek() {
-        Some(p) => {
-            match p.token {
-                Token::LessThan => function.template = template::construct(compiler),
-                _ => {}
-            }
-        }
-        None => display_err_message(format!("Error when trying to parse function: {}", function.id).as_str()),
+        Some(p) => match p.token {
+            Token::LessThan => function.template = template::construct(compiler),
+            _ => {}
+        },
+        None => display_err_message(
+            format!("Error when trying to parse function: {}", function.id).as_str(),
+        ),
     }
     loop {
         let (variable, is_end) = variable::construct_args(compiler, None);
-        if !variable.has_minimum() { break; }
+        if !variable.has_minimum() {
+            break;
+        }
         function.arguments.push(variable.to_owned());
-        if is_end { break; }
+        if is_end {
+            break;
+        }
     }
     if function.id == String::from("main") {
         function.arguments.push(Variable::from(
@@ -58,7 +80,7 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
                     function.return_value = Some(variable::get_type(compiler));
                 }
             }
-            _ => {},
+            _ => {}
         }
     }
     // Set Inner Function stuff
@@ -68,9 +90,15 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
             format!("Function is not closed [{}]", function.id).as_str(),
         );
         match x.token {
-            Token::Foreach => function.expressions.push(foreach::construct(compiler, true)),
-            Token::For => function.expressions.push(foreach::construct(compiler, false)),
-            Token::Condition => function.expressions.push(condition::construct(compiler, x.name)),
+            Token::Foreach => function
+                .expressions
+                .push(foreach::construct(compiler, true)),
+            Token::For => function
+                .expressions
+                .push(foreach::construct(compiler, false)),
+            Token::Condition => function
+                .expressions
+                .push(condition::construct(compiler, x.name)),
             Token::Switch => function.expressions.push(switch::construct(compiler)),
             Token::Select => function.expressions.push(selects::construct(compiler)),
             Token::SemiColon => break,
@@ -78,8 +106,12 @@ pub fn construct(compiler: &mut Compiler, variable_state: VariableState, constru
             Token::EOF => break,
             Token::NewLine => continue,
             _ => {
-                function.expressions.push(expression::construct(compiler, x.to_owned()));
-                if x.token.is_do() { break; }
+                function
+                    .expressions
+                    .push(expression::construct(compiler, x.to_owned()));
+                if x.token.is_do() {
+                    break;
+                }
             }
         }
     }
