@@ -29,12 +29,12 @@ class TreeSitter
     string text = ""
     List<string> lines = List<string>()
     Ncurses *n
-    TreeSitter IContainer *container, Ncurses *n, string path, List<string> text, Vector internal_offset =>
+    TreeSitter IContainer *container, Ncurses *n, string path, List<string> text, Vector internal_offset, string file_type =>
         this->internal_offset = internal_offset
         this->offset = container->Offset()
         this->size = container->Size()
         this->n = n
-        this->path = path + ".tree.ha"
+        this->path = path + $".tree.{file_type}"
         this->lines = text
         this->text = join_text(text)
     ;

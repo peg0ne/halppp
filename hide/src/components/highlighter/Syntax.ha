@@ -61,6 +61,7 @@ class Syntax
 
     bool _is_complete = false
     string _name = "plain"
+    string _file_type = ".txt"
     vector<SyntaxBox> _boxings = {}
     vector<SyntaxCustom> _customs = {}
     vector<string> _wordlist = {}
@@ -68,6 +69,7 @@ class Syntax
     
     Syntax => do return
     Syntax string type =>
+        this->_file_type = type
         let home = "."
         select home_opt from env("HOME")
             home = home_opt
@@ -116,4 +118,5 @@ pub
     fn boxing => vector<SyntaxBox> doremi _boxings
     fn custom => vector<SyntaxCustom> doremi _customs
     fn rules => vector<SyntaxRule> doremi _rules
+    fn file_type => string doremi _file_type
 ;
