@@ -1,47 +1,9 @@
-fn error_checker Syntax* syntax, IContainer* container, Ncurses* n, string path, List<string> text =>
-    init_pair(256, 196, 239)
-    let s = ""
-    foreach line in text do s += line + "\n"
-    write(s, path + ".tree")
-    let output = system_output($"tree-sitter parse {path}.tree -q")
-    if output.size() == 0 dore remove(path + ".tree")
-    let tree = String(output[0])
-    if !tree.contains("ERROR") dore remove(path + ".tree")
-    while !tree.starts_with("(")
-        tree.remove(0)
-        if tree.len() == 0 dore remove(path + ".tree")
-    ;
-    tree.remove(0)
-    tree = String(tree.strip())
-    tree = String(tree.replace(")",""))
-    tree = String(tree.replace("ERROR", ""))
-    tree = String(tree.replace("[", ""))
-    tree = String(tree.replace("]", ""))
-    tree = String(tree.replace("-", ","))
-    tree = String(tree.replace(" ", ""))
-    let positions = tree.split(',')
-    if positions.size() < 4 dore remove(path + ".tree")
-    let ymin = String(positions[0]).to_num().value_or(0)
-    let xmin = String(positions[1]).to_num().value_or(0)
-    let ymax = String(positions[2]).to_num().value_or(0)
-    let xmax = String(positions[3]).to_num().value_or(0)
-    let offset = container->Offset()
-    let size = container->Size()
-    let end = size.x + offset.x
-    let content = container->GetContent()
-    let line = content.at(ymin)
-    if ymax > ymin do xmax = line.size()
-    n->underline_until(ymin + offset.y, xmin + offset.x, 256, xmax - xmin)
-    n->mark_until(ymin + offset.y, offset.x-5, 256, 5)
-    n->col(1)
-    n->add_until(ymin + offset.y, line.size() + offset.x + 1, $"◉ Error", end, true)
-    n->col(1,false)
-    remove(path + ".tree")
-;
+get => TreeSitter
 
-fn error_checker Syntax* syntax, IContainer* container, Ncurses* n, string path, bool temp_remove_after_tree =>
-    if !syntax->is_complete() do return
+fn error_checker Syntax* syntax, IContainer* container, Ncurses *n, string path, List<string> text, Vector internal_offset =>
     init_pair(256, 196, 239)
+    TreeSitter(container, n, path, text, internal_offset).run()
+    if !syntax->is_complete() do return
     let content = container->GetContent()
     let y = 0
     let rules = syntax->rules()
