@@ -34,7 +34,7 @@ class TreeSitter
         this->offset = container->Offset()
         this->size = container->Size()
         this->n = n
-        this->path = path + $".tree.{file_type}"
+        this->path = $"temp_tree_sitter.{file_type}"
         this->lines = text
         this->text = join_text(text)
     ;
