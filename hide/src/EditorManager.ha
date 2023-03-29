@@ -15,9 +15,9 @@ class EditorManager => IContent
     ;
     fn activate Dir dir =>
         switch dir
-        case Dir::Left
+        case Dir::Left dobr activate_h(dir)
         case Dir::Right dobr activate_h(dir)
-        case Dir::Up
+        case Dir::Up dobr activate_v(dir)
         case Dir::Down dobr activate_v(dir)
         ;
     ;

@@ -67,7 +67,10 @@ pub
         ;
         //Ye ol commands
         switch cmd
-        case Command::Exit dobr n.stop(); return true
+        case Command::Exit
+            n.stop()
+            return true
+            break
         case Command::ModeFileEx dobr _mode_view.set(Mode::FileEx)
         case Command::ModeCmdHan dobr _mode_view.set(Mode::CmdHan)
         case Command::ModeNormal dobr _mode_view.set(Mode::Normal)

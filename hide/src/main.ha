@@ -3,6 +3,7 @@ get => ncurses, option, bounds, dictionary, json, ngui
 get => math, files, stringextensions, list, regex
 get => model
 
+
 fn main =>
     let n = Ncurses()
     let model = Model(argc, argv)

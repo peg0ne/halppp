@@ -29,12 +29,14 @@ class TreeSitter
     string text = ""
     List<string> lines = List<string>()
     Ncurses *n
-    TreeSitter IContainer *container, Ncurses *n, string path, List<string> text, Vector internal_offset, string file_type =>
+    Syntax *syntax
+    TreeSitter IContainer *container, Ncurses *n, string path, List<string> text, Vector internal_offset, Syntax *s =>
         this->internal_offset = internal_offset
         this->offset = container->Offset()
         this->size = container->Size()
         this->n = n
-        this->path = $"temp_tree_sitter.{file_type}"
+        this->syntax = s
+        this->path = $"temp_tree_sitter.{s->file_type()}"
         this->lines = text
         this->text = join_text(text)
     ;
@@ -62,19 +64,26 @@ class TreeSitter
             blocks[i] = String(blocks[i]).replace("  ", " ")
             blocks[i] = String(blocks[i]).strip()
         ;
+        return parse_blocks(blocks)
+    ;
+    fn parse_blocks vector<string> blocks => vector<TreeSitterBlock>
         vector<TreeSitterBlock> ts_blocks = {}
         foreach b in blocks
             let ts_block = TreeSitterBlock(b)
             if ts_block.info == "" do continue
             ts_blocks.push_back(ts_block)
         ;
+        syntax->set_cache(text, ts_blocks)
         return ts_blocks
     ;
 pub
     fn run =>
-        write(text, path)
-        if !is_error() dore remove(path)
-        let tree = get_tree()
+        let tree = syntax->cached_blocks(text)
+        if tree.size() == 0
+            write(text, path)
+            if !is_error() dore remove(path)
+            tree = get_tree()
+        ;
         let end = size.x + offset.x
         foreach i,b in tree
             if b.info != "ERROR" do continue

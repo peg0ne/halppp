@@ -60,6 +60,8 @@ class Syntax
     Json _definition = Json()
 
     bool _is_complete = false
+    string _cached_tree = ""
+    vector<TreeSitterBlock> _cached_t_block = {}
     string _name = "plain"
     string _file_type = ".txt"
     vector<SyntaxBox> _boxings = {}
@@ -119,4 +121,12 @@ pub
     fn custom => vector<SyntaxCustom> doremi _customs
     fn rules => vector<SyntaxRule> doremi _rules
     fn file_type => string doremi _file_type
+    fn cached_blocks string key => vector<TreeSitterBlock>
+        if key == _cached_tree doremi _cached_t_block
+        return {}
+    ;
+    fn set_cache string tree, vector<TreeSitterBlock> blocks =>
+        _cached_tree = tree
+        _cached_t_block = blocks
+    ;
 ;

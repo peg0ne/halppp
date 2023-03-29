@@ -87,9 +87,6 @@ pub
         let next = line.find(match, first + 1)
         let next_end = line.find(end, first + 1)
         if next_end == -1 doremi None<int>()
-        
-        //if next start is more than next end
-        //it's not nested so we can mark safely and keep look for more
         elif next > next_end
             if xy.x + next_end < max_x
                 n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
