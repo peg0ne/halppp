@@ -1,7 +1,7 @@
 get => components/Editor
 class EditorManager => IContent
     vector<Editor*> _editors = {}
-    vector<HorizontalLayout*> _editorspaces = {} 
+    vector<HorizontalLayout*> _editorspaces = {}
     Option<HorizontalLayout*> _activeSpace = None<HorizontalLayout*>()
     Option<Editor*> _activeEditor = None<Editor*>()
     vector<string> _shared_buffer = {}
@@ -32,10 +32,12 @@ class EditorManager => IContent
                 switch dir
                 case Dir::Up
                     if i == 0 dobr i = _editorspaces.size() - 1
-                    else dobr i--
+                    i--
+                    break
                 case Dir::Down
                     if i == _editorspaces.size() - 1 dobr i = 0
-                    else dobr i++
+                    i++
+                    break
                 ;
 
                 let active = _editorspaces.at(i)
@@ -61,10 +63,12 @@ class EditorManager => IContent
         switch dir
         case Dir::Left
             if index == 0 dobr index = size - 1
-            else dobr index--
+            index--
+            break
         case Dir::Right
             if index >= size - 1 dobr index = 0
-            else dobr index++
+            index++
+            break
         ;
         let editor = space->containers()->at(index)
         _activeEditor = find_editor_from_offset(editor->Offset())

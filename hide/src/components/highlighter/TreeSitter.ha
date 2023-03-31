@@ -1,19 +1,24 @@
 struct TreeSitterBlock
     string info = ""
+    string target = ""
     Vector min = Vector()
     Vector max = Vector()
     TreeSitterBlock string block =>
         let pieces = String(block).split(' ')
         let n = Ncurses()
-        if pieces.size() != 5 do return
+        if pieces.size() < 5 do return
         this->info = pieces[0]
+        let extra = pieces.size() == 6 ? 1 : 0
+        if extra == 1
+            this->target = pieces[1]
+        ;
         this->min = Vector(
-            String(pieces[2]).to_num().value_or(0),
-            String(pieces[1]).to_num().value_or(0)
+            String(pieces[2+extra]).to_num().value_or(0),
+            String(pieces[1+extra]).to_num().value_or(0)
         )
         this->max = Vector(
-            String(pieces[4]).to_num().value_or(0),
-            String(pieces[3]).to_num().value_or(0)
+            String(pieces[4+extra]).to_num().value_or(0),
+            String(pieces[3+extra]).to_num().value_or(0)
         )
     ;
     fn as_str => string
@@ -49,7 +54,8 @@ class TreeSitter
     fn is_error => bool
         let output = system_output($"tree-sitter parse {path} -q")
         if output.size() == 0 doremi false
-        return String(output[output.size() - 1]).contains("ERROR")
+        let s = String(output[output.size() - 1])
+        return s.contains("ERROR") || s.contains("MISSING")
     ;
     fn get_tree => vector<TreeSitterBlock>
         let output = system_output($"tree-sitter parse {path}")
@@ -86,7 +92,7 @@ pub
         ;
         let end = size.x + offset.x
         foreach i,b in tree
-            if b.info != "ERROR" do continue
+            if b.info != "ERROR" && b.info != "MISSING" do continue
             let line = lines.len() > b.min.y ? lines.at(b.min.y) : " "
             if b.max.y > b.min.y do b.max.x = line.size()
             if b.min.y >= size.y + internal_offset.y do break
@@ -94,7 +100,7 @@ pub
             n->underline_until(b.min + offset - internal_offset, 256, b.max.x - b.min.x)
             n->mark_until(offset + Vector(-5, b.min.y - internal_offset.y), 256, 5)
             n->col(1)
-            n->add_until(offset + Vector(line.size() + 1, b.min.y - internal_offset.y), $"◉ Error", end, true)
+            n->add_until(offset + Vector(line.size() + 1, b.min.y - internal_offset.y), $"◉ {b.info} {b.target}", end, true)
             n->col(1,false)
         ;
         remove(path)
