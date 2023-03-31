@@ -60,7 +60,10 @@ class Syntax
     Json _definition = Json()
 
     bool _is_complete = false
+    string _cached_tree = ""
+    vector<TreeSitterBlock> _cached_t_block = {}
     string _name = "plain"
+    string _file_type = ".txt"
     vector<SyntaxBox> _boxings = {}
     vector<SyntaxCustom> _customs = {}
     vector<string> _wordlist = {}
@@ -68,6 +71,7 @@ class Syntax
     
     Syntax => do return
     Syntax string type =>
+        this->_file_type = type
         let home = "."
         select home_opt from env("HOME")
             home = home_opt
@@ -116,4 +120,13 @@ pub
     fn boxing => vector<SyntaxBox> doremi _boxings
     fn custom => vector<SyntaxCustom> doremi _customs
     fn rules => vector<SyntaxRule> doremi _rules
+    fn file_type => string doremi _file_type
+    fn cached_blocks string key => vector<TreeSitterBlock>
+        if key == _cached_tree doremi _cached_t_block
+        return {}
+    ;
+    fn set_cache string tree, vector<TreeSitterBlock> blocks =>
+        _cached_tree = tree
+        _cached_t_block = blocks
+    ;
 ;

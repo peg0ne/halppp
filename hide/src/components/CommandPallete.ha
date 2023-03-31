@@ -76,7 +76,7 @@ pub
             ;
             pallete_found.SetContent(buf)
             pallete_window.draw(n)
-            n->mark_until((LINES/4) + 1 + pos, COLS/4, 4, COLS/2)
+            n->mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)
             let key = n->key()
             switch key
             case KEY_DOWN dobr pos++

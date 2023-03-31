@@ -98,10 +98,12 @@ class Editor => IContent
         switch type
         case TextEdit::PasteLine
             if !is_undo dobr _text.insert(pos.y+1, text)
-            else dobr _text.remove(pos.y+1)
+            _text.remove(pos.y+1)
+            break
         case TextEdit::DeleteLine
             if is_undo dobr _text.insert(pos.y, text)
-            else dobr _text.remove(pos.y)
+            _text.remove(pos.y)
+            break
         case TextEdit::InsertNl
             if is_undo
                 _text.set(pos.y, text)
@@ -147,7 +149,7 @@ pub
         return this
     ;
     fn move_to int pos =>
-        let diff = (pos - 1) - _selector.y
+        let diff = pos - 1 - _selector.y
         let dir = diff > 0 ? Dir::Down : Dir::Up
         if dir == Dir::Up do diff *= -1
         move(dir, diff, false)
@@ -220,7 +222,7 @@ pub
         select highlighter from _highlighter
             highlighter->highlight(_content, n)
             highlighter->highlight(_status_line, n, true, -2)
-            if _check_errors do highlighter->error_check(_content, n, _path)
+            if _check_errors do highlighter->error_check(_content, n, _path, _text, internal_offset)
         ;
 
         mark_selections(is_current, internal_offset)
@@ -633,7 +635,7 @@ pub
     fn move Dir dir => do move(dir, 1, true)
     fn move Dir dir, int multiply => do move(dir, multiply, true)
     fn move Dir dir, int multiply, bool can_line_swap =>
-        Vector vec
+        Vector vec = Vector()
         switch dir
         case Dir::Up dobr vec = Vector(0, -1)
         case Dir::Down dobr vec = Vector(0, 1)
@@ -651,7 +653,7 @@ pub
         ;
         _selections = buf
     ;
-    fn move_word Dir dir, => do move_word(dir, false)
+    fn move_word Dir dir => do move_word(dir, false)
     fn move_word Dir dir, bool spacebreak =>
         move_word_impl(dir, &_selector, spacebreak)
         vector<Vector> buf = {}
@@ -882,7 +884,7 @@ pub
             return Command::Nop
         case 's' 
             select fp from Lgrep(n) do open(fp)
-            doremi Command::ModeNormal
+            return Command::ModeNormal
         ;
         return Command::Nop
     ;
@@ -909,7 +911,7 @@ pub
     fn run_y => Command
         switch n->key()
         case 'y' do break
-        default return Command::Nop
+        default doremi Command::Nop
         ;
         select num from _modifier.to_num()
             if num == 0 do yank_line(&_selector)
@@ -948,10 +950,10 @@ pub
             case '\n' 
                 find(search)
                 n->clearLn(LINES - 1)
-                doremi Command::Nop
+                return Command::Nop
             case 27
                 n->clearLn(LINES - 1)
-                doremi Command::Nop
+                return Command::Nop
             case '\b'
             case 127
             case KEY_BACKSPACE 
@@ -988,7 +990,7 @@ pub
                 break
             case 27
                 n->clearLn(LINES - 1)
-                doremi Command::Nop
+                return Command::Nop
             case '\b'
             case 127
             case KEY_BACKSPACE

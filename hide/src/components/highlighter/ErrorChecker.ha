@@ -1,6 +1,9 @@
-fn error_checker Syntax* syntax, IContainer* container, Ncurses* n, string path =>
-    if !syntax->is_complete() do return
+get => TreeSitter
+
+fn error_checker Syntax* syntax, IContainer* container, Ncurses *n, string path, List<string> text, Vector internal_offset =>
     init_pair(256, 196, 239)
+    TreeSitter(container, n, path, text, internal_offset, syntax).run()
+    if !syntax->is_complete() do return
     let content = container->GetContent()
     let y = 0
     let rules = syntax->rules()
@@ -40,7 +43,7 @@ fn file_exists_error_check Ncurses *n, RegexMatch match, Vector offset, Vector s
         n->mark_until(y + offset.y, offset.x-5, 256, 5)
     ;
     n->col(1)
-    n->add_until(y + offset.y, line.size() + offset.x + 1, $"- CANNOT FIND FILE {match.match}", end, true)
+    n->add_until(y + offset.y, line.size() + offset.x + 1, $"◉ CANNOT FIND FILE {match.match}", end, true)
     n->col(1,false)
 ;
 
@@ -54,6 +57,6 @@ fn equals_error_check Ncurses *n, RegexMatch match, Vector offset, Vector size, 
     n->underline_until(y + offset.y, start, 256, len)
     n->mark_until(y + offset.y, offset.x-5, 256, 5)
     n->col(1)
-    n->add_until(y + offset.y, line.size() + offset.x + 1, $"- Invalid token found {match.match} expected {validation_value}", end, true)
+    n->add_until(y + offset.y, line.size() + offset.x + 1, $"◉ Invalid token found \"{match.match}\" expected \"{validation_value}\"", end, true)
     n->col(1,false)
 ;

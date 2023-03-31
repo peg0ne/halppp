@@ -73,7 +73,7 @@ pub
         return Command::Nop
     ;
     fn add_ch int key => Command
-        string ch(1, key)
+        let ch = string(1, key)
         _line += ch
         update(_line)
         return Command::Nop
