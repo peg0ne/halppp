@@ -980,8 +980,9 @@ pub
         let step = 0
         loop
             n->clearLn(LINES - 1)
-            n->add(LINES - 1, 0, $"replace: {search} - {replace}" )
             let extra = step ? 3 : 0
+            let extra_str = step ? "" : " "
+            n->add(LINES - 1, 0, $"replace: {search}{extra_str} - {replace}" )
             n->col(1)
             n->add(LINES - 1, 9 + search.size() + replace.size() + extra, '|')
             n->col(1, false)
