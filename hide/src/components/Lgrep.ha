@@ -44,9 +44,16 @@ fn Lgrep Ncurses* n => Option<string>
             buf.add(file)
         ;
         content.SetContent(buf)
-        if pos >= buf.size() do view.SetContent(List<string>())
-        else do view.SetContent(readlines(buf.at(pos)))
-        base.draw(n)
+        if pos >= buf.size()
+            view.SetContent(List<string>())
+            base.draw(n)
+        ;
+        else view.SetContent(readlines(buf.at(pos)))
+            view.SetContent(readlines(buf.at(pos)))
+            let h = Highlighter(buf.at(pos))
+            base.draw(n)
+            h.highlight(&view, n)
+        ;
         n->mark_until(content.Offset().y + pos,
             content.Offset().x,
             5, content.Size().x)
