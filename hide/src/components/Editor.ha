@@ -945,6 +945,9 @@ pub
         loop
             n->clearLn(LINES - 1)
             n->add(LINES - 1, 0, "search: " + search)
+            n->col(1)
+            n->add(LINES - 1, 8 + search.size(), '|')
+            n->col(1, false)
             let key = n->key()
             switch key
             case '\n' 
@@ -978,6 +981,10 @@ pub
         loop
             n->clearLn(LINES - 1)
             n->add(LINES - 1, 0, $"replace: {search} - {replace}" )
+            let extra = step ? 3 : 0
+            n->col(1)
+            n->add(LINES - 1, 9 + search.size() + replace.size() + extra, '|')
+            n->col(1, false)
             let key = n->key()
             switch key
             case '\n'
@@ -1015,11 +1022,11 @@ pub
                 switch step
                 case 0
                     if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
-                    elif isalpha(key) do search += key
+                    elif isgraph(key) do search += key
                     break
                 case 1
-                    if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
-                    elif isalpha(key) do replace += key
+                    if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do replace += key
+                    elif isgraph(key) do replace += key
                     break
                 ;
                 break
