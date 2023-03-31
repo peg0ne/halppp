@@ -562,7 +562,10 @@ pub
             ;
             try_move(Vector(-1, 0), pos)
         ;
-        remove_char(&_text, pos)
+        if _current_mode == Mode::Visual && pos->x == 0 && _text.at(pos->y).size() == 0
+            text_editing(TextEdit::DeleteLine)
+        ;
+        else do remove_char(&_text, pos)
     ;
     fn delete_line Vector *pos => do delete_line(pos, false)
     fn delete_line Vector *pos, bool is_multi =>
@@ -857,9 +860,10 @@ pub
         switch key
         case 'i' doremi Command::ModeInsert
         case 27  doremi Command::ModeNormal
-        case 'd' 
+        case 'd'
             text_editing(TextEdit::DeleteChar)
             _selections.clear()
+            move(Dir::Left, 0)
             break
         case 'x' dobr select_line()
         case 'W' dobr select_word()

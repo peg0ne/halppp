@@ -27,8 +27,10 @@ fn insert_line List<string> *text, int pos, string line =>
 ;
 fn remove_word List<string> *text, Vector *pos, bool spacebreak =>
     let s = String(text->at(pos->y))
-    if s.starts_with(" ")
-        while s.starts_with(" ") do s.remove(0)
+    if pos->x < s.len() && s[pos->x] == ' '
+        while pos->x < s.len() && s[pos->x] == ' '
+            s.remove(pos->x)
+        ;
     ;
     else do s.remove_word(pos->x, spacebreak)
     text->set(pos->y, s.to_string())
