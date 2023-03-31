@@ -31,11 +31,11 @@ pub
             if _syntax.name() == "halppp" && String(line).strip() == ";"
                 let found = line.find(";")
                 for i until size.y
-                    if y-(i+1) < 0 do break
-                    let above = content.at(y-(i+1))
+                    if y-i+1 < 0 do break
+                    let above = content.at(y-i+1)
                     if found >= above.size() || above.at(found) == ' '
                         attron(A_DIM)
-                        n->add(y + offset.y - (i + 1), found + offset.x, '.')
+                        n->add(y + offset.y - i + 1, found + offset.x, '.')
                         attroff(A_DIM)
                     ;
                     else do break
@@ -93,8 +93,6 @@ pub
             ;
             h_pairs_imp(n, line, match, end, xy, 0, first + 1, colors, max_x)
         ;
-        //else if next start is less than next end
-        //It's nested and well need to keep checking until we find the end fo nesting
         elif next < next_end 
             let keep = h_pairs_imp(n, line, match, end, xy, depth + 1, first + 1, colors, max_x)
             loop

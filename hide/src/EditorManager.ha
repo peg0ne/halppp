@@ -132,7 +132,7 @@ pub
             spaces.push_back(space)
         ;
         select e from closed
-            delete(e->origin())
+            delete e->origin()
             delete(e)
         ;
         _editorspaces = spaces
