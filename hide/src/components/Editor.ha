@@ -944,7 +944,10 @@ pub
         let search = ""
         loop
             n->clearLn(LINES - 1)
-            n->add(LINES - 1, 0, "search: " + search)
+            n->col(3)
+            n->add(LINES - 1, 0, "search:")
+            n->col(3,false)
+            n->add(LINES - 1, 8, search)
             n->col(1)
             n->add(LINES - 1, 8 + search.size(), '|')
             n->col(1, false)
@@ -981,8 +984,12 @@ pub
         loop
             n->clearLn(LINES - 1)
             let extra = step ? 3 : 0
-            let extra_str = step ? "" : " "
-            n->add(LINES - 1, 0, $"replace: {search}{extra_str} - {replace}" )
+            string extra_str = step ? "" : " "
+            n->col(3)
+            n->add(LINES - 1, 0, "replace:")
+            n->col(3, false)
+            n->add(LINES - 1, 9, $"{search}{extra_str} - {replace}")
+            n->mark_until(LINES - 1, 9 + search.size() + extra_str.size() + 1, 2 + step, true)
             n->col(1)
             n->add(LINES - 1, 9 + search.size() + replace.size() + extra, '|')
             n->col(1, false)
