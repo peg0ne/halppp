@@ -31,11 +31,11 @@ pub
             if _syntax.name() == "halppp" && String(line).strip() == ";"
                 let found = line.find(";")
                 for i until size.y
-                    if y-i+1 < 0 do break
-                    let above = content.at(y-i+1)
+                    if y-(i+1) < 0 do break
+                    let above = content.at(y-(i+1))
                     if found >= above.size() || above.at(found) == ' '
                         attron(A_DIM)
-                        n->add(y + offset.y - i + 1, found + offset.x, '.')
+                        n->add(y + offset.y - (i + 1), found + offset.x, '.')
                         attroff(A_DIM)
                     ;
                     else do break

@@ -948,7 +948,7 @@ pub
             let key = n->key()
             switch key
             case '\n' 
-                find(search)
+                if !find(search) do find(search, true)
                 n->clearLn(LINES - 1)
                 return Command::Nop
             case 27
@@ -965,7 +965,7 @@ pub
                 break
             default
                 if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
-                elif isalpha(key) do search += key
+                elif isgraph(key) do search += key
                 break
             ;
         ;
