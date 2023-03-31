@@ -1,6 +1,9 @@
-fn error_checker Syntax* syntax, IContainer* container, Ncurses* n, string path =>
-    if !syntax->is_complete() do return
+get => TreeSitter
+
+fn error_checker Syntax* syntax, IContainer* container, Ncurses *n, string path, List<string> text, Vector internal_offset =>
     init_pair(256, 196, 239)
+    TreeSitter(container, n, path, text, internal_offset, syntax).run()
+    if !syntax->is_complete() do return
     let content = container->GetContent()
     let y = 0
     let rules = syntax->rules()

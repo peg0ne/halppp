@@ -10,7 +10,7 @@ class Highlighter
     ;
 pub
     fn wordlist => vector<string> doremi _syntax.wordlist()
-    fn error_check IContainer* container, Ncurses *n, string path => do error_checker(&_syntax, container, n, path)
+    fn error_check IContainer* container, Ncurses *n, string path, List<string> text, Vector internal_offset => do error_checker(&_syntax, container, n, path, text, internal_offset)
     fn highlight IContainer* container, Ncurses *n => do highlight(container, n, false, 0)
     fn highlight IContainer* container, Ncurses *n, bool is_label, int x_offset =>
         if !_syntax.is_complete() do return
@@ -31,11 +31,11 @@ pub
             if _syntax.name() == "halppp" && String(line).strip() == ";"
                 let found = line.find(";")
                 for i until size.y
-                    if y-(i+1) < 0 do break
-                    let above = content.at(y-(i+1))
+                    if y-i+1 < 0 do break
+                    let above = content.at(y-i+1)
                     if found >= above.size() || above.at(found) == ' '
                         attron(A_DIM)
-                        n->add(y + offset.y - (i + 1), found + offset.x, '.')
+                        n->add(y + offset.y - i + 1, found + offset.x, '.')
                         attroff(A_DIM)
                     ;
                     else do break
@@ -87,17 +87,12 @@ pub
         let next = line.find(match, first + 1)
         let next_end = line.find(end, first + 1)
         if next_end == -1 doremi None<int>()
-        
-        //if next start is more than next end
-        //it's not nested so we can mark safely and keep look for more
         elif next > next_end
             if xy.x + next_end < max_x
                 n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
             ;
             h_pairs_imp(n, line, match, end, xy, 0, first + 1, colors, max_x)
         ;
-        //else if next start is less than next end
-        //It's nested and well need to keep checking until we find the end fo nesting
         elif next < next_end 
             let keep = h_pairs_imp(n, line, match, end, xy, depth + 1, first + 1, colors, max_x)
             loop
