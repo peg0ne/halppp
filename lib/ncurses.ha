@@ -27,21 +27,21 @@ class Ncurses
         ;
     ;
     fn box_char int y, int x, int pos =>
-        if pos == 0 dore add(y,x,"█")
-        if pos == 1 dore add(y,x,"█")
-        if pos == 2 dore add(y,x,"█ ")
+        if pos == 0 dore add(y,x,"┌")
+        if pos == 1 dore add(y,x,"│")
+        if pos == 2 dore add(y,x,"└")
         if pos == 3 dore add(y,x," ")
     ;
     fn stop_box_char int y, int x, int pos =>
-        if pos == 0 dore add(y, x, "█")
-        if pos == 1 dore add(y, x, "█")
-        if pos == 2 dore add(y, x, "█")
+        if pos == 0 dore add(y, x, "┐")
+        if pos == 1 dore add(y, x, "│")
+        if pos == 2 dore add(y, x, "┘")
         if pos == 3 dore add(y, x, " ")
     ;
     fn center_box_char int y, int x, int pos =>
-        if pos == 0 dore add(y, x, "▀")
+        if pos == 0 dore add(y, x, "─")
         if pos == 1 dore add(y, x, " ")
-        if pos == 2 dore add(y, x, "▄")
+        if pos == 2 dore add(y, x, "─")
         if pos == 3 dore add(y, x, " ")
     ;
     fn box_line int y, int x, int len, int pos, bool invis =>
