@@ -213,5 +213,39 @@
             "validation_value": "from",
             "capture": 1,
         }
+    ],
+    "templates": [
+        {
+            "name": "function"
+            "template": ["fn ", "$ ", "=> ", "$", "%", "%", ";", "%"]
+        },
+        {
+            "name": "function do"
+            "template": ["fn ", "$ ", "=> ", "$ ", "do", "$ ", "$", "%"]
+        },
+        {
+            "name": "select"
+            "template": ["select ", "$ ", "from ", "$", "%", "%", ";", "%"]
+        },
+        {
+            "name": "select do"
+            "template": ["select ", "$ ", "from ", "$ ", "do", "$", "%"]
+        },
+        {
+            "name": "loop"
+            "template": ["loop", "%", "%", ";", "%"]
+        },
+        {
+            "name": "while"
+            "template": ["while", "$", "%", "%", ";", "%"]
+        },
+        {
+            "name": "for"
+            "template": ["for", "$ ", "until ", "$", "%", "%", ";", "%"]
+        },
+        {
+            "name": "foreach"
+            "template": ["foreach", "$ ", "in ", "$", "%", "%", ";", "%"]
+        },
     ]
 }

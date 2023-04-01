@@ -3,6 +3,22 @@ enum SyntaxType
     Halp,
 ;
 
+struct SyntaxTemplate
+    string template_name = ""
+    vector<string> templates = {}
+    SyntaxTemplate => do return
+    SyntaxTemplate Json *temp =>
+        template_name = temp->try_get_value_of("name", (string)"")
+        select temps from temp->try_get("template")
+            for i until temps->size()
+                select t from temps->try_get(i)
+                    templates.push_back(t->value_or((string)""))
+                ;
+            ;
+        ;
+    ;
+;
+
 struct SyntaxBox
     vector<short> colors = {}
     string start = ""
@@ -68,6 +84,7 @@ class Syntax
     vector<SyntaxCustom> _customs = {}
     vector<string> _wordlist = {}
     vector<SyntaxRule> _rules = {}
+    vector<SyntaxTemplate> _templates = {}
     
     Syntax => do return
     Syntax string type =>
@@ -111,6 +128,13 @@ class Syntax
                 ;
             ;
         ;
+        select templates from _definition.try_get("templates")
+            for i until templates->size()
+                select temp from templates->try_get(i)
+                    _templates.push_back(SyntaxTemplate(temp))
+                ;
+            ;
+        ;
     ;
 pub
     fn wordlist => vector<string> doremi _wordlist
@@ -120,6 +144,7 @@ pub
     fn boxing => vector<SyntaxBox> doremi _boxings
     fn custom => vector<SyntaxCustom> doremi _customs
     fn rules => vector<SyntaxRule> doremi _rules
+    fn templates => vector<SyntaxTemplate> doremi _templates
     fn file_type => string doremi _file_type
     fn cached_blocks string key => vector<TreeSitterBlock>
         if key == _cached_tree doremi _cached_t_block

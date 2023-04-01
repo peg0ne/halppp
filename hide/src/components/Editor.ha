@@ -529,8 +529,8 @@ pub
             n->col(1)
             let box_str = ""
             for i until width do box_str += "─"
-            n->add(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐")
-            n->add(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘")
+            n->add_until(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐", _content->Size().x + offset.x, false)
+            n->add_until(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘", _content->Size().x + offset.x, false)
             n->col(1, false)
             let key = n->key()
             switch key
@@ -719,6 +719,67 @@ pub
         ;
         if dir == Dir::Left do try_move(Vector(-1, 0), pos)
     ;
+    fn templates =>
+    select h from _highlighter
+        _selections.clear()
+        let templates = h->syntax().templates()
+        let container = HorizontalLayout(Vector(COLS/6*4, LINES/2), Vector(COLS/6, LINES/4))
+        let content = List<string>()
+        foreach t in templates do content.add(t.template_name)
+        container.SetColor(-2)
+        container.SetContent(content)
+        if templates.size() == 0 do return
+        let template_index = 0
+        loop
+            container.draw(n)
+            n->mark_until(
+                container.Offset() + Vector(0, template_index),
+                4, container.Size().x, true)
+            let key = n->key()
+            if key == '\n' do break
+            if key == 27 do return
+            switch key
+            case KEY_UP dobr template_index--
+            case KEY_DOWN dobr template_index++
+            ;
+            if template_index < 0 do template_index = 0
+            if template_index >= templates.size() do template_index = templates.size() - 1
+        ;
+        let temp = templates[template_index]
+        foreach t in temp.templates
+            let s = String(t)
+            if s.starts_with("%")
+                text_editing(TextEdit::InsertNl)
+                draw(6)
+                continue
+            ;
+            while s.starts_with("$")
+                loop
+                    let key = n->key()
+                    if key == 127 do break
+                    elif key =|= '\n' : ' ' dobr draw(6)
+                    elif isgraph(key)
+                        text_editing(TextEdit::Insert, string(1, key))
+                        draw(6)
+                    ;
+                ;
+                s.remove(0)
+                if s.len() == 0 do break
+                while !s.starts_with("$")
+                    content_change(TextEdit::Insert)
+                    insert_text(string(1, s.at(0)), &_selector, false)
+                    draw(6)
+                    s.remove(0)
+                    if s.len() == 0 do break
+                ;
+                if s.len() == 0 do break
+            ;
+            content_change(TextEdit::Insert)
+            foreach ch in s.to_string() do insert_text(string(1, ch), &_selector, false)
+            draw(6)
+        ;
+    ;
+    ;
     fn run Mode mode => Command doremi run(mode, false)
     fn run Mode mode, bool internal_run => Command
         _current_mode = mode
@@ -852,6 +913,7 @@ pub
         case 'z' dobr run_z()
         case 'o' dobr _num_diff = !_num_diff
         case 't' dobr _check_errors = !_check_errors
+        case 'T' dobr templates()
         default
             if !isdigit(key) do break
             _modifier.append(string(1,key))
