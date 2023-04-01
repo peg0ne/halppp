@@ -61,17 +61,21 @@ class CommandPallete
 pub
     fn show Ncurses *n => TextEditOrCommand
         let match = ""
+        let offset = 0
         search = ""
         pos = 0
         loop
+            let offset_used = 0
             pallete_search.SetLabel(" " + search)
             buf.clear()
-            foreach command in commands.keys()
+            foreach i, command in commands.keys()
                 if command.find(search) == -1 do continue
+                if i < offset doco offset_used++
                 buf.add(command)
             ;
-            foreach edit in textedits.keys()
+            foreach i, edit in textedits.keys()
                 if edit.find(search) == -1 do continue
+                if i < offset - offset_used do continue
                 buf.add(edit)
             ;
             pallete_found.SetContent(buf)
@@ -102,8 +106,14 @@ pub
                 break
             ;
             if pos > buf.size() - 1 do pos = buf.size() - 1
-            if pos > 8 do pos = 8
-            if pos < 0 do pos = 0
+            if pos > 8
+                pos = 8
+                offset++
+            ;
+            if pos < 0
+                pos = 0
+                if offset > 0 do offset--
+            ;
         ;
         return TextEditOrCommand(Command::Nop)
     ;

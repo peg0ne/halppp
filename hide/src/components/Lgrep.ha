@@ -36,11 +36,13 @@ fn Lgrep Ncurses* n => Option<string>
     base.add(&view)
     left.add(&search_bar)
     left.add(&content)
+    let offset = 0
     loop
         search_bar.SetLabel(search)
         buf.clear()
-        foreach file in files
+        foreach i, file in files
             if file.find(search) == -1 do continue
+            if i < offset do continue
             buf.add(file)
         ;
         content.SetContent(buf)
@@ -48,7 +50,7 @@ fn Lgrep Ncurses* n => Option<string>
             view.SetContent(List<string>())
             base.draw(n)
         ;
-        else view.SetContent(readlines(buf.at(pos)))
+        else
             view.SetContent(readlines(buf.at(pos)))
             let h = Highlighter(buf.at(pos))
             base.draw(n)
@@ -79,7 +81,13 @@ fn Lgrep Ncurses* n => Option<string>
             break
         ;
         if pos > buf.size() - 1 do pos = buf.size() - 1
-        if pos > content.Size().y - 1 do pos = content.Size().y - 1
-        if pos < 0 do pos = 0
+        if pos > content.Size().y - 1
+            pos = content.Size().y - 1
+            offset++
+        ;
+        if pos < 0
+            pos = 0
+            if offset > 0 do offset--
+        ;
     ;
 ;
