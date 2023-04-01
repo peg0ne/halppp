@@ -115,5 +115,11 @@
         "startswith",
         "split",
         "append"
+    ],
+    "templates": [
+        {
+            "name": "function",
+            "template": ["def ", "$(", "$", "):", "%", "    pass", "%"]
+        }
     ]
 }

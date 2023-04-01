@@ -164,5 +164,11 @@
         "enum",
         "fn",
         "glob"
+    ],
+    "templates": [
+        {
+            "name": "function",
+            "template": ["$ $(", "$", ")", "%", "{", "%", "%", "}", "%"]
+        }
     ]
 }

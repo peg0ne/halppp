@@ -236,16 +236,20 @@
             "template": ["loop", "%", "%", ";", "%"]
         },
         {
+            "name": "loop do"
+            "template": ["loop ", "do", "$", "$", "%"]
+        },
+        {
             "name": "while"
-            "template": ["while", "$", "%", "%", ";", "%"]
+            "template": ["while ", "$", "%", "%", ";", "%"]
         },
         {
             "name": "for"
-            "template": ["for", "$ ", "until ", "$", "%", "%", ";", "%"]
+            "template": ["for ", "$ ", "until ", "$", "%", "%", ";", "%"]
         },
         {
             "name": "foreach"
-            "template": ["foreach", "$ ", "in ", "$", "%", "%", ";", "%"]
+            "template": ["foreach ", "$ ", "in ", "$", "%", "%", ";", "%"]
         },
     ]
 }
