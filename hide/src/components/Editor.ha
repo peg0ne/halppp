@@ -509,22 +509,29 @@ pub
             let positioned_y = reverse ? y - max_size : y
             foreach um in unique_matches
                 if matching_index + 1 + positioned_y >= _content->Size().y do break
-                n->col(selected == matching_index ? 4 : 5)
+                let y = offset.y + positioned_y + matching_index - reverse + 1
+                n->col(1)
+                n->add(y, x - 1, "│")
+                n->add(y, x + width, "│")
+                n->col(1, false)
+                n->col(selected == matching_index ? 4 : 0)
                 n->add_until(
-                    offset.y + positioned_y + matching_index - reverse + 1,
-                    x, um,
+                    y, x, um,
                     _content->Size().x + offset.x,
                     false)
                 for i until width - um.size()
                     if x + um.size() + i >= _content->Size().x + offset.x do break
-                    n->add(
-                        offset.y + positioned_y + matching_index - reverse + 1,
-                        x + um.size() + i,
-                        " ")
+                    n->add(y, x + um.size() + i, " ")
                 ;
-                n->col(selected == matching_index ? 4 : 5, false)
+                n->col(selected == matching_index ? 4 : 0, false)
                 matching_index++
             ;
+            n->col(1)
+            let box_str = ""
+            for i until width do box_str += "─"
+            n->add(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐")
+            n->add(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘")
+            n->col(1, false)
             let key = n->key()
             switch key
             case KEY_BTAB
@@ -1022,12 +1029,8 @@ pub
                     break
                 ;
                 switch step
-                case 0
-                    search.pop_back()
-                    break
-                case 1
-                    replace.pop_back()
-                    break
+                case 0 dobr search.pop_back()
+                case 1 dobr replace.pop_back()
                 ;
                 break
             default

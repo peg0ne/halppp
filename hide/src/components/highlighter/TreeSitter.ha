@@ -52,13 +52,13 @@ class TreeSitter
         return s
     ;
     fn is_error => bool
-        let output = system_output($"tree-sitter parse {path} -q")
+        let output = system_output($"tree-sitter parse {path} -q 2> /dev/null")
         if output.size() == 0 doremi false
         let s = String(output[output.size() - 1])
         return s.contains("ERROR") || s.contains("MISSING")
     ;
     fn get_tree => vector<TreeSitterBlock>
-        let output = system_output($"tree-sitter parse {path}")
+        let output = system_output($"tree-sitter parse {path} 2> /dev/null")
         let joined = join_text(output)
         let blocks = String(joined).split('(')
         for i until blocks.size()

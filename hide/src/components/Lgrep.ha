@@ -25,7 +25,7 @@ fn Lgrep Ncurses* n => Option<string>
     let search_bar = IContainer(Fill::Static, Vector(0,1))
     let content = IContainer()
     let left = VerticalLayout(Fill::Flex)
-    let spacer = IContainer(Fill::Static, Vector(2,0), "|")
+    let spacer = IContainer(Fill::Static, Vector(2,0), "│")
     let left_spacer = IContainer(Fill::Static, Vector(1,0))
     let view = IContainer()
     base.SetColor(-2)
