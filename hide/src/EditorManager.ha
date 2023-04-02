@@ -125,7 +125,7 @@ pub
                 n->add(LINES-1, 0, "Buffer has changes please use q! if you really want to quit.")
                 n->col(1,false)
                 n->key()
-                return Command::ModeNormal
+                return Command::ModeCmdHan
             ;
         ;
         vector<HorizontalLayout*> spaces = {}

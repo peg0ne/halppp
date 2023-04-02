@@ -175,8 +175,7 @@ pub
         ;
         return _offset
     ;
-    fn draw => do draw(5)
-    fn draw short color =>
+    fn draw short color = 5 =>
         if !is_active() do return
         let is_current = color == 6
         let internal_offset = get_internal_offset()
@@ -250,7 +249,7 @@ pub
             content += _text.at(i)
             if i < _text.len() - 1 do content += "\n"
         ;
-        return content
+        return String(content).strip_end()
     ;
     fn has_changes => bool
         select content from read(_path)
@@ -357,9 +356,7 @@ pub
         default do break
         ;
     ;
-    fn find => string doremi find(false, true)
-    fn find bool is_reverse => string doremi find(is_reverse, true)
-    fn find bool is_reverse, bool should_move => string
+    fn find bool is_reverse = false, bool should_move = true => string
         if _text.size() == 0 do return ""
         let s = _text.at(_selector.y)
         if s.size() == 0 do return ""
