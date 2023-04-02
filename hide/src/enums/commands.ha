@@ -7,6 +7,7 @@ enum Command
     ModeCmdHan,
     SelectFile,
     CloseEditor,
+    CloseEditorForced,
     WriteEditor,
     WriteCloseEditor,
     SplitVertical,
@@ -16,5 +17,8 @@ enum Command
     EditorRight,
     EditorUp,
     EditorDown,
+    EditorTemplates,
+    EditorSearch,
+    EditorReplace,
     Nop,
 ;

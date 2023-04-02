@@ -112,11 +112,22 @@ pub
         select a from _activeEditor do a->write_content()
         return Command::ModeNormal
     ;
-    fn close_editor => Command
+    fn close_editor bool forced = false => Command
         if _editors.size() == 0 doremi Command::Exit
         _origin->clear()
         let closed = None<Editor*>()
-        select a from _activeEditor do Some(a->close())
+        select a from _activeEditor
+            if !a->has_changes() || forced
+                a->close()
+            ;
+            else
+                n->col(1)
+                n->add(LINES-1, 0, "Buffer has changes please use q! if you really want to quit.")
+                n->col(1,false)
+                n->key()
+                return Command::ModeNormal
+            ;
+        ;
         vector<HorizontalLayout*> spaces = {}
         foreach space in _editorspaces
             let containers = space->containers()
@@ -197,4 +208,13 @@ pub
         return get_at(vec, count - 1)
     ;
     fn get_at<T> vector<T> *vec, int at => T doremi vec->at(at)
+    fn templates =>
+        select a from _activeEditor do a->templates()
+    ;
+    fn search =>
+        select a from _activeEditor do a->run_s()
+    ;
+    fn replace =>
+        select a from _activeEditor do a->run_r()
+    ;
 ;

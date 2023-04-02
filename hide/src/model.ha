@@ -59,6 +59,7 @@ pub
         //Command with mode changes
         switch cmd
         case Command::CloseEditor dobr cmd = _manager.close_editor()
+        case Command::CloseEditorForced dobr cmd = _manager.close_editor(true)
         case Command::WriteEditor dobr cmd = _manager.write_editor()
         case Command::WriteCloseEditor
             _manager.write_editor()
@@ -78,6 +79,9 @@ pub
         case Command::SelectFile dobr _manager.open_file(_explorer.get_fp())
         case Command::SplitVertical   dobr _manager.add_space()
         case Command::SplitHorizontal dobr _manager.add_editor()
+        case Command::EditorTemplates dobr _manager.templates()
+        case Command::EditorSearch    dobr _manager.search()
+        case Command::EditorReplace   dobr _manager.replace()
         case Command::Nop do break
         ;
         _explorer.set_visibility(_mode_view.mode())

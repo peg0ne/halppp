@@ -1,5 +1,6 @@
 get => textediting/[Edits, Sorting]
 get => Lgrep, CommandPallete
+
 class Editor => IContent
     string _path = ""
     bool _num_diff = false
@@ -243,14 +244,21 @@ pub
             else do n->mark(y, x, 4)
         ;
     ;
-    fn write_content =>
+    fn to_complete_str => string
         let content = ""
         for i until _text.len()
             content += _text.at(i)
             if i < _text.len() - 1 do content += "\n"
         ;
-        write(String(content).strip(), _path)
+        return content
     ;
+    fn has_changes => bool
+        select content from read(_path)
+            return content != to_complete_str()
+        ;
+        return true
+    ;
+    fn write_content => do write(to_complete_str(), _path)
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
     fn sort_selections_rev => do sort(_selections.begin(), _selections.end(), &selection_comparer_rev)
     fn add_selector bool is_word = false =>
@@ -556,11 +564,10 @@ pub
             ;
         ;
     ;
-    fn remove_ch Vector *pos => do remove_ch(pos, false)
-    fn remove_ch Vector *pos, bool should_move =>
+    fn remove_ch Vector *pos, bool should_move = false =>
         if should_move
             if pos->x == 0
-                if pos->y == 0 || _selections.len() != 0 do return
+                if pos->y == 0 && _selections.size() == 0 do return
                 text_editing(TextEdit::DeleteLine)
                 move(Dir::Up, 1)
                 move(Dir::Right, 100000, false)
@@ -574,14 +581,12 @@ pub
         ;
         else do remove_char(&_text, pos)
     ;
-    fn delete_line Vector *pos => do delete_line(pos, false)
-    fn delete_line Vector *pos, bool is_multi =>
+    fn delete_line Vector *pos, bool is_multi = false =>
         if !is_multi do _shared_buffer->clear()
         _shared_buffer->push_back(_text.at(pos->y))
         remove_line(&_text, pos)
     ;
-    fn yank_line Vector *pos => do yank_line(pos, false)
-    fn yank_line Vector *pos, bool is_multi =>
+    fn yank_line Vector *pos, bool is_multi = false =>
         if _text.len() == 0 do return
         if !is_multi do _shared_buffer->clear()
         _shared_buffer->push_back(_text.at(pos->y))
@@ -617,8 +622,7 @@ pub
         if dir == Dir::Up do move(Dir::Up, 2)
         text_editing(TextEdit::PasteLine)
     ;
-    fn delete_word Vector *pos => do delete_word(pos, false)
-    fn delete_word Vector *pos, bool spacebreak => do remove_word(&_text, pos, spacebreak)
+    fn delete_word Vector *pos, bool spacebreak = false => do remove_word(&_text, pos, spacebreak)
     fn delete_from Vector *pos =>
         let s = _text.at(pos->y)
         _shared_buffer->clear()
@@ -637,8 +641,7 @@ pub
         ;
     ;
     fn comment_toggle Vector *pos => do commenting(&_text, pos)
-    fn try_move Vector dir, Vector* pos => do try_move(dir, pos, true)
-    fn try_move Vector dir, Vector* pos, bool can_line_swap =>
+    fn try_move Vector dir, Vector* pos, bool can_line_swap = false =>
         if _text.size() == 0 do return
         let y = pos->y
         let x = pos->x
@@ -656,9 +659,7 @@ pub
             pos->x = 0
         ;
     ;
-    fn move Dir dir => do move(dir, 1, true)
-    fn move Dir dir, int multiply => do move(dir, multiply, true)
-    fn move Dir dir, int multiply, bool can_line_swap =>
+    fn move Dir dir, int multiply = 1, bool can_line_swap = true =>
         Vector vec = Vector()
         switch dir
         case Dir::Up dobr vec = Vector(0, -1)
@@ -677,8 +678,7 @@ pub
         ;
         _selections = buf
     ;
-    fn move_word Dir dir => do move_word(dir, false)
-    fn move_word Dir dir, bool spacebreak =>
+    fn move_word Dir dir, bool spacebreak = false =>
         move_word_impl(dir, &_selector, spacebreak)
         vector<Vector> buf = {}
         for i until _selections.size()
@@ -780,8 +780,7 @@ pub
         ;
     ;
     ;
-    fn run Mode mode => Command doremi run(mode, false)
-    fn run Mode mode, bool internal_run => Command
+    fn run Mode mode, bool internal_run = false => Command
         _current_mode = mode
         if internal_run 
             draw(6)
@@ -815,8 +814,10 @@ pub
         case KEY_PPAGE dobr move(Dir::Up, _content->Size().y)
         case KEY_HOME  dobr move(Dir::Left, 100000, false)
         case KEY_END   dobr move(Dir::Right, 100000, false)
-        case 558       dobr shift_line(Dir::Up)
-        case 517       dobr shift_line(Dir::Down)
+        case KEY_SPREVIOUS
+        case KEY_SR   dobr shift_line(Dir::Up)
+        case KEY_SNEXT
+        case KEY_SF dobr shift_line(Dir::Down)
         case KEY_MOUSE
             if getmouse(&event) != OK do break
             if event.bstate & (BUTTON1_CLICKED)

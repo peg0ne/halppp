@@ -34,6 +34,7 @@ class CommandPallete
         commands.add(" mode file explorer", Command::ModeCmdHan)
         commands.add(" editor write", Command::WriteEditor)
         commands.add(" editor close", Command::CloseEditor)
+        commands.add(" editor close forced", Command::CloseEditorForced)
         commands.add(" editor write and close", Command::WriteCloseEditor)
         commands.add(" editor split horizontal", Command::SplitHorizontal)
         commands.add(" editor split vertical", Command::SplitVertical)
@@ -41,6 +42,9 @@ class CommandPallete
         commands.add(" editor move right", Command::EditorRight)
         commands.add(" editor move up", Command::EditorUp)
         commands.add(" editor move down", Command::EditorDown)
+        commands.add(" templates", Command::EditorTemplates)
+        commands.add(" search", Command::EditorSearch)
+        commands.add(" replace", Command::EditorReplace)
     ;
     fn add_text_edits =>
         textedits.add(" tab", TextEdit::Tab)

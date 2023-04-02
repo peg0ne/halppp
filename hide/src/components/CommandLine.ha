@@ -26,6 +26,10 @@ pub
             update("")
             return Command::CloseEditor
         ;
+        elif _line == "q!" 
+            update("")
+            return Command::CloseEditorForced
+        ;
         elif _line == "w"
             update("")
             return Command::WriteEditor
