@@ -638,7 +638,7 @@ pub
         ;
     ;
     fn comment_toggle Vector *pos => do commenting(&_text, pos)
-    fn try_move Vector dir, Vector* pos, bool can_line_swap = false =>
+    fn try_move Vector dir, Vector* pos, bool can_line_swap = true =>
         if _text.size() == 0 do return
         let y = pos->y
         let x = pos->x
