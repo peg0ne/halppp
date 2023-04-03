@@ -253,7 +253,7 @@ pub
     ;
     fn has_changes => bool
         select content from read(_path)
-            return content != to_complete_str()
+            return String(content).strip_end() != to_complete_str()
         ;
         return true
     ;
