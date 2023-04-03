@@ -252,6 +252,8 @@ pub
         return String(content).strip_end()
     ;
     fn has_changes => bool
+        if _path == "" doremi false
+        if _text.len() == 0 doremi false
         select content from read(_path)
             return String(content).strip_end() != to_complete_str()
         ;
