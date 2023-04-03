@@ -745,6 +745,9 @@ pub
             if template_index >= templates.size() do template_index = templates.size() - 1
         ;
         let temp = templates[template_index]
+        _modifier = String("")
+        _current_mode = Mode::Insert
+        draw(6)
         foreach t in temp.templates
             let s = String(t)
             if s.starts_with("%")
