@@ -760,6 +760,10 @@ pub
                     let key = n->key()
                     if key == 127 do break
                     elif key =|= '\n' : ' ' dobr draw(6)
+                    elif key == KEY_BACKSPACE
+                        text_editing(TextEdit::RemoveChar)
+                        draw(6)
+                    ;
                     elif isgraph(key)
                         text_editing(TextEdit::Insert, string(1, key))
                         draw(6)
@@ -780,6 +784,7 @@ pub
             foreach ch in s.to_string() do insert_text(string(1, ch), &_selector, false)
             draw(6)
         ;
+        _current_mode = Mode::Normal
     ;
     ;
     fn run Mode mode, bool internal_run = false => Command
