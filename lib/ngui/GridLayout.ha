@@ -47,6 +47,8 @@ pub
     ;
     fn destruct =>
         foreach row in _rows do delete(row)
+        foreach ele in _grid_elements do delete(ele)
+        _grid_elements.clear()
         _rows.clear()
     ;
 ;

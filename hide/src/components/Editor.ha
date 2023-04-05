@@ -962,6 +962,30 @@ pub
         return Command::Nop
     ;
     fn run_space => Command
+        let show = GridLayout(Vector(COLS, 4), Vector(0, LINES - 7))
+        show.SetColor(-1)
+        vector<string> commands = {
+            "f - open file explorer",
+            "t - split editor horizontally",
+            "v - split editor vertically",
+            "h - move to editor left",
+            "l - move to editor right",
+            "j - move to editor up",
+            "k - move to editor down",
+            "c - toggle comment",
+            "P - paste word from clipboard",
+            "p - open command pallete",
+            "s - open file searcher",
+            ""
+        }
+        foreach c in commands
+            let ele = new IContainer(Fill::Flex)
+            ele->SetContent(List<string>({c}))
+            show.add_element(ele)
+        ;
+        for i until 4 do show.add_row()
+        show.draw(n)
+        show.destruct()
         let result = TextEditOrCommand(Command::Nop)
         switch n->key()
         case 'f' doremi Command::ModeFileEx
