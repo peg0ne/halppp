@@ -91,7 +91,7 @@ pub
             case KEY_UP dobr pos--
             case KEY_PPAGE dobr pos-=1000
             case KEY_NPAGE dobr pos+=1000
-            case 27 doremi Command::Nop
+            case 27 doremi Command::ModeNormal
             case '\n'
                 if pos >= buf.size() do break
                 match = buf.at(pos)

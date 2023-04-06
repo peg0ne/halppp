@@ -999,17 +999,17 @@ pub
         case 'P'
             _shared_buffer->clear()
             text_editing(TextEdit::PasteLine)
-            return Command::Nop
+            break
         case 'p'
             result = _command_pallete->show(n)
             select edit from result.textedit do text_editing(edit)
             select command from result.command doremi command
-            return Command::Nop
+            break
         case 's' 
             select fp from Lgrep(n) do open(fp)
-            return Command::ModeNormal
+            break
         ;
-        return Command::Nop
+        return Command::ModeNormal
     ;
     fn run_d => Command
         let edit_cmd = Option<TextEdit>()
