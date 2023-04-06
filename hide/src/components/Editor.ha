@@ -511,6 +511,9 @@ pub
             reverse = true
         ;
         let max_size = min(unique_matches.size(), space_below)
+        if x + width >= _content->Size().x + offset.x
+            width = _content->Size().x + offset.x - x - 1
+        ;
         loop
             let matching_index = 0
             let positioned_y = reverse ? y - max_size : y
@@ -519,14 +522,12 @@ pub
                 let y = offset.y + positioned_y + matching_index - reverse + 1
                 n->col(1)
                 n->add(y, x - 1, "│")
-                if x + width < _content->Size().x + offset.x
-                    n->add(y, x + width, "│")
-                ;
+                n->add(y, x + width, "│")
                 n->col(1, false)
                 n->col(selected == matching_index ? 4 : 0)
                 n->add_until(
                     y, x, um,
-                    _content->Size().x + offset.x,
+                    _content->Size().x + offset.x - 1,
                     false)
                 for i until width - um.size()
                     if x + um.size() + i >= _content->Size().x + offset.x do break
@@ -537,9 +538,6 @@ pub
             ;
             n->col(1)
             let box_str = ""
-            if x + width >= _content->Size().x + offset.x
-                width = _content->Size().x + offset.x - x - 1
-            ;
             for i until width do box_str += "─"
             n->add(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐")
             n->add(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘")
