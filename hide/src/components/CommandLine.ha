@@ -66,6 +66,10 @@ pub
             manager->move_to(num)
             return Command::ModeNormal
         ;
+        n->col(1)
+        n->add(LINES - 1, 0, $"no such command: {_line}")
+        n->key()
+        n->col(1, false)
         update(":")
         return Command::Nop
     ;
