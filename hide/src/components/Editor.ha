@@ -519,7 +519,9 @@ pub
                 let y = offset.y + positioned_y + matching_index - reverse + 1
                 n->col(1)
                 n->add(y, x - 1, "│")
-                n->add(y, x + width, "│")
+                if x + width < _content->Size().x + offset.x
+                    n->add(y, x + width, "│")
+                ;
                 n->col(1, false)
                 n->col(selected == matching_index ? 4 : 0)
                 n->add_until(
@@ -535,9 +537,12 @@ pub
             ;
             n->col(1)
             let box_str = ""
+            if x + width >= _content->Size().x + offset.x
+                width = _content->Size().x + offset.x - x - 1
+            ;
             for i until width do box_str += "─"
-            n->add_until(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐", _content->Size().x + offset.x, false)
-            n->add_until(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘", _content->Size().x + offset.x, false)
+            n->add(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐")
+            n->add(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘")
             n->col(1, false)
             let key = n->key()
             switch key
