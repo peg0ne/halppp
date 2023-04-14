@@ -456,12 +456,11 @@ pub
     ;
     fn insert_text string text, Vector *pos, bool suggestions = true =>
         if _text.size() == 0 do _text.add(" ")
-        if text =|= "(" : "<" : "{"
-            switch text[0]
-            case '(' dobr text += ')'
-            case '<' dobr text += '>'
-            case '{' dobr text += '}'
-            ;
+        switch text[0]
+        case '(' dobr text += ')'
+        case '<' dobr text += '>'
+        case '{' dobr text += '}'
+        case '[' dobr text += ']'
         ;
         insert_snippet(&_text, pos, text)
         try_move(Vector(1, 0), pos)
@@ -520,10 +519,8 @@ pub
             foreach um in unique_matches
                 if matching_index + 1 + positioned_y >= _content->Size().y do break
                 let y = offset.y + positioned_y + matching_index - reverse + 1
-                n->col(1)
-                n->add(y, x - 1, "│")
-                n->add(y, x + width, "│")
-                n->col(1, false)
+                n->add(y, x - 1, "│", 1)
+                n->add(y, x + width, "│", 1)
                 n->col(selected == matching_index ? 4 : 0)
                 n->add_until(
                     y, x, um,
@@ -536,12 +533,10 @@ pub
                 n->col(selected == matching_index ? 4 : 0, false)
                 matching_index++
             ;
-            n->col(1)
             let box_str = ""
             for i until width do box_str += "─"
-            n->add(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐")
-            n->add(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘")
-            n->col(1, false)
+            n->add_col(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐", 1)
+            n->add_col(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘", 1)
             let key = n->key()
             switch key
             case KEY_BTAB
@@ -1067,13 +1062,9 @@ pub
         let search = ""
         loop
             n->clearLn(LINES - 1)
-            n->col(3)
-            n->add(LINES - 1, 0, "search:")
-            n->col(3,false)
+            n->add_col(LINES - 1, 0, "search:", 3)
             n->add(LINES - 1, 8, search)
-            n->col(1)
-            n->add(LINES - 1, 8 + search.size(), '|')
-            n->col(1, false)
+            n->add_col(LINES - 1, 8 + search.size(), '|', 1)
             let key = n->key()
             switch key
             case '\n' 
@@ -1107,14 +1098,10 @@ pub
             n->clearLn(LINES - 1)
             let extra = step ? 3 : 0
             string extra_str = step ? "" : " "
-            n->col(3)
-            n->add(LINES - 1, 0, "replace:")
-            n->col(3, false)
+            n->add_col(LINES - 1, 0, "replace:", 3)
             n->add(LINES - 1, 9, $"{search}{extra_str} - {replace}")
             n->mark_until(LINES - 1, 9 + search.size() + extra_str.size() + 1, 2 + step, true)
-            n->col(1)
-            n->add(LINES - 1, 9 + search.size() + replace.size() + extra, '|')
-            n->col(1, false)
+            n->add_col(LINES - 1, 9 + search.size() + replace.size() + extra, '|', 1)
             let key = n->key()
             switch key
             case '\n'

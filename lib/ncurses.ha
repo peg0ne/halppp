@@ -94,6 +94,8 @@ pub
         mvaddch(y,x,c)
         if is_bold do bold(false)
     ;
+    fn add<T> Vector xy, T s, bool is_bold = false => do add(xy.y, xy.x, $"{s}", is_bold)
+    fn add<T> int y, int x, T s, bool is_bold = false => do add(y, x, $"{s}", is_bold)
     fn add Vector xy, string s, bool is_bold = false => do add(xy.y, xy.x, s, is_bold)
     fn add int y, int x, string s, bool is_bold = false =>
         if is_bold do bold(true)
@@ -102,8 +104,22 @@ pub
         mvaddstr(y,x,ch)
         if is_bold do bold(false)
     ;
-    fn add<T> Vector xy, T s, bool is_bold = false => do add(xy.y, xy.x, $"{s}", is_bold)
-    fn add<T> int y, int x, T s, bool is_bold = false => do add(y, x, $"{s}", is_bold)
+    fn add_col Vector xy, char c, short color, bool is_bold = false => do add_col(xy.y, xy.x, c, color, is_bold)
+    fn add_col int y, int x, char c, short color, bool is_bold = false =>
+        if is_bold do bold(true)
+        col(color)
+        mvaddch(y,x,c)
+        col(color, false)
+        if is_bold do bold(false)
+    ;
+    fn add_col<T> Vector xy, T s, short color, bool is_bold = false => do add_col(xy.y, xy.x, $"{s}", color, is_bold)
+    fn add_col<T> int y, int x, T s, short color, bool is_bold = false => do add_col(y, x, $"{s}", color, is_bold)
+    fn add_col Vector xy, string s, short color, bool is_bold = false => do add_col(xy.y, xy.x, s, color, is_bold)
+    fn add_col int y, int x, string s, short color, bool is_bold = false =>
+        col(color)
+        add(y, x, $"{s}", is_bold)
+        col(color, false)
+    ;
     fn add_until Vector xy, string s, int limit, bool is_bold = false => do add_until(xy.y, xy.x, s, limit, is_bold)
     fn add_until int y, int x, string s, int limit, bool is_bold = false =>
         add(y, x, s.substr(0,limit-x), is_bold)
