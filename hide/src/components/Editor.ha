@@ -1052,18 +1052,15 @@ pub
         return Command::Nop
     ;
     fn run_z => Command
+        let vec = Vector(_offset.x, _selector.y)
         switch n->key()
-        case '.'
-            _offset = Vector(_offset.x, _selector.y - _content->Size().y / 2)
-            break
-        case 't'
-            _offset = Vector(_offset.x, _selector.y)
-            break
-        case 'b'
-            _offset = Vector(_offset.x, _selector.y - _content->Size().y)
-            break
+        case 'z'
+        case '.' dobr vec.y -= _content->Size().y / 2
+        case 'b' dobr vec.y -= _content->Size().y
+        case 't' do break
+        default doremi Command::ModeNormal
         ;
-        if _offset.y < 0 do _offset.y = 0
+        _offset = vec.y < 0 ? Vector(vec.x, 0) : vec
         return Command::ModeNormal
     ;
     fn run_s => Command
@@ -1096,8 +1093,7 @@ pub
                 search.pop_back()
                 break
             default
-                if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
-                elif isgraph(key) do search += key
+                if isgraph(key) do search += key
                 break
             ;
         ;
@@ -1151,12 +1147,10 @@ pub
             default
                 switch step
                 case 0
-                    if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do search += key
-                    elif isgraph(key) do search += key
+                    if isgraph(key) do search += key
                     break
                 case 1
-                    if key =|= ',': ' ': '/': ':': '.': '_': '-': '<': '>' do replace += key
-                    elif isgraph(key) do replace += key
+                    if isgraph(key) do replace += key
                     break
                 ;
                 break
