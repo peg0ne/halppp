@@ -46,7 +46,7 @@ class Editor => IContent
         entry->try_add("posx", _selector.x)
         j.try_add("undo", JsonType::Array)
         j.try_add("redo", JsonType::Array)
-        select undo from j.try_get("undo")
+        select undo from j["undo"]
             undo->add(entry)
             sort_selections()
             foreach selection in _selections
