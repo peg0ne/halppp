@@ -62,31 +62,26 @@ class Editor => IContent
         j.destruct()
     ;
     fn redo => do undo(false)
-    fn undo => do undo(true)
-    fn undo bool is_undo =>
+    fn undo bool is_undo = true =>
         let getter = is_undo ? "undo" : "redo"
         let setter = is_undo ? "redo" : "undo"
         let j = load_json(json_path())
         let entry = new Json()
-        select obj from j.try_get(getter)
+        select obj from j[getter]
             let last = obj->size() - 1
             select u from obj->try_get(last)
-                select text_obj from u->try_get("text")
-                select type_obj from u->try_get("type")
-                select posy_obj from u->try_get("posy")
-                select posx_obj from u->try_get("posx")
-                select store from j.try_get(setter)
-                    let text = text_obj->value_or((string)"")
-                    let type = type_obj->value_or(0.0)
-                    let posy = posy_obj->value_or(0.0)
-                    let posx = posx_obj->value_or(0.0)
+                let text = u->try_get_value_of("text", (string)"")
+                let type = u->try_get_value_of("type", 0.0)
+                let posy = u->try_get_value_of("posy", 0.0)
+                let posx = u->try_get_value_of("posx", 0.0)
+                select store from j[setter]
                     entry->add(new Json("text", text))
                     entry->add(new Json("type", type))
                     entry->add(new Json("posy", posy))
                     entry->add(new Json("posx", posx))
                     store->add(entry)
                     undo_handler(text, (TextEdit)type, Vector(posx, posy), is_undo)
-                ;;;;;
+                ;
                 obj->pop()
                 write_json(json_path(), j)
                 entry->destruct()
