@@ -10,6 +10,10 @@ pub
     fn value_or T value => T doremi is_some() ? _value : value
     fn value_unsafe => T doremi _value
     fn to_string => string doremi is_some() ? "Some(" + std::to_string(_value) + ")" : "None"
+    fn select_it<Func, ...Args> Func func, Args... args =>
+        if is_none() do return
+        func(_value, args...)
+    ;
     Option => 
         _forced_none = true
     ;
