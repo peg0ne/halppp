@@ -29,4 +29,9 @@ fn take<T> Option<T> obj => Linq<T>
     select o from obj doremi Linq<T>({o})
     return Linq<T>()
 ;
+fn range<int> int amount => Linq<int>
+    vector<int> temp = {}
+    for i until amount do temp.push_back(i)
+    return Linq<int>(temp)
+;
 ;
