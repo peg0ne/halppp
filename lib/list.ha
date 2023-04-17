@@ -45,6 +45,12 @@ pub
         clear()
         _list = buf
     ;
+    fn select_it<Func, ...Args> Func func, Args... args =>
+        foreach ele in _list do func(ele, args...)
+    ;
+    fn pselect_it<Func, ...Args> Func func, Args... args =>
+        for i until len() do func(at_ptr(i), args...)
+    ;
 ;
 
 fn to_string<T> List<T> list => string
