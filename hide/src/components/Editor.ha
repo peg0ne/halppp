@@ -514,8 +514,8 @@ pub
             foreach um in unique_matches
                 if matching_index + 1 + positioned_y >= _content->Size().y do break
                 let y = offset.y + positioned_y + matching_index - reverse + 1
-                n->add(y, x - 1, "│", 1)
-                n->add(y, x + width, "│", 1)
+                n->add_col(y, x - 1, "│", 1)
+                n->add_col(y, x + width, "│", 1)
                 n->col(selected == matching_index ? 4 : 0)
                 n->add_until(
                     y, x, um,
