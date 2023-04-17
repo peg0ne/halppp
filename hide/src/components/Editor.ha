@@ -870,38 +870,29 @@ pub
     ;
     fn run_nor int key => Command
         let cmd = run_base(key)
-        int _ = 0
         if cmd != Command::Nop doremi cmd
+        > set_cursor_mode this (int value, bool is_mod = false)
+            if (is_mod) do _modifier = String("")
+            system($"printf '\e[{value} q'")
+            _current_mode = Mode::Insert
+            draw(6)
+            return Command::ModeInsert
+        ;
         switch key
         case 27 dobr _modifier = String("")
         case 'v' 
             _modifier = String("")
             return Command::ModeVisual
         case 'a'
-            _modifier = String("")
-            _ = system("printf '\e[5 q'")
-            _current_mode = Mode::Insert
             move(Dir::Right)
-            draw(6)
-            return Command::ModeInsert
-        case 'i'
-            _modifier = String("")
-            _ = system("printf '\e[5 q'")
-            _current_mode = Mode::Insert
-            draw(6)
-            return Command::ModeInsert
+            return set_cursor_mode(5, true)
         case 'C'
             text_editing(TextEdit::DeleteFrom)
-            _ = system("printf '\e[5 q'")
-            _current_mode = Mode::Insert
-            draw(6)
-            return Command::ModeInsert
+            return set_cursor_mode(5)
         case 'c'
             run_d()
-            _ = system("printf '\e[5 q'")
-            _current_mode = Mode::Insert
-            draw(6)
-            return Command::ModeInsert
+            return set_cursor_mode(5)
+        case 'i' doremi set_cursor_mode(5, true)
         case 'x' dobr text_editing(TextEdit::DeleteChar)
         case 'M' dobr add_selector(true)
         case 'm' dobr add_selector()

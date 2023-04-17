@@ -49,6 +49,11 @@
             "expr": "fn ([A-z_]*)\W"
         },
         {
+            "color": 2,
+            "capture": 1,
+            "expr": "^\s*> ([A-z_]*)\s"
+        },
+        {
             "color": 1,
             "bold": true,
             "capture": 1,
@@ -216,40 +221,44 @@
     ],
     "templates": [
         {
-            "name": "function"
+            "name": "function",
             "template": ["fn ", "$ ", "=> ", "$", "%", "%", ";", "%"]
         },
         {
-            "name": "function do"
+            "name": "function do",
             "template": ["fn ", "$ ", "=> ", "$ ", "do", "$ ", "$", "%"]
         },
         {
-            "name": "select"
+            "name": "select",
             "template": ["select ", "$ ", "from ", "$", "%", "%", ";", "%"]
         },
         {
-            "name": "select do"
+            "name": "select do",
             "template": ["select ", "$ ", "from ", "$ ", "do", "$", "%"]
         },
         {
-            "name": "loop"
+            "name": "loop",
             "template": ["loop", "%", "%", ";", "%"]
         },
         {
-            "name": "loop do"
+            "name": "loop do",
             "template": ["loop ", "do", "$", "$", "%"]
         },
         {
-            "name": "while"
+            "name": "while",
             "template": ["while ", "$", "%", "%", ";", "%"]
         },
         {
-            "name": "for"
+            "name": "for",
             "template": ["for ", "$ ", "until ", "$", "%", "%", ";", "%"]
         },
         {
-            "name": "foreach"
+            "name": "foreach",
             "template": ["foreach ", "$ ", "in ", "$", "%", "%", ";", "%"]
         },
+        {
+            "name": "lambda",
+            "template": ["> " "$ ", "()", "%", "%", ";", "%"]
+        }
     ]
 }
