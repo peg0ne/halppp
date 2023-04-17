@@ -2,6 +2,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
     string doing = EMPTY
     string expression = EMPTY
     if first.token == Token::Let doremi get_let_expr(compiler_t)
+    if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t)
     switch first.token
         case Token::Doco dobr doing = ";\ncontinue "
         case Token::Dobr dobr doing = ";\nbreak "
@@ -66,5 +67,55 @@ fn get_let_expr Compiler *compiler_t => Expression
     else do variable_type = "auto "
     let v = Variable(id, variable_type, Some(value), VariableState::Private)
     expression += id + " = " + value
+    return Expression(v)
+;
+
+fn get_lambda_expr Compiler *compiler_t => Expression
+    let id = get_id_or_exit(compiler_t, "[Lambda] Required id after >")
+    let base = ""
+    let has_return = false
+    vector<string> parameters = {}
+    let args = ""
+    loop
+        let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
+        if x.token == Token::Id && String(x.name).starts_with("(")
+            args = x.name
+            break
+        ;
+        switch x.token
+        case Token::Id dobr parameters.push_back(x.name)
+        default dobr display_err_message("[Lambda] Incorrect parameter value", compiler_t->to_err_message())
+        ;
+        x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
+        if x.token == Token::Id && String(x.name).starts_with("(")
+            args = x.name
+            break
+        ;
+        if x.token == Token::Comma doco parameters.push_back(",")
+        display_err_message("[Lambda] Comma missing", compiler_t->to_err_message())
+    ;
+    base += "["
+    foreach p in parameters do base += p
+    base += "]"
+    base += args
+    base += "{"
+    let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
+    if x.is_do()
+        has_return = x.token == Token::Doremi
+        let expr = expression_construct(compiler_t, x)
+        base += expr.to_cpp(2)
+    ;
+    elif x.token == Token::NewLine
+        loop
+            x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
+            if x.token == Token::SemiColon do break
+            if x.token == Token::Return do has_return = true
+            let expr = expression_construct(compiler_t, x)
+            base += expr.to_cpp(2)
+        ;
+    ;
+    if !has_return do base += "return true;"
+    base += "}"
+    let v = Variable(id, "auto", Some(base), VariableState::Private)
     return Expression(v)
 ;
