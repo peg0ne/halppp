@@ -13,7 +13,14 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
     ;
     loop
         let x = get_next_or_exit(compiler_t, "[Expression] Expression ended unexpectedly")
-        if any(x.token, {Token::Eof, Token::NewLine}) dobr expression += doing
+        if x.token == Token::Eof dobr expression += doing
+        if x.token == Token::NewLine
+            let is_member = false
+            select peeked from compiler_t->peek()
+                is_member = String(peeked.name).starts_with(".")
+            ;
+            if !is_member dobr expression += doing
+        ;
         if any(x.token, {Token::Number, Token::Id}) do expression += " "
         if x.is_do() do expression += "\n"
         switch x.token
@@ -39,7 +46,14 @@ fn get_let_expr Compiler *compiler_t => Expression
     string value = EMPTY
     loop
         let x = get_next_or_exit(compiler_t, "LET exception")
-        if any(x.token, {Token::Eof, Token::NewLine}) do break
+        if x.token == Token::Eof do break
+        if x.token == Token::NewLine
+            let is_member = false
+            select peeked from compiler_t->peek()
+                is_member = String(peeked.name).starts_with(".")
+            ;
+            if !is_member do break
+        ;
         value += x.name
         if x.token == Token::New do value += " "
     ;

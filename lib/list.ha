@@ -20,6 +20,7 @@ pub
     fn add T ele => do _list.push_back(ele)
     fn pop => do remove(len()-1)
     fn clear => do _list.clear()
+    fn as_vec => vector<T> doremi _list
     fn as_vec_ptr => vector<T>* doremi &_list
     fn insert int at, T element =>
         if len() == 0 dore add(element)
