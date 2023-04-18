@@ -62,8 +62,8 @@ pub
     fn as_list => List<T> doremi List<T>(list)
 ;
 
-fn take<T> vector<T> list => Linq<T> doremi Linq(list)
-fn take<T> List<T> list => Linq<T> doremi Linq(list.as_vec())
+fn take<T> vector<T> list => Linq<T> doremi Linq<T>(list)
+fn take<T> List<T> list => Linq<T> doremi Linq<T>(list.as_vec())
 fn take<T> Option<T> obj => Linq<T>
     select o from obj doremi Linq<T>({o})
     return Linq<T>()
