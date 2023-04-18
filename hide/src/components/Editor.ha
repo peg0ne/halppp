@@ -193,8 +193,7 @@ pub
         for i until _text.size() 
             let num = i + 1 + internal_offset.y
             if _num_diff && num != _selector.y + 1
-                num = _selector.y - num + 1
-                if num < 0 do num *= -1
+                num = abs(_selector.y - num + 1)
             ;
             if num > _text.size() do break
             vec.add(to_string(num))
@@ -203,14 +202,9 @@ pub
         _lines->draw(n)
 
         //Content
-        List<string> buf = List<string>()
-        for i until _text.size()
-            if i < internal_offset.y do continue
-            let text = _text.at(i)
-            if internal_offset.x >= text.size() doco buf.add("")
-            text = text.substr(internal_offset.x)
-            buf.add(text)
-        ;
+        > is_within internal_offset (string text, int i) doremi i >= internal_offset.y
+        > catch_text internal_offset (string text) doremi internal_offset.x >= text.size() ? "" : text.substr(internal_offset.x)
+        let buf = linq::take(_text).where_with_iterator(is_within).operate(catch_text).as_list()
 
         _content->SetContent(buf)
         _content->draw(n)
