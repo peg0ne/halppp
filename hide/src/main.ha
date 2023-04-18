@@ -1,6 +1,6 @@
 inc => vector
 get => ncurses, option, bounds, dictionary, json, ngui
-get => math, files, stringextensions, list, regex
+get => math, files, stringextensions, list, regex, linq
 get => model
 
 

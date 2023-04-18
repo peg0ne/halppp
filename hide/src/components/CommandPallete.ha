@@ -70,18 +70,19 @@ pub
         pos = 0
         loop
             let offset_used = 0
+            let i = 0
             pallete_search.SetLabel(" " + search)
             buf.clear()
-            foreach i, command in commands.keys()
-                if command.find(search) == -1 do continue
-                if i < offset doco offset_used++
-                buf.add(command)
+            > is_found this (string cmd) doremi cmd.find(search) != -1
+            > operation this, &i, offset (string cmd)
+                if (i++ < offset) doremi false
+                buf.add(cmd)
+                return true
             ;
-            foreach i, edit in textedits.keys()
-                if edit.find(search) == -1 do continue
-                if i < offset - offset_used do continue
-                buf.add(edit)
-            ;
+            linq::take(commands.keys())
+                .join(textedits.keys())
+                .where(is_found)
+                .operate<bool>(operation)
             pallete_found.SetContent(buf)
             pallete_window.draw(n)
             n->mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)
@@ -105,8 +106,7 @@ pub
                 search.pop_back()
                 break
             default
-                if key =|= ',': ' ': '/': ':': '.': '_': '-' : '<' : '>' do search += key
-                elif isalpha(key) do search += key
+                if isgraph(key) do search += key
                 break
             ;
             if pos > buf.size() - 1 do pos = buf.size() - 1

@@ -21,12 +21,23 @@ pub
         ;
         return Linq(temp)
     ;
+    fn operate<R, Func, ...Args> Func func, Args... args => Linq<R>
+        vector<R> temp = {}
+        foreach ele in list
+            temp.push_back(func(ele, args...))
+        ;
+        return Linq<R>(temp)
+    ;
+    fn join vector<T> other => Linq
+        foreach ele in other do list.push_back(ele)
+        return Linq(list)
+    ;
     fn first => Option<T> doremi list.size() != 0 ? Some(list[0]) : None<T>()
     fn first_or T other => T doremi list.size() != 0 ? list[0] : other
     fn last => Option<T> doremi list.size() != 0 ? Some(list[list.size() - 1]) : None<T>()
     fn last_or T other => T doremi list.size() != 0 ? list[list.size() - 1] : other
     fn as_vec => vector<T> doremi list
-    fn as_vec_ptr => *vector<T> doremi &list
+    fn as_vec_ptr => vector<T>* doremi &list
 ;
 
 fn take<T> vector<T> list => Linq<T> doremi Linq(list)
