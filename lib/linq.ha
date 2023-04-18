@@ -7,33 +7,33 @@ class Linq<T>
     Linq => do return
     Linq vector<T> list => do this->list = list
 pub
-    fn where<Func, ...Args> Func func, Args... args => Linq
+    fn where<Func, ...Args> Func func, Args... args => Linq<T>
         vector<T> temp = {}
         foreach ele in list
             if func(ele, args...) do temp.push_back(ele)
         ;
-        return Linq(temp)
+        return Linq<T>(temp)
     ;
-    fn where_with_iterator<Func, ...Args> Func func, Args... args => Linq
+    fn where_with_iterator<Func, ...Args> Func func, Args... args => Linq<T>
         vector<T> temp = {}
         foreach i, ele in list
             if func(ele, i, args...) do temp.push_back(ele)
         ;
-        return Linq(temp)
+        return Linq<T>(temp)
     ;
-    fn operate<Func, ...Args> Func func, Args... args => Linq
+    fn operate<Func, ...Args> Func func, Args... args => Linq<T>
         vector<T> temp = {}
         foreach ele in list
             temp.push_back(func(ele, args...))
         ;
-        return Linq(temp)
+        return Linq<T>(temp)
     ;
-    fn operate_with_iterator<Func, ...Args> Func func, Args... args => Linq
+    fn operate_with_iterator<Func, ...Args> Func func, Args... args => Linq<T>
         vector<T> temp = {}
         foreach i, ele in list
             temp.push_back(func(ele, i, args...))
         ;
-        return Linq(temp)
+        return Linq<T>(temp)
     ;
     fn operate<R, Func, ...Args> Func func, Args... args => Linq<R>
         vector<R> temp = {}
@@ -49,9 +49,9 @@ pub
         ;
         return Linq<R>(temp)
     ;
-    fn join vector<T> other => Linq
+    fn join vector<T> other => Linq<T>
         foreach ele in other do list.push_back(ele)
-        return Linq(list)
+        return Linq<T>(list)
     ;
     fn first => Option<T> doremi list.size() != 0 ? Some(list[0]) : None<T>()
     fn first_or T other => T doremi list.size() != 0 ? list[0] : other
