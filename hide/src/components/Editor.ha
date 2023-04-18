@@ -217,25 +217,21 @@ pub
         mark_selections(is_current, internal_offset)
     ;
     fn mark_selections bool is_current, Vector internal_offset =>
-        //Selections
-        if is_current
-            let offset = _content->Offset()
-            let y = offset.y + _selector.y - internal_offset.y
-            let x = offset.x + _selector.x - internal_offset.x
-            foreach s in _selections
-                n->mark(
-                    offset.y + s.y - internal_offset.y,
-                    offset.x + s.x - internal_offset.x, 5)
-            ;
-            n->mark_until(y, offset.x - 5, 2, 5, true)
-            if _current_mode == Mode::Insert do n->move_curs(y, x)
-            else do n->mark(y, x, 4)
+        if !is_current do return
+        let offset = _content->Offset()
+        let vec = offset + _selector - internal_offset
+        foreach s in _selections
+            let s_vec = offset + s + internal_offset
+            n->mark(s_vec, 5)
         ;
+        n->mark_until(vec.y, offset.x - 5, 2, 5, true)
+        if _current_mode == Mode::Insert do n->move_curs(vec)
+        else do n->mark(vec, 4)
     ;
     fn to_complete_str => string
         let content = ""
-        for i until _text.len()
-            content += _text.at(i)
+        foreach i, line in _text
+            content += line
             if i < _text.len() - 1 do content += "\n"
         ;
         return String(content).strip_end()
