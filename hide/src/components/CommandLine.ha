@@ -14,57 +14,41 @@ pub
         _origin->SetLabel(_line)
         _origin->draw(n)
     ;
-    fn exit => Command
+    fn update_return Command cmd => Command
         update("")
-        return Command::ModeNormal
+        return cmd
     ;
+    fn exit => Command doremi update_return(Command::ModeNormal)
     fn try_parse EditorManager *manager => Command
         let s = String(_line)
         s.remove(0)
         _line = s.to_string()
-        if _line == "q" 
-            update("")
-            return Command::CloseEditor
-        ;
-        elif _line == "q!" 
-            update("")
-            return Command::CloseEditorForced
-        ;
-        elif _line == "w"
-            update("")
-            return Command::WriteEditor
-        ;
-        elif _line == "wq"
-            update("")
-            return Command::WriteCloseEditor
-        ;
+        if _line == "q" doremi update_return(Command::CloseEditor)
+        elif _line == "q!" doremi update_return(Command::CloseEditorForced)
+        elif _line == "w" doremi update_return(Command::WriteEditor)
+        elif _line == "wq" doremi update_return(Command::WriteCloseEditor)
         elif s.starts_with("touch ")
             write(" ", _line.substr(6))
-            update("")
-            return Command::ModeNormal
+            return update_return(Command::ModeNormal)
         ;
         elif s.starts_with("mkdir ")
             makedir(_line.substr(6))
-            update("")
-            return Command::ModeNormal
+            return update_return(Command::ModeNormal)
         ;
         elif s.starts_with("syntax ")
             _editorManager->set_syntax(_line.substr(7))
-            update("")
-            return Command::ModeNormal
+            return update_return(Command::ModeNormal)
         ;
         elif s.starts_with("!")
             n->stop()
             system($"{_line.substr(1)} && echo 'Press any key to return!'")
             n->key()
             n->start()
-            update("")
-            return Command::ModeNormal
+            return update_return(Command::ModeNormal)
         ;
         select num from s.to_num()
-            update("")
             manager->move_to(num)
-            return Command::ModeNormal
+            return update_return(Command::ModeNormal)
         ;
         n->col(1)
         n->add(LINES - 1, 0, $"no such command: {_line}")
