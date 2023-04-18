@@ -18,7 +18,6 @@ fn lgrep => vector<string>
 fn Lgrep Ncurses* n => Option<string>
     let key = 0
     let pos = 0
-    let buf = List<string>()
     let search = ""
     let files = List<string>(lgrep())
     let base = HorizontalLayout(Vector(COLS/10*8, LINES/8*6), Vector(COLS/10, LINES/8))
@@ -39,12 +38,10 @@ fn Lgrep Ncurses* n => Option<string>
     let offset = 0
     loop
         search_bar.SetLabel(search)
-        buf.clear()
-        foreach i, file in files
-            if file.find(search) == -1 do continue
-            if i < offset do continue
-            buf.add(file)
-        ;
+        let buf = linq::take(files)
+            .where([search](string file){return file.find(search) != -1;})
+            .where_with_iterator([offset](string file, int i){return i >= offset;})
+            .as_list()
         content.SetContent(buf)
         if pos >= buf.size()
             view.SetContent(List<string>())
@@ -76,8 +73,7 @@ fn Lgrep Ncurses* n => Option<string>
             search.pop_back()
             break
         default
-            if key =|= '.': '/': ' ' do search += key
-            elif isalpha(key) do search += key
+            if isgraph(key) do search += key
             break
         ;
         if pos > buf.size() - 1 do pos = buf.size() - 1
