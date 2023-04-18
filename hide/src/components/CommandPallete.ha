@@ -10,7 +10,6 @@ class CommandPallete
     string search = ""
     Dictionary<string, Command> commands = Dictionary<string, Command>()
     Dictionary<string, TextEdit> textedits = Dictionary<string, TextEdit>()
-    List<string> buf = List<string>()
     IContainer pallete_found = IContainer()
     IContainer pallete_search = IContainer(Fill::Static, Vector(0, 1))
     VerticalLayout pallete_window = VerticalLayout(
@@ -57,7 +56,7 @@ class CommandPallete
         textedits.add(" remove line", TextEdit::DeleteLine)
         textedits.add(" remove from cursor to end", TextEdit::DeleteFrom)
         textedits.add(" paste line/lines from buffer below", TextEdit::PasteLine)
-        textedits.add(" paste line/lines from buffer on to current lien", TextEdit::PasteWord)
+        textedits.add(" paste line/lines from buffer on to current line", TextEdit::PasteWord)
         textedits.add(" lower case", TextEdit::Lower)
         textedits.add(" upper case", TextEdit::Upper)
         textedits.add(" toggle comment", TextEdit::CommentToggle)
@@ -69,15 +68,13 @@ pub
         search = ""
         pos = 0
         loop
-            let offset_used = 0
             pallete_search.SetLabel(" " + search)
-            buf.clear()
             > is_found this (string cmd) doremi cmd.find(search) != -1
-            > is_within this, offset (string cmd, int i) doremi i < offset
-            buf = linq::take(commands.keys())
+            > is_within this, offset (string cmd, int i) doremi i >= offset
+            let buf = linq::take(commands.keys())
                 .join(textedits.keys())
                 .where(is_found)
-                .where_with_iterator(is_within).as_vec()
+                .where_with_iterator(is_within).as_list()
             pallete_found.SetContent(buf)
             pallete_window.draw(n)
             n->mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)

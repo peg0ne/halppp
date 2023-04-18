@@ -59,6 +59,7 @@ pub
     fn last_or T other => T doremi list.size() != 0 ? list[list.size() - 1] : other
     fn as_vec => vector<T> doremi list
     fn as_vec_ptr => vector<T>* doremi &list
+    fn as_list => List<T> doremi List<T>(list)
 ;
 
 fn take<T> vector<T> list => Linq<T> doremi Linq(list)
