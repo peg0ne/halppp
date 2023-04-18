@@ -14,6 +14,13 @@ pub
         ;
         return Linq(temp)
     ;
+    fn where_with_iterator<Func, ...Args> Func func, Args... args => Linq
+        vector<T> temp = {}
+        foreach i, ele in list
+            if func(ele, i, args...) do temp.push_back(ele)
+        ;
+        return Linq(temp)
+    ;
     fn operate<Func, ...Args> Func func, Args... args => Linq
         vector<T> temp = {}
         foreach ele in list
@@ -21,10 +28,24 @@ pub
         ;
         return Linq(temp)
     ;
+    fn operate_with_iterator<Func, ...Args> Func func, Args... args => Linq
+        vector<T> temp = {}
+        foreach i, ele in list
+            temp.push_back(func(ele, i, args...))
+        ;
+        return Linq(temp)
+    ;
     fn operate<R, Func, ...Args> Func func, Args... args => Linq<R>
         vector<R> temp = {}
         foreach ele in list
             temp.push_back(func(ele, args...))
+        ;
+        return Linq<R>(temp)
+    ;
+    fn operate_with_iterator<R, Func, ...Args> Func func, Args... args => Linq<R>
+        vector<R> temp = {}
+        foreach i, ele in list
+            temp.push_back(func(ele, i, args...))
         ;
         return Linq<R>(temp)
     ;

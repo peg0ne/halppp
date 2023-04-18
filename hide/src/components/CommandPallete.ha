@@ -70,19 +70,14 @@ pub
         pos = 0
         loop
             let offset_used = 0
-            let i = 0
             pallete_search.SetLabel(" " + search)
             buf.clear()
             > is_found this (string cmd) doremi cmd.find(search) != -1
-            > operation this, &i, offset (string cmd)
-                if (i++ < offset) doremi false
-                buf.add(cmd)
-                return true
-            ;
-            linq::take(commands.keys())
+            > is_within this, offset (string cmd, int i) doremi i < offset
+            buf = linq::take(commands.keys())
                 .join(textedits.keys())
                 .where(is_found)
-                .operate<bool>(operation)
+                .where_with_iterator(is_within).as_vec()
             pallete_found.SetContent(buf)
             pallete_window.draw(n)
             n->mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)
