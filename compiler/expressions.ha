@@ -72,10 +72,10 @@ fn get_let_expr Compiler *compiler_t => Expression
 
 fn get_lambda_expr Compiler *compiler_t => Expression
     let id = get_id_or_exit(compiler_t, "[Lambda] Required id after >")
-    let base = ""
+    string base = ""
     let has_return = false
     vector<string> parameters = {}
-    let args = ""
+    string args = ""
     loop
         let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
         if x.token == Token::Id && String(x.name).starts_with("(")
