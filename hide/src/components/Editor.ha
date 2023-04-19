@@ -221,7 +221,7 @@ pub
         let offset = _content->Offset()
         let vec = offset + _selector - internal_offset
         foreach s in _selections
-            let s_vec = offset + s + internal_offset
+            let s_vec = offset + s - internal_offset
             n->mark(s_vec, 5)
         ;
         n->mark_until(vec.y, offset.x - 5, 2, 5, true)
