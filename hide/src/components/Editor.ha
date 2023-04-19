@@ -189,22 +189,21 @@ pub
         _status_line->draw(n)
 
         //Lines
-        List<string> vec = List<string>()
-        for i until _text.size() 
-            let num = i + 1 + internal_offset.y
-            if _num_diff && num != _selector.y + 1
-                num = abs(_selector.y - num + 1)
-            ;
-            if num > _text.size() do break
-            vec.add(to_string(num))
+        > vec_as_str this (int i)
+            if (_num_diff && i != _selector.y + 1) do i = abs(_selector.y - i + 1)
+            return $"{i}"
         ;
+        let vec = linq::range(_text.size())
+            .operate_async([internal_offset](int i) { return i + 1 + internal_offset.y; })
+            .where([this](int i) { return i <= _text.size(); })
+            .operate_async<string>(vec_as_str).as_list()
         _lines->SetContent(vec)
         _lines->draw(n)
 
         //Content
         > is_within internal_offset (string text, int i) doremi i >= internal_offset.y
         > catch_text internal_offset (string text) doremi internal_offset.x >= text.size() ? "" : text.substr(internal_offset.x)
-        let buf = linq::take(_text).where_with_iterator(is_within).operate(catch_text).as_list()
+        let buf = linq::take(_text).where_with_iterator(is_within).operate_async(catch_text).as_list()
 
         _content->SetContent(buf)
         _content->draw(n)

@@ -1,3 +1,4 @@
+inc => future
 get => list, option
 
 named => linq
@@ -23,30 +24,50 @@ pub
     ;
     fn operate<Func, ...Args> Func func, Args... args => Linq<T>
         vector<T> temp = {}
-        foreach ele in list
-            temp.push_back(func(ele, args...))
-        ;
+        foreach ele in list do temp.push_back(func(ele, args...))
+        return Linq<T>(temp)
+    ;
+    fn operate_async<Func, ...Args> Func func, Args... args => Linq<T>
+        vector<future<T>> temp_fut = {}
+        vector<T> temp = {}
+        foreach ele in list do temp_fut.push_back(async(func, ele, args...))
+        for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<T>(temp)
     ;
     fn operate_with_iterator<Func, ...Args> Func func, Args... args => Linq<T>
         vector<T> temp = {}
-        foreach i, ele in list
-            temp.push_back(func(ele, i, args...))
-        ;
+        foreach i, ele in list do temp.push_back(func(ele, i, args...))
+        return Linq<T>(temp)
+    ;
+    fn operate_with_iterator_async<Func, ...Args> Func func, Args... args => Linq<T>
+        vector<future<T>> temp_fut = {}
+        vector<T> temp = {}
+        foreach i, ele in list do temp_fut.push_back(func(ele, i, args...))
+        for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<T>(temp)
     ;
     fn operate<R, Func, ...Args> Func func, Args... args => Linq<R>
         vector<R> temp = {}
-        foreach ele in list
-            temp.push_back(func(ele, args...))
-        ;
+        foreach ele in list do temp.push_back(func(ele, args...))
+        return Linq<R>(temp)
+    ;
+    fn operate_async<R, Func, ...Args> Func func, Args... args => Linq<R>
+        vector<future<R>> temp_fut = {}
+        vector<R> temp = {}
+        foreach ele in list do temp_fut.push_back(async(func, ele, args...))
+        for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<R>(temp)
     ;
     fn operate_with_iterator<R, Func, ...Args> Func func, Args... args => Linq<R>
         vector<R> temp = {}
-        foreach i, ele in list
-            temp.push_back(func(ele, i, args...))
-        ;
+        foreach i, ele in list do temp.push_back(func(ele, i, args...))
+        return Linq<R>(temp)
+    ;
+    fn operate_with_iterator_async<R, Func, ...Args> Func func, Args... args => Linq<R>
+        vector<future<R>> temp_fut = {}
+        vector<R> temp = {}
+        foreach i, ele in list do temp_fut.push_back(func(ele, i, args...))
+        for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<R>(temp)
     ;
     fn join vector<T> other => Linq<T>
