@@ -189,14 +189,13 @@ pub
         _status_line->draw(n)
 
         //Lines
-        > vec_as_str this (int i)
-            if (_num_diff && i != _selector.y + 1) do i = abs(_selector.y - i + 1)
-            return $"{i}"
+        let vec = List<string>()
+        for i until _text.size()
+            let num = i + 1 + internal_offset.y
+            if _num_diff && num != _selector.y + 1 do num = abs(_selector.y - num + 1)
+            if num > _text.size() do continue
+            vec.add(to_string(num))
         ;
-        let vec = linq::range(_text.size())
-            .operate_async([internal_offset](int i) { return i + 1 + internal_offset.y; })
-            .where([this](int i) { return i <= _text.size(); })
-            .operate_async<string>(vec_as_str).as_list()
         _lines->SetContent(vec)
         _lines->draw(n)
 
