@@ -48,7 +48,9 @@ fn Lgrep Ncurses* n => Option<string>
             base.draw(n)
         ;
         else
-            view.SetContent(readlines(buf.at(pos)))
+            let lines = linq::take(readlines(buf.at(pos)))
+                .operate_async([&view](string line){return line.substr(0, view.Size().x);}).as_list()
+            view.SetContent(lines)
             let h = Highlighter(buf.at(pos))
             base.draw(n)
             h.highlight(&view, n)
