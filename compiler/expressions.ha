@@ -110,8 +110,15 @@ fn get_lambda_expr Compiler *compiler_t => Expression
             x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
             if x.token == Token::SemiColon do break
             if x.token == Token::Return do has_return = true
-            let expr = expression_construct(compiler_t, x)
-            base += expr.to_cpp(2)
+            if x.is_nl() do continue
+            switch x.token
+            case Token::Foreach
+            case Token::For dobr base += for_construct(compiler_t, x.token == Token::Foreach).to_cpp(2)
+            case Token::Condition dobr base += condition_construct(compiler_t, x.name).to_cpp(2)
+            case Token::Switch dobr base += switch_construct(compiler_t).to_cpp(2)
+            case Token::Select dobr base += select_construct(compiler_t).to_cpp(2)
+            default dobr base += expression_construct(compiler_t, x).to_cpp(2)
+            ;
         ;
     ;
     if !has_return do base += "return true;"
