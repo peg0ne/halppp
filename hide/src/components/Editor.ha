@@ -551,7 +551,9 @@ pub
                 text_editing(TextEdit::DeleteLine)
                 move(Dir::Up, 1)
                 move(Dir::Right, 100000, false)
-                text_editing(TextEdit::PasteWord)
+                if _shared_buffer->size() != 0 && _shared_buffer->at(0).size() > 0
+                    text_editing(TextEdit::PasteWord)
+                ;
                 return
             ;
             try_move(Vector(-1, 0), pos)
