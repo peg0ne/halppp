@@ -30,7 +30,7 @@ pub
     fn operate_async<Func, ...Args> Func func, Args... args => Linq<T>
         vector<future<T>> temp_fut = {}
         vector<T> temp = {}
-        foreach ele in list do temp_fut.push_back(async(func, ele, args...))
+        foreach ele in list do temp_fut.push_back(async(launch::async, func, ele, args...))
         for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<T>(temp)
     ;
@@ -42,7 +42,7 @@ pub
     fn operate_with_iterator_async<Func, ...Args> Func func, Args... args => Linq<T>
         vector<future<T>> temp_fut = {}
         vector<T> temp = {}
-        foreach i, ele in list do temp_fut.push_back(func(ele, i, args...))
+        foreach i, ele in list do temp_fut.push_back(async(launch::async, func, ele, i, args...))
         for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<T>(temp)
     ;
@@ -54,7 +54,7 @@ pub
     fn operate_async<R, Func, ...Args> Func func, Args... args => Linq<R>
         vector<future<R>> temp_fut = {}
         vector<R> temp = {}
-        foreach ele in list do temp_fut.push_back(async(func, ele, args...))
+        foreach ele in list do temp_fut.push_back(async(launch::async, func, ele, args...))
         for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<R>(temp)
     ;
@@ -66,7 +66,7 @@ pub
     fn operate_with_iterator_async<R, Func, ...Args> Func func, Args... args => Linq<R>
         vector<future<R>> temp_fut = {}
         vector<R> temp = {}
-        foreach i, ele in list do temp_fut.push_back(func(ele, i, args...))
+        foreach i, ele in list do temp_fut.push_back(async(launch::async, func, ele, i, args...))
         for i until temp_fut.size() do temp.push_back(temp_fut[i].get())
         return Linq<R>(temp)
     ;
