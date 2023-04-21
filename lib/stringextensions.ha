@@ -131,6 +131,17 @@ pub
             last = start_pos + 1
         ;
     ;
+    fn replace_into string from, string to => String*
+        string replaced = _value
+        size_t last = 0
+        loop 
+            size_t start_pos = replaced.find(from, last)
+            if start_pos == -1 dobr _value = replaced
+            replaced.replace(start_pos, from.length(), to)
+            last = start_pos + 1
+        ;
+        return this
+    ;
     fn replace string from, string to, int amount => string
         string replaced = _value
         size_t last = 0
