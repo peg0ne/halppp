@@ -31,7 +31,9 @@ class SpiralLayout => VerticalLayout
         return div
     ;
 pub
+    fn elements => vector<IContainer*> doremi _elements
     fn add_element IContainer* element =>
+        _elements.push_back(element)
         let row = get_row()
         row->add(element)
         if _dividers.size() == 1 do add(row)

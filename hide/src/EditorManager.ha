@@ -1,8 +1,8 @@
 get => components/Editor
 class EditorManager => IContent
     vector<Editor*> _editors = {}
-    vector<HorizontalLayout*> _editorspaces = {}
-    Option<HorizontalLayout*> _activeSpace = None<HorizontalLayout*>()
+    vector<SpiralLayout*> _editorspaces = {}
+    Option<SpiralLayout*> _activeSpace = None<SpiralLayout*>()
     Option<Editor*> _activeEditor = None<Editor*>()
     vector<string> _shared_buffer = {}
     IContainer *_status_line
@@ -46,7 +46,7 @@ class EditorManager => IContent
                     index = active->size() - 1
                 ;
                 
-                let editor = active->containers()->at(index)
+                let editor = active->elements().at(index)
                 _activeEditor = find_editor_from_offset(editor->Offset())
                 return
             ;
@@ -58,7 +58,7 @@ class EditorManager => IContent
         select index from find_active_in_space()
         select space from _activeSpace
     
-        let size = space->containers()->size()
+        let size = space->elements().size()
 
         switch dir
         case Dir::Left
@@ -70,7 +70,7 @@ class EditorManager => IContent
             index++
             break
         ;
-        let editor = space->containers()->at(index)
+        let editor = space->elements().at(index)
         _activeEditor = find_editor_from_offset(editor->Offset())
 
         ;;
@@ -89,10 +89,10 @@ class EditorManager => IContent
     fn find_editor_in_space string path => Option<int>
         select editor from try_find_editor(path)
         select space from _activeSpace
-        let editors = space->containers()
-        let size = editors->size()
+        let editors = space->elements()
+        let size = editors.size()
         for i until size
-            let e = editors->at(i)
+            let e = editors.at(i)
             let offset = e->Offset()
             if offset.eq(editor->Offset()) doremi Some(i)
         ;;;
@@ -128,18 +128,20 @@ pub
                 return Command::ModeCmdHan
             ;
         ;
-        vector<HorizontalLayout*> spaces = {}
+        vector<SpiralLayout*> spaces = {}
         foreach space in _editorspaces
-            let containers = space->containers()
+            let containers = space->elements()
             vector<IContainer*> buf = {}
-            for i until containers->size()
-                let editor = containers->at(i)
+            for i until containers.size()
+                let editor = containers[i]
                 if !editor->Active() do continue
                 else do buf.push_back(editor)
             ;
-            space->clear()
+            space->destruct()
+            delete(space)
             if buf.size() == 0 do continue
-            foreach editor in buf do space->add(editor)
+            space = new SpiralLayout(Fill::Flex)
+            foreach editor in buf do space->add_element(editor)
             spaces.push_back(space)
         ;
         select e from closed
@@ -185,11 +187,11 @@ pub
         select active from _activeSpace
             let editor = get_last(&_editors)
             _activeEditor = Some(editor)
-            active->add(editor->origin())
+            active->add_element(editor->origin())
         ;
     ;
     fn add_space =>
-        _editorspaces.push_back(new HorizontalLayout(Fill::Flex))
+        _editorspaces.push_back(new SpiralLayout(Fill::Flex))
         let space = get_last(&_editorspaces)
         _origin->add(space)
         _activeSpace = Some(space)
