@@ -141,7 +141,6 @@ pub
         delete(_lines)
         delete(_content)    
         delete(_base)
-        delete(_origin)
         select h from _highlighter do delete(h)
         return this
     ;

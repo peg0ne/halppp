@@ -148,9 +148,14 @@ pub
         _origin->clear()
         foreach space in _editorspaces do _origin->add(space)
         vector<Editor*> editors = {}
-        foreach editor in _editors
+        let size = _editors.size()
+        for i until size
+            let editor = _editors.at(i)
             if editor->is_active() do editors.push_back(editor)
-            else do delete editor
+            else
+                delete(editor->origin())
+                delete(editor)
+            ;
         ;
         _editors = editors
         if _editors.size() == 0 doremi Command::Exit
