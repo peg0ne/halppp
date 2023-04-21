@@ -118,7 +118,7 @@ pub
         let closed = None<Editor*>()
         select a from _activeEditor
             if !a->has_changes() || forced
-                a->close()
+                closed = Some(a->close())
             ;
             else
                 n->col(1)
@@ -143,10 +143,6 @@ pub
             space = new SpiralLayout(Fill::Flex)
             foreach editor in buf do space->add_element(editor)
             spaces.push_back(space)
-        ;
-        select e from closed
-            delete e->origin()
-            delete(e)
         ;
         _editorspaces = spaces
         _origin->clear()
