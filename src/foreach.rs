@@ -7,8 +7,14 @@ use crate::{
 
 pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
     let mut for_def = For::new(is_foreach);
-    for_def.iterator = get_id_or_exit(compiler.next(), "[For] For loop is not closed");
     let mid_check = if is_foreach {Token::In} else {Token::Until};
+    for_def.iterator = get_id_or_exit(compiler.next(), "[For] For loop is not closed");
+    if is_foreach {
+        if compiler.peek().unwrap().token.to_owned() == Token::Comma {
+            compiler.next();
+            for_def.named_variable = Some(get_id_or_exit(compiler.next(), "[For] Requires identifier"));
+        }
+    }
     get_or_exit(compiler.next(), mid_check, format!("[For] Missing {:?} keyword", mid_check).as_str());
     for_def.until = compiler.next().unwrap().name.to_owned();
     loop {

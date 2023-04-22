@@ -21,7 +21,9 @@ impl Expression {
                 let mut iter = for_e.iterator.to_owned();
                 let mut to = for_e.until.to_owned();
                 if for_e.is_foreach {
-                    iter.push_str("_iterator");
+                    if for_e.named_variable.is_none() {
+                        iter.push_str("_iterator");
+                    }
                     to.push_str(".size()");
                 }
                 let formatted = format!(
@@ -30,7 +32,12 @@ impl Expression {
                 );
                 expression.push_str(formatted.as_str());
                 if for_e.is_foreach {
-                    expression.push_str(format!("auto {} = {}.at({});\n", for_e.iterator, for_e.until, iter).as_str());
+                    let name_var = if for_e.named_variable.is_some() {
+                        for_e.named_variable.to_owned().unwrap()
+                    } else {
+                        for_e.iterator.to_owned()
+                    };
+                    expression.push_str(format!("auto {} = {}.at({});\n", name_var, for_e.until, iter).as_str());
                 }
                 for line in for_e.lines.iter() {
                     expression.push_str(line.to_cpp(indentation + 1).as_str());
