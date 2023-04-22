@@ -61,15 +61,16 @@ class TreeSitter
         let output = system_output($"tree-sitter parse {path} 2> /dev/null")
         let joined = join_text(output)
         let blocks = String(joined).split('(')
-        for i until blocks.size()
-            blocks[i] = String(blocks[i]).replace(")", "")
-            blocks[i] = String(blocks[i]).replace("[", "")
-            blocks[i] = String(blocks[i]).replace("]", "")
-            blocks[i] = String(blocks[i]).replace("-", "")
-            blocks[i] = String(blocks[i]).replace(",", "")
-            blocks[i] = String(blocks[i]).replace("  ", " ")
-            blocks[i] = String(blocks[i]).strip()
-        ;
+        let block_replacer = [] (string block) {
+            return String(block).replace_into(")", "")
+                ->replace_into("[", "")
+                ->replace_into("]", "")
+                ->replace_into("-", "")
+                ->replace_into(",", "")
+                ->replace_into("  ", " ")
+                ->strip();
+        }
+        blocks = linq::take(blocks).operate_async(block_replacer).as_vec()
         return parse_blocks(blocks)
     ;
     fn parse_blocks vector<string> blocks => vector<TreeSitterBlock>
