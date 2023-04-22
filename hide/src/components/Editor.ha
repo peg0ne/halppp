@@ -533,7 +533,7 @@ pub
             case KEY_DOWN dobr selected = min(selected + 1, max_size - 1)
             case KEY_LEFT dore move(Dir::Left)
             case KEY_RIGHT dore move(Dir::Right)
-            case KEY_HOME dore move(Dir::Left, 100000, false)
+            case KEY_HOME dore move_home()
             case KEY_END dore move(Dir::Right, 100000, false)
             case KEY_PPAGE dobr selected = 0
             case KEY_NPAGE dobr selected = max_size - 1
@@ -660,6 +660,25 @@ pub
         ;
         _selections = buf
     ;
+    fn move_home =>
+        let vec = _selector
+        _selector.x = 0
+        move_word_impl(Dir::Right, &_selector, false)
+        if _selector.x >= vec.x || _selector.y != vec.y
+            _selector.x = 0
+            _selector.y = vec.y
+        ;
+        for i until _selections.size()
+            let s = _selections.at_ptr(i)
+            vec = Vector(s->x, s->y)
+            s->x = 0
+            move_word_impl(Dir::Right, s, false)
+            if s->x >= vec.x || s->y != vec.y
+                s->x = 0
+                s->y = vec.y
+            ;
+        ;
+    ;
     fn move_word Dir dir, bool spacebreak = false =>
         move_word_impl(dir, &_selector, spacebreak)
         vector<Vector> buf = {}
@@ -679,7 +698,7 @@ pub
             let s = String(_text.at(pos->y))
             let opt = s.find_alpha(pos->x, dir == Dir::Left)
             select f from opt
-                if f != 0 do break
+                if f != 0 && s.at(pos->x) != '_' do break
                 elif dir == Dir::Right doco try_move(Vector(1, 0), pos)
                 else doco try_move(Vector(-1, 0), pos)
             ;
@@ -693,7 +712,7 @@ pub
             let s = String(_text.at(pos->y))
             let opt = s.find_non_alpha(pos->x, dir == Dir::Left)
             select c from opt
-                if c != 0 do break
+                if c != 0 || s.at(pos->x) == '_' do break
                 elif dir == Dir::Right doco try_move(Vector(1, 0), pos)
                 else doco try_move(Vector(-1, 0), pos)
             ;
@@ -802,8 +821,8 @@ pub
         case KEY_UP    dobr move(Dir::Up)
         case KEY_NPAGE dobr move(Dir::Down, _content->Size().y)
         case KEY_PPAGE dobr move(Dir::Up, _content->Size().y)
-        case KEY_HOME  dobr move(Dir::Left, 100000, false)
         case KEY_END   dobr move(Dir::Right, 100000, false)
+        case KEY_HOME  dobr move_home()
         case KEY_SPREVIOUS
         case KEY_SR   dobr shift_line(Dir::Up)
         case KEY_SNEXT
