@@ -90,11 +90,8 @@ class EditorManager => IContent
         select editor from try_find_editor(path)
         select space from _activeSpace
         let editors = space->elements()
-        let size = editors.size()
-        for i until size
-            let e = editors.at(i)
-            let offset = e->Offset()
-            if offset.eq(editor->Offset()) doremi Some(i)
+        foreach i, e in editors
+            if e->Offset().eq(editor->Offset()) doremi Some(i)
         ;;;
         return None<int>()
     ;
@@ -131,12 +128,7 @@ pub
         vector<SpiralLayout*> spaces = {}
         foreach space in _editorspaces
             let containers = space->elements()
-            vector<IContainer*> buf = {}
-            for i until containers.size()
-                let editor = containers[i]
-                if !editor->Active() do continue
-                else do buf.push_back(editor)
-            ;
+            let buf = linq::take(containers).where([](IContainer* e){return e->Active();}).as_vec()
             space->destruct()
             delete(space)
             if buf.size() == 0 do continue
@@ -148,9 +140,7 @@ pub
         _origin->clear()
         foreach space in _editorspaces do _origin->add(space)
         vector<Editor*> editors = {}
-        let size = _editors.size()
-        for i until size
-            let editor = _editors.at(i)
+        foreach i, editor in _editors
             if editor->is_active() do editors.push_back(editor)
             else
                 delete(editor->origin())
@@ -199,12 +189,10 @@ pub
         add_editor()
     ;
     fn try_find_editor string path => Option<Editor*>
-        for i until _editors.size()
-            let p = _editors.at(i)->path()
-            if p != path do continue
-            return Some(_editors.at(i))
-        ;
-        return None<Editor*>()
+        return linq::take(_editors)
+            .where([path](Editor* e) {
+                return e->path() == path;
+            }).first()
     ;
     fn get_last<T> vector<T> *vec => T
         let count = vec->size()
