@@ -868,11 +868,17 @@ pub
         case 'b' dobr move_word(Dir::Left)
         case 'u' dobr undo()
         case 'r' dobr redo()
-        case 'f' dobr find()
-        case 'F' dobr find(true)
         case 'p' dobr text_editing(TextEdit::PasteLine)
         case 'P' dobr text_editing(TextEdit::PasteWord)
         case ';' dobr _selections.clear()
+        case 'f'
+            find()
+            center_on_cursor()
+            break
+        case 'F'
+            find(true)
+            center_on_cursor()
+            break
         default do break
         ;
         return Command::Nop
@@ -1041,6 +1047,10 @@ pub
         yank_line(&_selector)
         return Command::Nop
     ;
+    fn center_on_cursor =>
+        let vec = Vector(_offset.x, _selector.y - _content->Size().y / 2)
+        _offset = vec.y < 0 ? Vector(vec.x, 0) : vec
+    ;
     fn run_z => Command
         let vec = Vector(_offset.x, _selector.y)
         switch n->key()
@@ -1064,6 +1074,7 @@ pub
             switch key
             case '\n' 
                 if !find(search) do find(search, true)
+                center_on_cursor()
                 n->clearLn(LINES - 1)
                 return Command::Nop
             case 27
