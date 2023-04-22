@@ -16,6 +16,12 @@ pub fn create(content: &String) -> Vec<AstToken> {
             try_add_token(string, &mut ast);
             continue;
         }
+        if c == '$' && peekable.peek().unwrap_or(&' ').to_owned() == '"' {
+            let concat = get_concat(&mut peekable);
+            id = try_add_token(id, &mut ast);
+            try_add_token(concat, &mut ast);
+            continue;
+        }
         if is_char_number(c) {
             let num = collect_num(&mut peekable, c);
             id = try_add_token(id, &mut ast);
@@ -165,4 +171,24 @@ fn collect_num(peekable: &mut Peekable<Chars>, c: char) -> String {
         break;
     }
     num
+}
+
+fn get_concat(peekable: &mut Peekable<Chars>) -> String {
+    peekable.next();
+    let mut concat = String::from("\"");
+    let mut escaped = false;
+    loop {
+        let c_opt = peekable.next();
+        if c_opt.is_none() {return concat}
+        let c = c_opt.unwrap();
+        if c == '{' && !escaped {
+            concat += "\" + to_string("
+        }
+        else if c == '}' && !escaped {
+            concat += ") + \""
+        }
+        else {concat += String::from(c).as_str()}
+        if c == '"' && !escaped {return concat}
+        escaped = !escaped && c == '\\'
+    }
 }
