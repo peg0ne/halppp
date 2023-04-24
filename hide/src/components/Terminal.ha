@@ -24,9 +24,16 @@ class Terminal => IContent
         if cmd =|= "exit" : ":q" doremi clear_it(false)
         elif cmd =|= "clear" : ":c" doremi clear_it(true)
         _text.set(_text.len() - 1, $"> {_line}")
-        let output = linq::take(system_output($"{_line} 2>&1"))
-            .operate_async([](string o){return String(o).strip_end();}).as_vec()
-        _text = linq::take(_text).join(output).as_list()
+        if cmd.size() > 0 && cmd[0] == '!'
+            n->stop()
+            system(_line.substr(1))
+            n->start()
+        ;
+        else
+            let output = linq::take(system_output($"{_line} 2>&1"))
+                .operate_async([](string o){return String(o).strip_end();}).as_vec()
+            _text = linq::take(_text).join(output).as_list()
+        ;
         _line = ""
         _text.add($"~{get_pwd()}")
         _text.add("> ")
