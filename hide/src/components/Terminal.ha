@@ -39,6 +39,7 @@ class Terminal => IContent
         if _buffer_pos < 0 do _buffer_pos = _buffer.len() - 1
         if _buffer_pos >= _buffer.len() do _buffer_pos = 0
         _line = _buffer[_buffer_pos]
+        move_internal_curs(KEY_END)
     ;
     fn move_internal_curs int key =>
         switch key
