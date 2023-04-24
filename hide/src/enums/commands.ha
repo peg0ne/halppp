@@ -20,5 +20,6 @@ enum Command
     EditorTemplates,
     EditorSearch,
     EditorReplace,
+    Terminal,
     Nop,
 ;
