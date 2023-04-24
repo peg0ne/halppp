@@ -1,6 +1,6 @@
 inc => future
 get => list, option
-
+compiler => "-pthread"
 named => linq
 
 class Linq<T>

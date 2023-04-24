@@ -500,7 +500,7 @@ pub
             let matching_index = 0
             let positioned_y = reverse ? y - max_size : y
             foreach um in unique_matches
-                if matching_index + 1 + positioned_y >= _content->Size().y do break
+                if matching_index + 1 + positioned_y >= _content->Size().y - 1 do break
                 let y = offset.y + positioned_y + matching_index - reverse + 1
                 n->add_col(y, x - 1, "│", 1)
                 n->add_col(y, x + width, "│", 1)

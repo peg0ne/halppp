@@ -14,6 +14,7 @@ protected
     Vector _offset = Vector(0,0)
     bool is_active = true
     bool is_outline = false
+    bool is_center_text = false
     NGuiOutline outline = NGuiOutline()
     IContainer => do return
     IContainer Fill f =>
@@ -60,6 +61,7 @@ pub
         _content = content
     ;
     fn ToggleOutline => do is_outline = !is_outline
+    fn ToggleCenterText => do is_center_text = !is_center_text
     fn GetContent => List<string> doremi _content
     fn add IContainer* c => do _containers.add(c)
     fn size => int doremi _containers.len()
@@ -88,10 +90,12 @@ pub
             for i until _size.y do n->add(_offset.y + i, _offset.x, filling)
         ;
         n->add_until(_offset, _label, _size.x + _offset.x, true)
-        let i = 0
-        foreach s in _content
+        foreach i, s in _content
             if i >= _size.y do break
-            n->add_until(_offset.y + i++, _offset.x, s, _size.x + _offset.x, false)
+            if is_center_text
+                n->add_until(_offset.y + i, _offset.x + (_size.x / 2) - (s.size() / 2), s, _size.x + _offset.x, false)
+            ;
+            else do n->add_until(_offset.y + i, _offset.x, s, _size.x + _offset.x, false)
         ;
         n->col(_color < 0 ? -_color : _color, false)
     ;
