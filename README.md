@@ -65,3 +65,20 @@ println(sum())
 > sum (int a, int b, int c) doremi a + b + n
 println(sum(a,b,c))
 ```
+
+Extend classes (useful for larger classes)
+```
+get => print
+class A
+    int val = 0
+    extend => A/hello
+;
+
+fn main =>
+    let a = A()
+    a.hello()
+;
+
+//file A/hello.ha
+fn hello => do println($"hello world {val}")
+```

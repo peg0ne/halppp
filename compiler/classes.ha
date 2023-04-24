@@ -2,6 +2,10 @@ enum ClassError
     Closed,
     Definition,
     Duplicate,
+    Extend,
+    ExtendClosed,
+    ExtendNoId,
+    ExtendNotValid,
     Inheritance,
     NoId,
     NoInheritor,
@@ -13,12 +17,16 @@ fn c_err ClassError err, string opt => string doremi c_err(err, opt, false, "")
 fn c_err ClassError err, string opt, bool display, string recap => string
     string msg = "[Class] "
     switch err
-    case ClassError::Closed      dobr msg += "Class is not closed "
-    case ClassError::Definition  dobr msg += "Invalid class definition of: "
-    case ClassError::Duplicate   dobr msg += "Duplicate instance of: "
-    case ClassError::Inheritance dobr msg += "Invalid inheritance of: "
-    case ClassError::NoId        dobr msg += "Invalid class declaration"
-    case ClassError::NoInheritor dobr msg += "Invalid Inheritor Token\nExpected Id for inheritance for class: "
+    case ClassError::Closed       dobr msg += "Class is not closed "
+    case ClassError::Definition   dobr msg += "Invalid class definition of: "
+    case ClassError::Duplicate    dobr msg += "Duplicate instance of: "
+    case ClassError::Extend       dobr msg += "Missing => after extend in: "
+    case ClassError::ExtendClosed dobr msg += "Error when trying to extend in: "
+    case ClassError::ExtendNoId   dobr msg += "Missing id in extend: "
+    case ClassError::Inheritance  dobr msg += "Invalid inheritance of: "
+    case ClassError::NoId         dobr msg += "Invalid class declaration"
+    case ClassError::NoInheritor  dobr msg += "Invalid Inheritor Token\nExpected Id for inheritance for class: "
+    case ClassError::ExtendNotValid    dobr msg += "Invalid class extendor: "
     case ClassError::DoubleDeclaration dobr msg += "Duplicate instance of variable: "
     default do break
     ;
@@ -39,7 +47,7 @@ fn class_validate Class class_def, Compiler *compiler_t =>
     ;
 ;
 
-fn class_construct Compiler *compiler_t, bool is_struct => Class
+fn class_construct Compiler *compiler_t, bool is_struct, CompilerPath paths => Class
     let class_def = Class()
     class_def.is_struct = is_struct
     
@@ -53,26 +61,46 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
     if next.token == Token::CoolArrow
         class_def.inherit = Some(get_id_or_exit(compiler_t, c_err(ClassError::NoInheritor, class_def.id)))
     ;
+    class_internal_declarations(compiler_t, is_struct, &class_def, paths)
+    class_validate(class_def, compiler_t)
+    compiler_t->add_class(class_def)
+    return class_def
+;
+
+fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *class_def, CompilerPath paths =>
     //Construct inner Class values
     let variable_state = !is_struct ? VariableState::Private : VariableState::Public
     loop
-        let next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def.id))
+        let next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+        if next.token == Token::Extend
+            get_arrow_or_exit(compiler_t, c_err(ClassError::Extend, class_def->id)) 
+            let extends = imports_construct_impl(compiler_t)
+            foreach extender in extends
+                select content from read(paths.folder_path + extender + HA_SUFFIX)
+                    let ast = ast_create(content)
+                    let extend_compiler = Compiler(compiler_t->program, ast, 0)
+                    class_internal_declarations(&extend_compiler, is_struct, class_def, paths)
+                    continue
+                ;
+                c_err(ClassError::ExtendNotValid, extender, true, compiler_t->to_err_message())
+            ;
+        ;
         if next.token == Token::Function
-            let function = function_construct(compiler_t, variable_state, false, class_def.variables)
-            doco class_def.functions.push_back(function)
+            let function = function_construct(compiler_t, variable_state, false, class_def->variables)
+            doco class_def->functions.push_back(function)
         ;
         elif any(next.token, {Token::Id, Token::Type})
-            if next.name == class_def.id
-                let function = function_construct(compiler_t, VariableState::Public, true, class_def.variables)
-                function.return_value = Some(Variable(EMPTY, class_def.id))
-                doco class_def.functions.push_back(function)
+            if next.name == class_def->id
+                let function = function_construct(compiler_t, VariableState::Public, true, class_def->variables)
+                function.return_value = Some(Variable(EMPTY, class_def->id))
+                doco class_def->functions.push_back(function)
             ;
             let vnb = construct_args(compiler_t, Some(next.name))
             vnb.variable.variable_state = variable_state
-            if class_def.contains(vnb.variable)
+            if class_def->contains(vnb.variable)
                 c_err(ClassError::DoubleDeclaration, vnb.variable.id, true, compiler_t->to_err_message())
             ;
-            doco class_def.variables.push_back(vnb.variable)
+            doco class_def->variables.push_back(vnb.variable)
         ;
         elif any(next.token, {Token::Eof, Token::SemiColon, Token::Class}) do break
         switch next.token
@@ -82,7 +110,4 @@ fn class_construct Compiler *compiler_t, bool is_struct => Class
         default do break
         ;
     ;
-    class_validate(class_def, compiler_t)
-    compiler_t->add_class(class_def)
-    return class_def
 ;
