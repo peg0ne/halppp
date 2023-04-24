@@ -1,5 +1,7 @@
 class CommandLine => IContent
     string _line = ""
+    vector<string> _buffer = {}
+    int _buffer_pos = 0
     EditorManager *_editorManager
     CommandLine Ncurses *n, EditorManager *editorManager =>
         _origin = new IContainer(Fill::Static, Vector(0,1))
@@ -16,6 +18,7 @@ pub
     ;
     fn update_return Command cmd => Command
         update("")
+        _buffer_pos = _buffer.size()
         return cmd
     ;
     fn exit => Command doremi update_return(Command::ModeNormal)
@@ -23,6 +26,10 @@ pub
         let s = String(_line)
         s.remove(0)
         _line = s.to_string()
+        let match = linq::take(_buffer).where([this](string b){return _line == b;}).first()
+        if match.is_none()
+            _buffer.push_back(_line)
+        ;
         if _line == "q" doremi update_return(Command::CloseEditor)
         elif _line == "q!" doremi update_return(Command::CloseEditorForced)
         elif _line == "w" doremi update_return(Command::WriteEditor)
@@ -50,11 +57,13 @@ pub
             manager->move_to(num)
             return update_return(Command::ModeNormal)
         ;
+        _buffer.pop_back()
         n->col(1)
         n->add(LINES - 1, 0, $"no such command: {_line}")
         n->key()
         n->col(1, false)
         update(":")
+        _buffer_pos = _buffer.size()
         return Command::Nop
     ;
     fn remove_ch => Command
@@ -70,10 +79,21 @@ pub
         update(_line)
         return Command::Nop
     ;
+    fn get_from_buffer int key => Command
+        if _buffer.size() == 0 doremi Command::Nop
+        _buffer_pos += key == KEY_UP ? -1 : 1
+        if _buffer_pos < 0 do _buffer_pos = _buffer.size() - 1
+        if _buffer_pos >= _buffer.size() do _buffer_pos = 0
+        _line = _buffer[_buffer_pos]
+        update($":{_line}")
+        return Command::Nop
+    ;
     fn run EditorManager *manager => Command
         if _line.size() == 0 do update(":")
         let key = n->key()
         switch key
+        case KEY_DOWN
+        case KEY_UP doremi get_from_buffer(key)
         case 27     doremi exit()
         case '\n'   doremi try_parse(manager)
         case '\b'
