@@ -27,6 +27,7 @@ private fn run_space => Command
     switch n->key()
     case 'f' doremi Command::ModeFileEx
     case 't' doremi Command::SplitHorizontal
+    case 'T' doremi Command::Terminal
     case 'v' doremi Command::SplitVertical
     case 'h' doremi Command::EditorLeft
     case 'l' doremi Command::EditorRight
