@@ -4,6 +4,7 @@ private fn run_space => Command
     vector<string> commands = {
         "f - open file explorer",
         "t - split editor horizontally",
+        "T - open integrated terminal",
         "v - split editor vertically",
         "h - move to editor left",
         "l - move to editor right",
@@ -12,8 +13,7 @@ private fn run_space => Command
         "c - toggle comment",
         "P - paste word from clipboard",
         "p - open command pallete",
-        "s - open file searcher",
-        ""
+        "s - open file searcher"
     }
     foreach c in commands
         let ele = new IContainer(Fill::Flex)
