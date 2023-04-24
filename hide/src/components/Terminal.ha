@@ -29,6 +29,9 @@ class Terminal => IContent
             system(_line.substr(1))
             n->start()
         ;
+        if String(_line).starts_with("cd") && _line.size() > 3
+            changedir(_line.substr(3))
+        ;
         else
             let output = linq::take(system_output($"{_line} 2>&1"))
                 .operate_async([](string o){return String(o).strip_end();}).as_vec()
@@ -65,6 +68,7 @@ class Terminal => IContent
     ;
 pub
     fn show =>
+        let pwd = get_pwd()
         loop
             while _text.len() > _origin->Size().y do _text.remove(0)
             let t = _text
@@ -94,5 +98,6 @@ pub
             get_from_buffer(key)
             move_internal_curs(key)
         ;
+        changedir(pwd)
     ;
 ;
