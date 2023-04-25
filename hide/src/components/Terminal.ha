@@ -86,7 +86,7 @@ pub
                 _line += key
                 _curs_position++
             ;
-            elif key == KEY_BACKSPACE
+            elif key =|= KEY_BACKSPACE : 127 : '\b'
                 if _line.size() == 0 do continue
                 line = String(_line)
                 line.remove(_curs_position - 1)
