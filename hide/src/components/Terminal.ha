@@ -81,19 +81,40 @@ pub
             _text = t
             let key = n->key()
             if key == KEY_F(1) do break
-            elif key == '\n'
-                if !run_command() do break
-            ;
+            elif key == '\n' && !run_command() do break
             elif isgraph(key) || key == ' '
                 _line += key
                 _curs_position++
             ;
             elif key == KEY_BACKSPACE
                 if _line.size() == 0 do continue
-                let line = String(_line)
+                line = String(_line)
                 line.remove(_curs_position - 1)
                 _line = line.to_string()
                 move_internal_curs(KEY_LEFT)
+            ;
+            elif key == '\t'
+                if _line.size() == 0 do continue
+                line = String(_line)
+                let words = line.split(' ')
+                let word = words[words.size() - 1]
+                let files = list_files(".")
+                let matches = linq::take(files)
+                    .where([word](string files){return String(files)
+                    .starts_with(word);}).as_vec()
+                
+                switch matches.size()
+                case 0 do break
+                case 1
+                    for i until word.size() do line.remove(line.len() - 1)
+                    _line = (line + matches[0]).to_string()
+                    move_internal_curs(KEY_END)
+                    break
+                default
+                    foreach m in matches do _text.add(m)
+                    _text.add($"> {_line}")
+                    break
+                ;
             ;
             get_from_buffer(key)
             move_internal_curs(key)
