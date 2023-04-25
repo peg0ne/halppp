@@ -11,7 +11,7 @@ fn get_content CompilerPath paths, bool can_be_lib => string
     string content, linebuf
     ifstream reader(paths.current)
     if !reader && can_be_lib
-        select home from env("HOME")
+        select home from env("USERPROFILE")
             reader = ifstream(home + "/.local/lib/halppp/" + paths.current)
         ;
     ;

@@ -1,4 +1,4 @@
-inc => ncurses.h, curses.h, wchar.h, locale.h, iostream, cstring
+inc => ncurses/ncurses.h, wchar.h, locale.h, iostream, cstring
 use => std
 get => vector
 compiler => "-lncursesw"

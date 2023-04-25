@@ -130,6 +130,7 @@ fn manual => int
 ;
 
 fn main =>
+    println("update")
     let clap = Clap(argc, argv)
     select name from clap.peek("init")
         init(name)

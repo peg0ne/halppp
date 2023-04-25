@@ -78,7 +78,7 @@ pub fn create(content: &String) -> Vec<AstToken> {
             }
             continue;
         }
-        if c == ' ' || c == '\t' || c == '\n' {
+        if c == ' ' || c == '\t' || c == '\n' || c == '\r' {
             id = try_add_token(id, &mut ast);
             if c == '\n' {
                 ast.push(AstToken::new_line());

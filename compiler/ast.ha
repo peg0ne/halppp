@@ -52,7 +52,7 @@ fn ast_create string content => vector<AstToken>
             doco ast.push_back(num)
         ;
         string ch(1, c)
-        let is_white_space = any(c, {'\n', ' ', '\t'})
+        let is_white_space = any(c, {'\n', ' ', '\t', '\r'})
         let is_both_token = is_str_tokens(id) == is_char_token(c)
         if !is_both_token
             id = try_add_token(id, &ast, &peekable)

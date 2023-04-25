@@ -60,7 +60,7 @@ fn makedir string name => bool
     char name_arr[name.size() + 1]
     for i until name.size() do name_arr[i] = name.at(i)
     name_arr[name.size()] = '\0'
-    return !mkdir(name_arr, S_IRWXU)
+    return !mkdir(name_arr)
 ;
 fn changedir string name => bool
     char name_arr[name.size() + 1]
