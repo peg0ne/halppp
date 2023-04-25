@@ -90,7 +90,9 @@ private fn move_word_impl Dir dir, Vector *pos, bool spacebreak =>
 private fn move_home =>
     let vec = _selector
     _selector.x = 0
-    move_word_impl(Dir::Right, &_selector, false)
+    while _text[_selector.y][_selector.x] == ' '
+        try_move(Vector(1, 0), &_selector, false)
+    ;
     if _selector.x >= vec.x || _selector.y != vec.y
         _selector.x = 0
         _selector.y = vec.y
@@ -99,7 +101,9 @@ private fn move_home =>
         let s = _selections.at_ptr(i)
         vec = Vector(s->x, s->y)
         s->x = 0
-        move_word_impl(Dir::Right, s, false)
+        while _text[s->y][s->x] == ' '
+            try_move(Vector(1, 0), s, false)
+        ;
         if s->x >= vec.x || s->y != vec.y
             s->x = 0
             s->y = vec.y
