@@ -81,19 +81,54 @@ pub
             _text = t
             let key = n->key()
             if key == KEY_F(1) do break
-            elif key == '\n'
-                if !run_command() do break
-            ;
+            elif key == '\n' && !run_command() do break
             elif isgraph(key) || key == ' '
                 _line += key
                 _curs_position++
             ;
             elif key == KEY_BACKSPACE
                 if _line.size() == 0 do continue
-                let line = String(_line)
+                line = String(_line)
                 line.remove(_curs_position - 1)
                 _line = line.to_string()
                 move_internal_curs(KEY_LEFT)
+            ;
+            elif key == '\t'
+                if _line.size() == 0 do continue
+                line = String(_line)
+                let words = line.split(' ')
+                let word = words[words.size() - 1]
+                let word_str = String(word)
+                let path = "."
+                if word_str.contains("/")
+                    let new_word = ""
+                    while !word_str.ends_with("/")
+                        new_word = word_str[word_str.len() - 1] + new_word
+                        word_str.remove_back(1)
+                    ;
+                    word = new_word
+                    path = word_str.to_string()
+                ;
+                let files = list_reg_files(path)
+                let dirs = list_dirs(path)
+                > f_start_with word (string f) doremi String(f).starts_with(word)
+                let f_matches = linq::take(files).where(f_start_with).as_vec()
+                let d_matches = linq::take(dirs).where(f_start_with).as_vec()
+                let suffix = d_matches.size() != 0 ? "/" : " "
+                let matches = linq::take(f_matches).join(d_matches).as_vec()
+                
+                switch f_matches.size() + d_matches.size()
+                case 0 do break
+                case 1
+                    line.remove_back(word.size())
+                    _line = (line + matches[0]).to_string() + suffix
+                    move_internal_curs(KEY_END)
+                    break
+                default
+                    _text = linq::take(_text).join(matches).as_list()
+                    _text.add($"> {_line}")
+                    break
+                ;
             ;
             get_from_buffer(key)
             move_internal_curs(key)
