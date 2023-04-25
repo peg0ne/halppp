@@ -15,17 +15,37 @@
             "color": 102,
             "fg": 185,
             "bg": 0
-        }
+        },
         {
             "color": 103,
             "fg": 179,
             "bg": 0
-        }
+        },
         {
             "color": 104,
             "fg": 181,
             "bg": 0
-        }
+        },
+        {
+            "color": 105,
+            "fg": 192,
+            "bg": 0
+        },
+        {
+            "color": 106,
+            "fg": 203,
+            "bg": 0
+        },
+        {
+            "color": 107,
+            "fg": 96,
+            "bg": 0
+        },
+        {
+            "color": 108,
+            "fg": 180,
+            "bg": 0
+        },
     ],
     "boxing": [
         {
@@ -84,7 +104,13 @@
             "color": 101,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(bool|int|short|double|float|long|wchar_t|char|string)(?=$|\W)"
+            "expr": "(?:^|\W)(bool|int|short|double|float|long|wchar_t|char|vector|string)(?=$|\W)"
+        },
+        {
+            "color": 105,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(Option|Some|None)(?=$|\W)"
         },
         {
             "color": 9,
@@ -102,7 +128,13 @@
             "color": 3,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(new|let|auto|break|return|continue|case|default|catch|const|delete|this|extern|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(?=$|\W)"
+            "expr": "(?:^|\W)(let|auto|case|default|this)(?=$|\W)"
+        },
+        {
+            "color": 106,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(new|break|return|continue|catch|const|delete|extern|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(?=$|\W)"
         },
         {
             "color": 102,
@@ -135,6 +167,11 @@
         {
             "color": 1,
             "capture": 1,
+            "expr": "(?:^|\W)(select|for|foreach)(?=$|\W)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
             "expr": "(?:^|\W)(get|inc|use|named|compiler|class|struct|enum|fn|glob|;)(?=$|\W)"
         },
         {
@@ -148,7 +185,7 @@
             "expr": "('[^']')"
         },
         {
-            "color": 0,
+            "color": 107,
             "capture": 1,
             "dim": true,
             "expr": "(//.*)"
