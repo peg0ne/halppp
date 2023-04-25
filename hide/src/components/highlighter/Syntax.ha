@@ -135,6 +135,16 @@ class Syntax
                 ;
             ;
         ;
+        select colors from _definition.try_get("colors")
+            for i until colors->size()
+                select color from colors->try_get(i)
+                    let pair = (short)color->try_get_value_of("color", 100.0)
+                    let fg = (short)color->try_get_value_of("fg", 7.0)
+                    let bg = (short)color->try_get_value_of("bg", 0.0)
+                    init_pair(pair, fg, bg)
+                ;
+            ;
+        ;
     ;
 pub
     fn wordlist => vector<string> doremi _wordlist

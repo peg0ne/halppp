@@ -1,5 +1,32 @@
 {
     "name": "halppp",
+    "colors": [
+        {
+            "color": 100,
+            "fg": 167,
+            "bg": 0
+        },
+        {
+            "color": 101,
+            "fg": 191,
+            "bg": 0
+        },
+        {
+            "color": 102,
+            "fg": 185,
+            "bg": 0
+        }
+        {
+            "color": 103,
+            "fg": 179,
+            "bg": 0
+        }
+        {
+            "color": 104,
+            "fg": 181,
+            "bg": 0
+        }
+    ],
     "boxing": [
         {
             "colors": [7,8,9,1,2,3],
@@ -54,7 +81,7 @@
             "expr": "^\s*> ([A-z_]*)\s"
         },
         {
-            "color": 1,
+            "color": 101,
             "bold": true,
             "capture": 1,
             "expr": "(?:^|\W)(bool|int|short|double|float|long|wchar_t|char|string)(?=$|\W)"
@@ -66,7 +93,7 @@
             "expr": "([0-9][0-9.]*)"
         },
         {
-            "color": 9,
+            "color": 100,
             "capture": 1,
             "bold": true,
             "expr": "(?:^|\W)(true|false|null)(?=$|\W)"
@@ -75,7 +102,25 @@
             "color": 3,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(new|from|in|until|do|dore|doco|dobr|doremi|let|auto|break|return|continue|case|default|catch|const|delete|this|extern|private|pub|public|protected|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(?=$|\W)"
+            "expr": "(?:^|\W)(new|let|auto|break|return|continue|case|default|catch|const|delete|this|extern|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(?=$|\W)"
+        },
+        {
+            "color": 102,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(do|dore|doco|dobr|doremi)(?=$|\W)"
+        },
+        {
+            "color": 103,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(from|in|until)(?=$|\W)"
+        },
+        {
+            "color": 104,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(private|pub|public|protected)(?=$|\W)"
         },
         {
             "color": 8,
