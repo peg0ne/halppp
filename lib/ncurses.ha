@@ -53,6 +53,7 @@ class Ncurses
         ;
     ;
 pub
+    fn get_win => WINDOW* doremi win
     fn move_curs Vector xy => do move_curs(xy.y, xy.x)
     fn move_curs int y, int x => do move(y, x)
     fn underline_until Vector xy, short color, int len => do underline_until(xy.y, xy.x, color, len)

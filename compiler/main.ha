@@ -68,7 +68,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
         if next.is_terminator() do break
         elif next.is_nl() do continue
         elif next.is_classy()
-            let classdef = class_construct(&compiler_t, next.token == Token::Struct)
+            let classdef = class_construct(&compiler_t, next.token == Token::Struct, paths)
             output += classdef.to_cpp()
             headers += classdef.to_cpp_h()
         ;

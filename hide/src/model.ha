@@ -1,13 +1,14 @@
 get => enums/[movement, commands, rects, modes, textedit]
 get => components/IContent
 get => EditorManager
-get => components/[Explorer, CommandLine, ModeView]
+get => components/[Explorer, CommandLine, ModeView, Terminal]
 
 class Model => MainContainer
     Ncurses n = Ncurses()
     IContainer _line = IContainer(Fill::Flex)
     HorizontalLayout _top = HorizontalLayout(Fill::Flex)
     HorizontalLayout _status = HorizontalLayout(Fill::Static, Vector(0,1))
+    Terminal _term = Terminal(&n)
     Explorer _explorer = Explorer(&n)
     ModeView _mode_view = ModeView(&n)
     EditorManager _manager = EditorManager(&n, &_line)
@@ -82,6 +83,7 @@ pub
         case Command::EditorTemplates dobr _manager.templates()
         case Command::EditorSearch    dobr _manager.search()
         case Command::EditorReplace   dobr _manager.replace()
+        case Command::Terminal        dobr _term.show()
         case Command::Nop do break
         ;
         _explorer.set_visibility(_mode_view.mode())
