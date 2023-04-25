@@ -1,5 +1,5 @@
 private fn run_space => Command
-    let show = GridLayout(Vector(COLS, 4), Vector(0, LINES - 7))
+    let show = GridLayout(Vector(COLS - 2, 4), Vector(1, LINES - 7))
     show.SetColor(-1)
     vector<string> commands = {
         "f - open file explorer",
