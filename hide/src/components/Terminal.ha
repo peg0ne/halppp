@@ -67,7 +67,7 @@ class Terminal => IContent
         return String(pwd).strip()
     ;
     fn draw =>
-        ((MainContainer*)this)->update()
+        ((MainContainer*)_origin)->update()
         ((IContent*)this)->draw()
     ;
 pub
