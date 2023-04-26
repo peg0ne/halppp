@@ -87,7 +87,9 @@ pub
             if key == KEY_F(1) do break
             elif key == '\n' && !run_command() do break
             elif isgraph(key) || key == ' '
-                _line += key
+                line = String(_line)
+                line.insert(string(1,key), _curs_position)
+                _line = line.to_string()
                 _curs_position++
             ;
             elif key =|= KEY_BACKSPACE : 127 : '\b'
