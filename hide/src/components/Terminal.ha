@@ -66,6 +66,10 @@ class Terminal => IContent
         let pwd = linq::take(system_output("pwd 2>&1")).first_or("/")
         return String(pwd).strip()
     ;
+    fn draw =>
+        ((MainContainer*)this)->update()
+        ((IContent*)this)->draw()
+    ;
 pub
     fn show =>
         let pwd = get_pwd()
