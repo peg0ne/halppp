@@ -3,6 +3,15 @@ use => std
 get => vector
 compiler => "-lncursesw"
 
+glob =>
+    N_LEFT_UP_CORNER "┌"
+    N_LEFT_DOWN_CORNER "└"
+    N_RIGHT_UP_CORNER "┐"
+    N_RIGHT_DOWN_CORNER "┘"
+    N_HORIZONTAL_LINE "─"
+    N_VERTICAL_LINE "│"
+;
+
 class Ncurses
     WINDOW *win
     Ncurses bool ignore_colors = false =>

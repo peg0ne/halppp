@@ -20,13 +20,16 @@ fn Lgrep Ncurses* n => Option<string>
     let pos = 0
     let search = ""
     let files = List<string>(lgrep())
-    let base = HorizontalLayout(Vector(COLS/10*8, LINES/8*6), Vector(COLS/10, LINES/8))
+    let main = MainContainer(Vector(COLS/10, LINES/8))
+    let base = HorizontalLayout(Fill::Flex)
     let search_bar = IContainer(Fill::Static, Vector(0,1))
     let content = IContainer()
     let left = VerticalLayout(Fill::Flex)
     let spacer = IContainer(Fill::Static, Vector(2,0), "│")
     let left_spacer = IContainer(Fill::Static, Vector(1,0))
+    let search_spacer = IContainer(Fill::Static, Vector(0,1), "─")
     let view = IContainer()
+    main.add(&base)
     base.SetColor(-2)
     spacer.SetColor(2)
     base.add(&left_spacer)
@@ -34,6 +37,7 @@ fn Lgrep Ncurses* n => Option<string>
     base.add(&spacer)
     base.add(&view)
     left.add(&search_bar)
+    left.add(&search_spacer)
     left.add(&content)
     let offset = 0
     loop
@@ -45,16 +49,21 @@ fn Lgrep Ncurses* n => Option<string>
         content.SetContent(buf)
         if pos >= buf.size()
             view.SetContent(List<string>())
-            base.draw(n)
+            main.draw(n)
         ;
         else
+            
             let lines = linq::take(readlines(buf.at(pos)))
                 .operate_async([&view](string line){return line.substr(0, view.Size().x);}).as_list()
             view.SetContent(lines)
             let h = Highlighter(buf.at(pos))
-            base.draw(n)
+            main.draw(n)
             h.highlight(&view, n)
         ;
+        let count_info = $"{buf.len()}/{files.len()}"
+        n->add(search_bar.Offset().y,
+            search_bar.Offset().x + search_bar.Size().x - count_info.size(),
+            count_info)
         n->mark_until(content.Offset().y + pos,
             content.Offset().x,
             5, content.Size().x)
