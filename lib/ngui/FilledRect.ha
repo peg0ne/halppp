@@ -2,6 +2,7 @@ get => IContainer
 class FilledRect => IContainer
     string _fill = " "
     FilledRect string fill =>
+        _type = ContainerType::FilledRect
         this->_fill = fill
     ;
     FilledRect string fill, Vector size =>

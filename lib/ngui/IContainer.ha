@@ -87,7 +87,11 @@ pub
         if _color >= 0 do n->invis_box(_offset, _size)
         else do n->box(_offset - Vector(1,1), _size + Vector(2,2))
         select filling from _fill_str
-            for i until _size.y do n->add(_offset.y + i, _offset.x, filling)
+            for i until _size.y
+                for j until _size.x
+                    n->add(_offset.y + i, _offset.x + j, filling)
+                ;
+            ;
         ;
         n->add_until(_offset, _label, _size.x + _offset.x, true)
         foreach i, s in _content
