@@ -4,6 +4,7 @@ struct CompilerPath
     string main_path = EMPTY
     string main_path_cpp = EMPTY
     string main_path_bin = EMPTY
+    string file_name = EMPTY
     string output = EMPTY
     string current = EMPTY
     CompilerPath string main, string f_p, string f_n =>
@@ -17,5 +18,7 @@ struct CompilerPath
         this->main_path_bin = bin
         this->output = cpp + COMPILER_OUT + bin
         this->current = f_p + f_n
+        let parts = String(main).split('/')
+        this->file_name = parts[parts.size() - 1]
     ;
 ;
