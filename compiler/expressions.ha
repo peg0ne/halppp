@@ -18,7 +18,8 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
         if x.token == Token::NewLine
             let is_member = false
             select peeked from compiler_t->peek()
-                is_member = String(peeked.name).starts_with(".")
+                let S = String(peeked.name)
+                is_member = S.starts_with(".") || S.starts_with("->")
             ;
             if !is_member dobr expression += doing
         ;
