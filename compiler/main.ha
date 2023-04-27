@@ -56,38 +56,45 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     vector<string> cached_gets = {}
     let is_named = false
     let content = get_content(paths, !is_main)
-    if !is_main
-        select cached_data from read("./.cache/content_" + paths.file_name)
-            if String(content).strip() == String(cached_data).strip()
-                println("Can get from cache")
-                let c_get = read("./.cache/gets_" + paths.file_name).value_or("")
-                cached_gets = String(c_get).split('\n')
-                foreach g in cached_gets
-                    if String(g).strip() == "" do continue
-                    FpFn fpfn = get_folder_and_name(paths.folder_path + g + HA_SUFFIX)
-                    let get_path = CompilerPath(paths.folder_path + g + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
-                    let get_out = compile(get_path, p, false)
-                    output += get_out.output
-                    includes += get_out.includes
-                    headers += get_out.headers
-                    fnheaders += get_out.fnheaders
-                    foreach a in get_out.arguments
-                        if String(a).strip() == "" do continue
-                        cached_args.push_back(a)
-                    ;
+    select cached_data from read("./.cache/content_" + paths.file_name)
+        if String(content).strip() == String(cached_data).strip()
+            println("<Cached Data>")
+            let c_get = read("./.cache/gets_" + paths.file_name).value_or("")
+            cached_gets = String(c_get).split('\n')
+            foreach g in cached_gets
+                if String(g).strip() == "" do continue
+                let found = false
+                println("GETTING " + g)
+                foreach p_g in p->gets
+                    println("HAS " + p_g)
+                    if String(g).ends_with(p_g) do found = true
                 ;
-                output += read("./.cache/output_" + paths.file_name).value_or("")
-                includes += read("./.cache/includes_" + paths.file_name).value_or("")
-                headers += read("./.cache/headers_" + paths.file_name).value_or("")
-                fnheaders += read("./.cache/fnheaders_" + paths.file_name).value_or("")
-                let c_args = read("./.cache/args_" + paths.file_name).value_or("")
-                let c_args_vec = String(c_args).split('\n')
-                foreach a in c_args_vec
+                if found doco println("CACHED DUPLICATE")
+                FpFn fpfn = get_folder_and_name(paths.folder_path + g + HA_SUFFIX)
+                let get_path = CompilerPath(paths.folder_path + g + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
+                let get_out = compile(get_path, p, false)
+                while g.find("/") != -1 do g = g.substr(1)
+                p->gets.push_back(g)
+                output += get_out.output
+                includes += get_out.includes
+                headers += get_out.headers
+                fnheaders += get_out.fnheaders
+                foreach a in get_out.arguments
                     if String(a).strip() == "" do continue
                     cached_args.push_back(a)
                 ;
-                return CompileOutput(output, includes, headers, fnheaders, cached_args)
             ;
+            output += read("./.cache/output_" + paths.file_name).value_or("")
+            includes += read("./.cache/includes_" + paths.file_name).value_or("")
+            headers += read("./.cache/headers_" + paths.file_name).value_or("")
+            fnheaders += read("./.cache/fnheaders_" + paths.file_name).value_or("")
+            let c_args = read("./.cache/args_" + paths.file_name).value_or("")
+            let c_args_vec = String(c_args).split('\n')
+            foreach a in c_args_vec
+                if String(a).strip() == "" do continue
+                cached_args.push_back(a)
+            ;
+            return CompileOutput(output, includes, headers, fnheaders, cached_args)
         ;
     ;
     cached_content = content

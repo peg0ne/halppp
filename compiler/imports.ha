@@ -74,6 +74,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
 ;
 
 fn imports_check_duplicate vector<string> imports, string id => bool
+    println("IMPORTING " + id)
     foreach imp in imports
         if imp == id
             display_hint_message("[Import]: Token duplicate in entry " + id)
