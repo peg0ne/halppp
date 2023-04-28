@@ -52,6 +52,7 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
     let variable = Variable()
     select t from type_name do variable.v_type = t
     let is_end = false
+    string pre_name = EMPTY
     loop
         let next = get_next_or_exit(compiler_t, VAR_ERR_INV)
         if any(next.token, {Token::NewLine, Token::CoolArrow}) dobr is_end = true
@@ -64,6 +65,10 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
                 compiler_t->next()
             ;
             break
+        ;
+        elif next.token == Token::TriplePeriod
+            if variable.has_type() do variable.v_type += next.name
+            else do display_err_message(VAR_ERR_PER, compiler_t->to_err_message())
         ;
         elif next.token == Token::Comma do break
         elif next.token == Token::Asterix
@@ -91,5 +96,6 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
         ;
     ;
     if !variable.has_minimum() && !is_end do display_err_message(VAR_ERR_INC + variable.id, compiler_t->to_err_message())
+    variable.id = pre_name + variable.id
     return VariableNBool(variable, is_end)
 ;
