@@ -19,11 +19,6 @@ class HorizontalLayout => GroupedContainer
         _size = s
         _offset = o
     ;
-    pub fn draw Ncurses *n =>
-        if !is_active do return
-        update()
-        ((GroupedContainer*)this)->draw(n)
-    ;
     pub fn update =>
         double available_space = _size.x
         int offset = 0
@@ -54,5 +49,10 @@ class HorizontalLayout => GroupedContainer
             c->SetSize(c->Size().x, _size.y)
             offset += c->Size().x
         ;
+    ;
+    pub fn draw Ncurses *n =>
+        if !is_active do return
+        update()
+        ((GroupedContainer*)this)->draw(n)
     ;
 ;

@@ -15,24 +15,24 @@ glob =>
 class Ncurses
     WINDOW *win
     Ncurses bool ignore_colors = false =>
-        setlocale(LC_ALL, "")
+        {setlocale(LC_ALL, "");}
         win = initscr()
-        noecho()
-        keypad(win, true)
+        {noecho();}
+        {keypad(win, true);}
         if !ignore_colors && has_colors()
-            start_color()
-            init_pair(1, COLOR_RED, COLOR_BLACK)
-            init_pair(2, COLOR_YELLOW, COLOR_BLACK)
-            init_pair(3, COLOR_GREEN, COLOR_BLACK)
-            init_pair(4, COLOR_BLACK, COLOR_RED)
-            init_pair(5, COLOR_BLACK, COLOR_YELLOW)
-            init_pair(6, COLOR_BLACK, COLOR_GREEN)
-            init_pair(7, COLOR_BLUE, COLOR_BLACK)
-            init_pair(8, COLOR_CYAN, COLOR_BLACK)
-            init_pair(9, COLOR_MAGENTA, COLOR_BLACK)
-            init_pair(10, COLOR_BLACK, COLOR_BLUE)
-            init_pair(11, COLOR_BLACK, COLOR_CYAN)
-            init_pair(12, COLOR_BLACK, COLOR_MAGENTA)
+            {start_color();}
+            {init_pair(1, COLOR_RED, COLOR_BLACK);}
+            {init_pair(2, COLOR_YELLOW, COLOR_BLACK);}
+            {init_pair(3, COLOR_GREEN, COLOR_BLACK);}
+            {init_pair(4, COLOR_BLACK, COLOR_RED);}
+            {init_pair(5, COLOR_BLACK, COLOR_YELLOW);}
+            {init_pair(6, COLOR_BLACK, COLOR_GREEN);}
+            {init_pair(7, COLOR_BLUE, COLOR_BLACK);}
+            {init_pair(8, COLOR_CYAN, COLOR_BLACK);}
+            {init_pair(9, COLOR_MAGENTA, COLOR_BLACK);}
+            {init_pair(10, COLOR_BLACK, COLOR_BLUE);}
+            {init_pair(11, COLOR_BLACK, COLOR_CYAN);}
+            {init_pair(12, COLOR_BLACK, COLOR_MAGENTA);}
         ;
     ;
     fn box_char int y, int x, int pos =>
@@ -101,7 +101,7 @@ pub
     fn add Vector xy, char c, bool is_bold = false => do add(xy.y, xy.x, c, is_bold)
     fn add int y, int x, char c, bool is_bold = false =>
         if is_bold do bold(true)
-        mvaddch(y,x,c)
+        {mvaddch(y,x,c);}
         if is_bold do bold(false)
     ;
     fn add<T> Vector xy, T s, bool is_bold = false => do add(xy.y, xy.x, $"{s}", is_bold)
@@ -109,16 +109,18 @@ pub
     fn add Vector xy, string s, bool is_bold = false => do add(xy.y, xy.x, s, is_bold)
     fn add int y, int x, string s, bool is_bold = false =>
         if is_bold do bold(true)
-        char ch[s.size() + 1]
-        strcpy(ch, s.c_str())
-        mvaddstr(y,x,ch)
+        {
+            char ch[s.size() + 1];
+            strcpy(ch, s.c_str());
+            mvaddstr(y,x,ch);
+        }
         if is_bold do bold(false)
     ;
     fn add_col Vector xy, char c, short color, bool is_bold = false => do add_col(xy.y, xy.x, c, color, is_bold)
     fn add_col int y, int x, char c, short color, bool is_bold = false =>
         if is_bold do bold(true)
         col(color)
-        mvaddch(y,x,c)
+        {mvaddch(y,x,c);}
         col(color, false)
         if is_bold do bold(false)
     ;
@@ -144,17 +146,21 @@ pub
     ;
     fn key => auto doremi getch()
     fn stop =>
-        curs_set(1)
-        endwin()
+        {
+            curs_set(1);
+            endwin();
+        }
     ;
     fn start bool nonblock = false =>
-        curs_set(0)
+        {curs_set(0);}
         if nonblock do nodelay(win, TRUE)
     ;
     fn init_pair_adv short pair, short fg_p, Vector fg, short bg_p, Vector bg =>
         if !has_colors() do return
-        init_color(fg_p, (short)fg.x, (short)fg.y, (short)fg.z)
-        init_color(bg_p, (short)bg.x, (short)bg.y, (short)bg.z)
-        init_pair(pair, fg_p, bg_p)
+        {
+            init_color(fg_p, (short)fg.x, (short)fg.y, (short)fg.z);
+            init_color(bg_p, (short)bg.x, (short)bg.y, (short)bg.z);
+            init_pair(pair, fg_p, bg_p);
+        }
     ;
 ;

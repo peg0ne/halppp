@@ -8,8 +8,9 @@ fn get_file_path int argc, char **argv => string
     return fp
 ;
 fn get_content CompilerPath paths, bool can_be_lib => string
-    string content, linebuf
-    ifstream reader(paths.current)
+    string content
+    string linebuf
+    let reader = ifstream(paths.current)
     if !reader && can_be_lib
         select home from env("HOME")
             reader = ifstream(home + "/.local/lib/halppp/" + paths.current)
@@ -17,20 +18,15 @@ fn get_content CompilerPath paths, bool can_be_lib => string
     ;
     if !reader do display_err_message("Couldn't open file\nExiting...", "")
     while !reader.eof()
-        getline(reader, linebuf)
+        {getline(reader, linebuf);}
         content += linebuf + "\n"
     ;
     return content
 ;
 fn write_program string program, CompilerPath paths =>
-    ofstream file(paths.main_path_cpp)
+    let file = ofstream(paths.main_path_cpp)
     file << program
     file.close()
-;
-fn to_char_arr string s, char *buf => char*
-    for i until s.size() do buf[i] = s.at(i)
-    buf[s.size()] = '\0'
-    return buf
 ;
 fn compile_program CompilerPath paths, vector<string> arguments, bool is_release =>
     string base_cmd= "g++ "
@@ -38,8 +34,6 @@ fn compile_program CompilerPath paths, vector<string> arguments, bool is_release
     base_cmd += paths.output
     for i until arguments.size() do base_cmd += " " + arguments.at(i)
     println("compiling: " + base_cmd)
-    char cmd[base_cmd.size() + 1]
-    char cpp_path[paths.main_path_cpp.size() + 1]
-    system(to_char_arr(base_cmd, cmd))
-    remove(to_char_arr(paths.main_path_cpp, cpp_path))
+    system(base_cmd.c_str())
+    remove(paths.main_path_cpp.c_str())
 ;

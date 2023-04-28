@@ -2,11 +2,12 @@ inc => fstream, stdlib.h, vector, dirent.h, algorithm, unistd.h, sys/stat.h
 get => option, conditional
 
 fn read string path => Option<string>
-    string content, linebuf
-    ifstream reader(path)
+    string content
+    string linebuf
+    let reader = ifstream(path)
     if !reader doremi None<string>()
     while !reader.eof()
-        getline(reader, linebuf)
+        {getline(reader, linebuf);}
         content += linebuf + "\n"
     ;
     reader.close()
@@ -29,104 +30,67 @@ fn readlines string path => vector<string>
     return lines
 ;
 fn write string content, string path =>
-    ofstream file(path)
+    let file = ofstream(path)
     file << content
     file.close()
 ;
-fn system string command => bool
-    char command_arr[command.size() + 1]
-    for i until command.size() do command_arr[i] = command.at(i)
-    command_arr[command.size()] = '\0'
-    return !system(command_arr)
-;
+fn remove string path => do remove(path.c_str())
+fn system string command => bool doremi !system(command.c_str())
 fn system_output string command => vector<string>
     vector<string> output = {}
-    char command_arr[command.size() + 1]
-    for i until command.size() do command_arr[i] = command.at(i)
-    command_arr[command.size()] = '\0'
-
-    FILE* fp
-    char buffer[1064]
-    if (fp = popen(command_arr, "r")) == NULL
-        return output
-    ;
-    while fgets(buffer, sizeof(buffer), fp)
-        output.push_back(buffer)
-    ;
-    pclose(fp)
+    let fp = popen(command.c_str(), "r")
+    if fp == NULL doremi output
+    {
+        char buffer[1064];
+        while (fgets(buffer, sizeof(buffer), fp))
+            output.push_back(buffer);
+    }
+    {pclose(fp);}
     return output
 ;
-fn makedir string name => bool
-    char name_arr[name.size() + 1]
-    for i until name.size() do name_arr[i] = name.at(i)
-    name_arr[name.size()] = '\0'
-    return !mkdir(name_arr, S_IRWXU)
-;
-fn changedir string name => bool
-    char name_arr[name.size() + 1]
-    for i until name.size() do name_arr[i] = name.at(i)
-    name_arr[name.size()] = '\0'
-    return chdir(name_arr) >= 0
-;
+fn makedir string name => bool doremi mkdir(name.c_str(), S_IRWXU)
+fn changedir string name => bool doremi chdir(name.c_str())
 fn env string env_var => Option<string>
-    char env_var_arr[env_var.size() + 1]
-    for i until env_var.size() do env_var_arr[i] = env_var.at(i)
-    env_var_arr[env_var.size()] = '\0'
-    let e = getenv(env_var_arr)
+    let e = getenv(env_var.c_str())
     if e == NULL doremi None<string>()
     return Some((string)e)
 ;
 fn list_reg_files string path => vector<string>
     vector<string> files = {}
-    char path_arr[path.size() + 1]
-    for i until path.size() do path_arr[i] = path.at(i)
-    path_arr[path.size()] = '\0'
-    DIR *dir
     struct dirent *diread
-    if (dir = opendir(path_arr)) != nullptr
+    let dir = opendir(path.c_str())
+    if dir != nullptr
         while (diread = readdir(dir)) != nullptr
             if diread->d_type != DT_REG do continue
             files.push_back(diread->d_name)
         ;
-        closedir(dir)
+        {closedir(dir);}
     ;
-    sort(files.begin(), files.end())
+    {sort(files.begin(), files.end());}
     return files
 ;
 fn list_dirs string path => vector<string>
     vector<string> files = {}
-    char path_arr[path.size() + 1]
-    for i until path.size() do path_arr[i] = path.at(i)
-    path_arr[path.size()] = '\0'
-    DIR *dir
+    let dir = opendir(path.c_str())
     struct dirent *diread
-    if (dir = opendir(path_arr)) != nullptr
+    if dir != nullptr
         while (diread = readdir(dir)) != nullptr
             if diread->d_type != DT_DIR do continue
             files.push_back(diread->d_name)
         ;
-        closedir(dir)
+        {closedir(dir);}
     ;
-    sort(files.begin(), files.end())
+    {sort(files.begin(), files.end());}
     return files
 ;
 fn list_files string path => vector<string>
     vector<string> files = {}
-    char path_arr[path.size() + 1]
-    for i until path.size() do path_arr[i] = path.at(i)
-    path_arr[path.size()] = '\0'
-    DIR *dir
+    let dir = opendir(path.c_str())
     struct dirent *diread
-    if (dir = opendir(path_arr)) != nullptr
+    if dir != nullptr
         while (diread = readdir(dir)) != nullptr do files.push_back(diread->d_name)
-        closedir(dir)
+        {closedir(dir);}
     ;
-    sort(files.begin(), files.end())
+    {sort(files.begin(), files.end());}
     return files
-;
-fn remove string path =>
-    char path_arr[path.size() + 1]
-    for i until path.size() do path_arr[i] = path.at(i)
-    path_arr[path.size()] = '\0'
-    remove(path_arr)
 ;

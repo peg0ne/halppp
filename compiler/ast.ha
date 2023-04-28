@@ -36,9 +36,9 @@ fn ast_create string content => vector<AstToken>
             let is_part_of_adv = peeked == '&' || peeked == '<' || peeked == '!' || peeked == '|'
             let is_end_of_adv = third == '='
             if is_valid && is_part_of_adv && is_end_of_adv
-                string part_one(1, c)
-                string part_two(1, peeked)
-                string part_three(1, third)
+                let part_one = string(1, c)
+                let part_two = string(1, peeked)
+                let part_three = string(1, third)
                 let combined = part_one + part_two + part_three
                 id = try_add_token(combined, &ast, &peekable)
                 peekable.next()
@@ -51,7 +51,7 @@ fn ast_create string content => vector<AstToken>
             id = try_add_token(id, &ast, &peekable)
             doco ast.push_back(num)
         ;
-        string ch(1, c)
+        let ch = string(1, c)
         let is_white_space = any(c, {'\n', ' ', '\t'})
         let is_both_token = is_str_tokens(id) == is_char_token(c)
         if !is_both_token
@@ -102,25 +102,19 @@ fn is_str_tokens string s => bool
     ;
     return !Token_t(s).is_id()
 ;
-fn is_char_token char ch => bool
-    string s(1,ch)
-    return !Token_t(s).is_id()
-;
-fn is_char_number_t char ch => bool
-    string s(1,ch)
-    return Token_t(s).is_num()
-;
+fn is_char_token char ch => bool doremi !Token_t(string(1,ch)).is_id()
+fn is_char_number_t char ch => bool doremi Token_t(string(1,ch)).is_num()
 fn try_get_dbl Peekable<char> *peekable, char ch => Option<string>
     let peek = peekable->peek()
     if peek.is_none() || peek.value_or(' ') != ch doremi None<string>()
     peekable->next()
-    string dbl(1, ch)
+    let dbl = string(1, ch)
     return Some(dbl + dbl)
 ;
 
 fn get_pair Peekable<char> *peekable, char ch, char endch => string
     let escaped = false
-    string matching(1, ch)
+    let matching = string(1, ch)
     loop
         let c_opt = peekable->next()
         if c_opt.is_none() doremi matching
@@ -129,7 +123,7 @@ fn get_pair Peekable<char> *peekable, char ch, char endch => string
             matching += get_concat(peekable)
             continue
         ;
-        string matchbuf(1, c)
+        let matchbuf = string(1, c)
         if c == '\'' doco matching += get_matching(peekable, '\'')
         elif c == '"' doco matching += get_matching(peekable, '"')
         elif c == ch doco matching += get_pair(peekable, ch, endch)
@@ -140,12 +134,12 @@ fn get_pair Peekable<char> *peekable, char ch, char endch => string
 
 fn get_matching Peekable<char> *peekable, char ch => string
     let escaped = false
-    string matching(1, ch)
+    let matching = string(1, ch)
     loop
         let c_opt = peekable->next()
         if c_opt.is_none() doremi matching
         let c = c_opt.value_or(' ')
-        string matchbuf(1, c)
+        let matchbuf = string(1, c)
         matching += matchbuf
         if c == ch && !escaped doremi matching
         escaped = !escaped && c == '\\'
@@ -173,7 +167,7 @@ fn get_concat Peekable<char> *peekable => string
 ;
 
 fn collect_num Peekable<char> *peekable, char ch => AstToken
-    string num(1, ch)
+    let num = string(1, ch)
     let is_float = false
     let token = AstToken()
     loop
@@ -187,7 +181,7 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
         ;
         if peeked == '.' do is_float = true
         peekable->next()
-        string numbuf(1, peeked)
+        let numbuf = string(1, peeked)
         num += numbuf
     ;
 ;

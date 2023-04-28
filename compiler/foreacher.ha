@@ -1,11 +1,13 @@
-fn for_construct Compiler *compiler_t, bool is_foreach => Expression
+fn for_construct Compiler *compiler_t, bool is_foreach, vector<Variable> variables => Expression
     let for_def = For(is_foreach)
     let mid_checker = is_foreach ? Token::In : Token::Until
     for_def.iterator = get_id_or_exit(compiler_t, "[For] For loop is not closed")
+    variables.push_back(Variable(for_def.iterator, "TYPE"))
     if is_foreach
         if compiler_t->peek().value_or(AstToken("None")).token == Token::Comma
             get_next_or_exit(compiler_t, "[For] missing comma")
             for_def.named_variable = Some(get_id_or_exit(compiler_t, "[For] Requires identifier"))
+            select v from for_def.named_variable do variables.push_back(Variable(v, "TYPE"))
         ;
     ;
     get_or_exit(compiler_t, mid_checker, "[For] Missing keyword: " + to_string(mid_checker))
@@ -13,7 +15,7 @@ fn for_construct Compiler *compiler_t, bool is_foreach => Expression
     loop
         let x = get_next_or_exit(compiler_t, "[For] For loop is not closed")
         if x.is_do()
-            for_def.lines.push_back(expression_construct(compiler_t, x))
+            for_def.lines.push_back(expression_construct(compiler_t, x, variables))
             return Expression(for_def)
         ;
         if x.is_nl() do break
@@ -25,11 +27,22 @@ fn for_construct Compiler *compiler_t, bool is_foreach => Expression
         if x.is_nl() do continue
         switch x.token
             case Token::Foreach
-            case Token::For dobr for_def.lines.push_back(for_construct(compiler_t, x.token == Token::Foreach))
-            case Token::Condition dobr for_def.lines.push_back(condition_construct(compiler_t, x.name))
-            case Token::Switch dobr for_def.lines.push_back(switch_construct(compiler_t))
-            case Token::Select dobr for_def.lines.push_back(select_construct(compiler_t))
-            default dobr for_def.lines.push_back(expression_construct(compiler_t, x))
+            case Token::For dobr for_def.lines.push_back(for_construct(compiler_t, x.token == Token::Foreach, variables))
+            case Token::Condition dobr for_def.lines.push_back(condition_construct(compiler_t, x.name, variables))
+            case Token::Switch dobr for_def.lines.push_back(switch_construct(compiler_t, variables))
+            case Token::Select dobr for_def.lines.push_back(select_construct(compiler_t, variables))
+            default
+                let expr = expression_construct(compiler_t, x, variables)
+                for_def.lines.push_back(expr)
+                select declaration from expr.e_declaration
+                    foreach v in variables
+                        if v.id == declaration.id
+                            display_err_message("Variable has already been declared", compiler_t->to_err_message())
+                        ;
+                    ;
+                    variables.push_back(declaration)
+                ;
+                break
         ;
     ;
     return Expression(for_def)

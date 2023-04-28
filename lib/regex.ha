@@ -14,10 +14,10 @@ struct RegexMatch
 
 fn re string line, regex reg, int capture, vector<Vector> claimed => vector<RegexMatch>
     vector<RegexMatch> matches_str = {}
-    sregex_iterator current(line.begin(), line.end(), reg)
-    sregex_iterator last
+    let current = sregex_iterator(line.begin(), line.end(), reg)
+    (sregex_iterator) last
     while current != last
-        smatch match = *current
+        let match = *current
         if match.str(capture).size() != 0
             let pos = match.position(capture)
             let already_claimed = false
@@ -37,10 +37,10 @@ fn re string line, regex reg, int capture, vector<Vector> claimed => vector<Rege
 
 fn re string line, regex reg, int capture => vector<RegexMatch>
     vector<RegexMatch> matches_str = {}
-    sregex_iterator current(line.begin(), line.end(), reg)
-    sregex_iterator last
+    let current = sregex_iterator(line.begin(), line.end(), reg)
+    (sregex_iterator) last
     while current != last
-        smatch match = *current
+        let match = *current
         if match.str(capture).size() != 0
             matches_str.push_back(RegexMatch(match.str(capture), match.position(capture)))
         ;
@@ -51,11 +51,11 @@ fn re string line, regex reg, int capture => vector<RegexMatch>
 
 fn re string line, string rex, int capture => vector<RegexMatch>
     vector<RegexMatch> matches_str = {}
-    regex reg(rex)
-    sregex_iterator current(line.begin(), line.end(), reg)
-    sregex_iterator last
+    let reg = regex(rex)
+    let current = sregex_iterator(line.begin(), line.end(), reg)
+    (sregex_iterator) last
     while current != last
-        smatch match = *current
+        let match = *current
         if match.str(capture).size() != 0
             matches_str.push_back(RegexMatch(match.str(capture), match.position(capture)))
         ;

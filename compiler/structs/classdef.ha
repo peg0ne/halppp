@@ -5,6 +5,15 @@ struct Class
     vector<Function> functions = {}
     vector<Variable> variables = {}
     vector<string> templates = {}
+    vector<Variable> inherited_variables = {}
+    vector<Function> inherited_functions = {}
+    fn get_variables => vector<Variable>
+        let vec = variables
+        foreach v in inherited_variables do vec.push_back(v)
+        foreach f in functions do vec.push_back(Variable(f.id, "FUNC"))
+        foreach f in inherited_functions do vec.push_back(Variable(f.id, "FUNC"))
+        return vec
+    ;
     fn contains Variable v => bool
         foreach var in variables
             if var.id == v.id doremi true

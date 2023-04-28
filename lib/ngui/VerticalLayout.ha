@@ -19,11 +19,6 @@ class VerticalLayout => GroupedContainer
         _size = s
         _offset = o
     ;
-    pub fn draw Ncurses *n =>
-        if !is_active do return
-        update()
-        ((GroupedContainer*)this)->draw(n)
-    ;
     pub fn update =>
         double available_space = _size.y
         int offset = 0
@@ -54,5 +49,10 @@ class VerticalLayout => GroupedContainer
             c->SetSize(_size.x, c->Size().y)
             offset += c->Size().y
         ;
+    ;
+    pub fn draw Ncurses *n =>
+        if !is_active do return
+        update()
+        ((GroupedContainer*)this)->draw(n)
     ;
 ;

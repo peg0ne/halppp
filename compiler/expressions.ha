@@ -1,8 +1,16 @@
-fn expression_construct Compiler *compiler_t, AstToken first => Expression
+fn expression_construct Compiler *compiler_t, AstToken first, vector<Variable> local_scope => Expression
     string doing = EMPTY
     string expression = EMPTY
-    if first.token == Token::Let doremi get_let_expr(compiler_t)
-    if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t)
+    if first.token == Token::Let doremi get_let_expr(compiler_t, local_scope)
+    if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t, local_scope)
+    if first.token == Token::Type
+        let name = first.name
+        if try_get(compiler_t, Token::LessThan)
+            let temps = template_construct(compiler_t, true)
+            foreach t in temps do name += t
+        ;
+        return get_let_expr(compiler_t, local_scope, Some(name), true)
+    ;
     switch first.token
         case Token::Doco dobr doing = ";\ncontinue "
         case Token::Dobr dobr doing = ";\nbreak "
@@ -11,6 +19,26 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
         case Token::Doremi dobr expression = "\nreturn "
         case Token::Return dobr expression = "return "
         default dobr expression = first.name
+    ;
+    if first.token == Token::Id
+        let found = false
+        if String(first.name).starts_with("{") do found = true
+        if String(first.name).starts_with("(") do found = true
+        else
+            foreach v in local_scope
+                if v.id == first.name do found = true
+            ;
+            if !found
+                vector<string> c_stds = {
+                    "remove", "delete", "continue", "vector",
+                    "this", "break", "exit", "cin", "cout"
+                }
+                foreach stds in c_stds
+                    if stds == first.name do found = true
+                ;
+            ;
+        ;
+        if !found do display_err_message("[Expression] Variable not declared: " + first.name, compiler_t->to_err_message())
     ;
     loop
         let x = get_next_or_exit(compiler_t, "[Expression] Expression ended unexpectedly")
@@ -40,8 +68,13 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
     return Expression(expression)
 ;
 
-fn get_let_expr Compiler *compiler_t => Expression
+fn get_let_expr Compiler *compiler_t, vector<Variable> local_scope => Expression doremi get_let_expr(compiler_t, local_scope, None<string>(), false)
+fn get_let_expr Compiler *compiler_t, vector<Variable> local_scope, Option<string> type, bool is_type => Expression
     let id = get_id_or_exit(compiler_t, "[Let] Required id after let")
+    if is_type && try_get(compiler_t, Token::NewLine)
+        get_next_or_exit(compiler_t, "[Let] Expected Newline")
+        select t from type doremi Expression(Variable(id, t))
+    ;
     get_or_exit(compiler_t, Token::Equals,"[Let] Required equals after id")
     string variable_type = EMPTY
     string expression = EMPTY
@@ -66,12 +99,13 @@ fn get_let_expr Compiler *compiler_t => Expression
     elif token.is_char() do variable_type = "char "
     elif token.is_string() do variable_type = "string "
     else do variable_type = "auto "
+    select t from type do variable_type = t
     let v = Variable(id, variable_type, Some(value), VariableState::Private)
     expression += id + " = " + value
     return Expression(v)
 ;
 
-fn get_lambda_expr Compiler *compiler_t => Expression
+fn get_lambda_expr Compiler *compiler_t, vector<Variable> local_scope => Expression
     let id = get_id_or_exit(compiler_t, "[Lambda] Required id after >")
     string base = ""
     let has_return = false
@@ -103,7 +137,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
     let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
     if x.is_do()
         has_return = x.token == Token::Doremi
-        let expr = expression_construct(compiler_t, x)
+        let expr = expression_construct(compiler_t, x, {})
         base += expr.to_cpp(2)
     ;
     elif x.token == Token::NewLine
@@ -114,11 +148,11 @@ fn get_lambda_expr Compiler *compiler_t => Expression
             if x.is_nl() do continue
             switch x.token
             case Token::Foreach
-            case Token::For dobr base += for_construct(compiler_t, x.token == Token::Foreach).to_cpp(2)
-            case Token::Condition dobr base += condition_construct(compiler_t, x.name).to_cpp(2)
-            case Token::Switch dobr base += switch_construct(compiler_t).to_cpp(2)
-            case Token::Select dobr base += select_construct(compiler_t).to_cpp(2)
-            default dobr base += expression_construct(compiler_t, x).to_cpp(2)
+            case Token::For dobr base += for_construct(compiler_t, x.token == Token::Foreach, {}).to_cpp(2)
+            case Token::Condition dobr base += condition_construct(compiler_t, x.name, {}).to_cpp(2)
+            case Token::Switch dobr base += switch_construct(compiler_t, {}).to_cpp(2)
+            case Token::Select dobr base += select_construct(compiler_t, {}).to_cpp(2)
+            default dobr base += expression_construct(compiler_t, x, {}).to_cpp(2)
             ;
         ;
     ;

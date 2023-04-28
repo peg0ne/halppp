@@ -22,6 +22,13 @@ class GridLayout => VerticalLayout
         _offset = o
     ;
 pub
+    fn arrange_elements =>
+        if _rows.size() == 0 do return
+        foreach row in _rows do row->clear()
+        foreach i, ele in _grid_elements
+            _rows[i % _rows.size()]->add(ele)
+        ;
+    ;
     fn draw Ncurses *n =>
         if !is_active do return
         arrange_elements()
@@ -37,13 +44,6 @@ pub
     fn add_element IContainer* element =>
         _grid_elements.push_back(element)
         arrange_elements()
-    ;
-    fn arrange_elements =>
-        if _rows.size() == 0 do return
-        foreach row in _rows do row->clear()
-        foreach i, ele in _grid_elements
-            _rows[i % _rows.size()]->add(ele)
-        ;
     ;
     fn destruct =>
         foreach row in _rows do delete(row)

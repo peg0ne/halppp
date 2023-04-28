@@ -85,7 +85,14 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
             ;
         ;
         else
-            if !variable.has_type() doco variable.v_type = next.name
+            if !variable.has_type()
+                if next.name == "Args"
+                    for i until 3 do get_or_exit(compiler_t, Token::Member, "Expected Args...")
+                    variable.v_type = next.name + "..."
+                ;
+                else do variable.v_type = next.name
+                continue
+            ;
             if !variable.has_id() doco variable.id = next.name
             display_err_message(VAR_ERR_COM, compiler_t->to_err_message())
         ;

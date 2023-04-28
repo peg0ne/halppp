@@ -32,12 +32,21 @@ struct CompileOutput
 
 fn main =>
     let clap = Clap(argc, argv)
-    FpFn fpfn = get_folder_and_name(get_file_path(argc, argv))
+    let fpfn = get_folder_and_name(get_file_path(argc, argv))
     let paths = CompilerPath(get_file_path(argc, argv), fpfn.f_p, fpfn.f_n)
     let p = Program()
     let output = compile_main(paths, &p)
     write_program(output.content(), paths)
     if !clap.has("-t") do compile_program(paths, output.arguments, clap.has("-r"))
+;
+
+fn validate_compiled Compiler compiler, bool is_main =>
+    let has_main = false
+    foreach f in compiler.program->functions
+        if f.id == "main" dobr has_main = true
+    ;
+    if !has_main && is_main do display_hint_message("Main function is not present!")
+    if has_main && !is_main do display_hint_message("Main function not in main file")
 ;
 
 fn compile_main CompilerPath paths, Program *p => CompileOutput doremi compile(paths, p, true)
@@ -80,7 +89,9 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             output += "namespace " + id + "\n{\n"
         ;
         elif next.token == Token::Function
-            let fndef = function_construct(&compiler_t, VariableState::Public, false)
+            vector<Variable> variables = {}
+            foreach f in p->functions do variables.push_back(Variable(f.id, "FUNC"))
+            let fndef = function_construct(&compiler_t, VariableState::Public, false, variables)
             output += fndef.to_cpp(false)
             fnheaders += fndef.to_cpp_h()
         ;
@@ -104,7 +115,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
         elif next.token == Token::Get
             incs = imports_creation(&compiler_t, next)
             foreach i in incs
-                FpFn fpfn = get_folder_and_name(paths.folder_path + i + HA_SUFFIX)
+                let fpfn = get_folder_and_name(paths.folder_path + i + HA_SUFFIX)
                 let get_path = CompilerPath(paths.folder_path + i + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
                 let get_out = compile(get_path, p, false)
                 output += get_out.output
@@ -124,13 +135,4 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     if is_named do output += "\n}\n"
     validate_compiled(compiler_t, is_main)
     return CompileOutput(output, includes, headers, fnheaders, compiler_t.arguments)
-;
-
-fn validate_compiled Compiler compiler, bool is_main =>
-    let has_main = false
-    foreach f in compiler.program->functions
-        if f.id == "main" dobr has_main = true
-    ;
-    if !has_main && is_main do display_hint_message("Main function is not present!")
-    if has_main && !is_main do display_hint_message("Main function not in main file")
 ;

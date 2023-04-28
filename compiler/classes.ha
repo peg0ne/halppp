@@ -47,31 +47,28 @@ fn class_validate Class class_def, Compiler *compiler_t =>
     ;
 ;
 
-fn class_construct Compiler *compiler_t, bool is_struct, CompilerPath paths => Class
-    let class_def = Class()
-    class_def.is_struct = is_struct
-    
-    class_def.id = get_id_or_exit(compiler_t, c_err(ClassError::NoId))
-    // Set Inheritance Or Template
-    let next = get_next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
-    if next.token == Token::LessThan
-        class_def.templates = template_construct(compiler_t)
-        next = get_next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
-    ;
-    if next.token == Token::CoolArrow
-        class_def.inherit = Some(get_id_or_exit(compiler_t, c_err(ClassError::NoInheritor, class_def.id)))
-    ;
-    class_internal_declarations(compiler_t, is_struct, &class_def, paths)
-    class_validate(class_def, compiler_t)
-    compiler_t->add_class(class_def)
-    return class_def
-;
-
 fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *class_def, CompilerPath paths =>
     //Construct inner Class values
     let variable_state = !is_struct ? VariableState::Private : VariableState::Public
+    vector<Variable> variables = {}
+    let inherit_from = class_def->inherit
+    while inherit_from.is_some()
+        select i from inherit_from
+            foreach c in compiler_t->program->classes
+                if c.id == i
+                    foreach v in c.get_variables() do variables.push_back(v)
+                    inherit_from = c.inherit
+                    break
+                ;
+            ;
+        ;
+    ;
+    foreach f in compiler_t->program->functions do variables.push_back(Variable(f.id, "FUNC"))
     loop
         let next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+        let local_scope = variables
+        foreach v in class_def->variables do local_scope.push_back(v)
+        foreach func in class_def->functions do local_scope.push_back(Variable(func.id, "FUNC"))
         if next.token == Token::Extend
             get_arrow_or_exit(compiler_t, c_err(ClassError::Extend, class_def->id)) 
             let extends = imports_construct_impl(compiler_t)
@@ -79,19 +76,19 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
                 select content from read(paths.folder_path + extender + HA_SUFFIX)
                     let ast = ast_create(content)
                     let extend_compiler = Compiler(compiler_t->program, ast, 0)
-                    class_internal_declarations(&extend_compiler, is_struct, class_def, paths)
+                    {class_internal_declarations(&extend_compiler, is_struct, class_def, paths);}
                     continue
                 ;
                 c_err(ClassError::ExtendNotValid, extender, true, compiler_t->to_err_message())
             ;
         ;
         if next.token == Token::Function
-            let function = function_construct(compiler_t, variable_state, false, class_def->variables)
+            let function = function_construct(compiler_t, variable_state, false, local_scope)
             doco class_def->functions.push_back(function)
         ;
         elif any(next.token, {Token::Id, Token::Type})
             if next.name == class_def->id
-                let function = function_construct(compiler_t, VariableState::Public, true, class_def->variables)
+                let function = function_construct(compiler_t, VariableState::Public, true, local_scope)
                 function.return_value = Some(Variable(EMPTY, class_def->id))
                 doco class_def->functions.push_back(function)
             ;
@@ -110,4 +107,24 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
         default do break
         ;
     ;
+;
+
+fn class_construct Compiler *compiler_t, bool is_struct, CompilerPath paths => Class
+    let class_def = Class()
+    class_def.is_struct = is_struct
+    
+    class_def.id = get_id_or_exit(compiler_t, c_err(ClassError::NoId))
+    // Set Inheritance Or Template
+    let next = get_next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
+    if next.token == Token::LessThan
+        class_def.templates = template_construct(compiler_t)
+        next = get_next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
+    ;
+    if next.token == Token::CoolArrow
+        class_def.inherit = Some(get_id_or_exit(compiler_t, c_err(ClassError::NoInheritor, class_def.id)))
+    ;
+    class_internal_declarations(compiler_t, is_struct, &class_def, paths)
+    class_validate(class_def, compiler_t)
+    compiler_t->add_class(class_def)
+    return class_def
 ;

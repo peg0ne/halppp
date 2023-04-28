@@ -16,14 +16,6 @@ class CommandPallete
         Vector(COLS/2, 10),
         Vector(COLS/4, LINES/4))
     
-    CommandPallete =>
-        add_commands()
-        add_text_edits()
-        pallete_window.SetColor(-3)
-        pallete_search.SetColor(2)
-        pallete_window.add(&pallete_search)
-        pallete_window.add(&pallete_found)
-    ;
     fn add_commands =>
         commands.add(" exit", Command::Exit)
         commands.add(" mode normal", Command::ModeNormal)
@@ -61,6 +53,14 @@ class CommandPallete
         textedits.add(" lower case", TextEdit::Lower)
         textedits.add(" upper case", TextEdit::Upper)
         textedits.add(" toggle comment", TextEdit::CommentToggle)
+    ;
+    CommandPallete =>
+        add_commands()
+        add_text_edits()
+        pallete_window.SetColor(-3)
+        pallete_search.SetColor(2)
+        pallete_window.add(&pallete_search)
+        pallete_window.add(&pallete_found)
     ;
 pub
     fn show Ncurses *n => TextEditOrCommand

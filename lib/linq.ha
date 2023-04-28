@@ -16,7 +16,7 @@ pub
         return Linq<T>(temp)
     ;
     fn where_async<Func, ...Args> Func func, Args... args => Linq<T>
-        vector<future<bool>> temp_fut
+        vector<future<bool>> temp_fut = {}
         vector<T> temp = {}
         foreach ele in list do temp_fut.push_back(async(launch::async, func, ele, args...))
         foreach i, ele in list

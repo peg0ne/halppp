@@ -98,7 +98,7 @@ fn watch string type => int
         run(type)
         system("clear")
         println("=0.o= Do you want to exit? (y/n)")
-        cin >> key
+        {cin >> key;}
         if key == "y" doremi 1
     ;
     return 0
@@ -109,7 +109,7 @@ fn custom string argument => bool
     let lines = readlines("hamble.haml")
     bool isCommand = false
     foreach line in lines
-        String l = String(line)
+        let l = String(line)
         if l.starts_with("[commands]") do isCommand = true
         if l.starts_with("[rules]") do isCommand = false
         if l.starts_with("[dependencies]") do isCommand = false

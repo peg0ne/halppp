@@ -25,19 +25,19 @@ pub
         return false
     ;
     fn remove T key =>
-        vector<T> keys = {}
-        vector<U> values = {}
+        vector<T> keys_temp = {}
+        vector<U> values_temp = {}
         if !contains(key) do return
         let i = 0
         loop
             if i >= _keys.size() do break
             if _keys.at(i) == key doco i++
-            keys.push_back(_keys.at(i))
-            values.push_back(_values.at(i))
+            keys_temp.push_back(_keys.at(i))
+            values_temp.push_back(_values.at(i))
             i++
         ;
-        _keys = keys
-        _values = values
+        _keys = keys_temp
+        _values = values_temp
     ;
     fn add T key, U value =>
         if contains(key) do return

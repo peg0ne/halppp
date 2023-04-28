@@ -141,7 +141,7 @@ class Syntax
                     let pair = (short)color->try_get_value_of("color", 100.0)
                     let fg = (short)color->try_get_value_of("fg", 7.0)
                     let bg = (short)color->try_get_value_of("bg", 0.0)
-                    init_pair(pair, fg, bg)
+                    {init_pair(pair, fg, bg);}
                 ;
             ;
         ;

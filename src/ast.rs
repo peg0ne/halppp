@@ -22,6 +22,12 @@ pub fn create(content: &String) -> Vec<AstToken> {
             try_add_token(concat, &mut ast);
             continue;
         }
+        if c == '{' {
+            let string = collect_pair(&mut peekable, c, '}');
+            id = try_add_token(id, &mut ast);
+            try_add_token(string, &mut ast);
+            continue;
+        }
         if is_char_number(c) {
             let num = collect_num(&mut peekable, c);
             id = try_add_token(id, &mut ast);
@@ -151,6 +157,21 @@ fn collect_string(peekable: &mut Peekable<Chars>, ch: char) -> String {
         escaped = !escaped && c == '\\'
     }
     matching
+}
+
+fn collect_pair(peekable: &mut Peekable<Chars>, ch: char, endch: char) -> String {
+    let mut paired = String::from(ch);
+    loop {
+        let c = match peekable.next() {
+            None => return paired,
+            Some(c) => c,
+        };
+        paired.push(c);
+        if c == endch {
+            break;
+        }
+    }
+    paired
 }
 
 fn collect_num(peekable: &mut Peekable<Chars>, c: char) -> String {

@@ -53,11 +53,16 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
         let vnb = construct_args(compiler_t, true)
         if !vnb.variable.has_minimum() do break
         function.add_args(vnb.variable)
+        variables_in_func.push_back(vnb.variable)
         if vnb.is_end do break
     ;
     if function.id == "main"
-        function.add_args(Variable("argc", "int"))
-        function.add_args(Variable("argv[]", "char*"))
+        let argc = Variable("argc", "int")
+        let argv = Variable("argv[]", "char*")
+        function.add_args(argc)
+        function.add_args(argv)
+        variables_in_func.push_back(argc)
+        variables_in_func.push_back(argv)
         function.return_value = Some(Variable("", "int"))
         select peeked from compiler_t->peek()
             if peeked.token != Token::NewLine
@@ -72,31 +77,33 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     ;
     loop
         let x = get_next_or_exit(compiler_t, "Function is not closed " + function.id)
+        let local_scope = variables
+        foreach v in variables_in_func do local_scope.push_back(v)
         if any(x.token, {Token::SemiColon, Token::Eof}) do break
         if x.token == Token::Function dobr display_err_message("Function above is not closed " + function.id, compiler_t->to_err_message())
         if x.is_nl() do continue
         switch x.token
             case Token::Foreach
-            case Token::For dobr function.add_expr(for_construct(compiler_t, x.token == Token::Foreach))
-            case Token::Condition dobr function.add_expr(condition_construct(compiler_t, x.name))
-            case Token::Switch dobr function.add_expr(switch_construct(compiler_t))
-            case Token::Select dobr function.add_expr(select_construct(compiler_t))
+            case Token::For dobr function.add_expr(for_construct(compiler_t, x.token == Token::Foreach, local_scope))
+            case Token::Condition dobr function.add_expr(condition_construct(compiler_t, x.name, local_scope))
+            case Token::Switch dobr function.add_expr(switch_construct(compiler_t, local_scope))
+            case Token::Select dobr function.add_expr(select_construct(compiler_t, local_scope))
             default
-                let expr = expression_construct(compiler_t, x)
+                let expr = expression_construct(compiler_t, x, local_scope)
                 function.add_expr(expr)
                 select declaration from expr.e_declaration
                     foreach v in variables_in_func
-                        if v.id == declaration.id
+                        if v.id == declaration.id && v.v_type != "FUNC"
                             display_err_message("Multiple declarations with same name in function", compiler_t->to_err_message())
                         ;
                     ;
                     foreach v in variables
-                        if v.id == declaration.id
+                        if v.id == declaration.id && v.v_type != "FUNC"
                             display_err_message("Variable already declared in class", compiler_t->to_err_message())
                         ;
                     ;
                     foreach v in function.arguments
-                        if v.id == declaration.id
+                        if v.id == declaration.id && v.v_type != "FUNC"
                             display_err_message("Variable already declared in function arguments", compiler_t->to_err_message())
                         ;
                     ;

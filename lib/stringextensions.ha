@@ -192,18 +192,18 @@ pub
     fn split => vector<string> doremi split(None<char>())
     fn split char delimiter => vector<string> doremi split(Some(delimiter))
     fn split Option<char> delimiter => vector<string>
-        vector<string> split = {}
+        vector<string> split_vec = {}
         let delim = ' '
         select d from delimiter do delim = d
-        let splitting =  _value
+        let splitting = _value
         loop
             let found = splitting.find(delim)
             if found == -1 do break
-            split.push_back(splitting.substr(0, found))
+            split_vec.push_back(splitting.substr(0, found))
             splitting = splitting.substr(found + 1)
         ;
-        split.push_back(splitting)
-        return split
+        split_vec.push_back(splitting)
+        return split_vec
     ;
     fn contains string contains => bool doremi _value.find(contains) != -1
     fn starts_with string start => bool doremi _value.rfind(start, 0) == 0

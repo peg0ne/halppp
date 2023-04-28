@@ -28,7 +28,7 @@ fn json_tokenize_json string json => vector<JsonTokenized>
             break
         case '"'
             while iter.peek().is_some()
-                let ch = iter.next().value_or(' ')
+                ch = iter.next().value_or(' ')
                 if ch == '"' && !escaped do break
                 buf += string(1,ch)
                 if ch == '\\' do escaped = true
@@ -42,7 +42,7 @@ fn json_tokenize_json string json => vector<JsonTokenized>
         default
             buf = string(1,ch)
             while iter.peek().is_some()
-                let ch = iter.peek().value_or(' ')
+                ch = iter.peek().value_or(' ')
                 if ch == '.' && String(buf).to_num().is_some()
                     buf += string(1,ch)
                     iter.next()

@@ -1,4 +1,4 @@
-fn switch_construct Compiler *compiler_t => Expression
+fn switch_construct Compiler *compiler_t, vector<Variable> variables => Expression
     let cond = Condition("switch")
     let expression = ConditionalExpression()
     loop
@@ -13,11 +13,11 @@ fn switch_construct Compiler *compiler_t => Expression
         vector<Expression> result = {}
         switch x.token
             case Token::Default
-                result = create_case(compiler_t, x.token == Token::Default)
+                result = create_case(compiler_t, x.token == Token::Default, variables)
                 foreach i in result do cond.lines.push_back(i)
                 break
             case Token::Case
-                result = create_case(compiler_t, x.token == Token::Default)
+                result = create_case(compiler_t, x.token == Token::Default, variables)
                 foreach i in result do cond.lines.push_back(i)
                 break
             case Token::Eof dobr exit = true
@@ -30,7 +30,7 @@ fn switch_construct Compiler *compiler_t => Expression
     return Expression(cond)
 ;
 
-fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
+fn create_case Compiler *compiler_t, bool is_default, vector<Variable> variables => vector<Expression>
     vector<Expression> lines = {}
     string label = EMPTY
     if !is_default
@@ -62,12 +62,12 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
                 compiler_t->prev()
                 doremi lines
             case Token::Foreach
-            case Token::For dobr lines.push_back(for_construct(compiler_t, x.token == Token::Foreach))
-            case Token::Condition dobr lines.push_back(condition_construct(compiler_t, x.name))
-            case Token::Switch dobr lines.push_back(switch_construct(compiler_t))
-            case Token::Select dobr lines.push_back(select_construct(compiler_t))
+            case Token::For dobr lines.push_back(for_construct(compiler_t, x.token == Token::Foreach, variables))
+            case Token::Condition dobr lines.push_back(condition_construct(compiler_t, x.name, variables))
+            case Token::Switch dobr lines.push_back(switch_construct(compiler_t, variables))
+            case Token::Select dobr lines.push_back(select_construct(compiler_t, variables))
             case Token::NewLine do break
-            default dobr lines.push_back(expression_construct(compiler_t, x))
+            default dobr lines.push_back(expression_construct(compiler_t, x, variables))
         ;
     ;
 ;

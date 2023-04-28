@@ -9,7 +9,7 @@ struct AstToken
         this->token = t.t
     ;
     AstToken char ch =>
-        string buf(1,ch)
+        let buf = string(1,ch)
         this->name = buf
         this->t = Token_t(name)
         this->token = t.t

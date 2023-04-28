@@ -51,6 +51,7 @@ enum Token
     Let,
     LParen,
     MacroDefinition,
+    Member,
     MoreThan,
     MoreThanOrEquals,
     New,
@@ -135,6 +136,7 @@ struct Token_t
         elif s == TOKEN_LINE_COMMENT dore t = Token::Comment
         elif s == TOKEN_LPAREN dore t = Token::LParen
         elif s == TOKEN_MACRODEFINITION dore t = Token::MacroDefinition
+        elif s == TOKEN_MEMBER dore t = Token::Member
         elif s == TOKEN_MORETHAN dore t = Token::MoreThan
         elif s == TOKEN_MORETHANOREQUALS dore t = Token::MoreThanOrEquals
         elif s == TOKEN_NAMED dore t = Token::Named
@@ -164,7 +166,7 @@ struct Token_t
         elif any(s, {TOKEN_ZERO, TOKEN_ONE, TOKEN_TWO}) dore t = Token::Number
         elif any(s, {TOKEN_THREE, TOKEN_FOUR, TOKEN_FIVE}) dore t = Token::Number
         elif any(s, {TOKEN_SIX, TOKEN_SEVEN, TOKEN_EIGHT, TOKEN_NINE}) dore t = Token::Number
-        elif any(s, {TOKEN_INT, TOKEN_STR, TOKEN_STRING}) dore t = Token::Type
+        elif any(s, {TOKEN_INT, TOKEN_STR, TOKEN_STRING, TOKEN_SIZE_T, TOKEN_VECTOR, TOKEN_CHAR, TOKEN_BOOL, TOKEN_DOUBLE}) dore t = Token::Type
         t = Token::Id
     ;
     fn is_id => bool doremi t == Token::Id
