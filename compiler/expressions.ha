@@ -16,12 +16,12 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
         let x = get_next_or_exit(compiler_t, "[Expression] Expression ended unexpectedly")
         if x.token == Token::Eof dobr expression += doing
         if x.token == Token::NewLine
-            let is_member = false
             select peeked from compiler_t->peek()
-                let S = String(peeked.name)
-                is_member = S.starts_with(".") || S.starts_with("->")
+                if none(peeked.token, {Token::Period, Token::Pointer})
+                    expression += doing
+                    break
+                ;
             ;
-            if !is_member dobr expression += doing
         ;
         if any(x.token, {Token::Number, Token::Id}) do expression += " "
         if x.is_do() do expression += "\n"
