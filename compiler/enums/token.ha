@@ -59,6 +59,9 @@ enum Token
     NonEquality,
     Number,
     Or,
+    Period,
+    DoublePeriod,
+    TriplePeriod,
     Pointer,
     Private,
     Protected,
@@ -142,6 +145,9 @@ struct Token_t
         elif s == TOKEN_NEWLINE dore t = Token::NewLine
         elif s == TOKEN_NONEQUALITY dore t = Token::NonEquality
         elif s == TOKEN_OR dore t = Token::Or
+        elif s == TOKEN_PERIOD dore t = Token::Period
+        elif s == TOKEN_DOUBLE_PERIOD dore t = Token::DoublePeriod
+        elif s == TOKEN_TRIPLE_PERIOD dore t = Token::TriplePeriod
         elif s == TOKEN_POINTER dore t = Token::Pointer
         elif s == TOKEN_PRIVATE dore t = Token::Private
         elif s == TOKEN_PROTECTED dore t = Token::Protected

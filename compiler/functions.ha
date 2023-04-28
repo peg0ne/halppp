@@ -47,6 +47,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     let peeked_opt = compiler_t->peek()
     if peeked_opt.is_none() do display_err_message("Error when trying to parse function: " + function.id, compiler_t->to_err_message())
     if peeked_opt.value_or(AstToken("NONE")).token == Token::LessThan
+        compiler_t->next()
         function.templates = template_construct(compiler_t)
     ;
     loop

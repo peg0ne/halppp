@@ -40,6 +40,6 @@ fn compile_program CompilerPath paths, vector<string> arguments, bool is_release
     println("compiling: " + base_cmd)
     char cmd[base_cmd.size() + 1]
     char cpp_path[paths.main_path_cpp.size() + 1]
-    system(to_char_arr(base_cmd, cmd))
+    let _ = system(to_char_arr(base_cmd, cmd))
     remove(to_char_arr(paths.main_path_cpp, cpp_path))
 ;
