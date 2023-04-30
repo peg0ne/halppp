@@ -57,6 +57,7 @@ glob
     TOKEN_LOOP "loop"
     TOKEN_LPAREN "("
     TOKEN_MACRODEFINITION "def"
+    TOKEN_MATCH "match"
     TOKEN_MORETHAN ">"
     TOKEN_MORETHANOREQUALS ">="
     TOKEN_NAMED "named"

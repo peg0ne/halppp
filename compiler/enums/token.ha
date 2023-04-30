@@ -51,6 +51,7 @@ enum Token
     Let,
     LParen,
     MacroDefinition,
+    Match,
     MoreThan,
     MoreThanOrEquals,
     New,
@@ -138,6 +139,7 @@ struct Token_t
         elif s == TOKEN_LINE_COMMENT dore t = Token::Comment
         elif s == TOKEN_LPAREN dore t = Token::LParen
         elif s == TOKEN_MACRODEFINITION dore t = Token::MacroDefinition
+        elif s == TOKEN_MATCH dore t = Token::Match
         elif s == TOKEN_MORETHAN dore t = Token::MoreThan
         elif s == TOKEN_MORETHANOREQUALS dore t = Token::MoreThanOrEquals
         elif s == TOKEN_NAMED dore t = Token::Named

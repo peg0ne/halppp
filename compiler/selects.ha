@@ -22,10 +22,9 @@ fn select_construct Compiler *compiler_t => Expression
             case Token::Condition dobr select_def.lines.push_back(condition_construct(compiler_t, x.name))
             case Token::Switch dobr select_def.lines.push_back(switch_construct(compiler_t))
             case Token::Select dobr select_def.lines.push_back(select_construct(compiler_t))
+            case Token::Match dobr display_err_message("unhandled statement", compiler_t->to_err_message())
             default dobr select_def.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
     return Expression(select_def)
 ;
-
-
