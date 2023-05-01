@@ -1,4 +1,5 @@
-fn match_construct Compiler *compiler_t, bool is_let => Expression
+fn match_construct Compiler *compiler_t => Expression doremi match_construct(compiler_t, None<string>())
+fn match_construct Compiler *compiler_t, Option<string> id => Expression
     string matcher = EMPTY
     vector<string> statments = {}
     vector<MatchLines> internal = {}
@@ -19,7 +20,7 @@ fn match_construct Compiler *compiler_t, bool is_let => Expression
             break
         ;
     ;
-    return Expression(MatchDef(matcher, statments, internal, is_let))
+    return Expression(MatchDef(matcher, statments, internal, id))
 ; 
 
 fn match_statements Compiler *compiler_t => string

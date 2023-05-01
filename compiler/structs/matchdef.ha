@@ -10,13 +10,13 @@ struct MatchDef
     string matcher_expr = EMPTY
     vector<string> statments = {}
     vector<MatchLines> lines = {}
-    bool is_let = false
+    Option<string> id = None<string>()
     MatchDef => do return
-    MatchDef string matcher_expr, vector<string> statments, vector<MatchLines> lines, bool is_let =>
+    MatchDef string matcher_expr, vector<string> statments, vector<MatchLines> lines, Option<string> id =>
         this->matcher_expr = matcher_expr
         this->statments = statments
         this->lines = lines
-        this->is_let = is_let
+        this->id = id
     ;
     fn to_cpp => string
         string matcher = "{"
@@ -28,7 +28,14 @@ struct MatchDef
             elif statment != "_" do matcher += "elif (_match_expr_ == " + statment + ") {\n"
             else do matcher += "else {\n"
             let s_lines = lines[i]
-            foreach line in s_lines.lines do matcher += line + NEWLINE
+            foreach j, line in s_lines.lines
+                if j == s_lines.lines.size() - 1
+                    select returner from id
+                        matcher += returner + " = "
+                    ;
+                ;
+                matcher += line + NEWLINE
+            ;
             matcher += "}\n"
         ;
         matcher += "}\n"

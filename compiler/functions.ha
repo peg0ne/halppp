@@ -82,7 +82,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
             case Token::Condition dobr function.add_expr(condition_construct(compiler_t, x.name))
             case Token::Switch dobr function.add_expr(switch_construct(compiler_t))
             case Token::Select dobr function.add_expr(select_construct(compiler_t))
-            case Token::Match dobr display_err_message("unhandled statement", compiler_t->to_err_message())
+            case Token::Match dobr function.add_expr(match_construct(compiler_t))
             default
                 let expr = expression_construct(compiler_t, x)
                 function.add_expr(expr)

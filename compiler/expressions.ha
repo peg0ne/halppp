@@ -48,7 +48,8 @@ fn get_let_expr Compiler *compiler_t => Expression
     string value = EMPTY
     if try_get(compiler_t, Token::Match)
         get_next_or_exit(compiler_t, "Expected match")
-        display_err_message("unhandled statement", compiler_t->to_err_message())
+        let v = Variable(id, variable_type, Some(match_construct(compiler_t, Some(id)).to_cpp(2)), VariableState::Private)
+        return Expression(v)
     ;
     loop
         let x = get_next_or_exit(compiler_t, "LET exception")
@@ -122,7 +123,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
             case Token::Condition dobr base += condition_construct(compiler_t, x.name).to_cpp(2)
             case Token::Switch dobr base += switch_construct(compiler_t).to_cpp(2)
             case Token::Select dobr base += select_construct(compiler_t).to_cpp(2)
-            case Token::Match dobr display_err_message("unhandled statement", compiler_t->to_err_message())
+            case Token::Match dobr base += match_construct(compiler_t).to_cpp(2)
             default dobr base += expression_construct(compiler_t, x).to_cpp(2)
             ;
         ;
