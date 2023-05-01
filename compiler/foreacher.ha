@@ -29,7 +29,7 @@ fn for_construct Compiler *compiler_t, bool is_foreach => Expression
             case Token::Condition dobr for_def.lines.push_back(condition_construct(compiler_t, x.name))
             case Token::Switch dobr for_def.lines.push_back(switch_construct(compiler_t))
             case Token::Select dobr for_def.lines.push_back(select_construct(compiler_t))
-            case Token::Match dobr display_err_message("unhandled statement", compiler_t->to_err_message())
+            case Token::Match dobr for_def.lines.push_back(match_construct(compiler_t, false))
             default dobr for_def.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;

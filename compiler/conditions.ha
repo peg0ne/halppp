@@ -55,7 +55,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
             case Token::Condition dobr cond.lines.push_back(condition_construct(compiler_t, x.name))
             case Token::Switch dobr cond.lines.push_back(switch_construct(compiler_t))
             case Token::Select dobr cond.lines.push_back(select_construct(compiler_t))
-            case Token::Match dobr display_err_message("unhandled statement", compiler_t->to_err_message())
+            case Token::Match dobr cond.lines.push_back(match_construct(compiler_t, false))
             default dobr cond.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
