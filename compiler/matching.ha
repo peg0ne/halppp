@@ -16,6 +16,7 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
     loop
         statments.push_back(match_statements(compiler_t))
         internal.push_back(match_lines(compiler_t))
+        if try_get(compiler_t, Token::NewLine) do get_next_or_exit(compiler_t, "[Match] Missing new line")
         if try_get(compiler_t, Token::SemiColon)
             get_next_or_exit(compiler_t, "[Match] Missing ; at the end")
             break
