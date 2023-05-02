@@ -46,7 +46,7 @@ fn match_lines Compiler *compiler_t => MatchLines
     loop
         if x.token == Token::SemiColon do break
         if x.token == Token::Eof do break
-        if x.token == Token::NewLine do continue
+        if x.token == Token::NewLine doco x = get_next_or_exit(compiler_t, "[Match] expected some expression")
         lines.lines.push_back(expression_construct(compiler_t, x).to_cpp(2))
         x = get_next_or_exit(compiler_t, "[Match] expected some expression")
     ;
