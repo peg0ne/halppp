@@ -162,7 +162,7 @@
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(if|else|elif|select|switch|while|loop|for|foreach)(?=$|\W)"
+            "expr": "(?:^|\W)(if|else|elif|match|select|switch|while|loop|for|foreach)(?=$|\W)"
         },
         {
             "color": 1,
@@ -245,6 +245,7 @@
         "else",
         "elif",
         "select",
+        "match",
         "switch",
         "while",
         "loop",

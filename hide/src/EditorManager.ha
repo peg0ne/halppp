@@ -59,7 +59,6 @@ class EditorManager => IContent
         select space from _activeSpace
     
         let size = space->containers()->size()
-
         switch dir
         case Dir::Left
             if index == 0 dobr index = size - 1
