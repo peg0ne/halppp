@@ -268,10 +268,10 @@ pub
         if s.size() == 0 do return ""
         let matches = re(s, R"(([A-z_]*))", 1)
         let matching = ""
-        foreach match in matches
-            if match.position > _selector.x do continue
-            if match.match.size() + match.position < _selector.x do continue
-            matching = match.match
+        foreach m in matches
+            if m.position > _selector.x do continue
+            if m.reg_match.size() + m.position < _selector.x do continue
+            matching = m.reg_match
             break
         ;
         if should_move do find(matching, is_reverse)
@@ -287,10 +287,10 @@ pub
         let reg = regex($"(^|\\W)({matching})($|\\W)")
         let s = _text.at(_selector.y)
         let matches = re(s, reg, 2)
-        foreach match in matches
-            if match.position <= _selector.x && !is_reverse do continue
-            elif match.position == _selector.x do continue
-            _selector.x = match.position
+        foreach m in matches
+            if m.position <= _selector.x && !is_reverse do continue
+            elif m.position == _selector.x do continue
+            _selector.x = m.position
             if is_replace
                 for i until matching.size()
                     remove_ch(&_selector)
@@ -393,15 +393,15 @@ pub
         ;
         foreach line in _text
             let matches = re(line, reg, 2)
-            foreach match in matches
-                if match.match == suggestion do continue
+            foreach m in matches
+                if m.reg_match == suggestion do continue
                 let found_already = false
                 foreach um in unique_matches
-                    if um == match.match do found_already = true
+                    if um == m.reg_match do found_already = true
                 ;
                 if found_already do continue
-                unique_matches.push_back(match.match)
-                if match.match.size() > width do width = match.match.size()
+                unique_matches.push_back(m.reg_match)
+                if m.reg_match.size() > width do width = m.reg_match.size()
             ;
         ;
         if unique_matches.size() == 0 do return

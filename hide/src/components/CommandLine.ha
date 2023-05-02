@@ -26,10 +26,8 @@ pub
         let s = String(_line)
         s.remove(0)
         _line = s.to_string()
-        let match = linq::take(_buffer).where([this](string b){return _line == b;}).first()
-        if match.is_none()
-            _buffer.push_back(_line)
-        ;
+        let m = linq::take(_buffer).where([this](string b){return _line == b;}).first()
+        if m.is_none() do _buffer.push_back(_line)
         if _line == "q" doremi update_return(Command::CloseEditor)
         elif _line == "q!" doremi update_return(Command::CloseEditorForced)
         elif _line == "w" doremi update_return(Command::WriteEditor)

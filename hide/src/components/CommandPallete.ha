@@ -64,7 +64,7 @@ class CommandPallete
     ;
 pub
     fn show Ncurses *n => TextEditOrCommand
-        let match = ""
+        let matcher = ""
         let offset = 0
         search = ""
         pos = 0
@@ -88,9 +88,9 @@ pub
             case 27 doremi Command::ModeNormal
             case '\n'
                 if pos >= buf.size() do break
-                match = buf.at(pos)
-                select cmd from commands.try_get_value(match) doremi TextEditOrCommand(cmd)
-                select edit from textedits.try_get_value(match) doremi TextEditOrCommand(edit)
+                matcher = buf.at(pos)
+                select cmd from commands.try_get_value(matcher) doremi TextEditOrCommand(cmd)
+                select edit from textedits.try_get_value(matcher) doremi TextEditOrCommand(edit)
                 break
             case '\b'
             case 127

@@ -44,9 +44,9 @@ pub
             ;
             foreach part in custom
                 let matches = re(line, part.expr, part.capture)
-                foreach match in matches
-                    let start = match.position + offset.x
-                    let len = match.match.size()
+                foreach m in matches
+                    let start = m.position + offset.x
+                    let len = m.reg_match.size()
                     if start > end do continue
                     if start + len > end
                         len = end - start

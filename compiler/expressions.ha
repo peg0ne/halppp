@@ -3,14 +3,25 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
     string expression = EMPTY
     if first.token == Token::Let doremi get_let_expr(compiler_t)
     if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t)
-    switch first.token
-        case Token::Doco dobr doing = ";\ncontinue "
-        case Token::Dobr dobr doing = ";\nbreak "
-        case Token::Dore do doing = ";\nreturn "
-        case Token::Do dobr expression = "\n"
-        case Token::Doremi dobr expression = "\nreturn "
-        case Token::Return dobr expression = "return "
-        default dobr expression = first.name
+    if first.token == Token::Id && try_get(compiler_t, Token::Equals)
+        let t = get_next_or_exit(compiler_t, "[Expression] Expected =")
+        expression = first.name   
+        expression += t.name
+        if try_get(compiler_t, Token::Match)
+            get_next_or_exit(compiler_t, "[Expression] Expected match")
+            return match_construct(compiler_t, Some(first.name), false)
+        ;
+    ;
+    else
+        switch first.token
+            case Token::Doco dobr doing = ";\ncontinue "
+            case Token::Dobr dobr doing = ";\nbreak "
+            case Token::Dore do doing = ";\nreturn "
+            case Token::Do dobr expression = "\n"
+            case Token::Doremi dobr expression = "\nreturn "
+            case Token::Return dobr expression = "return "
+            default dobr expression = first.name
+        ;
     ;
     loop
         let x = get_next_or_exit(compiler_t, "[Expression] Expression ended unexpectedly")
@@ -48,8 +59,7 @@ fn get_let_expr Compiler *compiler_t => Expression
     string value = EMPTY
     if try_get(compiler_t, Token::Match)
         get_next_or_exit(compiler_t, "Expected match")
-        let v = Variable(id, variable_type, Some(match_construct(compiler_t, Some(id)).to_cpp(2)), VariableState::Private)
-        return Expression(v)
+        return match_construct(compiler_t, Some(id), true)
     ;
     loop
         let x = get_next_or_exit(compiler_t, "LET exception")

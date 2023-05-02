@@ -21,42 +21,42 @@ fn error_checker Syntax* syntax, IContainer* container, Ncurses *n, string path,
             if rule.type == "starts_with" && !s.starts_with(rule.value) do continue
             if rule.type == "contains" && !s.contains(rule.value) do continue
             let matches = re(line, rule.expr, rule.capture)
-            foreach match in matches
-                if rule.validation_type == "file_exists" doco file_exists_error_check(n, match, offset, size, y, path_dir, line)
-                if rule.validation_type == "equals" doco equals_error_check(n, match, offset, size, y, rule.validation_value, line)
+            foreach m in matches
+                if rule.validation_type == "file_exists" doco file_exists_error_check(n, m, offset, size, y, path_dir, line)
+                if rule.validation_type == "equals" doco equals_error_check(n, m, offset, size, y, rule.validation_value, line)
             ;
         ;
         y++
     ;
 ;
 
-fn file_exists_error_check Ncurses *n, RegexMatch match, Vector offset, Vector size, int y, string path_dir, string line =>
-    let start = match.position + offset.x
+fn file_exists_error_check Ncurses *n, RegexMatch r_match, Vector offset, Vector size, int y, string path_dir, string line =>
+    let start = r_match.position + offset.x
     let end = size.x + offset.x
-    let len = match.match.size()
+    let len = r_match.reg_match.size()
     if start > end do return
     if start + len > end do len = end - start
     select home from env("HOME")
-        select f from read($"{home}/.local/lib/halppp/{match.match}.ha") do return
-        select f from read($"{path_dir}{match.match}.ha") do return
+        select f from read($"{home}/.local/lib/halppp/{r_match.reg_match}.ha") do return
+        select f from read($"{path_dir}{r_match.reg_match}.ha") do return
         n->underline_until(y + offset.y, start, 256, len)
         n->mark_until(y + offset.y, offset.x-5, 256, 5)
     ;
     n->col(1)
-    n->add_until(y + offset.y, line.size() + offset.x + 1, $"◉ CANNOT FIND FILE {match.match}", end, true)
+    n->add_until(y + offset.y, line.size() + offset.x + 1, $"◉ CANNOT FIND FILE {r_match.reg_match}", end, true)
     n->col(1,false)
 ;
 
-fn equals_error_check Ncurses *n, RegexMatch match, Vector offset, Vector size, int y, string validation_value, string line =>
-    if match.match == validation_value do return
-    let start = match.position + offset.x
+fn equals_error_check Ncurses *n, RegexMatch r_match, Vector offset, Vector size, int y, string validation_value, string line =>
+    if r_match.reg_match == validation_value do return
+    let start = r_match.position + offset.x
     let end = size.x + offset.x
-    let len = match.match.size()
+    let len = r_match.reg_match.size()
     if start > end do return
     if start + len > end do len = end - start
     n->underline_until(y + offset.y, start, 256, len)
     n->mark_until(y + offset.y, offset.x-5, 256, 5)
     n->col(1)
-    n->add_until(y + offset.y, line.size() + offset.x + 1, $"◉ Invalid token found \"{match.match}\" expected \"{validation_value}\"", end, true)
+    n->add_until(y + offset.y, line.size() + offset.x + 1, $"◉ Invalid token found \"{r_match.reg_match}\" expected \"{validation_value}\"", end, true)
     n->col(1,false)
 ;
