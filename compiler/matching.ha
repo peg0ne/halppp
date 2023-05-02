@@ -20,7 +20,7 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
             get_next_or_exit(compiler_t, "[Match] Missing ; at the end")
             break
         ;
-        elif try_get(compiler_t, Token::Eof) do display_err_message("[Match] Unclosed match statement")
+        elif try_get(compiler_t, Token::Eof) do display_err_message("[Match] Unclosed match statement", compiler_t->to_err_message())
     ;
     return Expression(MatchDef(matcher, statments, internal, id, is_let))
 ; 
