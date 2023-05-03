@@ -10,11 +10,11 @@ pub fn templates =>
         if templates.size() == 0 do return
         let template_index = 0
         loop
-            container.draw(n)
-            n->mark_until(
+            container.draw()
+            Ncurses::mark_until(
                 container.Offset() + Vector(0, template_index),
                 4, container.Size().x, true)
-            let key = n->key()
+            let key = Ncurses::key()
             if key == '\n' do break
             if key == 27 do return
             switch key
@@ -37,7 +37,7 @@ pub fn templates =>
             ;
             while s.starts_with("$")
                 loop
-                    let key = n->key()
+                    let key = Ncurses::key()
                     if key == 127 do break
                     elif key =|= '\n' : ' ' dobr draw(6)
                     elif key == KEY_BACKSPACE

@@ -15,7 +15,7 @@ fn lgrep => vector<string>
     return files
 ;
 
-fn Lgrep Ncurses* n => Option<string>
+fn Lgrep => Option<string>
     let key = 0
     let pos = 0
     let search = ""
@@ -49,7 +49,7 @@ fn Lgrep Ncurses* n => Option<string>
         content.SetContent(buf)
         if pos >= buf.size()
             view.SetContent(List<string>())
-            main.draw(n)
+            main.draw()
         ;
         else
             
@@ -57,17 +57,17 @@ fn Lgrep Ncurses* n => Option<string>
                 .operate_async([&view](string line){return line.substr(0, view.Size().x);}).as_list()
             view.SetContent(lines)
             let h = Highlighter(buf.at(pos))
-            main.draw(n)
-            h.highlight(&view, n)
+            main.draw()
+            h.highlight(&view)
         ;
         let count_info = $"{buf.len()}/{files.len()}"
-        n->add(search_bar.Offset().y,
+        Ncurses::add(search_bar.Offset().y,
             search_bar.Offset().x + search_bar.Size().x - count_info.size(),
             count_info)
-        n->mark_until(content.Offset().y + pos,
+        Ncurses::mark_until(content.Offset().y + pos,
             content.Offset().x,
             5, content.Size().x)
-        key = n->key()
+        key = Ncurses::key()
         switch key
         case 27 doremi None<string>()
         case KEY_DOWN dobr pos++

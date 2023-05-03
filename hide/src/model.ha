@@ -4,15 +4,14 @@ get => EditorManager
 get => components/[Explorer, CommandLine, ModeView, Terminal]
 
 class Model => MainContainer
-    Ncurses n = Ncurses()
     IContainer _line = IContainer(Fill::Flex)
     HorizontalLayout _top = HorizontalLayout(Fill::Flex)
     HorizontalLayout _status = HorizontalLayout(Fill::Static, Vector(0,1))
-    Terminal _term = Terminal(&n)
-    Explorer _explorer = Explorer(&n)
-    ModeView _mode_view = ModeView(&n)
-    EditorManager _manager = EditorManager(&n, &_line)
-    CommandLine _command_line = CommandLine(&n, &_manager)
+    Terminal _term = Terminal()
+    Explorer _explorer = Explorer()
+    ModeView _mode_view = ModeView()
+    EditorManager _manager = EditorManager(&_line)
+    CommandLine _command_line = CommandLine(&_manager)
 
     Model int argc, char **argv =>
         mousemask(ALL_MOUSE_EVENTS, NULL)
@@ -36,12 +35,12 @@ class Model => MainContainer
         ;
 
         update()
-        draw(&n)
+        draw()
     ;
 pub
     fn render =>
         update()
-        draw(&n)
+        draw()
         _explorer.draw()
         _manager.draw()
     ;
@@ -70,7 +69,7 @@ pub
         //Ye ol commands
         switch cmd
         case Command::Exit
-            n.stop()
+            Ncurses::stop()
             return true
         case Command::ModeFileEx dobr _mode_view.set(Mode::FileEx)
         case Command::ModeCmdHan dobr _mode_view.set(Mode::CmdHan)

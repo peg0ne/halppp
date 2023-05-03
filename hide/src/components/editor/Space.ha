@@ -21,10 +21,10 @@ private fn run_space => Command
         show.add_element(ele)
     ;
     for i until 4 do show.add_row()
-    show.draw(n)
+    show.draw()
     show.destruct()
     let result = TextEditOrCommand(Command::Nop)
-    switch n->key()
+    switch Ncurses::key()
     case 'f' doremi Command::ModeFileEx
     case 't' doremi Command::SplitHorizontal
     case 'T' doremi Command::Terminal
@@ -36,12 +36,12 @@ private fn run_space => Command
     case 'c' dobr text_editing(TextEdit::CommentToggle)
     case 'P' dobr paste_from_clip()
     case 'p'
-        result = _command_pallete->show(n)
+        result = _command_pallete->show()
         select edit from result.textedit do text_editing(edit)
         select command from result.command doremi command
         break
     case 's' 
-        select fp from Lgrep(n) do open(fp)
+        select fp from Lgrep() do open(fp)
         break
     ;
     return Command::ModeNormal

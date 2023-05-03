@@ -5,7 +5,6 @@ struct TreeSitterBlock
     Vector max = Vector()
     TreeSitterBlock string block =>
         let pieces = String(block).split(' ')
-        let n = Ncurses()
         if pieces.size() < 5 do return
         this->info = pieces[0]
         let extra = pieces.size() == 6 ? 1 : 0
@@ -33,13 +32,11 @@ class TreeSitter
     string path = ""
     string text = ""
     List<string> lines = List<string>()
-    Ncurses *n
     Syntax *syntax
-    TreeSitter IContainer *container, Ncurses *n, string path, List<string> text, Vector internal_offset, Syntax *s =>
+    TreeSitter IContainer *container, string path, List<string> text, Vector internal_offset, Syntax *s =>
         this->internal_offset = internal_offset
         this->offset = container->Offset()
         this->size = container->Size()
-        this->n = n
         this->syntax = s
         this->path = $"temp_tree_sitter.{s->file_type()}"
         this->lines = text
@@ -98,11 +95,11 @@ pub
             if b.max.y > b.min.y do b.max.x = line.size()
             if b.min.y >= size.y + internal_offset.y do break
             if b.min.y < internal_offset.y do continue
-            n->underline_until(b.min + offset - internal_offset, 256, b.max.x - b.min.x)
-            n->mark_until(offset + Vector(-5, b.min.y - internal_offset.y), 256, 5)
-            n->col(1)
-            n->add_until(offset + Vector(line.size() + 1, b.min.y - internal_offset.y), $"◉ {b.info} {b.target}", end, true)
-            n->col(1,false)
+            Ncurses::underline_until(b.min + offset - internal_offset, 256, b.max.x - b.min.x)
+            Ncurses::mark_until(offset + Vector(-5, b.min.y - internal_offset.y), 256, 5)
+            Ncurses::col(1)
+            Ncurses::add_until(offset + Vector(line.size() + 1, b.min.y - internal_offset.y), $"◉ {b.info} {b.target}", end, true)
+            Ncurses::col(1,false)
         ;
         remove(path)
     ;

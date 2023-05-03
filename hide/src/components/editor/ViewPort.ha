@@ -17,7 +17,7 @@ pub fn bot_on_cursor => Command
 ;
 
 private fn run_z => Command
-    switch n->key()
+    switch Ncurses::key()
     case 'z'
     case '.' doremi center_on_cursor()
     case 'b' doremi bot_on_cursor()
