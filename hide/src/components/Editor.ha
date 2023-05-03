@@ -18,7 +18,7 @@ class Editor => IContent
     IContainer *_status_line
     CommandPallete *_command_pallete
     Mode _current_mode = Mode::Normal
-    Editor Ncurses *n, string path, vector<string> *shared_buffer, IContainer *status_line, CommandPallete *command_pallete =>
+    Editor string path, vector<string> *shared_buffer, IContainer *status_line, CommandPallete *command_pallete =>
         _origin = new VerticalLayout()
         _highlighter = Some(new Highlighter(path))
         _status_line = status_line
@@ -34,7 +34,6 @@ class Editor => IContent
         _origin->add(_base)
         _shared_buffer = shared_buffer
         open(path)
-        this->n = n
     ;
     fn json_path => string doremi $"{_path}.json"
 pub 
@@ -99,7 +98,7 @@ pub
         //Header
         _header->SetColor(color)
         _header->SetLabel($"| {_path}")
-        _header->draw(n)
+        _header->draw()
 
         //Status
         vector<string> progress = {"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"}
@@ -107,7 +106,7 @@ pub
         int current = 7*percent
         let cp = progress[min(current,7)]
         _status_line->SetLabel($" ◁ {_path} $ [{_selector.x},{_selector.y + 1}] {cp}{cp}")
-        _status_line->draw(n)
+        _status_line->draw()
 
         //Lines
         let vec = List<string>()
@@ -118,7 +117,7 @@ pub
             vec.add(to_string(num))
         ;
         _lines->SetContent(vec)
-        _lines->draw(n)
+        _lines->draw()
 
         //Content
         > is_within internal_offset (string text, int i) doremi i >= internal_offset.y
@@ -126,11 +125,11 @@ pub
         let buf = linq::take(_text).where_with_iterator(is_within).operate_async(catch_text).as_list()
 
         _content->SetContent(buf)
-        _content->draw(n)
+        _content->draw()
         select highlighter from _highlighter
-            highlighter->highlight(_content, n)
-            highlighter->highlight(_status_line, n, true, -2)
-            if _check_errors do highlighter->error_check(_content, n, _path, _text, internal_offset)
+            highlighter->highlight(_content)
+            highlighter->highlight(_status_line, true, -2)
+            if _check_errors do highlighter->error_check(_content, _path, _text, internal_offset)
         ;
 
         mark_selections(is_current, internal_offset)
@@ -141,11 +140,11 @@ pub
         let vec = offset + _selector - internal_offset
         foreach s in _selections
             let s_vec = offset + s - internal_offset
-            n->mark(s_vec, 5)
+            Ncurses::mark(s_vec, 5)
         ;
-        n->mark_until(vec.y, offset.x - 5, 2, 5, true)
-        if _current_mode == Mode::Insert do n->move_curs(vec)
-        else do n->mark(vec, 4)
+        Ncurses::mark_until(vec.y, offset.x - 5, 2, 5, true)
+        if _current_mode == Mode::Insert do Ncurses::move_curs(vec)
+        else do Ncurses::mark(vec, 4)
     ;
     fn to_complete_str => string
         let content = ""
@@ -426,25 +425,25 @@ pub
             foreach um in unique_matches
                 if matching_index + 1 + positioned_y >= _content->Size().y - 1 do break
                 let y = offset.y + positioned_y + matching_index - reverse + 1
-                n->add_col(y, x - 1, "│", 1)
-                n->add_col(y, x + width, "│", 1)
-                n->col(selected == matching_index ? 4 : 0)
-                n->add_until(
+                Ncurses::add_col(y, x - 1, "│", 1)
+                Ncurses::add_col(y, x + width, "│", 1)
+                Ncurses::col(selected == matching_index ? 4 : 0)
+                Ncurses::add_until(
                     y, x, um,
                     _content->Size().x + offset.x - 1,
                     false)
                 for i until width - um.size()
                     if x + um.size() + i >= _content->Size().x + offset.x do break
-                    n->add(y, x + um.size() + i, " ")
+                    Ncurses::add(y, x + um.size() + i, " ")
                 ;
-                n->col(selected == matching_index ? 4 : 0, false)
+                Ncurses::col(selected == matching_index ? 4 : 0, false)
                 matching_index++
             ;
             let box_str = ""
             for i until width do box_str += "─"
-            n->add_col(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐", 1)
-            n->add_col(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘", 1)
-            let key = n->key()
+            Ncurses::add_col(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐", 1)
+            Ncurses::add_col(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘", 1)
+            let key = Ncurses::key()
             switch key
             case KEY_BTAB
             case 27 do return
@@ -510,7 +509,7 @@ pub
             ;
         ;
         let cmd = Command::Nop
-        let key = n->key()
+        let key = Ncurses::key()
         if !run_all(key)
             switch _current_mode
             case Mode::Normal dobr cmd = run_nor(key)

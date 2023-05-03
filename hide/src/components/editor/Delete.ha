@@ -17,7 +17,7 @@ private fn delete_word Vector *pos, bool spacebreak = false =>
 
 private fn run_d => Command
     let edit_cmd = Option<TextEdit>()
-    switch n->key()
+    switch Ncurses::key()
     case 'd' dobr edit_cmd = Some(TextEdit::DeleteLine)
     case 'w' dobr edit_cmd = Some(TextEdit::DeleteWord)
     case 'e' dobr edit_cmd = Some(TextEdit::DeleteWordExlusive)

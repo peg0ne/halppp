@@ -14,10 +14,10 @@ class MainContainer => VerticalLayout
         _size = Vector(COLS - (_offset.x * 2), LINES - (_offset.y * 2))
         ((VerticalLayout*)this)->update()
     ;
-    pub fn draw Ncurses *n =>
+    pub fn draw =>
         if !is_active do return
         update()
-        ((IContainer*)this)->draw(n)
-        foreach c in _containers do draw_container_impl(c,n)
+        ((IContainer*)this)->draw()
+        foreach c in _containers do draw_container_impl(c)
     ;
 ;

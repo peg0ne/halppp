@@ -63,7 +63,7 @@ class CommandPallete
         textedits.add(" toggle comment", TextEdit::CommentToggle)
     ;
 pub
-    fn show Ncurses *n => TextEditOrCommand
+    fn show => TextEditOrCommand
         let matcher = ""
         let offset = 0
         search = ""
@@ -77,9 +77,9 @@ pub
                 .where(is_found)
                 .where_with_iterator(is_within).as_list()
             pallete_found.SetContent(buf)
-            pallete_window.draw(n)
-            n->mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)
-            let key = n->key()
+            pallete_window.draw()
+            Ncurses::mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)
+            let key = Ncurses::key()
             switch key
             case KEY_DOWN dobr pos++
             case KEY_UP dobr pos--

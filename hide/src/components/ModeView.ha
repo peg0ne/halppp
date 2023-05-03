@@ -1,10 +1,9 @@
 class ModeView => IContent
     string _line = ""
     Mode _mode = Mode::FileEx
-    ModeView Ncurses *n =>
+    ModeView =>
         _origin = new IContainer(Fill::Static, Vector(10,0))
         _origin->SetColor(5)
-        this->n = n
         set(_mode)
     ;
 pub 
