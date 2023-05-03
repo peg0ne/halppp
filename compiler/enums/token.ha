@@ -72,6 +72,7 @@ enum Token
     Return,
     RParen,
     SemiColon,
+    Static,
     String,
     Struct,
     Sub,
@@ -160,6 +161,7 @@ struct Token_t
         elif s == TOKEN_RPAREN dore t = Token::RParen
         elif s == TOKEN_SEMICOLON dore t = Token::SemiColon
         elif s == TOKEN_SELECT dore t = Token::Select
+        elif s == TOKEN_STATIC dore t = Token::Static
         elif s == TOKEN_STRUCT dore t = Token::Struct
         elif s == TOKEN_SUB dore t = Token::Sub
         elif s == TOKEN_SUM dore t = Token::Sum

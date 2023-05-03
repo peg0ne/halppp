@@ -5,6 +5,7 @@ struct Function
     vector<Variable> arguments = {}
     vector<Expression> expressions = {}
     vector<string> templates = {}
+    bool staticness = false
     Function VariableState state =>
         this->variable_state = state
     ;
@@ -17,6 +18,7 @@ struct Function
             fun_str += i + 1 < templates.size() ? TEMPLATE_MID : TEMPLATE_END
         ;
         fun_str += in_class ? TAB : EMPTY
+        if staticness do fun_str += " static "
         fun_str += return_value.value_or(Variable(true)).v_type
         fun_str += SPACE + id + LPAREN
         for i until arguments.size()

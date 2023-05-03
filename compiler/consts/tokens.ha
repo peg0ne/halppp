@@ -79,6 +79,7 @@ glob
     TOKEN_SEVEN "7"
     TOKEN_SIX "6"
     TOKEN_STR "str"
+    TOKEN_STATIC "static"
     TOKEN_STRING "string"
     TOKEN_STRUCT "struct"
     TOKEN_SUB "-"
