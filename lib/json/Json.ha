@@ -22,7 +22,10 @@ class Json
         this->_type = JsonType::String
         bool escaped = false
         this->_text_value = ""
-        foreach ch in value
+        foreach i, ch in value
+            if ch == '\\' && i == value.size() - 1 && !escaped
+                _text_value += "\\"
+            ;
             if ch == '"' && !escaped do _text_value += "\\"
             _text_value += string(1, ch)
             escaped = ch == '\\'

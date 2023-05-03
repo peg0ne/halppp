@@ -283,10 +283,13 @@ pub
     fn find string matching, string replace, bool is_reverse, bool is_replace => bool
         if _text.size() == 0 do return false
         if matching == "" do return false
+        regex reg = regex(".*")
+        vector<RegexMatch> matches = {}
         let y = 0
-        let reg = regex($"(^|\\W)({matching})($|\\W)")
         let s = _text.at(_selector.y)
-        let matches = re(s, reg, 2)
+        let reg_str = $"(^|\\W)({matching})($|\\W)"
+        try {reg = regex(reg_str);} catch (...) {return false;}
+        try {matches = re(s, reg, 2);} catch (...) {return false;}
         foreach m in matches
             if m.position <= _selector.x && !is_reverse do continue
             elif m.position == _selector.x do continue
