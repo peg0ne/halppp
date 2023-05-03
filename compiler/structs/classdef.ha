@@ -30,12 +30,19 @@ struct Class
     fn to_cpp => string
         string class_str = to_cpp_start_inherit()
         class_str += BLOCK_START
-        foreach v in variables
-            class_str += variable_state_to_cpp(v.variable_state)
+        let previous_state = VariableState::Private
+        foreach i,v in variables
+            if i == 0 || v.variable_state != previous_state
+                class_str += variable_state_to_cpp(v.variable_state)
+                previous_state = v.variable_state
+            ;
             class_str += v.to_cpp(TAB, LINE_END)
         ;
-        foreach f in functions
-            class_str += variable_state_to_cpp(f.variable_state)
+        foreach i,f in functions
+            if i == 0 || f.variable_state != previous_state
+                class_str += variable_state_to_cpp(f.variable_state)
+                previous_state = f.variable_state
+            ;
             class_str += f.to_cpp(true)
         ;
         class_str += RBRACK
