@@ -15,6 +15,7 @@ glob =>
 class Ncurses
     static WINDOW* win
 pub
+    Ncurses bool ignore_colors = false => do init(ignore_colors)
     static fn init bool ignore_colors = false =>
         setlocale(LC_ALL, "")
         win = initscr()
