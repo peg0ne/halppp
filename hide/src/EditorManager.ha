@@ -7,8 +7,7 @@ class EditorManager => IContent
     vector<string> _shared_buffer = {}
     IContainer *_status_line
     CommandPallete _command_pallete = CommandPallete()
-    EditorManager Ncurses *n, IContainer *status_line =>
-        this->n = n
+    EditorManager IContainer *status_line =>
         _status_line = status_line
         _origin = new VerticalLayout(Fill::Flex)
         add_space()
@@ -118,10 +117,10 @@ pub
                 closed = Some(a->close())
             ;
             else
-                n->col(1)
-                n->add(LINES-1, 0, "Buffer has changes please use q! if you really want to quit.")
-                n->col(1,false)
-                n->key()
+                Ncurses::col(1)
+                Ncurses::add(LINES-1, 0, "Buffer has changes please use q! if you really want to quit.")
+                Ncurses::col(1,false)
+                Ncurses::key()
                 return Command::ModeCmdHan
             ;
         ;
@@ -174,7 +173,7 @@ pub
         select a from _activeEditor do a->draw(6)
     ;
     fn add_editor =>
-        _editors.push_back(new Editor(n, (string)"", &_shared_buffer, _status_line, &_command_pallete))
+        _editors.push_back(new Editor((string)"", &_shared_buffer, _status_line, &_command_pallete))
         select active from _activeSpace
             let editor = get_last(&_editors)
             _activeEditor = Some(editor)
