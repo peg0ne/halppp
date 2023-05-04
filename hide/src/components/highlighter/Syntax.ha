@@ -1,3 +1,5 @@
+get => TreeNode
+
 enum SyntaxType
     Plain,
     Halp,
@@ -77,7 +79,7 @@ class Syntax
 
     bool _is_complete = false
     string _cached_tree = ""
-    vector<TreeSitterBlock> _cached_t_block = {}
+    Option<TreeNode> _cached_node = None<TreeNode>()
     string _name = "plain"
     string _file_type = ".txt"
     vector<SyntaxBox> _boxings = {}
@@ -156,12 +158,12 @@ pub
     fn rules => vector<SyntaxRule> doremi _rules
     fn templates => vector<SyntaxTemplate> doremi _templates
     fn file_type => string doremi _file_type
-    fn cached_blocks string key => vector<TreeSitterBlock>
-        if key == _cached_tree doremi _cached_t_block
-        return {}
+    fn cached_blocks string key => Option<TreeNode>
+        if key == _cached_tree doremi _cached_node
+        return None<TreeNode>()
     ;
-    fn set_cache string tree, vector<TreeSitterBlock> blocks =>
+    fn set_cache string tree, TreeNode root =>
         _cached_tree = tree
-        _cached_t_block = blocks
+        _cached_node = root
     ;
 ;

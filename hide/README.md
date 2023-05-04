@@ -72,8 +72,9 @@ hide
 -   `i` -> enter `Insert` mode
 -   `a` -> enter `Insert` mode and jump one forward
 -   `v` -> enter `Visual` mode (Still in works)
--   `SPACE + F` -> enter `FileEx` mode
+-   `SPACE + f` -> enter `FileEx` mode
 -   `SPACE + S` -> enter `File search` window
+-   `SPACE + T` -> enter `Terminal` window
 -   `j` -> move cursor up
 -   `k` -> move cursor down
 -   `l` -> move cursor right
@@ -107,6 +108,7 @@ hide
 -   `Y` -> cuts from cursor to end
 -   `y + y` -> copies entire line
 -   `<number> yy` copies `<number>` of lines together
+-   `z + z` -> make window center on cursor
 -   `z + .` -> make window center on cursor
 -   `z + t` -> make window move so that the cursor is at the top of the window
 -   `z + b` -> make window move so that the cursor is at the bottom of the window
