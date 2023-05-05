@@ -2,7 +2,7 @@ struct Global
     vector<Variable> variables = {}
     Global => do return
     fn to_cpp => string
-        string g_str = EMPTY
+        let g_str = ""
         foreach v in variables
             g_str += $"\n{GLOBAL}{v.v_type} {v.id}\n"
         ;

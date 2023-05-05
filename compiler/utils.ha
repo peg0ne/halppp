@@ -1,6 +1,6 @@
 struct FpFn
-    string f_p = EMPTY
-    string f_n = EMPTY
+    string f_p = ""
+    string f_n = ""
     FpFn => do return
     FpFn string f_p, string f_n =>
         this->f_p = f_p
@@ -26,9 +26,9 @@ fn get_id_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(co
 fn get_eq_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Equals, s)
 fn get_arrow_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::CoolArrow, s)
 fn get_folder_and_name string file_path => FpFn
-    string file_name = EMPTY
-    string reversed = EMPTY
-    string folder_path = file_path
+    let file_name = ""
+    let reversed = ""
+    let folder_path = file_path
     loop
         if folder_path.size() == 0 do break
         let ch = folder_path.back()
@@ -43,6 +43,3 @@ fn get_folder_and_name string file_path => FpFn
     file_name = reversed
     return FpFn(folder_path, file_name)
 ;
-
-
-

@@ -40,7 +40,7 @@ fn expr_to_cpp Expression *self, int indent => string
     let declaration = self->e_declaration
     let matcher = self->e_matcher
     let line = self->line
-    string expression = EMPTY
+    let expression = ""
 
     select c from condition doremi c.to_cpp(indent + 1)
     select f from foreacher doremi f.to_cpp(indent + 1)

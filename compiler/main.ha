@@ -15,10 +15,10 @@ get => functions, classes, globals
 compiler => "-O3"
 
 struct CompileOutput
-    string output = EMPTY
-    string includes = EMPTY
-    string headers = EMPTY
-    string fnheaders = EMPTY
+    string output = ""
+    string includes = ""
+    string headers = ""
+    string fnheaders = ""
     vector<string> arguments = {}
     fn content => string doremi includes + headers + fnheaders + output
     CompileOutput string output, string includes, string headers, string fnheaders, vector<string> args =>
@@ -43,16 +43,16 @@ fn main =>
 fn compile_main CompilerPath paths, Program *p => CompileOutput doremi compile(paths, p, true)
 fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     println("compiling: " + paths.current)
-    string output = EMPTY
-    string includes = EMPTY
-    string headers = EMPTY
-    string fnheaders = EMPTY
+    let output = ""
+    let includes = ""
+    let headers = ""
+    let fnheaders = ""
     let is_named = false
     let content = get_content(paths, !is_main)
     let extralines = 0
     if is_main
         extralines = 5
-        string extras = "\nfn to_string string value => string doremi value\n" 
+        let extras = "\nfn to_string string value => string doremi value\n" 
         extras += "\ninc => string\nuse => std\n"
         content = extras + content
     ;

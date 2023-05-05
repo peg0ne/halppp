@@ -5,7 +5,7 @@ enum ConditionError
 fn co_err ConditionError err => string doremi co_err(err, EMPTY, false, "")
 fn co_err ConditionError err, string opt => string doremi co_err(err, opt, false, "")
 fn co_err ConditionError err, string opt, bool display, string recap => string
-    string msg = "[Condition] "
+    let msg = "[Condition] "
     switch err
     case ConditionError::Closed dobr msg += "Condition is not closed "
     default do break

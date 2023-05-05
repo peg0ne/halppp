@@ -123,6 +123,7 @@ pub fn construct(
             e_for: None,
             e_select: None,
             e_match: None,
+            e_variable: None,
             line: Some(String::from("return 0")),
         });
     }

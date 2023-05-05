@@ -9,7 +9,7 @@ struct For
         this->is_foreach = is_foreach
     ;
     fn to_cpp int indent => string
-        string for_str = EMPTY
+        let for_str = ""
         string iter = is_foreach && named_variable.is_none() ? $"{iterator}_iterator" : iterator
         string to = is_foreach ? $"{until}.size()" : until
         for i until indent do for_str += TAB

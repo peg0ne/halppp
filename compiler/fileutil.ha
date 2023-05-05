@@ -2,7 +2,7 @@ inc => fstream
 
 fn get_file_path int argc, char **argv => string
     if argc < 2 do display_err_message("No file path supplied in arguments!\nExiting...", "")
-    string fp = EMPTY
+    let fp = ""
     let i = 0
     while argv[1][i] != '\0' do fp.push_back(argv[1][i++])
     return fp
@@ -33,7 +33,7 @@ fn to_char_arr string s, char *buf => char*
     return buf
 ;
 fn compile_program CompilerPath paths, vector<string> arguments, bool is_release =>
-    string base_cmd= "g++ "
+    let base_cmd= "g++ "
     base_cmd += is_release ? "-O3 " : "-Wall "
     base_cmd += paths.output
     for i until arguments.size() do base_cmd += $" {arguments.at(i)}"

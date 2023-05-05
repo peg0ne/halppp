@@ -1,6 +1,6 @@
 fn expression_construct Compiler *compiler_t, AstToken first => Expression
-    string doing = EMPTY
-    string expression = EMPTY
+    let doing = ""
+    let expression = ""
     if first.token == Token::Let doremi get_let_expr(compiler_t)
     if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t)
     if first.token == Token::Id && try_get(compiler_t, Token::Equals)
@@ -54,15 +54,14 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
 fn get_let_expr Compiler *compiler_t => Expression
     let id = get_id_or_exit(compiler_t, "[Let] Required id after let")
     get_or_exit(compiler_t, Token::Equals,"[Let] Required equals after id")
-    string variable_type = EMPTY
-    string expression = EMPTY
-    string value = EMPTY
+    let variable_type = ""
+    let value = ""
     if try_get(compiler_t, Token::Match)
         get_next_or_exit(compiler_t, "Expected match")
         return match_construct(compiler_t, Some(id), true)
     ;
     loop
-        let x = get_next_or_exit(compiler_t, "LET exception")
+        let x = get_next_or_exit(compiler_t, "[Let] Expected token got nothing")
         if x.token == Token::Eof do break
         if x.token == Token::NewLine
             let is_member = false
@@ -82,16 +81,15 @@ fn get_let_expr Compiler *compiler_t => Expression
     elif token.is_string() do variable_type = "string "
     else do variable_type = "auto "
     let v = Variable(id, variable_type, Some(value), VariableState::Private)
-    expression += $"{id} = {value}"
     return Expression(v)
 ;
 
 fn get_lambda_expr Compiler *compiler_t => Expression
     let id = get_id_or_exit(compiler_t, "[Lambda] Required id after >")
-    string base = ""
+    let base = ""
     let has_return = false
     vector<string> parameters = {}
-    string args = ""
+    let args = ""
     loop
         let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
         if x.token == Token::Id && String(x.name).starts_with("(")

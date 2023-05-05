@@ -26,6 +26,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
                 e_for: Some(for_def),
                 e_select: None,
                 e_match: None,
+                e_variable: None,
                 line: None,
             }
         }
@@ -54,6 +55,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
         e_for: Some(for_def),
         e_select: None,
         e_match: None,
+        e_variable: None,
         line: None,
     }
 }

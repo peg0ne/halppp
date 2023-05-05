@@ -1,13 +1,13 @@
 fn template_construct Compiler *compiler_t => vector<string>
     vector<string> templates = {}
-    string pre_text = EMPTY
+    let pre_text = ""
     let is_comma = true
     loop
         let next = get_next_or_exit(compiler_t, "[Template]: Template declaration invalid")
         if next.is_id()
             if is_comma
                 templates.push_back(pre_text + next.name)
-                pre_text = EMPTY
+                pre_text = ""
                 is_comma = false
                 continue
             ;

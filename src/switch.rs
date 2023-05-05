@@ -53,6 +53,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
         e_for: None,
         e_select: None,
         e_match: None,
+        e_variable: None,
         line: None,
     }
 }
@@ -83,6 +84,7 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
             e_for: None,
             e_select: None,
             e_match: None,
+            e_variable: None,
             line: Some(format!("case {}:\n", id))
         });
     }
@@ -92,6 +94,7 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
             e_for: None,
             e_select: None,
             e_match: None,
+            e_variable: None,
             line: Some(String::from("default:\n"))
         });
     }

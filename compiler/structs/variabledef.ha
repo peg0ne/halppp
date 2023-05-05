@@ -29,7 +29,7 @@ struct Variable
         return staticness ? $"static {base}" : base
     ;
     fn to_cpp int indent, string new_line => string
-        string spacing = EMPTY
+        let spacing = ""
         for i until indent do spacing += TAB
         string base = spacing + v_type + SPACE + id
         select v from v_value do base += ASSIGNMENT + v
