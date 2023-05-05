@@ -12,13 +12,13 @@ fn get_content CompilerPath paths, bool can_be_lib => string
     ifstream reader(paths.current)
     if !reader && can_be_lib
         select home from env("HOME")
-            reader = ifstream(home + "/.local/lib/halppp/" + paths.current)
+            reader = ifstream($"{home}/.local/lib/halppp/{paths.current}")
         ;
     ;
     if !reader do display_err_message("Couldn't open file\nExiting...", "")
     while !reader.eof()
         getline(reader, linebuf)
-        content += linebuf + "\n"
+        content += $"{linebuf}\n"
     ;
     return content
 ;
@@ -36,7 +36,7 @@ fn compile_program CompilerPath paths, vector<string> arguments, bool is_release
     string base_cmd= "g++ "
     base_cmd += is_release ? "-O3 " : "-Wall "
     base_cmd += paths.output
-    for i until arguments.size() do base_cmd += " " + arguments.at(i)
+    for i until arguments.size() do base_cmd += $" {arguments.at(i)}"
     println("compiling: " + base_cmd)
     char cmd[base_cmd.size() + 1]
     char cpp_path[paths.main_path_cpp.size() + 1]

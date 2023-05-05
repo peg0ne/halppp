@@ -67,6 +67,7 @@ pub fn construct(compiler: &mut Compiler, first: AstToken) -> Expression {
         e_condition: None,
         e_for: None,
         e_select: None,
+        e_match: None,
         line: Some(expression),
     }
 }

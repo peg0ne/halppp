@@ -8,7 +8,7 @@ fn colored MessageSeverity severity, string msg, string recap =>
     case MessageSeverity::Hint  dobr color = "\033[34m"
     case MessageSeverity::Error dobr color = "\033[31m"
     ;
-    println(color + "[" + to_string(severity) + "] >> " + msg + "\033[0m")
+    println($"{color}[{severity}] >> {msg} \033[0m")
     println(recap)
 ;
 fn display_message MessageSeverity severity, string msg, string recap => do colored(severity, msg, recap)
@@ -17,6 +17,3 @@ fn display_err_message string msg, string recap =>
     display_message(MessageSeverity::Error, msg, recap)
     exit(1)
 ;
-
-
-

@@ -63,7 +63,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     loop
         let next = get_next_or_exit(&compiler_t, "Compiler failed to do unexpected EOF")
         if !next.is_base()
-            display_err_message("Token not allowed in base: " + to_string(next.token), compiler_t.to_err_message())
+            display_err_message($"Token not allowed in base: {next.token}", compiler_t.to_err_message())
         ;
         if next.is_terminator() do break
         elif next.is_nl() do continue
@@ -77,7 +77,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             is_named = true
             get_arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
             let id = get_id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
-            output += "namespace " + id + "\n{\n"
+            output += $"namespace {id}\n" + "{\n"
         ;
         elif next.token == Token::Function
             let fndef = function_construct(&compiler_t, VariableState::Public, false)
@@ -115,11 +115,11 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             ;
         ;
         elif next.token == Token::Compiler
-            get_arrow_or_exit(&compiler_t, "[Compiler] Missing start of compiler intent [=>]: " + next.name)
-            args = get_or_exit(&compiler_t, Token::String, "[Compiler] Missing value of compiler intent [TString]: " + next.name)
+            get_arrow_or_exit(&compiler_t, $"[Compiler] Missing start of compiler intent [=>]: {next.name}")
+            args = get_or_exit(&compiler_t, Token::String, $"[Compiler] Missing value of compiler intent [TString]: {next.name}")
             compiler_t.add_arg(args)
         ;
-        else do display_err_message("Token not handled: " + next.name, compiler_t.to_err_message())
+        else do display_err_message($"Token not handled: {next.name}", compiler_t.to_err_message())
     ;
     if is_named do output += "\n}\n"
     validate_compiled(compiler_t, is_main)

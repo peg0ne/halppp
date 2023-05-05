@@ -26,7 +26,7 @@ struct Variable
         string base = spacing + v_type + SPACE + id
         select v from v_value do base += ASSIGNMENT + v
         base += new_line
-        return staticness ? "static " + base : base
+        return staticness ? $"static {base}" : base
     ;
     fn to_cpp int indent, string new_line => string
         string spacing = EMPTY
@@ -34,6 +34,6 @@ struct Variable
         string base = spacing + v_type + SPACE + id
         select v from v_value do base += ASSIGNMENT + v
         base += new_line
-        return staticness ? "static " + base : base
+        return staticness ? $"static {base}" : base
     ;
 ;

@@ -4,10 +4,7 @@ struct Global
     fn to_cpp => string
         string g_str = EMPTY
         foreach v in variables
-            g_str += NEWLINE
-            g_str += GLOBAL + v.v_type
-            g_str += SPACE + v.id
-            g_str += NEWLINE
+            g_str += $"\n{GLOBAL}{v.v_type} {v.id}\n"
         ;
         return g_str
     ;

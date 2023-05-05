@@ -4,6 +4,7 @@ use crate::{
     expression, foreach,
     message::display_err_message,
     selects,
+    matches,
     structs::{Compiler, Expression, Function, Variable},
     switch, template,
     utils::get_next_or_exit,
@@ -101,6 +102,7 @@ pub fn construct(
                 .push(condition::construct(compiler, x.name)),
             Token::Switch => function.expressions.push(switch::construct(compiler)),
             Token::Select => function.expressions.push(selects::construct(compiler)),
+            Token::Match => function.expressions.push(matches::construct(compiler, None, false)),
             Token::SemiColon => break,
             Token::Function => break,
             Token::EOF => break,
@@ -120,6 +122,7 @@ pub fn construct(
             e_condition: None,
             e_for: None,
             e_select: None,
+            e_match: None,
             line: Some(String::from("return 0")),
         });
     }

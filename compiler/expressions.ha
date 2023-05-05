@@ -82,7 +82,7 @@ fn get_let_expr Compiler *compiler_t => Expression
     elif token.is_string() do variable_type = "string "
     else do variable_type = "auto "
     let v = Variable(id, variable_type, Some(value), VariableState::Private)
-    expression += id + " = " + value
+    expression += $"{id} = {value}"
     return Expression(v)
 ;
 
@@ -112,9 +112,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
     ;
     base += "["
     foreach p in parameters do base += p
-    base += "]"
-    base += args
-    base += "{"
+    base += $"]{args}" + "{"
     let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
     if x.is_do()
         has_return = x.token == Token::Doremi

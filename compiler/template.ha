@@ -11,15 +11,15 @@ fn template_construct Compiler *compiler_t => vector<string>
                 is_comma = false
                 continue
             ;
-            display_err_message("[Template]: Expected ',' got: " + next.name, compiler_t->to_err_message())
+            display_err_message($"[Template]: Expected ',' got: {next.name}", compiler_t->to_err_message())
         ;
         elif next.token == Token::TriplePeriod
             if is_comma doco pre_text = next.name
-            display_err_message("[Template]: Expected ',' got: " + next.name, compiler_t->to_err_message())
+            display_err_message($"[Template]: Expected ',' got: {next.name}", compiler_t->to_err_message())
         ;
         elif next.token == Token::Comma doco is_comma = true
         elif next.token == Token::MoreThan do break
-        display_err_message("[Template]: Unecpected token: " + next.name, compiler_t->to_err_message())
+        display_err_message($"[Template]: Unecpected token: {next.name}", compiler_t->to_err_message())
     ;
     return templates
 ;

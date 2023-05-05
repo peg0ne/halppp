@@ -20,7 +20,7 @@ struct Function
         fun_str += in_class ? TAB : EMPTY
         if staticness do fun_str += " static "
         fun_str += return_value.value_or(Variable(true)).v_type
-        fun_str += SPACE + id + LPAREN
+        fun_str += $" {id}("
         for i until arguments.size()
             fun_str += arguments.at(i).to_cpp(EMPTY, EMPTY)
             fun_str += i + 1 < arguments.size() ? ARG_SEP : EMPTY
