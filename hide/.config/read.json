@@ -1,0 +1,11 @@
+{
+    "name": "read",
+    "custom": [
+        {
+            "color": 0,
+            "bold": true,
+            "capture": 1,
+            "expr": "(\\w\\w)\\w+"
+        },
+    ],
+}
