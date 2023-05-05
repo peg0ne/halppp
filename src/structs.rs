@@ -14,6 +14,7 @@ mod path_def;
 mod enum_def;
 mod compiler_output;
 mod select_def;
+mod match_def;
 
 pub use crate::structs::{
     ast_token_def::AstToken,
@@ -32,4 +33,5 @@ pub use crate::structs::{
     enum_def::{Enum, EnumValue},
     compiler_output::CompilerOutput,
     select_def::Select,
+    match_def::Match,
 };

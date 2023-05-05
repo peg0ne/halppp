@@ -11,9 +11,9 @@ class Highlighter
 pub
     fn syntax => Syntax doremi _syntax
     fn wordlist => vector<string> doremi _syntax.wordlist()
-    fn error_check IContainer* container, Ncurses *n, string path, List<string> text, Vector internal_offset => do error_checker(&_syntax, container, n, path, text, internal_offset)
-    fn highlight IContainer* container, Ncurses *n => do highlight(container, n, false, 0)
-    fn highlight IContainer* container, Ncurses *n, bool is_label, int x_offset =>
+    fn error_check IContainer* container, string path, List<string> text, Vector internal_offset => do error_checker(&_syntax, container, path, text, internal_offset)
+    fn highlight IContainer* container, => do highlight(container, false, 0)
+    fn highlight IContainer* container, bool is_label, int x_offset =>
         if !_syntax.is_complete() do return
         let content = container->GetContent()
         if is_label
@@ -36,7 +36,7 @@ pub
                     let above = content.at(y-(i+1))
                     if found >= above.size() || above.at(found) == ' '
                         attron(A_DIM)
-                        n->add(y + offset.y - (i + 1), found + offset.x, '.')
+                        Ncurses::add(y + offset.y - (i + 1), found + offset.x, '.')
                         attroff(A_DIM)
                     ;
                     else do break
@@ -44,14 +44,14 @@ pub
             ;
             foreach part in custom
                 let matches = re(line, part.expr, part.capture)
-                foreach match in matches
-                    let start = match.position + offset.x
-                    let len = match.match.size()
+                foreach m in matches
+                    let start = m.position + offset.x
+                    let len = m.reg_match.size()
                     if start > end do continue
                     if start + len > end
                         len = end - start
                     ;
-                    n->mark_until(
+                    Ncurses::mark_until(
                         y + offset.y,
                         start,
                         part.color, 
@@ -61,7 +61,7 @@ pub
                 ;
             ;
             foreach box in boxes
-                highlight_pairs(n, line, box.start,
+                highlight_pairs(line, box.start,
                     box.end,
                     y + offset.y,
                     offset.x, box.colors, end)
@@ -70,10 +70,10 @@ pub
         ;
     ;
     
-    fn highlight_pairs Ncurses *n, string line, string match, string end, int y, int x, vector<short> colors, int max_x =>
-        h_pairs_imp(n, line, match, end, Vector(x,y), 0, 0, colors, max_x)
+    fn highlight_pairs string line, string match, string end, int y, int x, vector<short> colors, int max_x =>
+        h_pairs_imp(line, match, end, Vector(x,y), 0, 0, colors, max_x)
     ;
-    fn h_pairs_imp Ncurses *n, string line, string match, string end, Vector xy, int depth, int start, vector<short> colors, int max_x => Option<int>
+    fn h_pairs_imp string line, string match, string end, Vector xy, int depth, int start, vector<short> colors, int max_x => Option<int>
         //Try find first
         if colors.size() <= 0 do return None<int>()
         if start >= line.size() doremi None<int>()
@@ -81,7 +81,7 @@ pub
         if first == -1 doremi None<int>()
         if first + 1 >= line.size() doremi None<int>()
         if xy.x + first < max_x
-            n->mark(xy.y, xy.x + first, colors[depth % colors.size()])
+            Ncurses::mark(xy.y, xy.x + first, colors[depth % colors.size()])
         ;
 
         //Find end and next start
@@ -90,12 +90,12 @@ pub
         if next_end == -1 doremi None<int>()
         elif next > next_end
             if xy.x + next_end < max_x
-                n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
+                Ncurses::mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
             ;
-            h_pairs_imp(n, line, match, end, xy, 0, first + 1, colors, max_x)
+            h_pairs_imp(line, match, end, xy, 0, first + 1, colors, max_x)
         ;
         elif next < next_end 
-            let keep = h_pairs_imp(n, line, match, end, xy, depth + 1, first + 1, colors, max_x)
+            let keep = h_pairs_imp(line, match, end, xy, depth + 1, first + 1, colors, max_x)
             loop
                 select find from keep
                     if find == -1 doremi None<int>()
@@ -104,11 +104,11 @@ pub
                     let next_start = line.find(match, find + 1)
                     if next_end < next_start
                         if xy.x + next_end < max_x
-                            n->mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
+                            Ncurses::mark(xy.y, xy.x + next_end, colors[depth % colors.size()])
                         ;
                         break
                     ;
-                    keep = h_pairs_imp(n, line, match, end, xy, depth + 1, find + 1, colors, max_x)
+                    keep = h_pairs_imp(line, match, end, xy, depth + 1, find + 1, colors, max_x)
                     continue
                 ;
                 break

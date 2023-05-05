@@ -11,7 +11,7 @@ private fn yank_from =>
 ;
 
 private fn run_y => Command
-    switch n->key()
+    switch Ncurses::key()
     case 'y' do break
     default doremi Command::Nop
     ;

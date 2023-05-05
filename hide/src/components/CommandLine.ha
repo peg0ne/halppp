@@ -3,18 +3,17 @@ class CommandLine => IContent
     vector<string> _buffer = {}
     int _buffer_pos = 0
     EditorManager *_editorManager
-    CommandLine Ncurses *n, EditorManager *editorManager =>
+    CommandLine EditorManager *editorManager =>
         _origin = new IContainer(Fill::Static, Vector(0,1))
         _origin->SetColor(3)
         _origin->SetLabel(_line)
-        this->n = n
         _editorManager = editorManager
     ;
 pub 
     fn update string line =>
         _line = line
         _origin->SetLabel(_line)
-        _origin->draw(n)
+        _origin->draw()
     ;
     fn update_return Command cmd => Command
         update("")
@@ -26,10 +25,8 @@ pub
         let s = String(_line)
         s.remove(0)
         _line = s.to_string()
-        let match = linq::take(_buffer).where([this](string b){return _line == b;}).first()
-        if match.is_none()
-            _buffer.push_back(_line)
-        ;
+        let m = linq::take(_buffer).where([this](string b){return _line == b;}).first()
+        if m.is_none() do _buffer.push_back(_line)
         if _line == "q" doremi update_return(Command::CloseEditor)
         elif _line == "q!" doremi update_return(Command::CloseEditorForced)
         elif _line == "w" doremi update_return(Command::WriteEditor)
@@ -47,10 +44,10 @@ pub
             return update_return(Command::ModeNormal)
         ;
         elif s.starts_with("!")
-            n->stop()
+            Ncurses::stop()
             system($"{_line.substr(1)} && echo 'Press any key to return!'")
-            n->key()
-            n->start()
+            Ncurses::key()
+            Ncurses::start()
             return update_return(Command::ModeNormal)
         ;
         select num from s.to_num()
@@ -58,10 +55,10 @@ pub
             return update_return(Command::ModeNormal)
         ;
         _buffer.pop_back()
-        n->col(1)
-        n->add(LINES - 1, 0, $"no such command: {_line}")
-        n->key()
-        n->col(1, false)
+        Ncurses::col(1)
+        Ncurses::add(LINES - 1, 0, $"no such command: {_line}")
+        Ncurses::key()
+        Ncurses::col(1, false)
         update(":")
         _buffer_pos = _buffer.size()
         return Command::Nop
@@ -90,7 +87,7 @@ pub
     ;
     fn run EditorManager *manager => Command
         if _line.size() == 0 do update(":")
-        let key = n->key()
+        let key = Ncurses::key()
         switch key
         case KEY_DOWN
         case KEY_UP doremi get_from_buffer(key)

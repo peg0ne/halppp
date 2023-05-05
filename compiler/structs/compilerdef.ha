@@ -15,10 +15,10 @@ struct Compiler
             select n from next(true) do continue
             break
         ;
-        string s = "\n"
+        let s = "\n"
         foreach line in current_text
             let nr = to_string(current)
-            s += nr + " " + line + "\n"
+            s += $"{nr} {line}\n"
             current++
         ;
         return s
@@ -38,10 +38,10 @@ struct Compiler
             else
                 select last from current_text.last()
                     if !is_err
-                        last += "\033[034m" + peeked.name + "\033[0m "
+                        last += $"\033[034m{peeked.name}\033[0m "
                     ;
                     else
-                        last += "\033[031m" + peeked.name + "\033[0m "
+                        last += $"\033[031m{peeked.name}\033[0m "
                     ;
                     let vec = current_text.as_vec_ptr()
                     vec->at(len - 1) = last

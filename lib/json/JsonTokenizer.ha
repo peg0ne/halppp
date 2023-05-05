@@ -30,9 +30,9 @@ fn json_tokenize_json string json => vector<JsonTokenized>
             while iter.peek().is_some()
                 let ch = iter.next().value_or(' ')
                 if ch == '"' && !escaped do break
+                if ch == '\\' && escaped doco escaped = false
                 buf += string(1,ch)
-                if ch == '\\' do escaped = true
-                else do escaped = false
+                escaped = ch == '\\'
             ;
             tokens.push_back(JsonTokenized(buf, JsonToken::StringLiteral))
             buf = ""

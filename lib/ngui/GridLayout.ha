@@ -22,10 +22,10 @@ class GridLayout => VerticalLayout
         _offset = o
     ;
 pub
-    fn draw Ncurses *n =>
+    fn draw =>
         if !is_active do return
         arrange_elements()
-        ((VerticalLayout*)this)->draw(n)
+        ((VerticalLayout*)this)->draw()
     ;
     fn add_row => HorizontalLayout*
         let row = new HorizontalLayout(Fill::Flex)

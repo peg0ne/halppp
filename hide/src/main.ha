@@ -5,14 +5,14 @@ get => model
 
 
 fn main =>
-    let n = Ncurses()
+    Ncurses::init()
     let model = Model(argc, argv)
     loop
-        n.clearScr()
+        Ncurses::clearScr()
         model.render()
         if model.run() do break
     ;
-    n.stop()
+    Ncurses::stop()
 ;
 
 compiler => "&& mkdir -p $HOME/.config/hide"

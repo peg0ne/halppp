@@ -9,13 +9,14 @@ enum ClassError
     Inheritance,
     NoId,
     NoInheritor,
+    StaticNotValid,
     DoubleDeclaration,
 ;
 
 fn c_err ClassError err => string doremi c_err(err, EMPTY, false, "")
 fn c_err ClassError err, string opt => string doremi c_err(err, opt, false, "")
 fn c_err ClassError err, string opt, bool display, string recap => string
-    string msg = "[Class] "
+    let msg = "[Class] "
     switch err
     case ClassError::Closed       dobr msg += "Class is not closed "
     case ClassError::Definition   dobr msg += "Invalid class definition of: "
@@ -27,6 +28,7 @@ fn c_err ClassError err, string opt, bool display, string recap => string
     case ClassError::NoId         dobr msg += "Invalid class declaration"
     case ClassError::NoInheritor  dobr msg += "Invalid Inheritor Token\nExpected Id for inheritance for class: "
     case ClassError::ExtendNotValid    dobr msg += "Invalid class extendor: "
+    case ClassError::StaticNotValid    dobr msg += "Cannot make this static: "
     case ClassError::DoubleDeclaration dobr msg += "Duplicate instance of variable: "
     default do break
     ;
@@ -72,6 +74,14 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
     let variable_state = !is_struct ? VariableState::Private : VariableState::Public
     loop
         let next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+        let staticness = false
+        if next.token == Token::Static
+            next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+            if none(next.token, {Token::Id, Token::Type, Token::Function})
+                c_err(ClassError::StaticNotValid, next.name, true, compiler_t->to_err_message())
+            ;
+            staticness = true
+        ;
         if next.token == Token::Extend
             get_arrow_or_exit(compiler_t, c_err(ClassError::Extend, class_def->id)) 
             let extends = imports_construct_impl(compiler_t)
@@ -87,6 +97,7 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
         ;
         if next.token == Token::Function
             let function = function_construct(compiler_t, variable_state, false, class_def->variables)
+            function.staticness = staticness
             doco class_def->functions.push_back(function)
         ;
         elif any(next.token, {Token::Id, Token::Type})
@@ -97,6 +108,7 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
             ;
             let vnb = construct_args(compiler_t, Some(next.name))
             vnb.variable.variable_state = variable_state
+            vnb.variable.staticness = staticness
             if class_def->contains(vnb.variable)
                 c_err(ClassError::DoubleDeclaration, vnb.variable.id, true, compiler_t->to_err_message())
             ;

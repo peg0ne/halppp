@@ -67,36 +67,40 @@ pub
     fn size => int doremi _containers.len()
     fn containers => List<IContainer*>* doremi &_containers
     fn clear => do _containers = {}
-    fn draw_outline Ncurses *n =>
+    fn draw_outline =>
         if is_outline
-            n->add(_offset.y-1, _offset.x-1, outline.lu_corner)
-            for i until _size.x do n->add(_offset.y-1, _offset.x+i, outline.horizontal)
-            n->add(_offset.y-1, _offset.x-1 + _size.x + 1, outline.ru_corner)
+            Ncurses::add(_offset.y-1, _offset.x-1, outline.lu_corner)
+            for i until _size.x do Ncurses::add(_offset.y-1, _offset.x+i, outline.horizontal)
+            Ncurses::add(_offset.y-1, _offset.x-1 + _size.x + 1, outline.ru_corner)
             for i until _size.y
-                n->add(_offset.y+i, _offset.x-1, outline.vertical)
-                n->add(_offset.y+i, _offset.x-1 + _size.x + 1, outline.vertical)
+                Ncurses::add(_offset.y+i, _offset.x-1, outline.vertical)
+                Ncurses::add(_offset.y+i, _offset.x-1 + _size.x + 1, outline.vertical)
             ;
-            n->add(_offset.y-1 + _size.y + 1, _offset.x-1, outline.ld_corner)
-            for i until _size.x do n->add(_offset.y-1 + _size.y + 1, _offset.x+i, outline.horizontal)
-            n->add(_offset.y-1 + _size.y + 1, _offset.x-1 + _size.x + 1, outline.rd_corner)
+            Ncurses::add(_offset.y-1 + _size.y + 1, _offset.x-1, outline.ld_corner)
+            for i until _size.x do Ncurses::add(_offset.y-1 + _size.y + 1, _offset.x+i, outline.horizontal)
+            Ncurses::add(_offset.y-1 + _size.y + 1, _offset.x-1 + _size.x + 1, outline.rd_corner)
         ;
     ;
-    fn draw Ncurses *n =>
+    fn draw =>
         if !is_active do return
-        n->col(_color < 0 ? -_color : _color)
-        if _color >= 0 do n->invis_box(_offset, _size)
-        else do n->box(_offset - Vector(1,1), _size + Vector(2,2))
+        Ncurses::col(_color < 0 ? -_color : _color)
+        if _color >= 0 do Ncurses::invis_box(_offset, _size)
+        else do Ncurses::box(_offset - Vector(1,1), _size + Vector(2,2))
         select filling from _fill_str
-            for i until _size.y do n->add(_offset.y + i, _offset.x, filling)
+            for i until _size.y
+                for j until _size.x
+                    Ncurses::add(_offset.y + i, _offset.x + j, filling)
+                ;
+            ;
         ;
-        n->add_until(_offset, _label, _size.x + _offset.x, true)
+        Ncurses::add_until(_offset, _label, _size.x + _offset.x, true)
         foreach i, s in _content
             if i >= _size.y do break
             if is_center_text
-                n->add_until(_offset.y + i, _offset.x + (_size.x / 2) - (s.size() / 2), s, _size.x + _offset.x, false)
+                Ncurses::add_until(_offset.y + i, _offset.x + (_size.x / 2) - (s.size() / 2), s, _size.x + _offset.x, false)
             ;
-            else do n->add_until(_offset.y + i, _offset.x, s, _size.x + _offset.x, false)
+            else do Ncurses::add_until(_offset.y + i, _offset.x, s, _size.x + _offset.x, false)
         ;
-        n->col(_color < 0 ? -_color : _color, false)
+        Ncurses::col(_color < 0 ? -_color : _color, false)
     ;
 ;

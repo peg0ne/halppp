@@ -15,10 +15,28 @@ pub
         ;
         return Linq<T>(temp)
     ;
+    fn where_async<Func, ...Args> Func func, Args... args => Linq<T>
+        vector<future<bool>> temp_fut
+        vector<T> temp = {}
+        foreach ele in list do temp_fut.push_back(async(launch::async, func, ele, args...))
+        foreach i, ele in list
+            if temp_fut[i].get() do temp.push_back(ele)
+        ;
+        return Linq<T>(temp)
+    ;
     fn where_with_iterator<Func, ...Args> Func func, Args... args => Linq<T>
         vector<T> temp = {}
         foreach i, ele in list
             if func(ele, i, args...) do temp.push_back(ele)
+        ;
+        return Linq<T>(temp)
+    ;
+    fn where_with_iterator_async<Func, ...Args> Func func, Args... args => Linq<T>
+        vector<future<bool>> temp_fut = {}
+        vector<T> temp = {}
+        foreach i, ele in list do temp_fut.push_back(async(launch::async, func, ele, i, args...))
+        foreach i, ele in list        
+            if temp_fut[i].get() do temp.push_back(ele)
         ;
         return Linq<T>(temp)
     ;

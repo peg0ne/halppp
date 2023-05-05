@@ -22,7 +22,7 @@ struct Condition
     ;
     fn add_expr ConditionalExpression cexpr => do expressions.push_back(cexpr)
     fn to_cpp int indentation => string
-        string condition_str = EMPTY
+        let condition_str = ""
         for i until indentation do condition_str += TAB
         condition_str += conditioner
         if conditioner != TOKEN_ELSE

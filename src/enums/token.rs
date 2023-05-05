@@ -47,9 +47,11 @@ pub enum Token {
     Let,
     LParen,
     MacroDefinition,
+    Match,
     MoreThan,
     MoreThanOrEquals,
     Named,
+    New,
     NewLine,
     NonEquality,
     Number,
@@ -95,6 +97,7 @@ impl Token {
             "*" => Token::Asterix,
             "/" => Token::ForwardSlash,
             "//" => Token::Comment,
+            "new" => Token::New,
             "\n" => Token::NewLine,
             "&&" => Token::And,
             "+" => Token::Sum,
@@ -154,6 +157,7 @@ impl Token {
             "inc" => Token::Include,
             "int" => Token::Type,
             "let" => Token::Let,
+            "match" => Token::Match,
             "named" => Token::Named,
             "private" => Token::Private,
             "protected" => Token::Protected,
@@ -169,6 +173,35 @@ impl Token {
             "while" => Token::Condition,
             "loop" => Token::Condition,
             _ => Token::Id,
+        }
+    }
+
+    pub fn is_bool(self: &Token) -> bool {
+        match self {
+            Token::False => true,
+            Token::True => true,
+            _ => false
+        }
+    }
+    
+    pub fn is_num(self: &Token) -> bool {
+        match self {
+            Token::Number => true,
+            _ => false
+        }
+    }
+    
+    pub fn is_char(self: &Token) -> bool {
+        match self {
+            Token::Char => true,
+            _ => false
+        }
+    }
+    
+    pub fn is_string(self: &Token) -> bool {
+        match self {
+            Token::String => true,
+            _ => false
         }
     }
 

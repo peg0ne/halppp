@@ -5,4 +5,5 @@ enum ContainerType
     Horizontal,
     Main,
     Grid,
+    FilledRect,
 ;

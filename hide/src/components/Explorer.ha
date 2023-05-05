@@ -3,12 +3,11 @@ class Explorer => IContent
     int _pos = 0
     int _offset = 0
     Vector _global_size = Vector(COLS,LINES)
-    Explorer Ncurses *n =>
+    Explorer =>
         _text = list_files(_path)
         _origin = new IContainer(Fill::Static, Vector(25,0))
         _origin->SetColor(2)
         _origin->SetContent(_text)
-        this->n = n
     ;
     fn get_internal_offset => int
         let size = _origin->Size()
@@ -30,8 +29,8 @@ pub
             buf.add(_text.at(i))
         ;
         _origin->SetContent(buf)
-        _origin->draw(n)
-        n->mark_until(_pos - offset, 0, 5, _origin->Size().x)
+        _origin->draw()
+        Ncurses::mark_until(_pos - offset, 0, 5, _origin->Size().x)
     ;
     fn set_visibility Mode mode => do _origin->SetActive(mode == Mode::FileEx)
     fn toggle => Command
@@ -80,7 +79,7 @@ pub
             ;
         ;
         let cmd = Command::Nop
-        switch n->key()
+        switch Ncurses::key()
         case ' '  dobr cmd = search()
         case 'f'  dobr cmd = toggle()
         case KEY_UP
@@ -97,7 +96,7 @@ pub
     ;
     fn search => Command doremi search(false, None<int>())
     fn search bool recurse, Option<int> key_opt => Command
-        let key = key_opt.is_none() ? n->key() : 0
+        let key = key_opt.is_none() ? Ncurses::key() : 0
         select k from key_opt do key = k
         let i = -1
         foreach s in _text

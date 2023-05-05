@@ -1,26 +1,38 @@
 fn expression_construct Compiler *compiler_t, AstToken first => Expression
-    string doing = EMPTY
-    string expression = EMPTY
+    let doing = ""
+    let expression = ""
     if first.token == Token::Let doremi get_let_expr(compiler_t)
     if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t)
-    switch first.token
-        case Token::Doco dobr doing = ";\ncontinue "
-        case Token::Dobr dobr doing = ";\nbreak "
-        case Token::Dore do doing = ";\nreturn "
-        case Token::Do dobr expression = "\n"
-        case Token::Doremi dobr expression = "\nreturn "
-        case Token::Return dobr expression = "return "
-        default dobr expression = first.name
+    if first.token == Token::Id && try_get(compiler_t, Token::Equals)
+        let t = get_next_or_exit(compiler_t, "[Expression] Expected =")
+        expression = first.name   
+        expression += t.name
+        if try_get(compiler_t, Token::Match)
+            get_next_or_exit(compiler_t, "[Expression] Expected match")
+            return match_construct(compiler_t, Some(first.name), false)
+        ;
+    ;
+    else
+        switch first.token
+            case Token::Doco dobr doing = ";\ncontinue "
+            case Token::Dobr dobr doing = ";\nbreak "
+            case Token::Dore do doing = ";\nreturn "
+            case Token::Do dobr expression = "\n"
+            case Token::Doremi dobr expression = "\nreturn "
+            case Token::Return dobr expression = "return "
+            default dobr expression = first.name
+        ;
     ;
     loop
         let x = get_next_or_exit(compiler_t, "[Expression] Expression ended unexpectedly")
         if x.token == Token::Eof dobr expression += doing
         if x.token == Token::NewLine
-            let is_member = false
             select peeked from compiler_t->peek()
-                is_member = String(peeked.name).starts_with(".")
+                if none(peeked.token, {Token::Period, Token::Pointer})
+                    expression += doing
+                    break
+                ;
             ;
-            if !is_member dobr expression += doing
         ;
         if any(x.token, {Token::Number, Token::Id}) do expression += " "
         if x.is_do() do expression += "\n"
@@ -42,11 +54,14 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
 fn get_let_expr Compiler *compiler_t => Expression
     let id = get_id_or_exit(compiler_t, "[Let] Required id after let")
     get_or_exit(compiler_t, Token::Equals,"[Let] Required equals after id")
-    string variable_type = EMPTY
-    string expression = EMPTY
-    string value = EMPTY
+    let variable_type = ""
+    let value = ""
+    if try_get(compiler_t, Token::Match)
+        get_next_or_exit(compiler_t, "Expected match")
+        return match_construct(compiler_t, Some(id), true)
+    ;
     loop
-        let x = get_next_or_exit(compiler_t, "LET exception")
+        let x = get_next_or_exit(compiler_t, "[Let] Expected token got nothing")
         if x.token == Token::Eof do break
         if x.token == Token::NewLine
             let is_member = false
@@ -66,16 +81,15 @@ fn get_let_expr Compiler *compiler_t => Expression
     elif token.is_string() do variable_type = "string "
     else do variable_type = "auto "
     let v = Variable(id, variable_type, Some(value), VariableState::Private)
-    expression += id + " = " + value
     return Expression(v)
 ;
 
 fn get_lambda_expr Compiler *compiler_t => Expression
     let id = get_id_or_exit(compiler_t, "[Lambda] Required id after >")
-    string base = ""
+    let base = ""
     let has_return = false
     vector<string> parameters = {}
-    string args = ""
+    let args = ""
     loop
         let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
         if x.token == Token::Id && String(x.name).starts_with("(")
@@ -96,9 +110,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
     ;
     base += "["
     foreach p in parameters do base += p
-    base += "]"
-    base += args
-    base += "{"
+    base += $"]{args}" + "{"
     let x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
     if x.is_do()
         has_return = x.token == Token::Doremi
@@ -117,6 +129,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
             case Token::Condition dobr base += condition_construct(compiler_t, x.name).to_cpp(2)
             case Token::Switch dobr base += switch_construct(compiler_t).to_cpp(2)
             case Token::Select dobr base += select_construct(compiler_t).to_cpp(2)
+            case Token::Match dobr base += match_construct(compiler_t).to_cpp(2)
             default dobr base += expression_construct(compiler_t, x).to_cpp(2)
             ;
         ;

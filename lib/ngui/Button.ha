@@ -18,12 +18,12 @@ class Button => IContainer
 pub
     fn hover => do _selected = true
     fn unhover => do _selected = false
-    fn draw Ncurses *n =>
-        n->col(_selected)
-        n->box(_offset.y, _offset.x, _size.y, _size.x)
+    fn draw =>
+        Ncurses::col(_selected)
+        Ncurses::box(_offset.y, _offset.x, _size.y, _size.x)
         let pos_y = _size.y/2
         let pos_x = (_size.x/2) - (_label.size()/2)
-        n->add(_offset.y + pos_y, _offset.x + pos_x, _label)
-        n->col(_selected, false)
+        Ncurses::add(_offset.y + pos_y, _offset.x + pos_x, _label)
+        Ncurses::col(_selected, false)
     ;
 ;

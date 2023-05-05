@@ -5,20 +5,20 @@ get => enums/[token, variablestate]
 get => structs/[asttoken, pathdef]
 get => structs/[variabledef, enumdef]
 get => structs/[importsdef, globaldef, structdef]
-get => structs/[fordef, conditiondef, selectdef, expressiondef]
+get => structs/[fordef, conditiondef, selectdef, matchdef, expressiondef]
 get => structs/[functiondef, classdef]
 get => structs/[programdef, compilerdef]
 get => message, utils, fileutil
-get => ast, imports, enums, foreacher, expressions
+get => ast, imports, enums, foreacher, expressions, matching
 get => switch, selects, conditions, variable, template
 get => functions, classes, globals
 compiler => "-O3"
 
 struct CompileOutput
-    string output = EMPTY
-    string includes = EMPTY
-    string headers = EMPTY
-    string fnheaders = EMPTY
+    string output = ""
+    string includes = ""
+    string headers = ""
+    string fnheaders = ""
     vector<string> arguments = {}
     fn content => string doremi includes + headers + fnheaders + output
     CompileOutput string output, string includes, string headers, string fnheaders, vector<string> args =>
@@ -43,16 +43,16 @@ fn main =>
 fn compile_main CompilerPath paths, Program *p => CompileOutput doremi compile(paths, p, true)
 fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     println("compiling: " + paths.current)
-    string output = EMPTY
-    string includes = EMPTY
-    string headers = EMPTY
-    string fnheaders = EMPTY
+    let output = ""
+    let includes = ""
+    let headers = ""
+    let fnheaders = ""
     let is_named = false
     let content = get_content(paths, !is_main)
     let extralines = 0
     if is_main
         extralines = 5
-        string extras = "\nfn to_string string value => string doremi value\n" 
+        let extras = "\nfn to_string string value => string doremi value\n" 
         extras += "\ninc => string\nuse => std\n"
         content = extras + content
     ;
@@ -63,7 +63,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     loop
         let next = get_next_or_exit(&compiler_t, "Compiler failed to do unexpected EOF")
         if !next.is_base()
-            display_err_message("Token not allowed in base: " + to_string(next.token), compiler_t.to_err_message())
+            display_err_message($"Token not allowed in base: {next.token}", compiler_t.to_err_message())
         ;
         if next.is_terminator() do break
         elif next.is_nl() do continue
@@ -77,7 +77,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             is_named = true
             get_arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
             let id = get_id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
-            output += "namespace " + id + "\n{\n"
+            output += $"namespace {id}\n" + "{\n"
         ;
         elif next.token == Token::Function
             let fndef = function_construct(&compiler_t, VariableState::Public, false)
@@ -115,11 +115,11 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             ;
         ;
         elif next.token == Token::Compiler
-            get_arrow_or_exit(&compiler_t, "[Compiler] Missing start of compiler intent [=>]: " + next.name)
-            args = get_or_exit(&compiler_t, Token::String, "[Compiler] Missing value of compiler intent [TString]: " + next.name)
+            get_arrow_or_exit(&compiler_t, $"[Compiler] Missing start of compiler intent [=>]: {next.name}")
+            args = get_or_exit(&compiler_t, Token::String, $"[Compiler] Missing value of compiler intent [TString]: {next.name}")
             compiler_t.add_arg(args)
         ;
-        else do display_err_message("Token not handled: " + next.name, compiler_t.to_err_message())
+        else do display_err_message($"Token not handled: {next.name}", compiler_t.to_err_message())
     ;
     if is_named do output += "\n}\n"
     validate_compiled(compiler_t, is_main)

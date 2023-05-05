@@ -63,8 +63,8 @@ class CommandPallete
         textedits.add(" toggle comment", TextEdit::CommentToggle)
     ;
 pub
-    fn show Ncurses *n => TextEditOrCommand
-        let match = ""
+    fn show => TextEditOrCommand
+        let matcher = ""
         let offset = 0
         search = ""
         pos = 0
@@ -77,9 +77,9 @@ pub
                 .where(is_found)
                 .where_with_iterator(is_within).as_list()
             pallete_found.SetContent(buf)
-            pallete_window.draw(n)
-            n->mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)
-            let key = n->key()
+            pallete_window.draw()
+            Ncurses::mark_until(LINES/4 + 1 + pos, COLS/4, 4, COLS/2)
+            let key = Ncurses::key()
             switch key
             case KEY_DOWN dobr pos++
             case KEY_UP dobr pos--
@@ -88,9 +88,9 @@ pub
             case 27 doremi Command::ModeNormal
             case '\n'
                 if pos >= buf.size() do break
-                match = buf.at(pos)
-                select cmd from commands.try_get_value(match) doremi TextEditOrCommand(cmd)
-                select edit from textedits.try_get_value(match) doremi TextEditOrCommand(edit)
+                matcher = buf.at(pos)
+                select cmd from commands.try_get_value(matcher) doremi TextEditOrCommand(cmd)
+                select edit from textedits.try_get_value(matcher) doremi TextEditOrCommand(edit)
                 break
             case '\b'
             case 127

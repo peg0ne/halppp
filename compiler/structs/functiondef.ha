@@ -5,6 +5,7 @@ struct Function
     vector<Variable> arguments = {}
     vector<Expression> expressions = {}
     vector<string> templates = {}
+    bool staticness = false
     Function VariableState state =>
         this->variable_state = state
     ;
@@ -17,8 +18,9 @@ struct Function
             fun_str += i + 1 < templates.size() ? TEMPLATE_MID : TEMPLATE_END
         ;
         fun_str += in_class ? TAB : EMPTY
+        if staticness do fun_str += " static "
         fun_str += return_value.value_or(Variable(true)).v_type
-        fun_str += SPACE + id + LPAREN
+        fun_str += $" {id}("
         for i until arguments.size()
             fun_str += arguments.at(i).to_cpp(EMPTY, EMPTY)
             fun_str += i + 1 < arguments.size() ? ARG_SEP : EMPTY
@@ -28,7 +30,7 @@ struct Function
     ;
     fn to_cpp_h => string doremi to_cpp_start(false) + LINE_END
     fn to_cpp bool in_class => string
-        string fun_str = to_cpp_start(in_class)
+        let fun_str = to_cpp_start(in_class)
         fun_str += BLOCK_START
         foreach e in expressions
             fun_str += e.to_cpp(1 + in_class)

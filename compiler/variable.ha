@@ -9,7 +9,7 @@ struct VariableNBool
 
 fn get_value Compiler *compiler_t, bool found_setter => Option<string> doremi get_value(compiler_t, found_setter, false)
 fn get_value Compiler *compiler_t, bool found_setter, bool in_args => Option<string>
-    string value = EMPTY
+    let value = ""
     if !found_setter do get_eq_or_exit(compiler_t, VAR_ERR_SET)
     loop
         let next = get_next_or_exit(compiler_t, VAR_ERR_VAL)
@@ -52,6 +52,7 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
     let variable = Variable()
     select t from type_name do variable.v_type = t
     let is_end = false
+    let pre_name = ""
     loop
         let next = get_next_or_exit(compiler_t, VAR_ERR_INV)
         if any(next.token, {Token::NewLine, Token::CoolArrow}) dobr is_end = true
@@ -65,6 +66,10 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
             ;
             break
         ;
+        elif next.token == Token::TriplePeriod
+            if variable.has_type() do variable.v_type += next.name
+            else do display_err_message(VAR_ERR_PER, compiler_t->to_err_message())
+        ;
         elif next.token == Token::Comma do break
         elif next.token == Token::Asterix
             if !variable.has_type() do display_err_message(VAR_ERR_POI + variable.v_type, compiler_t->to_err_message())
@@ -73,10 +78,15 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
         elif next.token == Token::LessThan
             if !variable.has_id() && !variable.has_type() do display_err_message(VAR_ERR_TEM + variable.v_type, compiler_t->to_err_message())
             variable.v_type += next.name
+            let depth = 1
             loop
                 next = get_next_or_exit(compiler_t, VAR_ERR_INV)
                 variable.v_type += next.name
-                if next.token == Token::MoreThan do break
+                if next.token == Token::LessThan do depth++
+                if next.token == Token::MoreThan do depth--
+                if next.token == Token::DblMoreThan do depth -= 2
+                if next.token == Token::AllMoreThan do depth -= 3
+                if depth == 0 do break
             ;
         ;
         else
@@ -86,7 +96,6 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
         ;
     ;
     if !variable.has_minimum() && !is_end do display_err_message(VAR_ERR_INC + variable.id, compiler_t->to_err_message())
+    variable.id = pre_name + variable.id
     return VariableNBool(variable, is_end)
 ;
-
-

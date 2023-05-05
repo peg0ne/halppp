@@ -1,6 +1,5 @@
 get => ncurses, list, stringextensions, math
 class Manual
-    Ncurses n = Ncurses()
     int current = 0
     int currentMan = 0
     int skip = 0
@@ -9,7 +8,8 @@ class Manual
     List<string> files = List<string>()
     List<string> content = List<string>()
     Manual =>
-        n.start()
+        Ncurses::init()
+        Ncurses::start()
         select home from env("HOME")
             let found = list_reg_files($"{home}/.local/lib/halppp")
             foreach f in found
@@ -28,16 +28,16 @@ class Manual
             if line.contains(";") doremi i
             if !line.starts_with("enum")
                 line.remove_back(1)
-                n.col(2)
-                n.add_until(i - skipMan, 0, "-", COLS, false)
-                n.col(2, false)
-                n.add_until(i++ - skipMan, 1, line.to_string(), COLS, false)
+                Ncurses::col(2)
+                Ncurses::add_until(i - skipMan, 0, "-", COLS, false)
+                Ncurses::col(2, false)
+                Ncurses::add_until(i++ - skipMan, 1, line.to_string(), COLS, false)
             ;
             else
-                n.col(1)
-                n.add_until(i - skipMan, 0, "enum", COLS, false)
-                n.col(1, false)
-                n.add_until(i++ - skipMan, 5, line.replace("enum ", ""), COLS, false)
+                Ncurses::col(1)
+                Ncurses::add_until(i - skipMan, 0, "enum", COLS, false)
+                Ncurses::col(1, false)
+                Ncurses::add_until(i++ - skipMan, 5, line.replace("enum ", ""), COLS, false)
             ;
         ;
     ;
@@ -57,17 +57,17 @@ class Manual
             print_line = String(line.substr(0, r))
         ;
         if col != 0
-            n.col(col)
-            n.add_until(i - skipMan, 0, "-", COLS, false)
-            n.col(col, false)
+            Ncurses::col(col)
+            Ncurses::add_until(i - skipMan, 0, "-", COLS, false)
+            Ncurses::col(col, false)
         ;
         else
-            n.col(1)
-            n.add_until(i - skipMan, 0, "fn", COLS, false)
-            n.col(1, false)
+            Ncurses::col(1)
+            Ncurses::add_until(i - skipMan, 0, "fn", COLS, false)
+            Ncurses::col(1, false)
             print_line = String(print_line.replace("fn ", ""))
         ;
-        n.add_until(i++ - skipMan, col != 0 ? 2 : 3, print_line.to_string(), COLS, false)
+        Ncurses::add_until(i++ - skipMan, col != 0 ? 2 : 3, print_line.to_string(), COLS, false)
         if line.contains(" do ") doremi i
         if line.contains(" dore ") doremi i
         if line.contains(" doremi ") doremi i
@@ -100,10 +100,10 @@ class Manual
             else
                 let stripped = String(line.replace("class ", "")).strip()
                 class_name = line.split()[1]
-                n.col(1)
-                n.add_until(i - skipMan, 0, "class", COLS, false)
-                n.col(1, false)
-                n.add_until(i++ - skipMan, 6, stripped, COLS, false)
+                Ncurses::col(1)
+                Ncurses::add_until(i - skipMan, 0, "class", COLS, false)
+                Ncurses::col(1, false)
+                Ncurses::add_until(i++ - skipMan, 6, stripped, COLS, false)
             ;
         ;
     ;
@@ -126,15 +126,15 @@ class Manual
             else
                 let stripped = String(line.replace("struct ", "")).strip()
                 struct_name = line.split()[1]
-                n.col(1)
-                n.add_until(i - skipMan, 0, "struct", COLS, false)
-                n.col(1, false)
-                n.add_until(i++ - skipMan, 7, stripped, COLS, false)
+                Ncurses::col(1)
+                Ncurses::add_until(i - skipMan, 0, "struct", COLS, false)
+                Ncurses::col(1, false)
+                Ncurses::add_until(i++ - skipMan, 7, stripped, COLS, false)
             ;
         ;
     ;
     fn draw_content =>
-        n.clearScr()
+        Ncurses::clearScr()
         select s from selected
             select home from env("HOME")
                 let lines = readlines($"{home}/.local/lib/halppp/{files.at(s)}.ha")
@@ -161,8 +161,8 @@ class Manual
                 return
             ;
         ;
-        foreach i, f in files do n.add(i, 0, $"- {f}")
-        n.mark_until(current, 0, 5, COLS)
+        foreach i, f in files do Ncurses::add(i, 0, $"- {f}")
+        Ncurses::mark_until(current, 0, 5, COLS)
     ;
     fn search_content char key =>
         foreach i, f in files
@@ -178,7 +178,7 @@ pub
         loop
             let max = files.len() < LINES ? files.len() - 1 : LINES - 1
             let maxMan = content.len() - skipMan < LINES ? 0 : content.len() - skipMan - LINES
-            let key = n.key()
+            let key = Ncurses::key()
             switch key
             case 'j'
             case KEY_UP 
@@ -209,7 +209,7 @@ pub
                 currentMan = 0
                 skip = 0
                 break
-            case 'q' dore n.stop()
+            case 'q' dore Ncurses::stop()
             default
                 if selected.is_some() do break
                 search_content(key)

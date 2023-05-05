@@ -14,7 +14,7 @@ enum EnumError
 fn e_err EnumError err => string doremi e_err(err, EMPTY, false, "")
 fn e_err EnumError err, string opt => string doremi e_err(err, opt, false, "")
 fn e_err EnumError err, string opt, bool display, string recap => string
-    string msg = "[Enum] "
+    let msg = "[Enum] "
     switch err
     case EnumError::Closed      dobr msg += "Ends without closing itself"
     case EnumError::CommaNoId   dobr msg += "Missing enum before separator"

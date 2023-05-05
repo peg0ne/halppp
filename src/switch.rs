@@ -3,7 +3,7 @@ use crate::{
     enums::Token,
     structs::{Compiler, Condition, Expression, ConditionalExpression},
     utils::{get_next_or_exit, try_get},
-    message::display_err_message,
+    message::display_err_message, matches,
 };
 
 pub fn construct(compiler: &mut Compiler) -> Expression {
@@ -52,6 +52,8 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
         e_condition: Some(condition_def),
         e_for: None,
         e_select: None,
+        e_match: None,
+        e_variable: None,
         line: None,
     }
 }
@@ -81,6 +83,8 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
             e_condition: None,
             e_for: None,
             e_select: None,
+            e_match: None,
+            e_variable: None,
             line: Some(format!("case {}:\n", id))
         });
     }
@@ -89,6 +93,8 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
             e_condition: None,
             e_for: None,
             e_select: None,
+            e_match: None,
+            e_variable: None,
             line: Some(String::from("default:\n"))
         });
     }
@@ -116,6 +122,7 @@ fn create_case(compiler: &mut Compiler, is_default: bool) -> Vec<Expression> {
             Token::Select => lines.push(selects::construct(compiler)),
             Token::Switch => lines.push(construct(compiler)),
             Token::Condition => lines.push(condition::construct(compiler, x.name)),
+            Token::Match => lines.push(matches::construct(compiler, None, false)),
             _ => lines.push(expression::construct(compiler, x)),
         }
     }

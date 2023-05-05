@@ -5,7 +5,7 @@ enum ConditionError
 fn co_err ConditionError err => string doremi co_err(err, EMPTY, false, "")
 fn co_err ConditionError err, string opt => string doremi co_err(err, opt, false, "")
 fn co_err ConditionError err, string opt, bool display, string recap => string
-    string msg = "[Condition] "
+    let msg = "[Condition] "
     switch err
     case ConditionError::Closed dobr msg += "Condition is not closed "
     default do break
@@ -42,8 +42,8 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         ;
         if x.is_conditional() doco expression.operator_value = x.name
         if x.is_nl() dobr cond.add_expr(expression)
-        if expression.operator_value.size() == 0 doco expression.value_left += x.name + " "
-        expression.value_right += x.name + " "
+        if expression.operator_value.size() == 0 doco expression.value_left += $"{x.name} "
+        expression.value_right += $"{x.name} "
     ;
     loop
         let x = get_next_or_exit(compiler_t, co_err(ConditionError::Closed))
@@ -55,6 +55,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
             case Token::Condition dobr cond.lines.push_back(condition_construct(compiler_t, x.name))
             case Token::Switch dobr cond.lines.push_back(switch_construct(compiler_t))
             case Token::Select dobr cond.lines.push_back(select_construct(compiler_t))
+            case Token::Match dobr cond.lines.push_back(match_construct(compiler_t))
             default dobr cond.lines.push_back(expression_construct(compiler_t, x))
         ;
     ;
@@ -76,8 +77,8 @@ fn adv_conditional_construct Compiler *compiler_t, ConditionalExpression *expr, 
             break
         default dobr display_err_message("UNKOWN TOKEN", compiler_t->to_err_message())
     ;
-    let op = expr->operator_value + " "
-    let left = expr->value_left + " "
+    let op = $"{expr->operator_value} "
+    let left = $"{expr->value_left} "
     let is_first = true
     loop
         let x = compiler_t->peek().value_or(' ')
@@ -87,7 +88,7 @@ fn adv_conditional_construct Compiler *compiler_t, ConditionalExpression *expr, 
         if x.is_nl() do return
         if x.name == ":" doco compiler_t->next()
         if !is_first do expr->value_right += separator + left + op
-        expr->value_right += x.name + " "
+        expr->value_right += $"{x.name} "
         compiler_t->next()
         is_first = false
     ;

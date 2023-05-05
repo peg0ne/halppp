@@ -4,11 +4,10 @@ class Terminal => IContent
     List<string> _buffer = List<string>()
     int _buffer_pos = 0
     Highlighter h = Highlighter("shell.sh")
-    Terminal Ncurses *n =>
+    Terminal =>
         _origin = new MainContainer(Vector(9,3))
         _origin->SetColor(-3)
         clear_it()
-        this->n = n
     ;
     fn clear_it bool returner = true => bool
         _line = ""
@@ -25,9 +24,9 @@ class Terminal => IContent
         elif cmd =|= "clear" : ":c" doremi clear_it(true)
         _text.set(_text.len() - 1, $"> {_line}")
         if cmd.size() > 0 && cmd[0] == '!'
-            n->stop()
+            Ncurses::stop()
             system(_line.substr(1))
-            n->start()
+            Ncurses::start()
         ;
         if String(_line).starts_with("cd") && _line.size() > 3
             changedir(_line.substr(3))
@@ -66,6 +65,10 @@ class Terminal => IContent
         let pwd = linq::take(system_output("pwd 2>&1")).first_or("/")
         return String(pwd).strip()
     ;
+    fn draw =>
+        ((MainContainer*)_origin)->update()
+        ((IContent*)this)->draw()
+    ;
 pub
     fn show =>
         let pwd = get_pwd()
@@ -77,13 +80,15 @@ pub
             line.insert("|", _curs_position)
             _text.set(_text.len() - 1, $"> {line.to_string()}")
             draw()
-            h.highlight(_origin, n)
+            h.highlight(_origin)
             _text = t
-            let key = n->key()
+            let key = Ncurses::key()
             if key == KEY_F(1) do break
             elif key == '\n' && !run_command() do break
             elif isgraph(key) || key == ' '
-                _line += key
+                line = String(_line)
+                line.insert(string(1,key), _curs_position)
+                _line = line.to_string()
                 _curs_position++
             ;
             elif key =|= KEY_BACKSPACE : 127 : '\b'

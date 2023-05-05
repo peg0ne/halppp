@@ -3,6 +3,7 @@ struct Expression
     Option<For> e_for = None<For>()
     Option<Select> e_select = None<Select>()
     Option<Variable> e_declaration = None<Variable>()
+    Option<MatchDef> e_matcher = None<MatchDef>()
     Option<string> line = None<string>()
     Expression => do return
     Expression Condition conditions => 
@@ -16,6 +17,9 @@ struct Expression
     ;
     Expression Variable declaration =>
         this->e_declaration = Some(declaration)
+    ;
+    Expression MatchDef matcher =>
+        this->e_matcher = Some(matcher)
     ;
     Expression string line => 
         this->line = Some(line)
@@ -34,13 +38,15 @@ fn expr_to_cpp Expression *self, int indent => string
     let foreacher = self->e_for
     let selects = self->e_select
     let declaration = self->e_declaration
+    let matcher = self->e_matcher
     let line = self->line
-    string expression = EMPTY
+    let expression = ""
 
     select c from condition doremi c.to_cpp(indent + 1)
     select f from foreacher doremi f.to_cpp(indent + 1)
     select s from selects doremi s.to_cpp(indent + 1)
     select d from declaration doremi d.to_cpp(indent + 1, LINE_END)
+    select m from matcher doremi m.to_cpp()
 
     for i until indent do expression += TAB
     let line_value = line.value_or(EMPTY)

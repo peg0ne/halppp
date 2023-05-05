@@ -9,4 +9,5 @@ glob
     VAR_ERR_TEM "[Variable]: Variable declaration cannot have template without id and type: "
     VAR_ERR_TYP "[Variable]: Expected return value type got: "
     VAR_ERR_VAL "[Variable]: Invalid value"
+    VAR_ERR_PER "[Variable]: Expected Type got: '...'"
 ;
