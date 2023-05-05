@@ -37,6 +37,7 @@ pub fn construct(compiler: &mut Compiler, id: Option<String>, is_let: bool) -> E
         e_for: None,
         e_select: None,
         e_match: Some(match_def),
+        e_variable: None,
         line: None
     };
 }

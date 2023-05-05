@@ -22,6 +22,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
                 e_for: None,
                 e_select: Some(select),
                 e_match: None,
+                e_variable: None,
                 line: None,
             }
         }
@@ -50,6 +51,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
         e_for: None,
         e_select: Some(select),
         e_match: None,
+        e_variable: None,
         line: None,
     }
 }

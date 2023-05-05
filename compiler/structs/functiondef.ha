@@ -30,7 +30,7 @@ struct Function
     ;
     fn to_cpp_h => string doremi to_cpp_start(false) + LINE_END
     fn to_cpp bool in_class => string
-        string fun_str = to_cpp_start(in_class)
+        let fun_str = to_cpp_start(in_class)
         fun_str += BLOCK_START
         foreach e in expressions
             fun_str += e.to_cpp(1 + in_class)

@@ -14,7 +14,7 @@ struct Enum
     fn to_cpp_start => string doremi $"{ENUM}{name}: int"
     fn to_cpp_h => string doremi to_cpp_start() + LINE_END + to_cpp_string_start() + LINE_END
     fn to_cpp => string
-        string enum_str = $"{to_cpp_start()}{BLOCK_START}"
+        let enum_str = $"{to_cpp_start()}{BLOCK_START}"
         foreach e in enums
             enum_str += $"{TAB}{e.name}"
             select e_val from e.value do enum_str += $"{ASSIGNMENT}{e_val}"

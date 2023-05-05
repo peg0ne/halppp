@@ -4,8 +4,8 @@ struct Select
     vector<Expression> lines = {}
     Select => do return
     fn to_cpp int indent => string
-        string select_str = EMPTY
-        string wrapped = $"{value_name}_optional_value"
+        let select_str = ""
+        let wrapped = $"{value_name}_optional_value"
         for i until indent do select_str += TAB
         select_str += "\n{\n"
         select_str += $"auto {wrapped} = {optional_value}{LINE_END}"

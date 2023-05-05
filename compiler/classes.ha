@@ -16,7 +16,7 @@ enum ClassError
 fn c_err ClassError err => string doremi c_err(err, EMPTY, false, "")
 fn c_err ClassError err, string opt => string doremi c_err(err, opt, false, "")
 fn c_err ClassError err, string opt, bool display, string recap => string
-    string msg = "[Class] "
+    let msg = "[Class] "
     switch err
     case ClassError::Closed       dobr msg += "Class is not closed "
     case ClassError::Definition   dobr msg += "Invalid class definition of: "

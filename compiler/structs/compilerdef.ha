@@ -15,7 +15,7 @@ struct Compiler
             select n from next(true) do continue
             break
         ;
-        string s = "\n"
+        let s = "\n"
         foreach line in current_text
             let nr = to_string(current)
             s += $"{nr} {line}\n"

@@ -21,7 +21,7 @@ struct MatchDef
         this->is_let = is_let
     ;
     fn to_cpp => string
-        string matcher = EMPTY
+        let matcher = ""
         select returner from id
             if is_let
                 matcher += $"auto {returner} = "

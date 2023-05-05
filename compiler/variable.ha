@@ -9,7 +9,7 @@ struct VariableNBool
 
 fn get_value Compiler *compiler_t, bool found_setter => Option<string> doremi get_value(compiler_t, found_setter, false)
 fn get_value Compiler *compiler_t, bool found_setter, bool in_args => Option<string>
-    string value = EMPTY
+    let value = ""
     if !found_setter do get_eq_or_exit(compiler_t, VAR_ERR_SET)
     loop
         let next = get_next_or_exit(compiler_t, VAR_ERR_VAL)
@@ -52,7 +52,7 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
     let variable = Variable()
     select t from type_name do variable.v_type = t
     let is_end = false
-    string pre_name = EMPTY
+    let pre_name = ""
     loop
         let next = get_next_or_exit(compiler_t, VAR_ERR_INV)
         if any(next.token, {Token::NewLine, Token::CoolArrow}) dobr is_end = true

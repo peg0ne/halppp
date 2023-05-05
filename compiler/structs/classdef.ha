@@ -12,7 +12,7 @@ struct Class
         return false
     ;
     fn to_cpp_start => string
-        string class_str = templates.size() > 0 ? TEMPLATE : EMPTY
+        string class_str = templates.size() > 0 ? TEMPLATE : ""
         for i until templates.size()
             class_str += templates.at(i)
             class_str += i + 1 < templates.size() ? TEMPLATE_MID : TEMPLATE_END
@@ -22,13 +22,13 @@ struct Class
         return class_str
     ;
     fn to_cpp_start_inherit => string
-        string class_str = to_cpp_start()
+        let class_str = to_cpp_start()
         select i from inherit do class_str += INHERIT + i
         return class_str
     ;
     fn to_cpp_h => string doremi to_cpp_start() + LINE_END
     fn to_cpp => string
-        string class_str = to_cpp_start_inherit()
+        let class_str = to_cpp_start_inherit()
         class_str += BLOCK_START
         let previous_state = VariableState::Private
         foreach i,v in variables

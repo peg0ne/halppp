@@ -32,7 +32,7 @@ fn switch_construct Compiler *compiler_t => Expression
 
 fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
     vector<Expression> lines = {}
-    string label = EMPTY
+    let label = ""
     if !is_default
         let next = get_next_or_exit(compiler_t, "[Switch] Case unfinished")
         label = "case " + next.name

@@ -1,4 +1,4 @@
-use crate::{structs::{Condition, For, Select, Match}, message::display_err_message};
+use crate::{structs::{Condition, For, Select, Match, Variable}, message::display_err_message};
 
 #[derive(Clone, Debug)]
 pub struct Expression {
@@ -6,6 +6,7 @@ pub struct Expression {
     pub e_for: Option<For>,
     pub e_select: Option<Select>,
     pub e_match: Option<Match>,
+    pub e_variable: Option<Variable>,
     pub line: Option<String>,
 }
 
@@ -106,6 +107,10 @@ impl Expression {
                 expression.push_str("}\n");
                 return expression;
             }
+            _ => {}
+        }
+        match self.e_variable.as_ref() {
+            Some(v) => return v.to_cpp(spacing, ";\n"),
             _ => {}
         }
         if self.line.is_some() {

@@ -1,6 +1,6 @@
 fn match_construct Compiler *compiler_t => Expression doremi match_construct(compiler_t, None<string>(), false)
 fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expression
-    string matcher = EMPTY
+    let matcher = ""
     vector<string> statments = {}
     vector<MatchLines> internal = {}
     //Expression to match
@@ -27,7 +27,7 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
 ; 
 
 fn match_statements Compiler *compiler_t => string
-    string statement = EMPTY
+    let statement = ""
     loop
         let x = get_next_or_exit(compiler_t, "[Match] statement not finalized")
         if x.token == Token::CoolArrow do break

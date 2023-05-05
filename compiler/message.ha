@@ -3,7 +3,7 @@ enum MessageSeverity
     Error,
 ;
 fn colored MessageSeverity severity, string msg, string recap =>
-    string color = EMPTY
+    string color = ""
     switch severity
     case MessageSeverity::Hint  dobr color = "\033[34m"
     case MessageSeverity::Error dobr color = "\033[31m"

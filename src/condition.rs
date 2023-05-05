@@ -27,6 +27,7 @@ pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression 
                 e_for: None,
                 e_select: None,
                 e_match: None,
+                e_variable: None,
                 line: None,
             }
         }
@@ -78,6 +79,7 @@ pub fn construct(compiler: &mut Compiler, condition_type: String) -> Expression 
         e_for: None,
         e_select: None,
         e_match: None,
+        e_variable: None,
         line: None,
     }
 }

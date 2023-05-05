@@ -4,7 +4,7 @@ fn imports_construct Compiler *compiler_t => vector<string>
 ;
 fn imports_construct_impl Compiler *compiler_t => vector<string>
     vector<string> imports = {}
-    string id = EMPTY
+    let id = ""
     loop
         let next = get_next_or_exit(compiler_t, "[Import]: Import declaration invalid")
         if any(next.token, {Token::Eof, Token::NewLine, Token::Comma, Token::RBrack})
