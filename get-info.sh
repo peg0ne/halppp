@@ -3,7 +3,8 @@ get_info_in() {
     NROFFILE=$(find $1 -type f | grep $3 | wc -l)
     NROFLINE=$(find $1 -type f | grep $3 | xargs cat | grep -v -e "^$" | wc -l)
     NROFWORDS=$(find $1 -type f | grep $3 | xargs cat | grep -v -e "^$" | wc -w)
-    NROFCHARS=$(find $1 -type f | grep $3 | xargs cat | grep -v -e "^$" | wc -m)
+    NROFCHARS=$(find $1 -type f | grep $3 | xargs cat | grep -v -e "^$" | tr -d ' ' | wc -m)
+    NROFNONALPHA=$(find $1 -type f | grep $3 | xargs cat | grep -v -e "^$" | tr -d ' ' | tr -d '[:alpha:]' | wc -m)
     MAXLINELEN=$(find $1 -type f | grep $3 | xargs cat | grep -v -e "^$" | wc -L)
     echo ""
     echo $2":"
@@ -11,6 +12,7 @@ get_info_in() {
     echo "Lines of code:" $NROFLINE
     echo "Total words:" $NROFWORDS
     echo "Total chars:" $NROFCHARS
+    echo "Total non alpha chars:" $NROFNONALPHA
     echo "Max Line len: " $MAXLINELEN
     echo ""
 }
