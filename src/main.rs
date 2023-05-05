@@ -16,6 +16,7 @@ mod enumerator;
 mod switch;
 mod globals;
 mod selects;
+mod matches;
 
 use crate::{
     enums::{Token, VariableState},
@@ -37,7 +38,14 @@ fn main() {
 fn compile_main(paths: &CompilerPath, p: &mut Program) -> CompilerOutput {compile(paths, p, true)}
 fn compile(paths: &CompilerPath, p: &mut Program, is_main: bool) -> CompilerOutput {
     println!("compiling: {}", paths.current);
-    let content: String = get_content(&paths);
+    let content: String = if is_main {
+        let mut c: String = "\nfn to_string string value => string doremi value\n".to_owned();
+        c.push_str("\ninc => string\nuse => std\n");
+        c.push_str(get_content(paths).as_str());
+        c
+    } else {
+        get_content(&paths)
+    };
     let ast = ast::create(&content);
     let mut output = String::new();
     let mut includes = String::new();

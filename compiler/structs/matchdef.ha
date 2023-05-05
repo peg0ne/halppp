@@ -24,7 +24,7 @@ struct MatchDef
         string matcher = EMPTY
         select returner from id
             if is_let
-                matcher += "auto " + returner + " = "
+                matcher += $"auto {returner} = "
                 let default_statement = -1
                 foreach i, statment in statments
                     if statment == "_" dobr default_statement = i
@@ -35,21 +35,19 @@ struct MatchDef
             ;
         ;
         matcher += "{"
-        matcher += NEWLINE
-        matcher += TAB
-        matcher += "auto _match_expr_ = " + matcher_expr + LINE_END
+        matcher += $"\n{TAB}auto _match_expr_ = {matcher_expr}{LINE_END}"
         foreach i, statment in statments
-            if i == 0 do matcher += "if (_match_expr_ == " + statment + ") {\n" 
-            elif statment != "_" do matcher += "else if (_match_expr_ == " + statment + ") {\n"
+            if i == 0 do matcher += $"if (_match_expr_ == {statment}) {BLOCK_START}"
+            elif statment != "_" do matcher += $"else if (_match_expr_ == {statment}) {BLOCK_START}"
             else do matcher += "else {\n"
             let s_lines = lines[i]
             foreach j, line in s_lines.lines
                 if j == s_lines.lines.size() - 1
                     select returner from id
-                        matcher += returner + " = "
+                        matcher += $"{returner} = "
                     ;
                 ;
-                matcher += line + NEWLINE
+                matcher += $"{line}\n"
             ;
             matcher += "}\n"
         ;

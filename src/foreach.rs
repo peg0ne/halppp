@@ -2,7 +2,7 @@ use crate::{
     condition, expression, switch, selects,
     enums::Token,
     structs::{Compiler, Expression, For},
-    utils::{get_id_or_exit, get_next_or_exit, get_or_exit},
+    utils::{get_id_or_exit, get_next_or_exit, get_or_exit}, matches,
 };
 
 pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
@@ -25,6 +25,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
                 e_condition: None,
                 e_for: Some(for_def),
                 e_select: None,
+                e_match: None,
                 line: None,
             }
         }
@@ -41,6 +42,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
             Token::For => for_def.lines.push(construct(compiler, false)),
             Token::Switch => for_def.lines.push(switch::construct(compiler)),
             Token::Select => for_def.lines.push(selects::construct(compiler)),
+            Token::Match => for_def.lines.push(matches::construct(compiler, None, false)),
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => continue,
@@ -51,6 +53,7 @@ pub fn construct(compiler: &mut Compiler, is_foreach: bool) -> Expression {
         e_condition: None,
         e_for: Some(for_def),
         e_select: None,
+        e_match: None,
         line: None,
     }
 }

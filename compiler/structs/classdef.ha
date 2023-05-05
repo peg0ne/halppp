@@ -45,13 +45,12 @@ struct Class
             ;
             class_str += f.to_cpp(true)
         ;
-        class_str += RBRACK
-        class_str += LINE_END
+        class_str += $"{RBRACK}{LINE_END}"
         foreach v in variables
             if !v.staticness do continue
-            class_str += v.v_type + " " + id + "::" + v.id
+            class_str += $"{v.v_type} {id}::{v.id}"
             select value from v.v_value
-                class_str += " = " + value
+                class_str += $" = {value}"
             ;
             if v.v_value.is_none() && String(v.v_type).contains("*")
                 class_str += " = nullptr"

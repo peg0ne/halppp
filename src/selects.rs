@@ -5,7 +5,7 @@ use crate::{
     switch,
     foreach,
     structs::{Compiler, Expression, Select},
-    utils::{get_id_or_exit, get_next_or_exit, get_or_exit},
+    utils::{get_id_or_exit, get_next_or_exit, get_or_exit}, matches,
 };
 
 pub fn construct(compiler: &mut Compiler) -> Expression {
@@ -21,6 +21,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
                 e_condition: None,
                 e_for: None,
                 e_select: Some(select),
+                e_match: None,
                 line: None,
             }
         }
@@ -37,6 +38,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
             Token::For => select.lines.push(foreach::construct(compiler, false)),
             Token::Switch => select.lines.push(switch::construct(compiler)),
             Token::Select => select.lines.push(construct(compiler)),
+            Token::Match => select.lines.push(matches::construct(compiler, None, false)),
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => continue,
@@ -47,6 +49,7 @@ pub fn construct(compiler: &mut Compiler) -> Expression {
         e_condition: None,
         e_for: None,
         e_select: Some(select),
+        e_match: None,
         line: None,
     }
 }

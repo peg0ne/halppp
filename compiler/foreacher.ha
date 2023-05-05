@@ -8,7 +8,7 @@ fn for_construct Compiler *compiler_t, bool is_foreach => Expression
             for_def.named_variable = Some(get_id_or_exit(compiler_t, "[For] Requires identifier"))
         ;
     ;
-    get_or_exit(compiler_t, mid_checker, "[For] Missing keyword: " + to_string(mid_checker))
+    get_or_exit(compiler_t, mid_checker,  $"[For] Missing keyword: {mid_checker}")
     for_def.until = compiler_t->next().value_or(AstToken("NONE")).name
     loop
         let x = get_next_or_exit(compiler_t, "[For] For loop is not closed")

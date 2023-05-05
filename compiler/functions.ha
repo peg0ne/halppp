@@ -7,7 +7,7 @@ fn validate_function Function function, Compiler *compiler_t =>
                 j++
             ;
         ;
-        display_err_message("Duplicate instances Function of: " + function.id, compiler_t->to_err_message())
+        display_err_message($"Duplicate instances Function of: {function.id}", compiler_t->to_err_message())
     ;
 ;
 
@@ -40,12 +40,12 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
             case Token::LBrack
                 function.id = "operator[]"
                 break
-            default dobr display_err_message("Expected id or operator but got: " + func_id.name, compiler_t->to_err_message())
+            default dobr display_err_message($"Expected id or operator but got: {func_id.name}", compiler_t->to_err_message())
             ;
         ;
     ;
     let peeked_opt = compiler_t->peek()
-    if peeked_opt.is_none() do display_err_message("Error when trying to parse function: " + function.id, compiler_t->to_err_message())
+    if peeked_opt.is_none() do display_err_message($"Error when trying to parse function: {function.id}", compiler_t->to_err_message())
     if peeked_opt.value_or(AstToken("NONE")).token == Token::LessThan
         compiler_t->next()
         function.templates = template_construct(compiler_t)
@@ -72,9 +72,9 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
         function.return_value = is_do ? Some(Variable(true)) : Some(get_type(compiler_t))
     ;
     loop
-        let x = get_next_or_exit(compiler_t, "Function is not closed " + function.id)
+        let x = get_next_or_exit(compiler_t, $"Function is not closed {function.id}")
         if any(x.token, {Token::SemiColon, Token::Eof}) do break
-        if x.token == Token::Function dobr display_err_message("Function above is not closed " + function.id, compiler_t->to_err_message())
+        if x.token == Token::Function dobr display_err_message($"Function above is not closed {function.id}", compiler_t->to_err_message())
         if x.is_nl() do continue
         switch x.token
             case Token::Foreach
