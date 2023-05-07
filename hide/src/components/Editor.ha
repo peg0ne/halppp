@@ -366,7 +366,7 @@ pub
         case '(' dobr text += ')'
         case '<' dobr text += '>'
         case '{' dobr text += '}'
-        case '[' dobr text += ']'
+        case '[' dobr text += ']' 
         ;
         insert_snippet(&_text, pos, text)
         try_move(Vector(1, 0), pos)
@@ -411,8 +411,8 @@ pub
         let selected = 0
         let reverse = false
         let space_below = _content->Size().y - 1 - y
-        if space_below < 5
-            space_below = _content->Size().y / 2
+        if space_below < y
+            space_below = y - 1
             reverse = true
         ;
         let max_size = min(unique_matches.size(), space_below)
