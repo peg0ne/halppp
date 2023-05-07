@@ -1,5 +1,5 @@
 get => textediting/[Edits, Sorting]
-get => Lgrep, CommandPallete
+get => Lgrep, CommandPallete, LSP
 
 class Editor => IContent
     string _path = ""
