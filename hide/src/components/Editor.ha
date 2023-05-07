@@ -220,6 +220,7 @@ pub
             break
         case TextEdit::Insert
             foreach s in selections do insert_text(text, s)
+            get_suggestions(text, &_selector)
             break
         case TextEdit::InsertNl
             sort(selections.begin(), selections.end(), &selection_comparer_rev_ptr)
@@ -360,17 +361,8 @@ pub
         pos->y++
         pos->x = 0
     ;
-    fn insert_text string text, Vector *pos, bool suggestions = true =>
-        if _text.size() == 0 do _text.add(" ")
-        switch text[0]
-        case '(' dobr text += ')'
-        case '<' dobr text += '>'
-        case '{' dobr text += '}'
-        case '[' dobr text += ']' 
-        ;
-        insert_snippet(&_text, pos, text)
-        try_move(Vector(1, 0), pos)
-        if !suggestions || text == " " || _selections.size() > 0 do return
+    fn get_suggestions string text, Vector *pos, bool suggestions = true =>
+        if !suggestions || text == " " || pos != &_selector || text.size() > 1 do return
         let suggestion = find(false, false)
         if suggestion.size() == 0 do return
         foreach ch in suggestion
@@ -440,7 +432,9 @@ pub
                 matching_index++
             ;
             let box_str = ""
-            for i until width do box_str += "─"
+            for i until width
+                box_str += "─"
+            ;
             Ncurses::add_col(offset.y + positioned_y - reverse, x - 1, $"┌{box_str}┐", 1)
             Ncurses::add_col(offset.y + positioned_y - reverse + matching_index + 1, x - 1, $"└{box_str}┘", 1)
             let key = Ncurses::key()
@@ -448,10 +442,7 @@ pub
             case KEY_BTAB
             case 27 do return
             case '\t'
-            case '\n'
-                insert_text(String(unique_matches[selected]).replace(suggestion, "", 1), &_selector, false)
-                move(Dir::Right, unique_matches[selected].size() - suggestion.size() - 1, true)
-                return
+            case '\n' dore text_editing(TextEdit::Insert, String(unique_matches[selected]).replace(suggestion, "", 1))
             case KEY_UP dobr selected = max(selected - 1, 0)
             case KEY_DOWN dobr selected = min(selected + 1, max_size - 1)
             case KEY_LEFT dore move(Dir::Left)
@@ -466,6 +457,17 @@ pub
             default dore text_editing(TextEdit::Insert, string(1, key))
             ;
         ;
+    ;
+    fn insert_text string text, Vector *pos, bool suggestions = true =>
+        if _text.size() == 0 do _text.add(" ")
+        switch text[0]
+        case '(' dobr text += ')'
+        case '<' dobr text += '>'
+        case '{' dobr text += '}'
+        case '[' dobr text += ']' 
+        ;
+        insert_snippet(&_text, pos, text)
+        try_move(Vector(text.size(), 0), pos)
     ;
     fn remove_ch Vector *pos, bool should_move = false =>
         if should_move
