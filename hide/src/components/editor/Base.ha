@@ -16,6 +16,7 @@ private fn run_base int key => Command
     case 'p' dobr text_editing(TextEdit::PasteLine)
     case 'P' dobr text_editing(TextEdit::PasteWord)
     case ';' dobr _selections.clear()
+    case '.' dobr LSP::show_definition(find(false, false), "ha")
     case 'f'
         find()
         center_on_cursor()
