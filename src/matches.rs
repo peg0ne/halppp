@@ -1,15 +1,18 @@
 use crate::{
-    expression,
+    condition,
     enums::Token,
-    structs::{Compiler, Expression, Match},
-    utils::{get_next_or_exit, try_get},
+    expression, foreach,
     message::display_err_message,
+    selects,
+    structs::{Compiler, Expression, Match},
+    switch,
+    utils::{get_next_or_exit, try_get},
 };
 
 pub fn construct(compiler: &mut Compiler, id: Option<String>, is_let: bool) -> Expression {
     let mut match_def = Match::new(id, is_let);
     loop {
-        let x = get_next_or_exit(compiler.next(), "[Match] Match is not closed");        
+        let x = get_next_or_exit(compiler.next(), "[Match] Match is not closed");
         match x.token {
             Token::NewLine => break,
             Token::EOF => display_err_message("[Match] Expected token got EOF"),
@@ -38,7 +41,7 @@ pub fn construct(compiler: &mut Compiler, id: Option<String>, is_let: bool) -> E
         e_select: None,
         e_match: Some(match_def),
         e_variable: None,
-        line: None
+        line: None,
     };
 }
 
@@ -49,7 +52,7 @@ fn match_statements(compiler: &mut Compiler) -> String {
         match x.token {
             Token::CoolArrow => break,
             Token::EOF => break,
-            _ => statement.push_str(x.name.as_str())
+            _ => statement.push_str(x.name.as_str()),
         }
     }
     statement
@@ -64,13 +67,19 @@ fn match_lines(compiler: &mut Compiler) -> Vec<String> {
     }
     loop {
         match x.token {
+            Token::Condition => lines.push(condition::construct(compiler, x.name).to_cpp(2)),
+            Token::Foreach => lines.push(foreach::construct(compiler, true).to_cpp(2)),
+            Token::For => lines.push(foreach::construct(compiler, false).to_cpp(2)),
+            Token::Switch => lines.push(switch::construct(compiler).to_cpp(2)),
+            Token::Select => lines.push(selects::construct(compiler).to_cpp(2)),
+            Token::Match => lines.push(construct(compiler, None, false).to_cpp(2)),
             Token::SemiColon => break,
             Token::EOF => break,
             Token::NewLine => {
                 x = get_next_or_exit(compiler.next(), "[Match] expected some expression");
                 continue;
             }
-            _ => lines.push(expression::construct(compiler, x).to_cpp(2))
+            _ => lines.push(expression::construct(compiler, x).to_cpp(2)),
         }
         x = get_next_or_exit(compiler.next(), "[Match] expected some expression");
     }
