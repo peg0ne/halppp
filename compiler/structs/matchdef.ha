@@ -12,13 +12,15 @@ struct MatchDef
     vector<MatchLines> lines = {}
     Option<string> id = None<string>()
     bool is_let = false
+    vector<string> operators = {}
     MatchDef => do return
-    MatchDef string matcher_expr, vector<string> statments, vector<MatchLines> lines, Option<string> id, bool is_let =>
+    MatchDef string matcher_expr, vector<string> statments, vector<MatchLines> lines, Option<string> id, bool is_let, vector<string> operators =>
         this->matcher_expr = matcher_expr
         this->statments = statments
         this->lines = lines
         this->id = id
         this->is_let = is_let
+        this->operators = operators
     ;
     fn to_cpp => string
         let matcher = ""
@@ -37,8 +39,8 @@ struct MatchDef
         matcher += "{"
         matcher += $"\n{TAB}auto _match_expr_ = {matcher_expr}{LINE_END}"
         foreach i, statment in statments
-            if i == 0 do matcher += $"if (_match_expr_ == {statment}) {BLOCK_START}"
-            elif statment != "_" do matcher += $"else if (_match_expr_ == {statment}) {BLOCK_START}"
+            if i == 0 do matcher += $"if (_match_expr_ {operators[i]} {statment}) {BLOCK_START}"
+            elif statment != "_" do matcher += $"else if (_match_expr_ {operators[i]} {statment}) {BLOCK_START}"
             else do matcher += "else {\n"
             let s_lines = lines[i]
             foreach j, line in s_lines.lines
