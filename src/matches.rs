@@ -25,6 +25,26 @@ pub fn construct(compiler: &mut Compiler, id: Option<String>, is_let: bool) -> E
         }
     }
     loop {
+        let operator = match compiler.peek() {
+            Some(p) => {
+                if p.token.is_conditional() {
+                    Some(p.name.to_owned())
+                }
+                else {
+                    None
+                }
+            },
+            _ => None
+        };
+        match operator {
+            Some(s) => {
+                compiler.next();
+                match_def.operators.push(s);
+            },
+            _ => {
+                match_def.operators.push("==".to_owned());
+            }
+        }
         match_def.statements.push(match_statements(compiler));
         match_def.lines.push(match_lines(compiler));
         if try_get(compiler.peek(), Token::NewLine) {
