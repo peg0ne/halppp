@@ -16,7 +16,7 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
     //Statements to match
     loop
         select peeked from compiler_t->peek()
-            if peeked.is_conditional() || peeked.is_adv_conditional() || peeked.token == Token::Period && peeked.token == Token::Pointer
+            if peeked.is_conditional() || peeked.is_adv_conditional() || peeked.token == Token::Period || peeked.token == Token::Pointer
                 compiler_t->next()
                 operators.push_back(peeked.name)
             ;
