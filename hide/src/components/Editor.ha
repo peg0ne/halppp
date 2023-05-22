@@ -380,7 +380,7 @@ pub
             foreach word in wordlist
                 let stringified = String(word)
                 if !stringified.starts_with(suggestion) do continue
-
+                if word == suggestion do continue
                 unique_matches.push_back(stringified.to_string())
                 if stringified.len() > width do width = stringified.len()
             ;
