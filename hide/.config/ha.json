@@ -3,7 +3,7 @@
     "colors": [
         {
             "color": 100,
-            "fg": 167,
+            "fg": 197,
             "bg": 0
         },
         {
@@ -46,6 +46,11 @@
             "fg": 180,
             "bg": 0
         },
+        {
+            "color": 109,
+            "fg": 183,
+            "bg": 0
+        },
     ],
     "boxing": [
         {
@@ -84,6 +89,17 @@
             "color": 9,
             "capture": 2,
             "expr": "(^|\W)([A-Z][A-z][A-z]*)"
+        },
+        {
+            "color": 109,
+            "capture": 2,
+            "expr": "(^|\W)([A-z][A-z]*::[A-z][A-z]*)"
+        },
+        {
+            "color": 109,
+            "capture": 1,
+            "bold": true,
+            "expr": "\b([A-Z_]+)\b"
         },
         {
             "color": 2,
