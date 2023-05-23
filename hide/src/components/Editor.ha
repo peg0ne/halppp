@@ -162,7 +162,7 @@ pub
         ;
         return true
     ;
-    fn write_content => do write(to_complete_str(), _path)
+    fn write_content => do write(to_complete_str() + "\n", _path)
     fn sort_selections => do sort(_selections.begin(), _selections.end(), &selection_comparer)
     fn sort_selections_rev => do sort(_selections.begin(), _selections.end(), &selection_comparer_rev)
     fn add_selector bool is_word = false =>
