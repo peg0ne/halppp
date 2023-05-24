@@ -460,13 +460,14 @@ pub
     ;
     fn insert_text string text, Vector *pos, bool suggestions = true =>
         if _text.size() == 0 do _text.add(" ")
-        switch text[0]
-        case '(' dobr text += ')'
-        case '<' dobr text += '>'
-        case '{' dobr text += '}'
-        case '[' dobr text += ']' 
+        let output = match text[0]
+            '(' => do "()"
+            '<' => do "<>"
+            '{' => do "{}"
+            '[' => do "[]"
+            _ => do text
         ;
-        insert_snippet(&_text, pos, text)
+        insert_snippet(&_text, pos, output)
         try_move(Vector(text.size(), 0), pos)
     ;
     fn remove_ch Vector *pos, bool should_move = false =>
