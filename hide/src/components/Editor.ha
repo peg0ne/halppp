@@ -287,7 +287,7 @@ pub
         vector<RegexMatch> matches = {}
         let y = 0
         let s = _text.at(_selector.y)
-        let reg_str = $"(^|\\W)({matching})($|\\W)"
+        let reg_str = $"(^|\\W)({matching}.*)($|\\W)"
         try {reg = regex(reg_str);} catch (...) {return false;}
         try {matches = re(s, reg, 2);} catch (...) {return false;}
         foreach m in matches
