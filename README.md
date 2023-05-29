@@ -11,6 +11,23 @@ Since it compiles to c++ you can do pretty much anything with it and explore it'
 I really haven't got to formatting the documentation of the language yet. But it's in the works...
 There's alot of interesting features that's probably very confusing to see first time. like the `do/dore/dobr/doco/doremi` and `select`
 
+# Installing
+```bash
+git clone https://github.com/peg0ne/halppp.git
+# install compiler
+cd halppp/compiler
+./rebuild.sh
+cp main $HOME/.local/bin/halppp
+# install "build tool"
+cd ../hamble
+halppp main.ha -r
+cp main $HOME/.local/bin/hamble++
+# install texteditor
+cd ../hide
+hamble++ build -r
+hamble++ do make
+```
+
 # Examples
 Hello world
 ```
