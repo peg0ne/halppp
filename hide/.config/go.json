@@ -1,0 +1,212 @@
+ 
+{
+    "name": "halppp",
+    "colors": [
+        {
+            "color": 100,
+            "fg": 197,
+            "bg": 0
+        },
+        {
+            "color": 101,
+            "fg": 191,
+            "bg": 0
+        },
+        {
+            "color": 102,
+            "fg": 185,
+            "bg": 0
+        },
+        {
+            "color": 103,
+            "fg": 179,
+            "bg": 0
+        },
+        {
+            "color": 104,
+            "fg": 181,
+            "bg": 0
+        },
+        {
+            "color": 105,
+            "fg": 192,
+            "bg": 0
+        },
+        {
+            "color": 106,
+            "fg": 203,
+            "bg": 0
+        },
+        {
+            "color": 107,
+            "fg": 96,
+            "bg": 0
+        },
+        {
+            "color": 108,
+            "fg": 180,
+            "bg": 0
+        },
+        {
+            "color": 109,
+            "fg": 183,
+            "bg": 0
+        },
+    ],
+    "boxing": [
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "[",
+            "end": "]"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "{",
+            "end": "}"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "(",
+            "end": ")"
+        },
+        {
+            "colors": [7,8,9,1,2,3],
+            "start": "<",
+            "end": ">"
+        }
+    ],
+    "custom": [
+        {
+            "color": 8,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-Z_]*)"
+        },
+        {
+            "color": 0,
+            "capture": 2,
+            "expr": "(^|\W)([a-z_]*)"
+        },
+        {
+            "color": 9,
+            "capture": 2,
+            "expr": "(^|\W)([A-Z][A-z][A-z]*)"
+        },
+        {
+            "color": 109,
+            "capture": 2,
+            "expr": "(^|\W)([A-z][A-z]*::[A-z][A-z]*)"
+        },
+        {
+            "color": 109,
+            "capture": 1,
+            "bold": true,
+            "expr": "\b([A-Z_]+)\b"
+        },
+        {
+            "color": 2,
+            "capture": 2,
+            "expr": "(^|\W)([A-z_]*)\("
+        },
+        {
+            "color": 2,
+            "capture": 1,
+            "expr": "func ([A-z_]*)\W"
+        },
+        {
+            "color": 2,
+            "capture": 1,
+            "expr": "^\s*> ([A-z_]*)\s"
+        },
+        {
+            "color": 101,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(bool|int|int32|float64|rune|char|string|len)(?=$|\W)"
+        },
+        {
+            "color": 105,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(Option|Some|None)(?=$|\W)"
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "bold": true,
+            "expr": "([0-9][0-9.]*)"
+        },
+        {
+            "color": 100,
+            "capture": 1,
+            "bold": true,
+            "expr": "(?:^|\W)(true|false|nil)(?=$|\W)"
+        },
+        {
+            "color": 3,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(var|case|default|this)(?=$|\W)"
+        },
+        {
+            "color": 106,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(new|break|return|continue|catch|const|delete|extern|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(?=$|\W)"
+        },
+        {
+            "color": 102,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(do|dore|doco|dobr|doremi)(?=$|\W)"
+        },
+        {
+            "color": 103,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(range|in|until)(?=$|\W)"
+        },
+        {
+            "color": 104,
+            "bold": true,
+            "capture": 1,
+            "expr": "(?:^|\W)(private|pub|public|protected)(?=$|\W)"
+        },
+        {
+            "color": 8,
+            "capture": 1,
+            "expr": "(<|>|=|\+|-|\?|:|!|\/|\*|%|\||&|\^|~|,|\$)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
+            "expr": "(?:^|\W)(if|else|match|select|switch|for)(?=$|\W)"
+        },
+        {
+            "color": 1,
+            "capture": 1,
+            "expr": "(?:^|\W)(import|package|type|map|class|struct|enum|func|;)(?=$|\W)"
+        },
+        {
+            "color": 3,
+            "capture": 1,
+            "expr": "\"([^\"]*)\""
+        },
+        {
+            "color": 9,
+            "capture": 1,
+            "expr": "('[^']')"
+        },
+        {
+            "color": 107,
+            "capture": 1,
+            "dim": true,
+            "expr": "(//.*)"
+        }
+    ],
+    "wordlist": [
+        "import",
+        "main",
+        "func",
+        "package",
+    ],
+}
