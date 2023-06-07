@@ -26,6 +26,8 @@ named => LSP
                 return String(opt.value_or("")).contains(func_start);
             }).as_vec()
 
+        vector<string> matches = {}
+        let max_len = 0
         foreach i,f in files
             select c from f
                 let content = String(c)
@@ -42,9 +44,13 @@ named => LSP
                     return_type += content[0]
                     content.remove(0)
                 ;
-                Ncurses::add(i,0, $"Args: {args} Returns: {return_type}")
+                let m_str = $"Args: {args} Returns: {return_type}"
+                matches.push_back(m_str)
+                if m_str.size() > max_len do max_len = m_str.size()
             ;
         ;
+        Ncurses::box(0, 0, matches.size() + 2, clamp(max_len + 2, COLS/3, COLS))
+        foreach i,s in matches do Ncurses::add(i + 1, 1, s)
         Ncurses::key()
     ;
 ;
