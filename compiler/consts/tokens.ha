@@ -11,6 +11,7 @@ glob
     TOKEN_BANG "!"
     TOKEN_CASE "case"
     TOKEN_CLASS "class"
+    TOKEN_CONST "const"
     TOKEN_COLON ":"
     TOKEN_COMMA ","
     TOKEN_PERIOD "."

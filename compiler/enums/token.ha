@@ -17,6 +17,7 @@ enum Token
     Comment,
     Compiler,
     Condition,
+    Const,
     CoolArrow,
     DblColon,
     DblLessThan,
@@ -114,6 +115,7 @@ struct Token_t
             TOKEN_COLON => dore t = Token::Colon
             TOKEN_COMMA => dore t = Token::Comma
             TOKEN_COMPILER => dore t = Token::Compiler
+            TOKEN_CONST => dore t = Token::Const
             TOKEN_COOLARROW => dore t = Token::CoolArrow
             TOKEN_DBLCOLON => dore t = Token::DblColon
             TOKEN_DBLLESSTHAN => dore t = Token::DblLessThan
