@@ -89,6 +89,9 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
                 if depth == 0 do break
             ;
         ;
+        elif next.token == Token::Const
+            pre_name = "const "
+        ;
         else
             if !variable.has_type() doco variable.v_type = next.name
             if !variable.has_id() doco variable.id = next.name
