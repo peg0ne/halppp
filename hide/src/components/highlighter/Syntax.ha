@@ -97,6 +97,11 @@ class Syntax
         ;
         let config = $"{home}/.config/hide/"
         _definition = load_json($"{config}{type}.json")
+        load_from_json(_definition)
+    ;
+    Syntax Json config => do load_from_json(config)
+    fn load_from_json Json config =>
+        _definition = config
         select name from _definition.try_get("name")
             _name = name->value_or((string)"")
             _is_complete = true
@@ -166,4 +171,5 @@ pub
         _cached_tree = tree
         _cached_node = root
     ;
+    fn destruct => do _definition.destruct()
 ;
