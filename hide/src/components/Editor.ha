@@ -52,7 +52,10 @@ pub
             _selector = Vector(0,0)
             _selections.clear()
             _path = path
-            select h from _highlighter do delete(h)
+            select h from _highlighter
+                h->destruct()
+                delete(h)
+            ;
             _highlighter = Some(new Highlighter(path))
             _header->SetLabel($"| {_path}")
             remove(json_path())
