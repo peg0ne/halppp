@@ -1,5 +1,10 @@
 # HALPPP - basically halp++
 
+# Documentation
+[WIP Documentation](https://peg0ne.github.io/halppp-documentation/)
+# Text editor included
+[Hide](https://github.com/peg0ne/halppp/tree/main/hide)
+
 halppp compiles to c++ and is inspired by c#/c++/python/rust and probably some more.
 It's experimental language that removes/reduce alot of the common tokens that's mandatory in alot of languages.
 Such as...
