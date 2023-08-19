@@ -15,7 +15,7 @@ if out == "y"
 
 print "Do you want to build hide (y/n)"
 read out
-if out != "y"
+if out == "y"
 | sys "cd hide && hamble++ build -r"
 
 exit
