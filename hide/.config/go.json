@@ -1,5 +1,6 @@
+ 
 {
-    "name": "halppp",
+    "name": "go",
     "colors": [
         {
             "color": 100,
@@ -109,7 +110,7 @@
         {
             "color": 2,
             "capture": 1,
-            "expr": "fn ([A-z_]*)\W"
+            "expr": "func ([A-z_]*)\W"
         },
         {
             "color": 2,
@@ -120,7 +121,7 @@
             "color": 101,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(bool|int|short|double|float|long|wchar_t|char|vector|string)(?=$|\W)"
+            "expr": "(?:^|\W)(bool|int|int32|float64|rune|char|string|len)(?=$|\W)"
         },
         {
             "color": 105,
@@ -138,13 +139,13 @@
             "color": 100,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(true|false|null)(?=$|\W)"
+            "expr": "(?:^|\W)(true|false|nil)(?=$|\W)"
         },
         {
             "color": 3,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(let|auto|case|default|this)(?=$|\W)"
+            "expr": "(?:^|\W)(var|case|default|this)(?=$|\W)"
         },
         {
             "color": 106,
@@ -162,7 +163,7 @@
             "color": 103,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(from|in|until)(?=$|\W)"
+            "expr": "(?:^|\W)(range|in|until)(?=$|\W)"
         },
         {
             "color": 104,
@@ -178,17 +179,12 @@
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(if|else|elif|match|select|switch|while|loop|for|foreach)(?=$|\W)"
+            "expr": "(?:^|\W)(if|else|match|select|switch|for)(?=$|\W)"
         },
         {
             "color": 1,
             "capture": 1,
-            "expr": "(?:^|\W)(select|for|foreach)(?=$|\W)"
-        },
-        {
-            "color": 1,
-            "capture": 1,
-            "expr": "(?:^|\W)(get|inc|use|named|compiler|class|struct|enum|fn|glob|;)(?=$|\W)"
+            "expr": "(?:^|\W)(import|package|type|map|class|struct|enum|func|;)(?=$|\W)"
         },
         {
             "color": 3,
@@ -208,156 +204,9 @@
         }
     ],
     "wordlist": [
-        "bool",
-        "int",
-        "short",
-        "double",
-        "float",
-        "long",
-        "wchar_t",
-        "char",
-        "string",
-        "true",
-        "false",
-        "null",
-        "new",
-        "from",
-        "in",
-        "until",
-        "do",
-        "dore",
-        "doco",
-        "dobr",
-        "doremi",
-        "let",
-        "auto",
-        "break",
-        "return",
-        "continue",
-        "case",
-        "default",
-        "catch",
-        "const",
-        "delete",
-        "this",
-        "extern",
-        "private",
-        "pub",
-        "public",
-        "protected",
-        "throw",
-        "try",
-        "register",
-        "typedef",
-        "friend",
-        "union",
-        "goto",
-        "unsigned",
-        "signed",
-        "virtual",
-        "void",
-        "volatile",
-        "if",
-        "else",
-        "elif",
-        "select",
-        "match",
-        "switch",
-        "while",
-        "loop",
-        "for",
-        "foreach",
-        "get",
-        "inc",
-        "use",
-        "named",
-        "compiler",
-        "class",
-        "struct",
-        "enum",
-        "fn",
-        "glob",
-        "ncurses",
-        "ngui",
-        "stringextensions",
-        "print",
-        "math",
-        "regex"
+        "import",
+        "main",
+        "func",
+        "package",
     ],
-    "rules": [
-        {
-            "type": "starts_with",
-            "value": "get =>",
-            "regex": "[\s,]([\w/.]*)",
-            "validate": "file_exists",
-            "validation_value": "capture_value",
-            "capture": 1,
-        },
-        {
-            "type": "contains",
-            "value": "for ",
-            "regex": "for\s*\w*\s*(\S*)",
-            "validate": "equals",
-            "validation_value": "until",
-            "capture": 1,
-        },
-        {
-            "type": "contains",
-            "value": "foreach ",
-            "regex": "foreach\s*\w*\s*(?:,\s*\w*)?\s*(\S*)",
-            "validate": "equals",
-            "validation_value": "in",
-            "capture": 1,
-        },
-        {
-            "type": "contains",
-            "value": "select ",
-            "regex": "select\s*\w*\s*(\S*)",
-            "validate": "equals",
-            "validation_value": "from",
-            "capture": 1,
-        }
-    ],
-    "templates": [
-        {
-            "name": "function",
-            "template": ["fn ", "$ ", "=> ", "$", "%", "%", ";", "%"]
-        },
-        {
-            "name": "function do",
-            "template": ["fn ", "$ ", "=> ", "$ ", "do", "$ ", "$", "%"]
-        },
-        {
-            "name": "select",
-            "template": ["select ", "$ ", "from ", "$", "%", "%", ";", "%"]
-        },
-        {
-            "name": "select do",
-            "template": ["select ", "$ ", "from ", "$ ", "do", "$", "%"]
-        },
-        {
-            "name": "loop",
-            "template": ["loop", "%", "%", ";", "%"]
-        },
-        {
-            "name": "loop do",
-            "template": ["loop ", "do", "$", "$", "%"]
-        },
-        {
-            "name": "while",
-            "template": ["while ", "$", "%", "%", ";", "%"]
-        },
-        {
-            "name": "for",
-            "template": ["for ", "$ ", "until ", "$", "%", "%", ";", "%"]
-        },
-        {
-            "name": "foreach",
-            "template": ["foreach ", "$ ", "in ", "$", "%", "%", ";", "%"]
-        },
-        {
-            "name": "lambda",
-            "template": ["> " "$ ", "()", "%", "%", ";", "%"]
-        }
-    ]
 }

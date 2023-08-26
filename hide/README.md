@@ -5,7 +5,9 @@
 `Hide` is a vim-like editor that pretty much does the same things as vim.
 It also provides with a pretty simple way of implementing syntax highlighting and rules to check for errors before compilation/running of a program.
 
-`Hide` provides an IDE-like editing experience in your terminal.
+`Hide` provides an IDE-like editing experience in your terminal (sort of).
+
+![Alt text](preview)
 
 ## Feature Highlights
 

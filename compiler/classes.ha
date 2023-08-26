@@ -10,6 +10,7 @@ enum ClassError
     NoId,
     NoInheritor,
     StaticNotValid,
+    ConstNotValid,
     DoubleDeclaration,
 ;
 
@@ -29,6 +30,7 @@ fn c_err ClassError err, string opt, bool display, string recap => string
     case ClassError::NoInheritor  dobr msg += "Invalid Inheritor Token\nExpected Id for inheritance for class: "
     case ClassError::ExtendNotValid    dobr msg += "Invalid class extendor: "
     case ClassError::StaticNotValid    dobr msg += "Cannot make this static: "
+    case ClassError::ConstNotValid     dobr msg += "Cannot make this const: "
     case ClassError::DoubleDeclaration dobr msg += "Duplicate instance of variable: "
     default do break
     ;
@@ -75,12 +77,20 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
     loop
         let next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
         let staticness = false
+        let constantness = false
         if next.token == Token::Static
             next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
-            if none(next.token, {Token::Id, Token::Type, Token::Function})
+            if none(next.token, {Token::Id, Token::Type, Token::Function, Token::Const})
                 c_err(ClassError::StaticNotValid, next.name, true, compiler_t->to_err_message())
             ;
             staticness = true
+        ;
+        if next.token == Token::Const
+            next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+            if none(next.token, {Token::Id, Token::Type})
+                c_err(ClassError::ConstNotValid, next.name, true, compiler_t->to_err_message())
+            ;
+            constantness = true
         ;
         if next.token == Token::Extend
             get_arrow_or_exit(compiler_t, c_err(ClassError::Extend, class_def->id)) 
@@ -109,6 +119,7 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
             let vnb = construct_args(compiler_t, Some(next.name))
             vnb.variable.variable_state = variable_state
             vnb.variable.staticness = staticness
+            vnb.variable.constantness = constantness
             if class_def->contains(vnb.variable)
                 c_err(ClassError::DoubleDeclaration, vnb.variable.id, true, compiler_t->to_err_message())
             ;

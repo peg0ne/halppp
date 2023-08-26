@@ -21,5 +21,6 @@ enum Command
     EditorSearch,
     EditorReplace,
     Terminal,
+    ConfigManager,
     Nop,
 ;

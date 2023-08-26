@@ -45,6 +45,7 @@ class CommandPallete
         commands.add(" search", Command::EditorSearch)
         commands.add(" replace", Command::EditorReplace)
         commands.add(" terminal", Command::Terminal)
+        commands.add(" config manager", Command::ConfigManager)
     ;
     fn add_text_edits =>
         textedits.add(" tab", TextEdit::Tab)

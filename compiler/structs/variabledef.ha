@@ -3,6 +3,7 @@ struct Variable
     string v_type = EMPTY
     Option<string> v_value = None<string>()
     bool staticness = false
+    bool constantness = false
     VariableState variable_state = VariableState::Private
     Variable => do return
     Variable string id, string type =>
@@ -26,6 +27,7 @@ struct Variable
         string base = spacing + v_type + SPACE + id
         select v from v_value do base += ASSIGNMENT + v
         base += new_line
+        base = constantness ? $"const {base}" : base
         return staticness ? $"static {base}" : base
     ;
     fn to_cpp int indent, string new_line => string
@@ -34,6 +36,7 @@ struct Variable
         string base = spacing + v_type + SPACE + id
         select v from v_value do base += ASSIGNMENT + v
         base += new_line
+        base = constantness ? $"const {base}" : base
         return staticness ? $"static {base}" : base
     ;
 ;

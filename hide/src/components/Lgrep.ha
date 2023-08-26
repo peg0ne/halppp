@@ -1,14 +1,15 @@
-fn lgrep => vector<string>
-    let files = list_reg_files(".")
-    let dirs = list_dirs(".")
+fn lgrep => vector<string> doremi lgrep(".")
+fn lgrep string start_dir => vector<string>
+    let files = list_reg_files(start_dir)
+    let dirs = list_dirs(start_dir)
     let current = 0
     while (current++) < dirs.size()
         let dir = dirs.at(current-1)
         if dir =|= ".": ".." do continue
         if String(dir).ends_with("/.") do continue
         if String(dir).ends_with("/..") do continue
-        let new_files = list_reg_files(dir)
-        let new_dirs = list_dirs(dir)
+        let new_files = list_reg_files($"{start_dir}/{dir}")
+        let new_dirs = list_dirs($"{start_dir}/{dir}")
         foreach f in new_files do files.push_back($"{dir}/{f}")
         foreach d in new_dirs do dirs.push_back($"{dir}/{d}")
     ;

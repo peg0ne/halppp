@@ -9,6 +9,7 @@ class Highlighter
         _syntax = Syntax(type)
     ;
 pub
+    fn destruct => do _syntax.destruct()
     fn syntax => Syntax doremi _syntax
     fn wordlist => vector<string> doremi _syntax.wordlist()
     fn error_check IContainer* container, string path, List<string> text, Vector internal_offset => do error_checker(&_syntax, container, path, text, internal_offset)
