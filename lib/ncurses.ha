@@ -1,7 +1,7 @@
-inc => ncurses/ncurses.h, wchar.h, locale.h, iostream, cstring
+inc => curses.h, wchar.h, locale.h, iostream, cstring
 use => std
 get => vector, option
-compiler => "-lncursesw"
+compiler => "-lncurses"
 
 glob =>
     N_LEFT_UP_CORNER "┌"
