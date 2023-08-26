@@ -2,3 +2,5 @@ target/
 compiler/main
 hamble/main
 .*.exe
+.vscode/
+.*.vscode/
