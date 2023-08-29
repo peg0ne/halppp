@@ -15,6 +15,7 @@ class ConfigManager => IContent
     VerticalLayout _content = VerticalLayout(Fill::Flex)
     HorizontalLayout _header_layout = HorizontalLayout(Fill::Static, Vector(0,1))
     IContainer _header = IContainer(Fill::Static)
+    IContainer _wordlist = IContainer()
     ConfigManager =>
         _origin = new MainContainer(Vector(9,3))
         _origin->SetColor(-3)
@@ -22,6 +23,7 @@ class ConfigManager => IContent
         _config.add(&_selector_spacer)
         _config.add(&_content)
         _content.add(&_header_layout)
+        _content.add(&_wordlist)
         _header_layout.add(new IContainer())
         _header_layout.add(&_header)
         _header_layout.add(new IContainer())
@@ -41,6 +43,12 @@ class ConfigManager => IContent
         let size = _selector.origin()->Size()
         _selector_spacer.SetSize(size.x + 2, 0)
     ;
+    fn update_selected Syntax selected =>
+        _current = selected
+        _header.SetLabel(_current.name())
+        _header.SetSize(_current.name().size(), 0)
+        _wordlist.SetContent(_current.wordlist())
+    ;
     fn draw => do ((MainContainer*)_origin)->draw()
 pub
     fn show => Command
@@ -50,9 +58,7 @@ pub
                 case ConfigState::Selector
                     select selected from _selector.run()
                         _state = ConfigState::Internal
-                        _current = selected
-                        _header.SetLabel(_current.name())
-                        _header.SetSize(_current.name().size(), 0)
+                        update_selected(selected)
                         break
                     ;
                     return Command::Nop
