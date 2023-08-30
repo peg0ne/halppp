@@ -1,4 +1,4 @@
-get => Selector
+get => Selector, Selectable
 
 enum ConfigState
     Selector,
@@ -23,6 +23,7 @@ class ConfigManager => IContent
         _config.add(&_selector_spacer)
         _config.add(&_content)
         _content.add(&_header_layout)
+        _content.add((new Selectable("test"))->origin())
         _content.add(&_wordlist)
         _header_layout.add(new IContainer())
         _header_layout.add(&_header)
