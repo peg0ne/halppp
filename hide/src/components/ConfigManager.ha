@@ -1,4 +1,4 @@
-get => Selector, Selectable
+get => Selector, Selectable, ConfigEntry
 
 enum ConfigState
     Selector,
@@ -13,21 +13,16 @@ class ConfigManager => IContent
     HorizontalLayout _config = HorizontalLayout()
     IContainer _selector_spacer = IContainer(Fill::Static)
     VerticalLayout _content = VerticalLayout(Fill::Flex)
-    HorizontalLayout _header_layout = HorizontalLayout(Fill::Static, Vector(0,1))
-    IContainer _header = IContainer(Fill::Static)
-    IContainer _wordlist = IContainer()
+    IContainer _header = IContainer(Fill::Static, Vector(0, 1))
+    ConfigEntry _entry = ConfigEntry()
     ConfigManager =>
         _origin = new MainContainer(Vector(9,3))
         _origin->SetColor(-3)
         _origin->add(&_config)
         _config.add(&_selector_spacer)
         _config.add(&_content)
-        _content.add(&_header_layout)
-        _content.add((new Selectable("test"))->origin())
-        _content.add(&_wordlist)
-        _header_layout.add(new IContainer())
-        _header_layout.add(&_header)
-        _header_layout.add(new IContainer())
+        _content.add(&_header)
+        _content.add(_entry.origin())
         reload_configs()
     ;
     fn reload_configs =>
@@ -46,9 +41,8 @@ class ConfigManager => IContent
     ;
     fn update_selected Syntax selected =>
         _current = selected
-        _header.SetLabel(_current.name())
-        _header.SetSize(_current.name().size(), 0)
-        _wordlist.SetContent(_current.wordlist())
+        _header.SetContent(List<string>({_current.name()}))
+        _entry.SetEntry(_current)
     ;
     fn draw => do ((MainContainer*)_origin)->draw()
 pub
@@ -65,7 +59,7 @@ pub
                     return Command::Nop
                 default
                     _selector.draw()
-                    if Ncurses::key() == 27 do _state = ConfigState::Selector
+                    if !_entry.run() do _state = ConfigState::Selector
                     break
             ;
         ;
