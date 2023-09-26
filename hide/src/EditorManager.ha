@@ -1,8 +1,8 @@
 get => components/Editor
 class EditorManager => IContent
     vector<Editor*> _editors = {}
-    vector<HorizontalLayout*> _editorspaces = {}
-    Option<HorizontalLayout*> _activeSpace = None<HorizontalLayout*>()
+    vector<SpiralLayout*> _editorspaces = {}
+    Option<SpiralLayout*> _activeSpace = None<SpiralLayout*>()
     Option<Editor*> _activeEditor = None<Editor*>()
     vector<string> _shared_buffer = {}
     IContainer *_status_line
@@ -45,7 +45,7 @@ class EditorManager => IContent
                     index = active->size() - 1
                 ;
                 
-                let editor = active->containers()->at(index)
+                let editor = active->elements().at(index)
                 _activeEditor = find_editor_from_offset(editor->Offset())
                 return
             ;
@@ -57,7 +57,8 @@ class EditorManager => IContent
         select index from find_active_in_space()
         select space from _activeSpace
     
-        let size = space->containers()->size()
+        let size = space->elements().size()
+
         switch dir
         case Dir::Left
             if index == 0 dobr index = size - 1
@@ -68,7 +69,7 @@ class EditorManager => IContent
             index++
             break
         ;
-        let editor = space->containers()->at(index)
+        let editor = space->elements().at(index)
         _activeEditor = find_editor_from_offset(editor->Offset())
 
         ;;
@@ -87,12 +88,9 @@ class EditorManager => IContent
     fn find_editor_in_space string path => Option<int>
         select editor from try_find_editor(path)
         select space from _activeSpace
-        let editors = space->containers()
-        let size = editors->size()
-        for i until size
-            let e = editors->at(i)
-            let offset = e->Offset()
-            if offset.eq(editor->Offset()) doremi Some(i)
+        let editors = space->elements()
+        foreach i, e in editors
+            if e->Offset().eq(editor->Offset()) doremi Some(i)
         ;;;
         return None<int>()
     ;
@@ -116,7 +114,7 @@ pub
         let closed = None<Editor*>()
         select a from _activeEditor
             if !a->has_changes() || forced
-                a->close()
+                closed = Some(a->close())
             ;
             else
                 Ncurses::col(1)
@@ -126,31 +124,27 @@ pub
                 return Command::ModeCmdHan
             ;
         ;
-        vector<HorizontalLayout*> spaces = {}
+        vector<SpiralLayout*> spaces = {}
         foreach space in _editorspaces
-            let containers = space->containers()
-            vector<IContainer*> buf = {}
-            for i until containers->size()
-                let editor = containers->at(i)
-                if !editor->Active() do continue
-                else do buf.push_back(editor)
-            ;
-            space->clear()
+            let containers = space->elements()
+            let buf = linq::take(containers).where([](IContainer* e){return e->Active();}).as_vec()
+            space->destruct()
+            delete(space)
             if buf.size() == 0 do continue
-            foreach editor in buf do space->add(editor)
+            space = new SpiralLayout(Fill::Flex)
+            foreach editor in buf do space->add_element(editor)
             spaces.push_back(space)
-        ;
-        select e from closed
-            delete e->origin()
-            delete(e)
         ;
         _editorspaces = spaces
         _origin->clear()
         foreach space in _editorspaces do _origin->add(space)
         vector<Editor*> editors = {}
-        foreach editor in _editors
+        foreach i, editor in _editors
             if editor->is_active() do editors.push_back(editor)
-            else do delete editor
+            else
+                delete(editor->origin())
+                delete(editor)
+            ;
         ;
         _editors = editors
         if _editors.size() == 0 doremi Command::Exit
@@ -183,23 +177,21 @@ pub
         select active from _activeSpace
             let editor = get_last(&_editors)
             _activeEditor = Some(editor)
-            active->add(editor->origin())
+            active->add_element(editor->origin())
         ;
     ;
     fn add_space =>
-        _editorspaces.push_back(new HorizontalLayout(Fill::Flex))
+        _editorspaces.push_back(new SpiralLayout(Fill::Flex))
         let space = get_last(&_editorspaces)
         _origin->add(space)
         _activeSpace = Some(space)
         add_editor()
     ;
     fn try_find_editor string path => Option<Editor*>
-        for i until _editors.size()
-            let p = _editors.at(i)->path()
-            if p != path do continue
-            return Some(_editors.at(i))
-        ;
-        return None<Editor*>()
+        return linq::take(_editors)
+            .where([path](Editor* e) {
+                return e->path() == path;
+            }).first()
     ;
     fn get_last<T> vector<T> *vec => T
         let count = vec->size()
