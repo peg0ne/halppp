@@ -5,7 +5,7 @@ named => LSP
         vector<string> lib_files = {}
         select home from env("HOME")
             let dir = $"{home}/.local/lib"
-            lib_files = lgrep(dir)
+            lib_files = lgrep(dir, 0)
             lib_files = linq::take(lib_files)
                 .operate([dir](string file) {
                     return $"{dir}/{file}";

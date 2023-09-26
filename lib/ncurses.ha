@@ -150,7 +150,7 @@ pub
     ;
     static fn start bool nonblock = false =>
         curs_set(0)
-        if nonblock do nodelay(win, TRUE)
+        nodelay(win, nonblock ? TRUE : FALSE)
     ;
     static fn init_pair_adv short pair, short fg_p, Vector fg, short bg_p, Vector bg =>
         if !has_colors() do return

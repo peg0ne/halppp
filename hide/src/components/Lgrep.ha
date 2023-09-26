@@ -1,6 +1,7 @@
-fn lgrep => vector<string> doremi lgrep(".")
-fn lgrep string start_dir => vector<string>
+fn lgrep => vector<string> doremi lgrep(".", 0)
+fn lgrep string start_dir, int depth => vector<string>
     let files = list_reg_files(start_dir)
+    if depth >= 5 doremi files
     let dirs = list_dirs(start_dir)
     let current = 0
     while (current++) < dirs.size()
@@ -8,19 +9,45 @@ fn lgrep string start_dir => vector<string>
         if dir =|= ".": ".." do continue
         if String(dir).ends_with("/.") do continue
         if String(dir).ends_with("/..") do continue
-        let new_files = list_reg_files($"{start_dir}/{dir}")
-        let new_dirs = list_dirs($"{start_dir}/{dir}")
+        let new_files = lgrep($"{start_dir}/{dir}", depth + 1)
         foreach f in new_files do files.push_back($"{dir}/{f}")
-        foreach d in new_dirs do dirs.push_back($"{dir}/{d}")
     ;
     return files
+;
+
+fn lgrep_p vector<string> *files, int depth, string start_dir =>
+    let fs = list_reg_files(start_dir)
+    foreach f in fs do files->push_back(f)
+    if depth >= 5 do return
+    let dirs = list_dirs(start_dir)
+    let current = 0
+    while (current++) < dirs.size()
+        let dir = dirs.at(current-1)
+        if dir =|= ".": ".." do continue
+        if String(dir).ends_with("/.") do continue
+        if String(dir).ends_with("/..") do continue
+        let new_files = lgrep($"{start_dir}/{dir}", depth + 1)
+        foreach f in new_files do files->push_back($"{dir}/{f}")
+    ;
+;
+
+fn get_files vector<string> files, string search => List<string>
+    List<string> filtered_files = List<string>()
+    foreach file in files
+        if search == "" doco filtered_files.add(file)
+        if file.find(search) == -1 do continue
+        filtered_files.add(file)
+    ;
+    return filtered_files
 ;
 
 fn Lgrep => Option<string>
     let key = 0
     let pos = 0
     let search = ""
-    let files = List<string>(lgrep())
+    vector<string> files = {}
+    let a = async(launch::async, lgrep_p, &files, 0, ".")
+    Ncurses::start(true)
     let main = MainContainer(Vector(COLS/10, LINES/8))
     let base = HorizontalLayout(Fill::Flex)
     let search_bar = IContainer(Fill::Static, Vector(0,1))
@@ -41,27 +68,31 @@ fn Lgrep => Option<string>
     left.add(&search_spacer)
     left.add(&content)
     let offset = 0
+    let filtered_files = get_files(files, search)
     loop
         search_bar.SetLabel(search)
-        let buf = linq::take(files)
-            .where([search](string file){return file.find(search) != -1;})
-            .where_with_iterator([offset](string file, int i){return i >= offset;})
-            .as_list()
+        let i = 0
+        let max = offset + view.Size().y
+        let buf = List<string>()
+        foreach file in filtered_files
+            if i >= max do break
+            if i >= offset do buf.add(file)
+            i++
+        ;
         content.SetContent(buf)
         if pos >= buf.size()
             view.SetContent(List<string>())
             main.draw()
         ;
         else
-            
             let lines = linq::take(readlines(buf.at(pos)))
-                .operate_async([&view](string line){return line.substr(0, view.Size().x);}).as_list()
+                .operate([&view](string line){return line.substr(0, view.Size().x);}).as_list()
             view.SetContent(lines)
             let h = Highlighter(buf.at(pos))
             main.draw()
             h.highlight(&view)
         ;
-        let count_info = $"{buf.len()}/{files.len()}"
+        let count_info = $"{filtered_files.len()}/{files.size()}"
         Ncurses::add(search_bar.Offset().y,
             search_bar.Offset().x + search_bar.Size().x - count_info.size(),
             count_info)
@@ -70,7 +101,9 @@ fn Lgrep => Option<string>
             5, content.Size().x)
         key = Ncurses::key()
         switch key
-        case 27 doremi None<string>()
+        case 27
+            Ncurses::start(false)
+            return None<string>()
         case KEY_DOWN dobr pos++
         case KEY_UP dobr pos--
         case KEY_PPAGE dobr pos-=1000
@@ -83,9 +116,13 @@ fn Lgrep => Option<string>
         case KEY_BACKSPACE
             if search.size() == 0 do break
             search.pop_back()
+            filtered_files = get_files(files, search)
             break
         default
-            if isgraph(key) do search += key
+            if isgraph(key)
+                search += key
+                filtered_files = get_files(files, search)
+            ;
             break
         ;
         if pos > buf.size() - 1 do pos = buf.size() - 1
