@@ -110,6 +110,7 @@ fn Lgrep => Option<string>
         case KEY_NPAGE dobr pos+=1000
         case '\n'
             if pos >= buf.size() do break
+            Ncurses::start(false)
             return buf.at(pos)
         case '\b'
         case 127
