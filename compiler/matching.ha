@@ -8,9 +8,9 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
     loop 
         let x = get_next_or_exit(compiler_t, "[Match] requires some kind of expression to match")
         if x.token == Token::NewLine do break
-        if x.token == Token::Eof dobr display_err_message("[Match] missing expression", compiler_t->to_err_message())
-        if x.is_do() dobr display_err_message("[Match] do is not valid in start expression", compiler_t->to_err_message())
-        if x.is_base() dobr display_err_message("[Match] Token is not valid in start expression", compiler_t->to_err_message())
+        if x.token == Token::Eof dobr error("[Match] missing expression", compiler_t->recap())
+        if x.is_do() dobr error("[Match] do is not valid in start expression", compiler_t->recap())
+        if x.is_base() dobr error("[Match] Token is not valid in start expression", compiler_t->recap())
         matcher += x.name
     ;
     //Statements to match
@@ -29,7 +29,7 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
             get_next_or_exit(compiler_t, "[Match] Missing ; at the end")
             break
         ;
-        elif try_get(compiler_t, Token::Eof) do display_err_message("[Match] Unclosed match statement", compiler_t->to_err_message())
+        elif try_get(compiler_t, Token::Eof) do error("[Match] Unclosed match statement", compiler_t->recap())
     ;
     return Expression(MatchDef(matcher, statments, internal, id, is_let, operators))
 ; 

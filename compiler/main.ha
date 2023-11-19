@@ -63,7 +63,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     loop
         let next = get_next_or_exit(&compiler_t, "Compiler failed to do unexpected EOF")
         if !next.is_base()
-            display_err_message($"Token not allowed in base: {next.token}", compiler_t.to_err_message())
+            error($"Token not allowed in base: {next.token}", compiler_t.recap())
         ;
         if next.is_terminator() do break
         elif next.is_nl() do continue
@@ -75,7 +75,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
         ;
         match next.token
             Token::Named =>
-                if is_named do display_err_message("[Named] cannot have nested namespaces", compiler_t.to_err_message())
+                if is_named do error("[Named] cannot have nested namespaces", compiler_t.recap())
                 is_named = true
                 get_arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
                 let id = get_id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
@@ -121,7 +121,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 args = get_or_exit(&compiler_t, Token::String, $"[Compiler] Missing value of compiler intent [TString]: {next.name}")
                 compiler_t.add_arg(args)
             ;
-            _ => do display_err_message($"Token not handled: {next.name}", compiler_t.to_err_message())
+            _ => do error($"Token not handled: {next.name}", compiler_t.recap())
         ;
     ;
     if is_named do output += "\n}\n"
@@ -134,6 +134,6 @@ fn validate_compiled Compiler compiler, bool is_main =>
     foreach f in compiler.program->functions
         if f.id == "main" dobr has_main = true
     ;
-    if !has_main && is_main do display_hint_message("Main function is not present!")
-    if has_main && !is_main do display_hint_message("Main function not in main file")
+    if !has_main && is_main do hint("Main function is not present!")
+    if has_main && !is_main do hint("Main function not in main file")
 ;

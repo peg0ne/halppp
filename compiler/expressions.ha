@@ -98,7 +98,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
         ;
         switch x.token
         case Token::Id dobr parameters.push_back(x.name)
-        default dobr display_err_message("[Lambda] Incorrect parameter value", compiler_t->to_err_message())
+        default dobr error("[Lambda] Incorrect parameter value", compiler_t->recap())
         ;
         x = get_next_or_exit(compiler_t, "[Lambda] Incomplete lambda")
         if x.token == Token::Id && String(x.name).starts_with("(")
@@ -106,7 +106,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
             break
         ;
         if x.token == Token::Comma doco parameters.push_back(",")
-        display_err_message("[Lambda] Comma missing", compiler_t->to_err_message())
+        error("[Lambda] Comma missing", compiler_t->recap())
     ;
     base += "["
     foreach p in parameters do base += p

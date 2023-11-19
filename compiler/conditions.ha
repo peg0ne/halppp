@@ -11,7 +11,7 @@ fn co_err ConditionError err, string opt, bool display, string recap => string
     default do break
     ;
     msg += opt
-    if display do display_err_message(msg, recap)
+    if display do error(msg, recap)
     return msg
 ;
 
@@ -75,7 +75,7 @@ fn adv_conditional_construct Compiler *compiler_t, ConditionalExpression *expr, 
             expr->operator_value = "=="
             separator = "|| "
             break
-        default dobr display_err_message("UNKOWN TOKEN", compiler_t->to_err_message())
+        default dobr error("UNKOWN TOKEN", compiler_t->recap())
     ;
     let op = $"{expr->operator_value} "
     let left = $"{expr->value_left} "

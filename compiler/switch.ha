@@ -3,7 +3,7 @@ fn switch_construct Compiler *compiler_t => Expression
     let expression = ConditionalExpression()
     loop
         let x = get_next_or_exit(compiler_t, "[Switch] Switch is not closed")
-        if x.is_do() do display_err_message("[Switch] Switch statements cannot have a do parameter", compiler_t->to_err_message())
+        if x.is_do() do error("[Switch] Switch statements cannot have a do parameter", compiler_t->recap())
         if x.is_nl() dobr cond.expressions.push_back(expression)
         expression.value_left += x.name + " "
     ;
@@ -23,7 +23,7 @@ fn switch_construct Compiler *compiler_t => Expression
             case Token::Eof dobr exit = true
             case Token::SemiColon dobr exit = true
             case Token::NewLine do break
-            default dobr display_err_message($"[Switch] Token not allowed in switch {x.token}", compiler_t->to_err_message())
+            default dobr error($"[Switch] Token not allowed in switch {x.token}", compiler_t->recap())
         ;
         if exit do break
     ;
@@ -38,14 +38,14 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
         label = "case " + next.name
         let name = String(next.name)
         if next.is_id() && !name.starts_with("KEY_")
-            if !compiler_t->has_enum(next.name) do display_err_message($"[Switch] Enum member doesn't exist: {next.name}", compiler_t->to_err_message())
+            if !compiler_t->has_enum(next.name) do error($"[Switch] Enum member doesn't exist: {next.name}", compiler_t->recap())
         ;
-        if !next.valid_case() do display_err_message("Token not allowed in switch: ", compiler_t->to_err_message())
+        if !next.valid_case() do error("Token not allowed in switch: ", compiler_t->recap())
         if next.is_id() && try_get(compiler_t, Token::DblColon)
             label += "::"
             compiler_t->next()
             let enum_name = get_next_or_exit(compiler_t, "[Switch] Unexpected end")
-            if !compiler_t->has_enum_name(enum_name.name) do display_err_message($"[Switch] Enum member doesn't exist: {enum_name.name}", compiler_t->to_err_message())
+            if !compiler_t->has_enum_name(enum_name.name) do error($"[Switch] Enum member doesn't exist: {enum_name.name}", compiler_t->recap())
             label += enum_name.name
         ;
         label += ":\n"

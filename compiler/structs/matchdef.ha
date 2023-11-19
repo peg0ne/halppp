@@ -31,7 +31,7 @@ struct MatchDef
                 foreach i, statment in statments
                     if statment == "_" dobr default_statement = i
                 ;
-                if default_statement == -1 do display_err_message("[Match] match let statement requires default statement!", "")
+                if default_statement == -1 do error("[Match] match let statement requires default statement!", "")
                 let l = lines[default_statement]
                 matcher += l.lines[l.lines.size() - 1]
             ;

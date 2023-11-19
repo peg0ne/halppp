@@ -26,11 +26,11 @@ fn get_type Compiler *compiler_t => Variable
     let next = get_next_or_exit(compiler_t, VAR_ERR_NON)
     let variable = Variable(true)
     if any(next.token, {Token::Id, Token::Type}) do variable.v_type = next.name
-    elif next.token != Token::NewLine do display_err_message(VAR_ERR_TYP + to_string(next.token), compiler_t->to_err_message())
+    elif next.token != Token::NewLine do error(VAR_ERR_TYP + to_string(next.token), compiler_t->recap())
     let tried = try_get(compiler_t, Token::LessThan)
     if tried
         if !variable.has_id()
-            display_err_message(VAR_ERR_TEM + variable.v_type, compiler_t->to_err_message())
+            error(VAR_ERR_TEM + variable.v_type, compiler_t->recap())
         ;
         next = get_next_or_exit(compiler_t, VAR_ERR_INV)
         variable.v_type += next.name
@@ -68,15 +68,15 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
         ;
         elif next.token == Token::TriplePeriod
             if variable.has_type() do variable.v_type += next.name
-            else do display_err_message(VAR_ERR_PER, compiler_t->to_err_message())
+            else do error(VAR_ERR_PER, compiler_t->recap())
         ;
         elif next.token == Token::Comma do break
         elif next.token == Token::Asterix
-            if !variable.has_type() do display_err_message(VAR_ERR_POI + variable.v_type, compiler_t->to_err_message())
+            if !variable.has_type() do error(VAR_ERR_POI + variable.v_type, compiler_t->recap())
             variable.v_type += next.name
         ;
         elif next.token == Token::LessThan
-            if !variable.has_id() && !variable.has_type() do display_err_message(VAR_ERR_TEM + variable.v_type, compiler_t->to_err_message())
+            if !variable.has_id() && !variable.has_type() do error(VAR_ERR_TEM + variable.v_type, compiler_t->recap())
             variable.v_type += next.name
             let depth = 1
             loop
@@ -95,10 +95,10 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
         else
             if !variable.has_type() doco variable.v_type = next.name
             if !variable.has_id() doco variable.id = next.name
-            display_err_message(VAR_ERR_COM, compiler_t->to_err_message())
+            error(VAR_ERR_COM, compiler_t->recap())
         ;
     ;
-    if !variable.has_minimum() && !is_end do display_err_message(VAR_ERR_INC + variable.id, compiler_t->to_err_message())
+    if !variable.has_minimum() && !is_end do error(VAR_ERR_INC + variable.id, compiler_t->recap())
     variable.id = pre_name + variable.id
     return VariableNBool(variable, is_end)
 ;

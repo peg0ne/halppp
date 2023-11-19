@@ -7,7 +7,7 @@ fn validate_function Function function, Compiler *compiler_t =>
                 j++
             ;
         ;
-        display_err_message($"Duplicate instances Function of: {function.id}", compiler_t->to_err_message())
+        error($"Duplicate instances Function of: {function.id}", compiler_t->recap())
     ;
 ;
 
@@ -40,12 +40,12 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
             case Token::LBrack
                 function.id = "operator[]"
                 break
-            default dobr display_err_message($"Expected id or operator but got: {func_id.name}", compiler_t->to_err_message())
+            default dobr error($"Expected id or operator but got: {func_id.name}", compiler_t->recap())
             ;
         ;
     ;
     let peeked_opt = compiler_t->peek()
-    if peeked_opt.is_none() do display_err_message($"Error when trying to parse function: {function.id}", compiler_t->to_err_message())
+    if peeked_opt.is_none() do error($"Error when trying to parse function: {function.id}", compiler_t->recap())
     if peeked_opt.value_or(AstToken("NONE")).token == Token::LessThan
         compiler_t->next()
         function.templates = template_construct(compiler_t)
@@ -62,7 +62,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
         function.return_value = Some(Variable("", "int"))
         select peeked from compiler_t->peek()
             if peeked.token != Token::NewLine
-                display_err_message("Return value invalid on main function", compiler_t->to_err_message())
+                error("Return value invalid on main function", compiler_t->recap())
             ;
         ;
     ;
@@ -74,7 +74,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     loop
         let x = get_next_or_exit(compiler_t, $"Function is not closed {function.id}")
         if any(x.token, {Token::SemiColon, Token::Eof}) do break
-        if x.token == Token::Function dobr display_err_message($"Function above is not closed {function.id}", compiler_t->to_err_message())
+        if x.token == Token::Function dobr error($"Function above is not closed {function.id}", compiler_t->recap())
         if x.is_nl() do continue
         switch x.token
             case Token::Foreach
@@ -89,17 +89,17 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
                 select declaration from expr.e_declaration
                     foreach v in variables_in_func
                         if v.id == declaration.id
-                            display_err_message("Multiple declarations with same name in function", compiler_t->to_err_message())
+                            error("Multiple declarations with same name in function", compiler_t->recap())
                         ;
                     ;
                     foreach v in variables
                         if v.id == declaration.id
-                            display_err_message("Variable already declared in class", compiler_t->to_err_message())
+                            error("Variable already declared in class", compiler_t->recap())
                         ;
                     ;
                     foreach v in function.arguments
                         if v.id == declaration.id
-                            display_err_message("Variable already declared in function arguments", compiler_t->to_err_message())
+                            error("Variable already declared in function arguments", compiler_t->recap())
                         ;
                     ;
                     variables_in_func.push_back(declaration)

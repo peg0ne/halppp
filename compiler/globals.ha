@@ -21,7 +21,7 @@ fn get_variables Compiler *compiler_t => vector<Variable>
             default
                 if !variable.has_type() dobr variable.v_type = x.name
                 elif !variable.has_id() dobr variable.id = x.name
-                display_err_message("[Global]: Variable is already finished", compiler_t->to_err_message())
+                error("[Global]: Variable is already finished", compiler_t->recap())
         ;
     ;
 ;
@@ -29,11 +29,11 @@ fn try_add_variable Compiler *compiler_t, Global *global, Variable variable =>
     if !variable.has_minimum() do return
     foreach v in global->variables
         if v.v_type == variable.v_type
-            display_err_message("[Global]: Multiple declarations of same value", compiler_t->to_err_message())
+            error("[Global]: Multiple declarations of same value", compiler_t->recap())
         ;
     ;
     if compiler_t->has_glob(variable.v_type)
-        display_err_message("[Global]: Multiple declarations of same value", compiler_t->to_err_message())
+        error("[Global]: Multiple declarations of same value", compiler_t->recap())
     ;
     global->variables.push_back(variable)
 ;

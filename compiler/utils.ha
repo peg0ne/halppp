@@ -9,7 +9,7 @@ struct FpFn
 ;
 fn get_next_or_exit Compiler *compiler_t, string s => AstToken
     let next = compiler_t->next()
-    if next.is_none() do display_err_message(s, compiler_t->to_err_message())
+    if next.is_none() do error(s, compiler_t->recap())
     return next.value_or(AstToken())
 ;
 fn try_get Compiler *compiler_t, Token token => bool
@@ -19,7 +19,7 @@ fn try_get Compiler *compiler_t, Token token => bool
 ;
 fn get_or_exit Compiler *compiler_t, Token token, string s => string
     let next = compiler_t->next()
-    if next.is_none() || next.value_or(AstToken()).token != token do display_err_message(s, compiler_t->to_err_message())
+    if next.is_none() || next.value_or(AstToken()).token != token do error(s, compiler_t->recap())
     return next.value_or(AstToken()).name
 ;
 fn get_id_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Id, s)

@@ -1,7 +1,7 @@
 inc => fstream
 
 fn get_file_path int argc, char **argv => string
-    if argc < 2 do display_err_message("No file path supplied in arguments!\nExiting...", "")
+    if argc < 2 do error("No file path supplied in arguments!\nExiting...", "")
     let fp = ""
     let i = 0
     while argv[1][i] != '\0' do fp.push_back(argv[1][i++])
@@ -15,7 +15,7 @@ fn get_content CompilerPath paths, bool can_be_lib => string
             reader = ifstream($"{home}/.local/lib/halppp/{paths.current}")
         ;
     ;
-    if !reader do display_err_message("Couldn't open file\nExiting...", "")
+    if !reader do error("Couldn't open file\nExiting...", "")
     while !reader.eof()
         getline(reader, linebuf)
         content += $"{linebuf}\n"

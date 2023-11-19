@@ -35,19 +35,19 @@ fn c_err ClassError err, string opt, bool display, string recap => string
     default do break
     ;
     msg += opt
-    if display do display_err_message(msg, recap)
+    if display do error(msg, recap)
     return msg
 ;
 
 fn class_validate Class class_def, Compiler *compiler_t =>
     // Check Duplicate Classes
     if compiler_t->has_class(class_def.id)
-        c_err(ClassError::Duplicate, class_def.id, true, compiler_t->to_err_message())
+        c_err(ClassError::Duplicate, class_def.id, true, compiler_t->recap())
     ;
     // Check Inheritance
     select inherit from class_def.inherit
         if compiler_t->has_class(inherit) do return
-        c_err(ClassError::Inheritance, class_def.id, true, compiler_t->to_err_message())
+        c_err(ClassError::Inheritance, class_def.id, true, compiler_t->recap())
     ;
 ;
 
@@ -81,14 +81,14 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
         if next.token == Token::Static
             next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
             if none(next.token, {Token::Id, Token::Type, Token::Function, Token::Const})
-                c_err(ClassError::StaticNotValid, next.name, true, compiler_t->to_err_message())
+                c_err(ClassError::StaticNotValid, next.name, true, compiler_t->recap())
             ;
             staticness = true
         ;
         if next.token == Token::Const
             next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
             if none(next.token, {Token::Id, Token::Type})
-                c_err(ClassError::ConstNotValid, next.name, true, compiler_t->to_err_message())
+                c_err(ClassError::ConstNotValid, next.name, true, compiler_t->recap())
             ;
             constantness = true
         ;
@@ -102,7 +102,7 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
                     class_internal_declarations(&extend_compiler, is_struct, class_def, paths)
                     continue
                 ;
-                c_err(ClassError::ExtendNotValid, extender, true, compiler_t->to_err_message())
+                c_err(ClassError::ExtendNotValid, extender, true, compiler_t->recap())
             ;
         ;
         if next.token == Token::Function
@@ -121,7 +121,7 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
             vnb.variable.staticness = staticness
             vnb.variable.constantness = constantness
             if class_def->contains(vnb.variable)
-                c_err(ClassError::DoubleDeclaration, vnb.variable.id, true, compiler_t->to_err_message())
+                c_err(ClassError::DoubleDeclaration, vnb.variable.id, true, compiler_t->recap())
             ;
             doco class_def->variables.push_back(vnb.variable)
         ;

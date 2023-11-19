@@ -9,7 +9,7 @@ struct Compiler
         this->ast = ast
         this->current_line -= extra_lines
     ;
-    fn to_err_message => string
+    fn recap => string
         let current = current_line - 2
         while current_text.len() < 7
             select n from next(true) do continue
