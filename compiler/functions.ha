@@ -16,7 +16,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     let function = Function(state)
     vector<Variable> variables_in_func = {}
     if !constr
-        let func_id = get_next_or_exit(compiler_t, "[FunctionError]: No Function Id")
+        let func_id = next_or_exit(compiler_t, "[FunctionError]: No Function Id")
         if func_id.token == Token::Id do function.id = func_id.name
         else
             switch func_id.token
@@ -72,7 +72,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
         function.return_value = is_do ? Some(Variable(true)) : Some(get_type(compiler_t))
     ;
     loop
-        let x = get_next_or_exit(compiler_t, $"Function is not closed {function.id}")
+        let x = next_or_exit(compiler_t, $"Function is not closed {function.id}")
         if any(x.token, {Token::SemiColon, Token::Eof}) do break
         if x.token == Token::Function dobr error($"Function above is not closed {function.id}", compiler_t->recap())
         if x.is_nl() do continue
@@ -111,6 +111,6 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     ;
     if function.id == "main" do function.add_expr(Expression((string)"return 0"))
     validate_function(function, compiler_t)
-    compiler_t->add_fn(function)
+    compiler_t->add(function)
     return function
 ;

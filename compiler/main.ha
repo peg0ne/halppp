@@ -32,7 +32,7 @@ struct CompileOutput
 
 fn main =>
     let clap = Clap(argc, argv)
-    FpFn fpfn = get_folder_and_name(get_file_path(argc, argv))
+    FpFn fpfn = folder_and_name(get_file_path(argc, argv))
     let paths = CompilerPath(get_file_path(argc, argv), fpfn.f_p, fpfn.f_n)
     let p = Program()
     let output = compile_main(paths, &p)
@@ -61,7 +61,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     vector<string> incs = {}
     string args = EMPTY
     loop
-        let next = get_next_or_exit(&compiler_t, "Compiler failed to do unexpected EOF")
+        let next = next_or_exit(&compiler_t, "Compiler failed to do unexpected EOF")
         if !next.is_base()
             error($"Token not allowed in base: {next.token}", compiler_t.recap())
         ;
@@ -77,8 +77,8 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             Token::Named =>
                 if is_named do error("[Named] cannot have nested namespaces", compiler_t.recap())
                 is_named = true
-                get_arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
-                let id = get_id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
+                arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
+                let id = id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
                 output += $"namespace {id}\n" + "{\n"
             ;
             Token::Function =>
@@ -106,7 +106,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             Token::Get =>
                 incs = imports_creation(&compiler_t, next)
                 foreach i in incs
-                    FpFn fpfn = get_folder_and_name(paths.folder_path + i + HA_SUFFIX)
+                    FpFn fpfn = folder_and_name(paths.folder_path + i + HA_SUFFIX)
                     let get_path = CompilerPath(paths.folder_path + i + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
                     let get_out = compile(get_path, p, false)
                     output += get_out.output
@@ -117,7 +117,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 ;
             ;
             Token::Compiler =>
-                get_arrow_or_exit(&compiler_t, $"[Compiler] Missing start of compiler intent [=>]: {next.name}")
+                arrow_or_exit(&compiler_t, $"[Compiler] Missing start of compiler intent [=>]: {next.name}")
                 args = get_or_exit(&compiler_t, Token::String, $"[Compiler] Missing value of compiler intent [TString]: {next.name}")
                 compiler_t.add_arg(args)
             ;

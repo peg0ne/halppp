@@ -10,9 +10,9 @@ struct VariableNBool
 fn get_value Compiler *compiler_t, bool found_setter => Option<string> doremi get_value(compiler_t, found_setter, false)
 fn get_value Compiler *compiler_t, bool found_setter, bool in_args => Option<string>
     let value = ""
-    if !found_setter do get_eq_or_exit(compiler_t, VAR_ERR_SET)
+    if !found_setter do eq_or_exit(compiler_t, VAR_ERR_SET)
     loop
-        let next = get_next_or_exit(compiler_t, VAR_ERR_VAL)
+        let next = next_or_exit(compiler_t, VAR_ERR_VAL)
         if next.is_nl() do break
         if in_args && any(next.token, {Token::Comma, Token::CoolArrow}) do break
         value += next.name
@@ -23,7 +23,7 @@ fn get_value Compiler *compiler_t, bool found_setter, bool in_args => Option<str
 
 
 fn get_type Compiler *compiler_t => Variable
-    let next = get_next_or_exit(compiler_t, VAR_ERR_NON)
+    let next = next_or_exit(compiler_t, VAR_ERR_NON)
     let variable = Variable(true)
     if any(next.token, {Token::Id, Token::Type}) do variable.v_type = next.name
     elif next.token != Token::NewLine do error(VAR_ERR_TYP + to_string(next.token), compiler_t->recap())
@@ -32,10 +32,10 @@ fn get_type Compiler *compiler_t => Variable
         if !variable.has_id()
             error(VAR_ERR_TEM + variable.v_type, compiler_t->recap())
         ;
-        next = get_next_or_exit(compiler_t, VAR_ERR_INV)
+        next = next_or_exit(compiler_t, VAR_ERR_INV)
         variable.v_type += next.name
         loop
-            next = get_next_or_exit(compiler_t, VAR_ERR_INV)
+            next = next_or_exit(compiler_t, VAR_ERR_INV)
             variable.v_type += next.name
             if next.token == Token::MoreThan do break
         ;
@@ -54,7 +54,7 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
     let is_end = false
     let pre_name = ""
     loop
-        let next = get_next_or_exit(compiler_t, VAR_ERR_INV)
+        let next = next_or_exit(compiler_t, VAR_ERR_INV)
         if any(next.token, {Token::NewLine, Token::CoolArrow}) dobr is_end = true
         if next.token == Token::Equals
             variable.v_value = get_value(compiler_t, true, is_func)
@@ -80,7 +80,7 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
             variable.v_type += next.name
             let depth = 1
             loop
-                next = get_next_or_exit(compiler_t, VAR_ERR_INV)
+                next = next_or_exit(compiler_t, VAR_ERR_INV)
                 variable.v_type += next.name
                 if next.token == Token::LessThan do depth++
                 if next.token == Token::MoreThan do depth--

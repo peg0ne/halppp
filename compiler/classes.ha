@@ -55,19 +55,19 @@ fn class_construct Compiler *compiler_t, bool is_struct, CompilerPath paths => C
     let class_def = Class()
     class_def.is_struct = is_struct
     
-    class_def.id = get_id_or_exit(compiler_t, c_err(ClassError::NoId))
+    class_def.id = id_or_exit(compiler_t, c_err(ClassError::NoId))
     // Set Inheritance Or Template
-    let next = get_next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
+    let next = next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
     if next.token == Token::LessThan
         class_def.templates = template_construct(compiler_t)
-        next = get_next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
+        next = next_or_exit(compiler_t, c_err(ClassError::Definition, class_def.id))
     ;
     if next.token == Token::CoolArrow
-        class_def.inherit = Some(get_id_or_exit(compiler_t, c_err(ClassError::NoInheritor, class_def.id)))
+        class_def.inherit = Some(id_or_exit(compiler_t, c_err(ClassError::NoInheritor, class_def.id)))
     ;
     class_internal_declarations(compiler_t, is_struct, &class_def, paths)
     class_validate(class_def, compiler_t)
-    compiler_t->add_class(class_def)
+    compiler_t->add(class_def)
     return class_def
 ;
 
@@ -75,25 +75,25 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
     //Construct inner Class values
     let variable_state = !is_struct ? VariableState::Private : VariableState::Public
     loop
-        let next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+        let next = next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
         let staticness = false
         let constantness = false
         if next.token == Token::Static
-            next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+            next = next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
             if none(next.token, {Token::Id, Token::Type, Token::Function, Token::Const})
                 c_err(ClassError::StaticNotValid, next.name, true, compiler_t->recap())
             ;
             staticness = true
         ;
         if next.token == Token::Const
-            next = get_next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
+            next = next_or_exit(compiler_t, c_err(ClassError::Closed, class_def->id))
             if none(next.token, {Token::Id, Token::Type})
                 c_err(ClassError::ConstNotValid, next.name, true, compiler_t->recap())
             ;
             constantness = true
         ;
         if next.token == Token::Extend
-            get_arrow_or_exit(compiler_t, c_err(ClassError::Extend, class_def->id)) 
+            arrow_or_exit(compiler_t, c_err(ClassError::Extend, class_def->id)) 
             let extends = imports_construct_impl(compiler_t)
             foreach extender in extends
                 select content from read(paths.folder_path + extender + HA_SUFFIX)

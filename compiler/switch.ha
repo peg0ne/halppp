@@ -2,13 +2,13 @@ fn switch_construct Compiler *compiler_t => Expression
     let cond = Condition("switch")
     let expression = ConditionalExpression()
     loop
-        let x = get_next_or_exit(compiler_t, "[Switch] Switch is not closed")
+        let x = next_or_exit(compiler_t, "[Switch] Switch is not closed")
         if x.is_do() do error("[Switch] Switch statements cannot have a do parameter", compiler_t->recap())
         if x.is_nl() dobr cond.expressions.push_back(expression)
         expression.value_left += x.name + " "
     ;
     loop
-        let x = get_next_or_exit(compiler_t, "[Switch] Switch is not closed")
+        let x = next_or_exit(compiler_t, "[Switch] Switch is not closed")
         let exit = false
         vector<Expression> result = {}
         switch x.token
@@ -34,7 +34,7 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
     vector<Expression> lines = {}
     let label = ""
     if !is_default
-        let next = get_next_or_exit(compiler_t, "[Switch] Case unfinished")
+        let next = next_or_exit(compiler_t, "[Switch] Case unfinished")
         label = "case " + next.name
         let name = String(next.name)
         if next.is_id() && !name.starts_with("KEY_")
@@ -44,7 +44,7 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
         if next.is_id() && try_get(compiler_t, Token::DblColon)
             label += "::"
             compiler_t->next()
-            let enum_name = get_next_or_exit(compiler_t, "[Switch] Unexpected end")
+            let enum_name = next_or_exit(compiler_t, "[Switch] Unexpected end")
             if !compiler_t->has_enum_name(enum_name.name) do error($"[Switch] Enum member doesn't exist: {enum_name.name}", compiler_t->recap())
             label += enum_name.name
         ;
@@ -53,7 +53,7 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
     else do label = "default:\n"
     lines.push_back(Expression(label))
     loop
-        let x = get_next_or_exit(compiler_t, "[Switch] Case unfinished")
+        let x = next_or_exit(compiler_t, "[Switch] Case unfinished")
         vector<Expression> result = {}
         switch x.token
             case Token::Case

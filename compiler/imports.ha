@@ -1,12 +1,12 @@
 fn imports_construct Compiler *compiler_t => vector<string>
-    get_arrow_or_exit(compiler_t, "[Import]: Missing [=>] in declaration")
+    arrow_or_exit(compiler_t, "[Import]: Missing [=>] in declaration")
     return imports_construct_impl(compiler_t)
 ;
 fn imports_construct_impl Compiler *compiler_t => vector<string>
     vector<string> imports = {}
     let id = ""
     loop
-        let next = get_next_or_exit(compiler_t, "[Import]: Import declaration invalid")
+        let next = next_or_exit(compiler_t, "[Import]: Import declaration invalid")
         if any(next.token, {Token::Eof, Token::NewLine, Token::Comma, Token::RBrack})
             if id.size() > 0 && !imports_check_duplicate(imports, id) do imports.push_back(id)
             id = EMPTY

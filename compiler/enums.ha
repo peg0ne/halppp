@@ -39,11 +39,11 @@ fn validate_enum Enum enumerator, Compiler *compiler_t =>
 ;
 
 fn enums_construct Compiler *compiler_t => Enum
-    let id = get_id_or_exit(compiler_t, e_err(EnumError::NoId))
+    let id = id_or_exit(compiler_t, e_err(EnumError::NoId))
     let enumerator = Enum(id)
     let enum_def = EnumValue()
     loop
-        let next = get_next_or_exit(compiler_t, e_err(EnumError::Closed))
+        let next = next_or_exit(compiler_t, e_err(EnumError::Closed))
         if next.is_id()
             if enum_def.name.size() == 0 doco enum_def.name = next.name
             e_err(EnumError::IdExists, EMPTY, true, compiler_t->recap())
@@ -71,6 +71,6 @@ fn enums_construct Compiler *compiler_t => Enum
         e_err(EnumError::Unexpected, EMPTY, true, compiler_t->recap())
     ;
     validate_enum(enumerator, compiler_t)
-    compiler_t->add_enum(enumerator)
+    compiler_t->add(enumerator)
     return enumerator
 ;

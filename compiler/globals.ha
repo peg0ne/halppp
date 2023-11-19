@@ -2,7 +2,7 @@ fn global_construct Compiler *compiler_t => Global
     let global = Global()
     let variables = get_variables(compiler_t)
     foreach i in variables do try_add_variable(compiler_t, &global, i)
-    compiler_t->add_glob(global)
+    compiler_t->add(global)
     return global
 ;
 
@@ -10,7 +10,7 @@ fn get_variables Compiler *compiler_t => vector<Variable>
     vector<Variable> variables = {}
     let variable = Variable()
     loop
-        let x = get_next_or_exit(compiler_t, "[Global]: Unexpected end of global")
+        let x = next_or_exit(compiler_t, "[Global]: Unexpected end of global")
         switch x.token
             case Token::Eof
             case Token::SemiColon doremi variables

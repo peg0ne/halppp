@@ -52,10 +52,10 @@ struct Compiler
     ;
     fn peek => Option<AstToken> doremi ast.peek()
     fn prev => Option<AstToken> doremi ast.prev()
-    fn add_fn Function function => do program->functions.push_back(function)
-    fn add_class Class class_obj => do program->classes.push_back(class_obj)
-    fn add_enum Enum enum_def => do program->enums.push_back(enum_def)
-    fn add_glob Global global => do program->global.push_back(global)
+    fn add Function function => do program->functions.push_back(function)
+    fn add Class class_obj => do program->classes.push_back(class_obj)
+    fn add Enum enum_def => do program->enums.push_back(enum_def)
+    fn add Global global => do program->global.push_back(global)
     fn add_inc vector<string> includes =>
         foreach i in includes do program->includes.push_back(Include(i))
     ;

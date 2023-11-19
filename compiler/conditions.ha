@@ -24,7 +24,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_left = "true"
     ;
     loop
-        let x = get_next_or_exit(compiler_t, co_err(ConditionError::Closed))
+        let x = next_or_exit(compiler_t, co_err(ConditionError::Closed))
         if x.is_do()
             cond.add_expr(expression)
             cond.lines.push_back(expression_construct(compiler_t, x))
@@ -46,7 +46,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_right += $"{x.name} "
     ;
     loop
-        let x = get_next_or_exit(compiler_t, co_err(ConditionError::Closed))
+        let x = next_or_exit(compiler_t, co_err(ConditionError::Closed))
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token

@@ -7,7 +7,7 @@ struct FpFn
         this->f_n = f_n
     ;
 ;
-fn get_next_or_exit Compiler *compiler_t, string s => AstToken
+fn next_or_exit Compiler *compiler_t, string s => AstToken
     let next = compiler_t->next()
     if next.is_none() do error(s, compiler_t->recap())
     return next.value_or(AstToken())
@@ -22,10 +22,10 @@ fn get_or_exit Compiler *compiler_t, Token token, string s => string
     if next.is_none() || next.value_or(AstToken()).token != token do error(s, compiler_t->recap())
     return next.value_or(AstToken()).name
 ;
-fn get_id_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Id, s)
-fn get_eq_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Equals, s)
-fn get_arrow_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::CoolArrow, s)
-fn get_folder_and_name string file_path => FpFn
+fn id_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Id, s)
+fn eq_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Equals, s)
+fn arrow_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::CoolArrow, s)
+fn folder_and_name string file_path => FpFn
     let file_name = ""
     let reversed = ""
     let folder_path = file_path
