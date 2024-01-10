@@ -29,30 +29,30 @@ fn e_err EnumError err, string opt, bool display, string recap => string
     default do break
     ;
     msg += opt
-    if display do display_err_message(msg, recap)
+    if display do error(msg, recap)
     return msg
 ;
 
 fn validate_enum Enum enumerator, Compiler *compiler_t =>
     let contains = compiler_t->has_enum(enumerator.name)
-    if contains do e_err(EnumError::Duplicate, enumerator.name, true, compiler_t->to_err_message())
+    if contains do e_err(EnumError::Duplicate, enumerator.name, true, compiler_t->recap())
 ;
 
 fn enums_construct Compiler *compiler_t => Enum
-    let id = get_id_or_exit(compiler_t, e_err(EnumError::NoId))
+    let id = id_or_exit(compiler_t, e_err(EnumError::NoId))
     let enumerator = Enum(id)
     let enum_def = EnumValue()
     loop
-        let next = get_next_or_exit(compiler_t, e_err(EnumError::Closed))
+        let next = next_or_exit(compiler_t, e_err(EnumError::Closed))
         if next.is_id()
             if enum_def.name.size() == 0 doco enum_def.name = next.name
-            e_err(EnumError::IdExists, EMPTY, true, compiler_t->to_err_message())
+            e_err(EnumError::IdExists, EMPTY, true, compiler_t->recap())
         ;
         elif next.token == Token::Comma
-            if enum_def.name.size() == 0 do e_err(EnumError::CommaNoId, EMPTY, true, compiler_t->to_err_message())
+            if enum_def.name.size() == 0 do e_err(EnumError::CommaNoId, EMPTY, true, compiler_t->recap())
             foreach i in enumerator.enums
                 if i.name == enum_def.name
-                    e_err(EnumError::Member, enum_def.name, true, compiler_t->to_err_message())
+                    e_err(EnumError::Member, enum_def.name, true, compiler_t->recap())
                 ;
             ;
             enumerator.enums.push_back(enum_def)
@@ -64,13 +64,13 @@ fn enums_construct Compiler *compiler_t => Enum
                 enum_def.value = Some(val)
                 continue
             ;
-            e_err(EnumError::ValueNoId, EMPTY, true, compiler_t->to_err_message())
+            e_err(EnumError::ValueNoId, EMPTY, true, compiler_t->recap())
         ;
         if any(next.token, {Token::SemiColon, Token::Eof}) do break
         if any(next.token, {Token::Id, Token::NewLine, Token::Comma}) do continue
-        e_err(EnumError::Unexpected, EMPTY, true, compiler_t->to_err_message())
+        e_err(EnumError::Unexpected, EMPTY, true, compiler_t->recap())
     ;
     validate_enum(enumerator, compiler_t)
-    compiler_t->add_enum(enumerator)
+    compiler_t->add(enumerator)
     return enumerator
 ;

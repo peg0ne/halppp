@@ -12,8 +12,8 @@ fn colored MessageSeverity severity, string msg, string recap =>
     println(recap)
 ;
 fn display_message MessageSeverity severity, string msg, string recap => do colored(severity, msg, recap)
-fn display_hint_message string msg => do display_message(MessageSeverity::Hint, msg, "")
-fn display_err_message string msg, string recap =>
+fn hint string msg => do display_message(MessageSeverity::Hint, msg, "")
+fn error string msg, string recap =>
     display_message(MessageSeverity::Error, msg, recap)
     exit(1)
 ;

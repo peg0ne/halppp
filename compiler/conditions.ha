@@ -11,7 +11,7 @@ fn co_err ConditionError err, string opt, bool display, string recap => string
     default do break
     ;
     msg += opt
-    if display do display_err_message(msg, recap)
+    if display do error(msg, recap)
     return msg
 ;
 
@@ -24,7 +24,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_left = "true"
     ;
     loop
-        let x = get_next_or_exit(compiler_t, co_err(ConditionError::Closed))
+        let x = next_or_exit(compiler_t, co_err(ConditionError::Closed))
         if x.is_do()
             cond.add_expr(expression)
             cond.lines.push_back(expression_construct(compiler_t, x))
@@ -46,7 +46,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
         expression.value_right += $"{x.name} "
     ;
     loop
-        let x = get_next_or_exit(compiler_t, co_err(ConditionError::Closed))
+        let x = next_or_exit(compiler_t, co_err(ConditionError::Closed))
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token
@@ -75,7 +75,7 @@ fn adv_conditional_construct Compiler *compiler_t, ConditionalExpression *expr, 
             expr->operator_value = "=="
             separator = "|| "
             break
-        default dobr display_err_message("UNKOWN TOKEN", compiler_t->to_err_message())
+        default dobr error("UNKOWN TOKEN", compiler_t->recap())
     ;
     let op = $"{expr->operator_value} "
     let left = $"{expr->value_left} "

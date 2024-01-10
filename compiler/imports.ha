@@ -1,12 +1,12 @@
 fn imports_construct Compiler *compiler_t => vector<string>
-    get_arrow_or_exit(compiler_t, "[Import]: Missing [=>] in declaration")
+    arrow_or_exit(compiler_t, "[Import]: Missing [=>] in declaration")
     return imports_construct_impl(compiler_t)
 ;
 fn imports_construct_impl Compiler *compiler_t => vector<string>
     vector<string> imports = {}
     let id = ""
     loop
-        let next = get_next_or_exit(compiler_t, "[Import]: Import declaration invalid")
+        let next = next_or_exit(compiler_t, "[Import]: Import declaration invalid")
         if any(next.token, {Token::Eof, Token::NewLine, Token::Comma, Token::RBrack})
             if id.size() > 0 && !imports_check_duplicate(imports, id) do imports.push_back(id)
             id = EMPTY
@@ -20,7 +20,7 @@ fn imports_construct_impl Compiler *compiler_t => vector<string>
             ;
             id = EMPTY
         ;
-        elif next.is_base() do display_err_message($"[Import]: Token not allowed: {next.name}", compiler_t->to_err_message())
+        elif next.is_base() do error($"[Import]: Token not allowed: {next.name}", compiler_t->recap())
         else do id += next.name
         if any(next.token, {Token::Eof, Token::NewLine, Token::RBrack}) do break
     ;
@@ -36,23 +36,23 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
         switch next.token
         case Token::Use
             if compiler_t->has_use(imp)
-                display_hint_message($"[Use]: Duplicate entry of: {imp}")
+                hint($"[Use]: Duplicate entry of: {imp}")
                 remove.push_back(i)
             ;
             break
         case Token::Include
             if compiler_t->has_inc(imp)
-                display_hint_message($"[Include]: Duplicate entry of: {imp}")
+                hint($"[Include]: Duplicate entry of: {imp}")
                 remove.push_back(i)
             ;
             break
         case Token::Get
             if compiler_t->has_get(imp)
-                display_hint_message($"[Get]: Duplicate entry of: {imp}")
+                hint($"[Get]: Duplicate entry of: {imp}")
                 remove.push_back(i)
             ;
             break
-        default dobr display_err_message($"[{next.token}]: Unhandled import", compiler_t->to_err_message())
+        default dobr error($"[{next.token}]: Unhandled import", compiler_t->recap())
         ;
     ;
     vector<string> import_buf = {}
@@ -68,7 +68,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
     case Token::Use dobr compiler_t->add_use(import)
     case Token::Include dobr compiler_t->add_inc(import)
     case Token::Get dobr compiler_t->add_get(import)
-    default dobr display_err_message($"[{next.token}]: Unhandled import", compiler_t->to_err_message())
+    default dobr error($"[{next.token}]: Unhandled import", compiler_t->recap())
     ;
     return import
 ;
@@ -76,7 +76,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
 fn imports_check_duplicate vector<string> imports, string id => bool
     foreach imp in imports
         if imp == id
-            display_hint_message($"[Import]: Token duplicate in entry {id}")
+            hint($"[Import]: Token duplicate in entry {id}")
             return true
         ;
     ;
