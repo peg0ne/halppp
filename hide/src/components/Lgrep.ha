@@ -31,14 +31,15 @@ fn lgrep_p vector<string> *files, int depth, string start_dir =>
     ;
 ;
 
-fn get_files vector<string> files, string search => List<string>
-    List<string> filtered_files = List<string>()
-    foreach file in files
-        if search == "" doco filtered_files.add(file)
+fn get_files List<string>* filtered_files, vector<string>* files, string search =>
+    filtered_files->clear()
+    let max = files->size()
+    for i until max
+        let file = files->at(i)
+        if search == "" doco filtered_files->add(file)
         if file.find(search) == -1 do continue
-        filtered_files.add(file)
+        filtered_files->add(file)
     ;
-    return filtered_files
 ;
 
 fn Lgrep => Option<string>
@@ -57,6 +58,7 @@ fn Lgrep => Option<string>
     let left_spacer = IContainer(Fill::Static, Vector(1,0))
     let search_spacer = IContainer(Fill::Static, Vector(0,1), "─")
     let view = IContainer()
+    let h = Highlighter("a.ha")
     main.add(&base)
     base.SetColor(-2)
     spacer.SetColor(2)
@@ -68,8 +70,17 @@ fn Lgrep => Option<string>
     left.add(&search_spacer)
     left.add(&content)
     let offset = 0
-    let filtered_files = get_files(files, search)
+    List<string> filtered_files = List<string>()
     loop
+        if a.valid() && a.wait_for(0.1s) != future_status::ready
+            get_files(&filtered_files, &files, search)
+        ;
+        elif a.valid()
+            a.wait_for(0.1s)
+            a.get()
+            get_files(&filtered_files, &files, search)
+        ;
+        else do Ncurses::start(false)
         search_bar.SetLabel(search)
         let i = 0
         let max = offset + view.Size().y
@@ -88,7 +99,8 @@ fn Lgrep => Option<string>
             let lines = linq::take(readlines(buf.at(pos)))
                 .operate([&view](string line){return line.substr(0, view.Size().x);}).as_list()
             view.SetContent(lines)
-            let h = Highlighter(buf.at(pos))
+            h.destruct()
+            h = Highlighter(buf.at(pos))
             main.draw()
             h.highlight(&view)
         ;
@@ -103,6 +115,7 @@ fn Lgrep => Option<string>
         switch key
         case 27
             Ncurses::start(false)
+            h.destruct()
             return None<string>()
         case KEY_DOWN dobr pos++
         case KEY_UP dobr pos--
@@ -111,18 +124,19 @@ fn Lgrep => Option<string>
         case '\n'
             if pos >= buf.size() do break
             Ncurses::start(false)
+            h.destruct()
             return buf.at(pos)
         case '\b'
         case 127
         case KEY_BACKSPACE
             if search.size() == 0 do break
             search.pop_back()
-            filtered_files = get_files(files, search)
+            get_files(&filtered_files, &files, search)
             break
         default
             if isgraph(key)
                 search += key
-                filtered_files = get_files(files, search)
+                get_files(&filtered_files, &files, search)
             ;
             break
         ;
