@@ -1,4 +1,5 @@
 class LGREP
+    static bool is_content_search
     static int key
     static int pos
     static int offset
@@ -27,7 +28,8 @@ class LGREP
             content.Offset().x,
             5, content.Size().x)
     ;
-    static fn reset =>
+    static fn reset const bool in_is_content_search = false =>
+        is_content_search = in_is_content_search
         key = 0
         pos = 0
         offset = 0
@@ -60,12 +62,20 @@ class LGREP
     ;
     static fn get_files =>
         filtered_files.clear()
+        if is_content_search && search == "" do return
         let max_files = files.size()
         for i until max_files
             let file = files[i]
-            if search == "" doco filtered_files.add(file)
-            if file.find(search) == -1 do continue
-            filtered_files.add(file)
+            if !is_content_search
+                if search == "" doco filtered_files.add(file)
+                if file.find(search) == -1 do continue
+                filtered_files.add(file)
+                continue
+            ;
+            select content from read(file)
+                if content.find(search) == -1 do continue
+                filtered_files.add(file)
+            ;
         ;
     ;
     static fn lgrep_while const vector<string>* dirs, const int current, vector<string>* fs, const string start_dir, int depth =>
@@ -97,7 +107,7 @@ class LGREP
     ;
     static fn exit => Option<string>
         Ncurses::start(false)
-        return None<string>()
+        return Option<string>(" ")
     ;
     static fn backspace =>
         if search.size() == 0 do return
@@ -108,6 +118,26 @@ class LGREP
         if !isgraph(key) do return
         search += key
         LGREP::get_files()
+    ;
+    static fn handle_key => Option<string>
+        key = Ncurses::key()
+        switch key
+        case 27 doremi LGREP::exit()
+        case KEY_DOWN dobr pos++
+        case KEY_UP dobr pos--
+        case KEY_PPAGE dobr pos-=1000
+        case KEY_NPAGE dobr pos+=1000
+        case '\n'
+            if pos >= buffer.size() do break
+            Ncurses::start(false)
+            return buffer.at(pos)
+        case '\b'
+        case 127
+        case KEY_BACKSPACE dobr LGREP::backspace()
+        default dobr LGREP::add_search()
+        ;
+        LGREP::align_cursor()
+        return None<string>()
     ;
 pub
     static fn init =>
@@ -161,23 +191,34 @@ pub
             LGREP::set_content()
             LGREP::add_count_info($"{filtered_files.len()}/{files.size()}")
             LGREP::mark_current_selected(pos)
-            key = Ncurses::key()
-            switch key
-            case 27 doremi LGREP::exit()
-            case KEY_DOWN dobr pos++
-            case KEY_UP dobr pos--
-            case KEY_PPAGE dobr pos-=1000
-            case KEY_NPAGE dobr pos+=1000
-            case '\n'
-                if pos >= buffer.size() do break
-                Ncurses::start(false)
-                return buffer.at(pos)
-            case '\b'
-            case 127
-            case KEY_BACKSPACE dobr LGREP::backspace()
-            default dobr LGREP::add_search()
+            select fp from LGREP::handle_key()
+                if fp == "" do continue
+                return fp
             ;
-            LGREP::align_cursor()
+        ;
+    ;
+    static fn Search => Option<string>
+        LGREP::reset(true)
+        let async_tasks = async(launch::async, LGREP::lgrep_internal, 0, ".")
+        Ncurses::start(true)
+        loop
+            if async_tasks.valid() && async_tasks.wait_for(0.1s) != future_status::ready
+                LGREP::get_files()
+            ;
+            elif async_tasks.valid()
+                async_tasks.wait_for(0.1s)
+                async_tasks.get()
+                LGREP::get_files()
+            ;
+            else do Ncurses::start(false)
+            search_bar.SetLabel(search)
+            LGREP::set_content()
+            LGREP::add_count_info($"{filtered_files.len()}/{files.size()}")
+            LGREP::mark_current_selected(pos)
+            select fp from LGREP::handle_key()
+                if fp == " " do continue
+                return fp
+            ;
         ;
     ;
 ;

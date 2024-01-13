@@ -13,7 +13,9 @@ private fn run_space => Command
         "c - toggle comment",
         "P - paste word from clipboard",
         "p - open command pallete",
-        "s - open file searcher"
+        "s - open file searcher",
+        "S - open project searcher"
+        
     }
     foreach c in commands
         let ele = new IContainer(Fill::Flex)
@@ -42,6 +44,9 @@ private fn run_space => Command
         break
     case 's' 
         select fp from LGREP::Lgrep() do open(fp)
+        break
+    case 'S'
+        select fp from LGREP::Search() do open(fp)
         break
     ;
     return Command::ModeNormal
