@@ -9,11 +9,11 @@ named => LSP
     ;
     fn show_definition string word, string lang =>
         let func_start = $"fn {word} "
-        let project_files = lgrep()
+        let project_files = LGREP::lgrep()
         vector<string> lib_files = {}
         select home from env("HOME")
             let dir = $"{home}/.local/lib"
-            lib_files = lgrep(dir, 0)
+            lib_files = LGREP::lgrep(dir, 0)
             lib_files = linq::take(lib_files)
                 .operate([dir](string file) {
                     return $"{dir}/{file}";

@@ -41,7 +41,7 @@ private fn run_space => Command
         select command from result.command doremi command
         break
     case 's' 
-        select fp from Lgrep() do open(fp)
+        select fp from LGREP::Lgrep() do open(fp)
         break
     ;
     return Command::ModeNormal
