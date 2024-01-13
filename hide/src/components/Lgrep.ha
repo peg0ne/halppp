@@ -32,6 +32,7 @@ class LGREP
         pos = 0
         offset = 0
         search = ""
+        files.clear()
         filtered_files.clear()
     ;
     static fn set_content =>
