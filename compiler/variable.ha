@@ -56,49 +56,49 @@ fn construct_args Compiler *compiler_t, Option<string> type_name, bool is_func =
     loop
         let next = next_or_exit(compiler_t, VAR_ERR_INV)
         if any(next.token, {Token::NewLine, Token::CoolArrow}) dobr is_end = true
-        if next.token == Token::Equals
-            variable.v_value = get_value(compiler_t, true, is_func)
-            if is_func
-                select prev from compiler_t->prev()
-                    is_end = prev.token == Token::CoolArrow
+        match next.token
+            Token::Equals =>
+                variable.v_value = get_value(compiler_t, true, is_func)
+                if is_func
+                    select prev from compiler_t->prev()
+                        is_end = prev.token == Token::CoolArrow
+                    ;
+                    compiler_t->next()
                 ;
-                compiler_t->next()
+                break
             ;
-            break
-        ;
-        elif next.token == Token::TriplePeriod
-            if variable.has_type() do variable.v_type += next.name
-            else do error(VAR_ERR_PER, compiler_t->recap())
-        ;
-        elif next.token == Token::Comma do break
-        elif next.token == Token::Asterix
-            if !variable.has_type() do error(VAR_ERR_POI + variable.v_type, compiler_t->recap())
-            variable.v_type += next.name
-        ;
-        elif next.token == Token::LessThan
-            if !variable.has_id() && !variable.has_type() do error(VAR_ERR_TEM + variable.v_type, compiler_t->recap())
-            variable.v_type += next.name
-            let depth = 1
-            loop
-                next = next_or_exit(compiler_t, VAR_ERR_INV)
+            Token::TriplePeriod =>
+                if variable.has_type() do variable.v_type += next.name
+                else do error(VAR_ERR_PER, compiler_t->recap())
+            ;
+            Token::Comma => do break
+            Token::Asterix =>
+                if !variable.has_type() do error(VAR_ERR_POI + variable.v_type, compiler_t->recap())
                 variable.v_type += next.name
-                if next.token == Token::LessThan do depth++
-                if next.token == Token::MoreThan do depth--
-                if next.token == Token::DblMoreThan do depth -= 2
-                if next.token == Token::AllMoreThan do depth -= 3
-                if depth == 0 do break
             ;
-        ;
-        elif next.token == Token::Const
-            pre_name = "const "
-        ;
-        else
-            if !variable.has_type() doco variable.v_type = next.name
-            if !variable.has_id() doco variable.id = next.name
-            error(VAR_ERR_COM, compiler_t->recap())
+            Token::LessThan =>
+                if !variable.has_id() && !variable.has_type() do error(VAR_ERR_TEM + variable.v_type, compiler_t->recap())
+                variable.v_type += next.name
+                let depth = 1
+                loop
+                    next = next_or_exit(compiler_t, VAR_ERR_INV)
+                    variable.v_type += next.name
+                    if next.token == Token::LessThan do depth++
+                    if next.token == Token::MoreThan do depth--
+                    if next.token == Token::DblMoreThan do depth -= 2
+                    if next.token == Token::AllMoreThan do depth -= 3
+                    if depth == 0 do break
+                ;
+            ;
+            Token::Const => do pre_name = "const "
+            _ => 
+                if !variable.has_type() doco variable.v_type = next.name
+                if !variable.has_id() doco variable.id = next.name
+                error(VAR_ERR_COM, compiler_t->recap())
+            ;
         ;
     ;
     if !variable.has_minimum() && !is_end do error(VAR_ERR_INC + variable.id, compiler_t->recap())
-    variable.id = pre_name + variable.id
+    variable.v_type = pre_name + variable.v_type
     return VariableNBool(variable, is_end)
 ;
