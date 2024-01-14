@@ -88,6 +88,7 @@ class LGREP
         if String(start_dir).contains("Code/Work") do return
         if String(start_dir).contains("Code/Service") do return
         if String(start_dir).contains("Library/Artifacts") do return
+        if String(start_dir).contains("Library/ScriptAssemblies") do return
         let new_files = lgrep($"{start_dir}/{dir}", depth + 1)
         foreach f in new_files
             let f_str = String(f)
@@ -113,14 +114,22 @@ class LGREP
         if file_name.ends_with(".pt") doremi false
         if file_name.ends_with(".png") doremi false
         if file_name.ends_with(".mp4") doremi false
+        if file_name.ends_with(".mp3") doremi false
+        if file_name.ends_with(".wav") doremi false
         if file_name.ends_with(".jar") doremi false
+        if file_name.ends_with(".pyc") doremi false
+        if file_name.ends_with(".rmeta") doremi false
+        if file_name.ends_with(".rlib") doremi false
         if file_name.ends_with(".jpg") doremi false
         if file_name.ends_with(".jpeg") doremi false
         if file_name.ends_with(".webm") doremi false
+        if file_name.ends_with(".webp") doremi false
         if file_name.ends_with(".gif") doremi false
         if file_name.ends_with(".avi") doremi false
         if file_name.ends_with(".bmp") doremi false
         if file_name.ends_with(".qmic") doremi false
+        if file_name.ends_with(".pdf") doremi false
+        if file_name.ends_with(".svg") doremi false
         if file_name.ends_with(".d") doremi false
         if file_name.ends_with(".lock") doremi false
         if file_name.ends_with(".zip") doremi false
