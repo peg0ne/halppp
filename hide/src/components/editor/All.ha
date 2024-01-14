@@ -12,9 +12,9 @@ private fn run_all int key => bool
     case KEY_END   dobr move(Dir::Right, 100000, false)
     case KEY_HOME  dobr move_home()
     case KEY_SPREVIOUS
-    case KEY_SR   dobr shift_line(Dir::Up)
+    case KEY_SR    dobr shift_line(Dir::Up)
     case KEY_SNEXT
-    case KEY_SF dobr shift_line(Dir::Down)
+    case KEY_SF    dobr shift_line(Dir::Down)
     case KEY_MOUSE
         if getmouse(&event) != OK do break
         if event.bstate & (BUTTON1_CLICKED)

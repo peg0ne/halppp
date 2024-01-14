@@ -65,8 +65,8 @@ hide
 -   `PGDN` -> move cursor down a page
 -   `HOME` -> move cursor to the start of the line
 -   `END` -> move cursor to the end of the line
--   `ALT + UP ARROW` -> move line up one
--   `ALT + DOWN ARROW` -> move line down one
+-   `SHIFT + UP ARROW` -> move line up one
+-   `SHIFT + DOWN ARROW` -> move line down one
 
 ### `Normal` mode specific key commands
 
@@ -75,7 +75,8 @@ hide
 -   `a` -> enter `Insert` mode and jump one forward
 -   `v` -> enter `Visual` mode (Still in works)
 -   `SPACE + f` -> enter `FileEx` mode
--   `SPACE + S` -> enter `File search` window
+-   `SPACE + s` -> enter `File search` window
+-   `SPACE + S` -> enter `Content File search` window
 -   `SPACE + T` -> enter `Terminal` window
 -   `j` -> move cursor up
 -   `k` -> move cursor down
@@ -124,6 +125,8 @@ hide
 -   `SPACE + k` -> move to editor below
 -   `SPACE + c` -> toggle comments
 -   `SPACE + p` -> opens command pallete
+-   `SPACE + ->` -> moves to next file opened
+-   `SPACE + <-` -> moves to previous file opened
 
 ### CmdHan commands
 
