@@ -178,15 +178,25 @@ class LGREP
         while (current++) < dirs.size() do LGREP::lgrep_while(&dirs, current, &files, start_dir, depth)
     ;
     static fn align_cursor =>
-        if pos > buffer.size() - 1 do pos = buffer.size() - 1
-        if pos > content.Size().y - 1
-            pos = content.Size().y - 1
-            offset++
+        if buffer.size() == 0
+            pos = 0
+            offset = 0
+            return
+        ;
+        let height = content.Size().y - 1
+        let max_offset = filtered_files.size() - height - 1
+        let delta_pos = pos >= height ? pos - height : pos
+        if pos > height
+            offset += delta_pos
+            pos = height
         ;
         if pos < 0
+            offset += delta_pos
             pos = 0
-            if offset > 0 do offset--
         ;
+        if offset < 0 do offset = 0
+        if offset > max_offset do offset = max_offset
+        if pos > buffer.size() - 1 do pos = buffer.size() - 1
     ;
     static fn exit => Option<string>
         Ncurses::start(false)
@@ -209,8 +219,8 @@ class LGREP
         case 27 doremi LGREP::exit()
         case KEY_DOWN dobr pos++
         case KEY_UP dobr pos--
-        case KEY_PPAGE dobr pos-=1000
-        case KEY_NPAGE dobr pos+=1000
+        case KEY_PPAGE dobr pos-=content.Size().y-1
+        case KEY_NPAGE dobr pos+=content.Size().y-1
         case '\n'
             if pos >= buffer.size() do break
             Ncurses::start(false)
