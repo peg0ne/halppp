@@ -99,6 +99,7 @@ hide
 -   `p` -> paste line below
 -   `P` -> paste at cursor
 -   `;` -> remove multi cursors
+-   `.` -> searches for function definitions and can jump to that file
 -   `C` -> cuts from cursor to end and enters insert mode
 -   `c + d` -> cuts entire line and enters insert mode on line below
 -   `c + e` -> cuts from cursor until end of word and enters insert mode
