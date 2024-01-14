@@ -37,7 +37,7 @@ class LGREP
         offset = 0
         search = ""
         filtered_files.clear()
-        header.SetLabel(is_content_search ? "Project Search" : "Live File Grep")
+        header.SetLabel(!is_content_search ? "Project Search" : "Live File Grep")
     ;
     static fn set_content =>
         let max = offset + view.Size().y
