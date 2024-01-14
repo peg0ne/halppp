@@ -46,7 +46,7 @@ private fn run_space => Command
         select fp from LGREP::Lgrep() do open(fp)
         break
     case 'S'
-        select fp from LGREP::Search() do open(fp)
+        select fp from LGREP::Lgrep(true) do open(fp)
         break
     ;
     return Command::ModeNormal
