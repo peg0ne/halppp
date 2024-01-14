@@ -150,7 +150,7 @@
             "color": 106,
             "bold": true,
             "capture": 1,
-            "expr": "(?:^|\W)(new|break|return|continue|catch|const|delete|extern|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(?=$|\W)"
+            "expr": "(?:^|\W)(new|break|return|continue|catch|static|const|delete|extern|throw|try|register|typedef|friend|union|goto|unsigned|signed|virtual|void|volatile)(?=$|\W)"
         },
         {
             "color": 102,

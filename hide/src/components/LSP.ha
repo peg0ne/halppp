@@ -7,7 +7,7 @@ named => LSP
             this->text = text
         ;
     ;
-    fn show_definition string word, string lang =>
+    fn show_definition string word, string lang => Option<string>
         let func_start = $"fn {word} "
         let project_files = LGREP::lgrep()
         vector<string> lib_files = {}
@@ -35,6 +35,7 @@ named => LSP
             }).as_vec()
 
         vector<string> matches = {}
+        vector<string> file_names = {}
         let max_len = 0
         foreach i,f in files
             select c from f.text
@@ -54,11 +55,25 @@ named => LSP
                 ;
                 let m_str = $"Args: {args} Returns: {return_type} File: {f.file_name}"
                 matches.push_back(m_str)
+                file_names.push_back(f.file_name)
                 if m_str.size() > max_len do max_len = m_str.size()
             ;
         ;
-        Ncurses::box(0, 0, matches.size() + 2, clamp(max_len + 2, COLS/3, COLS))
-        foreach i,s in matches do Ncurses::add(i + 1, 1, s)
-        Ncurses::key()
+        let pos = 0
+        if file_names.size() == 0 doremi None<string>()
+        loop
+            Ncurses::box(0, 0, matches.size() + 2, clamp(max_len + 2, COLS/3, COLS))
+            foreach i,s in matches do Ncurses::add(i + 1, 1, s)
+            Ncurses::mark_until(1 + pos, 1, 5, clamp(max_len, COLS/3, COLS))
+            let key = Ncurses::key()
+            switch key
+            case '\n' doremi Option<string>(file_names[pos])
+            case KEY_DOWN dobr pos++
+            case KEY_UP dobr pos--
+            default doremi None<string>()
+            ;
+            if pos > matches.size() do pos = 0
+            if pos < 0 do pos = matches.size() - 1
+        ;
     ;
 ;

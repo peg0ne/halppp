@@ -7,6 +7,8 @@ class Editor => IContent
     bool _check_errors = false
     String _modifier = String("")
     List<Vector> _selections = List<Vector>()
+    List<string> _previously_opened_files = List<string>()
+    int _position_in_history = 0
     Vector _selector = Vector(0,0)
     Vector _offset = Vector(0,0)
     Vector _global_size = Vector(COLS,LINES)
@@ -45,7 +47,7 @@ pub
         select h from _highlighter do delete(h)
         _highlighter = Some(new Highlighter($"temp.{syntax}"))
     ;
-    fn open string path =>
+    fn open string path, bool is_navigate = false =>
         remove(json_path())
         if _path != path
             _offset = Vector(0,0)
@@ -62,6 +64,16 @@ pub
         ;
         _text = readlines(_path)
         _content->SetContent(_text)
+        if !is_navigate && _path != ""
+            _previously_opened_files.add(_path)
+            _position_in_history = _previously_opened_files.size() - 1
+        ;
+    ;
+    fn navigate bool is_forward =>
+        let forward_pos = min(_position_in_history + 1, _previously_opened_files.size() - 1)
+        let backward_pos = max(_position_in_history - 1, 0)
+        _position_in_history = is_forward ? forward_pos : backward_pos
+        open(_previously_opened_files[_position_in_history], true)
     ;
     fn close => Editor*
         set_active(false)

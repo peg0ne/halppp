@@ -14,8 +14,9 @@ private fn run_space => Command
         "P - paste word from clipboard",
         "p - open command pallete",
         "s - open file searcher",
-        "S - open project searcher"
-        
+        "S - open project searcher",
+        "-> - move forward",
+        "<- - move backwards"
     }
     foreach c in commands
         let ele = new IContainer(Fill::Flex)
@@ -35,6 +36,8 @@ private fn run_space => Command
     case 'l' doremi Command::EditorRight
     case 'j' doremi Command::EditorUp
     case 'k' doremi Command::EditorDown
+    case KEY_LEFT  dobr navigate(false)
+    case KEY_RIGHT dobr navigate(true)
     case 'c' dobr text_editing(TextEdit::CommentToggle)
     case 'P' dobr paste_from_clip()
     case 'p'
