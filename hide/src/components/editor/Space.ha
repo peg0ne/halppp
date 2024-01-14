@@ -13,7 +13,9 @@ private fn run_space => Command
         "c - toggle comment",
         "P - paste word from clipboard",
         "p - open command pallete",
-        "s - open file searcher"
+        "s - open file searcher",
+        "S - open project searcher"
+        
     }
     foreach c in commands
         let ele = new IContainer(Fill::Flex)
@@ -41,7 +43,10 @@ private fn run_space => Command
         select command from result.command doremi command
         break
     case 's' 
-        select fp from Lgrep() do open(fp)
+        select fp from LGREP::Lgrep() do open(fp)
+        break
+    case 'S'
+        select fp from LGREP::Lgrep(true) do open(fp)
         break
     ;
     return Command::ModeNormal

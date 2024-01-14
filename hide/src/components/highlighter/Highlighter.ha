@@ -9,6 +9,12 @@ class Highlighter
         _syntax = Syntax(type)
     ;
 pub
+    fn new_syntax string filename =>
+        _syntax.destruct()
+        let split = String(filename).split('.')
+        let type = split.at(split.size()-1)
+        _syntax = Syntax(type)
+    ;
     fn destruct => do _syntax.destruct()
     fn syntax => Syntax doremi _syntax
     fn wordlist => vector<string> doremi _syntax.wordlist()

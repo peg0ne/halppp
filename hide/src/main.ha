@@ -6,6 +6,7 @@ get => model
 
 fn main =>
     Ncurses::init()
+    LGREP::init(true)
     let model = Model(argc, argv)
     loop
         Ncurses::clearScr()
