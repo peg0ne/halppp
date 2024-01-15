@@ -87,8 +87,8 @@ named => LSP
             case KEY_UP dobr pos--
             default doremi None<LSPFoundTarget>()
             ;
-            if pos > matches.size() do pos = 0
             if pos < 0 do pos = matches.size() - 1
+            if pos >= matches.size() do pos = 0
         ;
     ;
 ;

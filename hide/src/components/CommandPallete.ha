@@ -30,7 +30,7 @@ class CommandPallete
         commands.add(" mode insert", Command::ModeInsert)
         commands.add(" mode visual", Command::ModeVisual)
         commands.add(" mode file explorer", Command::ModeFileEx)
-        commands.add(" mode file explorer", Command::ModeCmdHan)
+        commands.add(" mode command line", Command::ModeCmdHan)
         commands.add(" editor write", Command::WriteEditor)
         commands.add(" editor close", Command::CloseEditor)
         commands.add(" editor close forced", Command::CloseEditorForced)
@@ -44,7 +44,10 @@ class CommandPallete
         commands.add(" templates", Command::EditorTemplates)
         commands.add(" search", Command::EditorSearch)
         commands.add(" replace", Command::EditorReplace)
+        commands.add(" file search", Command::FileSearch)
+        commands.add(" content search", Command::ContentSearch)
         commands.add(" terminal", Command::Terminal)
+        commands.add(" function search", Command::LSPSearch)
         commands.add(" config manager", Command::ConfigManager)
     ;
     fn add_text_edits =>
