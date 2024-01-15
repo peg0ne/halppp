@@ -18,7 +18,7 @@ private fn run_base int key => Command
     case ';' dobr _selections.clear()
     case '.'
         select f from LSP::show_definition(find(false, false), "ha")
-            open(f)
+            open(f.file_name, f.found_at_line)
         ;
         break
     case 'f'
