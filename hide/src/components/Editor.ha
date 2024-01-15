@@ -8,6 +8,7 @@ class Editor => IContent
     String _modifier = String("")
     List<Vector> _selections = List<Vector>()
     List<string> _previously_opened_files = List<string>()
+    List<int> _position_in_documents = List<int>()
     int _position_in_history = 0
     Vector _selector = Vector(0,0)
     Vector _offset = Vector(0,0)
@@ -47,9 +48,13 @@ pub
         select h from _highlighter do delete(h)
         _highlighter = Some(new Highlighter($"temp.{syntax}"))
     ;
-    fn open string path, bool is_navigate = false =>
+    fn open string path, int found_at_line = 0, bool is_navigate = false =>
         remove(json_path())
         if _path != path
+            if _position_in_documents.len() > 0 && !is_navigate
+                let pos_vec = _position_in_documents.as_vec_ptr()
+                pos_vec->at(_position_in_history) = _selector.y + 1
+            ;
             _offset = Vector(0,0)
             _selector = Vector(0,0)
             _selections.clear()
@@ -64,16 +69,23 @@ pub
         ;
         _text = readlines(_path)
         _content->SetContent(_text)
+        move_to(found_at_line)
+        center_on_cursor()
         if !is_navigate && _path != ""
             _previously_opened_files.add(_path)
+            _position_in_documents.add(found_at_line)
             _position_in_history = _previously_opened_files.size() - 1
         ;
     ;
     fn navigate bool is_forward =>
         let forward_pos = min(_position_in_history + 1, _previously_opened_files.size() - 1)
         let backward_pos = max(_position_in_history - 1, 0)
-        _position_in_history = is_forward ? forward_pos : backward_pos
-        open(_previously_opened_files[_position_in_history], true)
+        let position_in_history = is_forward ? forward_pos : backward_pos
+        if _position_in_history == position_in_history do return
+        let pos_vec = _position_in_documents.as_vec_ptr()
+        pos_vec->at(_position_in_history) = _selector.y + 1
+        _position_in_history = position_in_history
+        open(_previously_opened_files[_position_in_history], _position_in_documents[_position_in_history], true)
     ;
     fn close => Editor*
         set_active(false)
