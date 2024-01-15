@@ -43,7 +43,20 @@ private fn run_space => Command
     case 'p'
         result = _command_pallete->show()
         select edit from result.textedit do text_editing(edit)
-        select command from result.command doremi command
+        select command from result.command
+            match command
+                Command::LSPSearch =>
+                    select f from LSP::show_definition(find(false, false), "ha") do open(f.file_name, f.found_at_line)
+                ;
+                Command::FileSearch =>
+                    select fp from LGREP::Lgrep() do open(fp)
+                ;
+                Command::ContentSearch =>
+                    select fp from LGREP::Lgrep(true) do open(fp)
+                ;
+                _ => doremi command
+            ;
+        ;
         break
     case 's' 
         select fp from LGREP::Lgrep() do open(fp)
