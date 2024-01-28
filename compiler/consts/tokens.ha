@@ -96,4 +96,5 @@ glob
     TOKEN_USE "use"
     TOKEN_WHILE "while"
     TOKEN_ZERO "0"
+    TOKEN_RAW "raw"
 ;

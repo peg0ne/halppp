@@ -138,7 +138,7 @@
             "color": 100,
             "capture": 1,
             "bold": true,
-            "expr": "(?:^|\W)(true|false|null)(?=$|\W)"
+            "expr": "(?:^|\W)(raw|true|false|null)(?=$|\W)"
         },
         {
             "color": 3,

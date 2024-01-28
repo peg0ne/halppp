@@ -44,12 +44,25 @@ fn system_output string command => vector<string>
     return output
 ;
 fn remove string path => do remove(path.c_str())
-fn makedir string name => bool doremi !mkdir(name.c_str(), S_IRWXU)
+fn makedir string name => bool
+    raw #ifdef _WIN32
+    return !mkdir(name.c_str())
+    raw #else
+    return !mkdir(name.c_str(), S_IRWXU)
+    raw #endif
+;
 fn changedir string name => bool doremi chdir(name.c_str()) >= 0
 fn env string env_var => Option<string>
     let e = getenv(env_var.c_str())
     if e == NULL doremi None<string>()
     return Some((string)e)
+;
+fn home_env => Option<string>
+    raw #ifdef _WIN32
+    return env("USERPROFILE")
+    raw #else
+    return env("HOME")
+    raw #endif
 ;
 fn list_reg_files string path => vector<string>
     vector<string> files = {}

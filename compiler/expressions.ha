@@ -1,6 +1,7 @@
 fn expression_construct Compiler *compiler_t, AstToken first => Expression
     let doing = ""
     let expression = ""
+    if first.token == Token::Raw doremi Expression(first.name, true)
     if first.token == Token::Let doremi get_let_expr(compiler_t)
     if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t)
     if first.token == Token::Id && try_get(compiler_t, Token::Equals)

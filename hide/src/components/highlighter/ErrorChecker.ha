@@ -36,7 +36,7 @@ fn file_exists_error_check RegexMatch r_match, Vector offset, Vector size, int y
     let len = r_match.reg_match.size()
     if start > end do return
     if start + len > end do len = end - start
-    select home from env("HOME")
+    select home from home_env()
         select f from read($"{home}/.local/lib/halppp/{r_match.reg_match}.ha") do return
         select f from read($"{path_dir}{r_match.reg_match}.ha") do return
         Ncurses::underline_until(y + offset.y, start, 256, len)

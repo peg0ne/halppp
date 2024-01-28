@@ -121,6 +121,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 args = get_or_exit(&compiler_t, Token::String, $"[Compiler] Missing value of compiler intent [TString]: {next.name}")
                 compiler_t.add_arg(args)
             ;
+            Token::Raw => do output += next.name
             _ => do error($"Token not handled: {next.name}", compiler_t.recap())
         ;
     ;
