@@ -1,5 +1,4 @@
 class LGREP
-    static bool is_cached
     static bool is_content_search
     static int key
     static int pos
@@ -166,6 +165,7 @@ class LGREP
         return false
     ;
     static fn lgrep_internal int depth, string start_dir =>
+        files = {}
         let fs = list_reg_files(start_dir)
         foreach f in fs
             if !LGREP::is_valid_suffix(f) do continue
@@ -234,11 +234,7 @@ class LGREP
         return None<string>()
     ;
 pub
-    static fn init bool load_on_init = false =>
-        if load_on_init
-            is_cached = true
-            let _ = async(launch::async, LGREP::lgrep_internal, 0, ".")
-        ;
+    static fn init =>
         LGREP::reset()
         main = MainContainer(Vector(COLS/10, LINES/8))
         base = HorizontalLayout(Fill::Flex)
@@ -274,16 +270,26 @@ pub
     ;
 
     static fn Lgrep bool in_is_content_search = false => Option<string>
-        if !is_cached
-            is_cached = true
-            let _ = async(launch::async, LGREP::lgrep_internal, 0, ".")
-        ;
+        raw std::chrono::milliseconds span(100);
+        let async_load = async(launch::async, LGREP::lgrep_internal, 0, ".")
+        let is_valid = async_load.valid()
+        let is_ready = is_valid && async_load.wait_for(span) == future_status::ready
+
         LGREP::reset(in_is_content_search)
         LGREP::get_files()
         LGREP::set_content()
         LGREP::add_count_info($"{filtered_files.len()}/{files.size()}")
         LGREP::mark_current_selected(pos)
         loop
+            Ncurses::start(!is_valid)
+            if !is_valid do LGREP::get_files()
+            is_valid = async_load.valid()
+            is_ready = is_valid && async_load.wait_for(span) == future_status::ready
+            if is_ready
+                async_load.get()
+                LGREP::get_files()
+            ;
+
             search_bar.SetLabel(search)
             LGREP::set_content()
             LGREP::add_count_info($"{filtered_files.len()}/{files.size()}")
