@@ -1,4 +1,4 @@
-use crate::{enums::Token, structs::AstToken};
+use crate::{enums::Token, message::display_err_message, structs::AstToken};
 use std::{iter::Peekable, str::Chars};
 
 pub fn create(content: &String) -> Vec<AstToken> {
@@ -6,6 +6,16 @@ pub fn create(content: &String) -> Vec<AstToken> {
     let mut id = String::from("");
     let mut ast: Vec<AstToken> = Vec::new();
     loop {
+        match ast.last_mut() {
+            Some(last_token) => {
+                if last_token.token == Token::Raw {
+                    let raw = try_collect_raw(&mut peekable);
+                    last_token.name = raw;
+                    ast.push(AstToken::new_line());
+                }
+            }
+            _ => {}
+        }
         let c = match peekable.next() {
             None => break,
             Some(c) => c,
@@ -34,7 +44,7 @@ pub fn create(content: &String) -> Vec<AstToken> {
             let dbl_col = id != ":" && c == ':';
             let dbl_eq = id != "=" && c == '=';
             let dbl_slash = id != "/" && c == '/';
-            if dbl_less || dbl_more || dbl_eq || dbl_col{
+            if dbl_less || dbl_more || dbl_eq || dbl_col {
                 match try_get_dbl(&mut peekable, c) {
                     Some(s) => {
                         id = try_add_token(id, &mut ast);
@@ -49,7 +59,7 @@ pub fn create(content: &String) -> Vec<AstToken> {
                     id = try_add_token(id, &mut ast);
                     loop {
                         let next = peekable.next().unwrap_or('\n');
-                        if next == '\n' { 
+                        if next == '\n' {
                             ast.push(AstToken::from_char(next));
                             break;
                         }
@@ -84,7 +94,7 @@ pub fn create(content: &String) -> Vec<AstToken> {
             }
             continue;
         }
-        if c == ' ' || c == '\t' || c == '\n' {
+        if c == ' ' || c == '\t' || c == '\n' || c == '\r' {
             id = try_add_token(id, &mut ast);
             if c == '\n' {
                 ast.push(AstToken::new_line());
@@ -179,16 +189,38 @@ fn get_concat(peekable: &mut Peekable<Chars>) -> String {
     let mut escaped = false;
     loop {
         let c_opt = peekable.next();
-        if c_opt.is_none() {return concat}
+        if c_opt.is_none() {
+            return concat;
+        }
         let c = c_opt.unwrap();
         if c == '{' && !escaped {
             concat += "\" + to_string("
-        }
-        else if c == '}' && !escaped {
+        } else if c == '}' && !escaped {
             concat += ") + \""
+        } else {
+            concat += String::from(c).as_str()
         }
-        else {concat += String::from(c).as_str()}
-        if c == '"' && !escaped {return concat}
+        if c == '"' && !escaped {
+            return concat;
+        }
         escaped = !escaped && c == '\\'
+    }
+}
+
+fn try_collect_raw(peekable: &mut Peekable<Chars>) -> String {
+    let mut raw_str = String::new();
+    loop {
+        match peekable.next() {
+            Some(c) => {
+                raw_str += String::from(c).as_str();
+                if c == '\n' {
+                    return raw_str;
+                }
+            }
+            None => {
+                display_err_message("Error parsing raw string");
+                return raw_str;
+            }
+        }
     }
 }

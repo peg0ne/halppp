@@ -20,7 +20,7 @@ named => LSP
         let func_start = $"fn {word} "
         let project_files = LGREP::lgrep()
         vector<string> lib_files = {}
-        select home from env("HOME")
+        select home from home_env()
             let dir = $"{home}/.local/lib"
             lib_files = LGREP::lgrep(dir, 0)
             lib_files = linq::take(lib_files)

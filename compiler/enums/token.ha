@@ -68,6 +68,7 @@ enum Token
     Private,
     Protected,
     Public,
+    Raw,
     RBlock,
     RBrack,
     Return,
@@ -164,6 +165,7 @@ struct Token_t
             TOKEN_PRIVATE => dore t = Token::Private
             TOKEN_PROTECTED => dore t = Token::Protected
             TOKEN_PUBLIC => dore t = Token::Public
+            TOKEN_RAW => dore t = Token::Raw
             TOKEN_RBLOCK => dore t = Token::RBlock
             TOKEN_RBRACK => dore t = Token::RBrack
             TOKEN_RETURN => dore t = Token::Return

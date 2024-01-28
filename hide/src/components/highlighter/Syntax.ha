@@ -91,10 +91,7 @@ class Syntax
     Syntax => do return
     Syntax string type =>
         this->_file_type = type
-        let home = "."
-        select home_opt from env("HOME")
-            home = home_opt
-        ;
+        let home = home_env().value_or(".")
         let config = $"{home}/.config/hide/"
         _definition = load_json($"{config}{type}.json")
         load_from_json(_definition)

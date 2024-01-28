@@ -19,7 +19,8 @@ fn halp string info => bool
 
 fn hamble_base string name => string
     let base = "[commands]\n"
-    base += "make=cp bin/main $HOME/.local/bin/" + name + "\n"
+    let home = home_env().value_or("HOME")
+    base += $"make=cp bin/main ${home}/.local/bin/" + name + "\n"
     base += "[rules]\n[dependencies]\n"
     return base
 ;

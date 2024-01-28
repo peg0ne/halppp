@@ -10,7 +10,7 @@ class Manual
     Manual =>
         Ncurses::init()
         Ncurses::start()
-        select home from env("HOME")
+        select home from home_env()
             let found = list_reg_files($"{home}/.local/lib/halppp")
             foreach f in found
                 let s = String(f)
@@ -136,7 +136,7 @@ class Manual
     fn draw_content =>
         Ncurses::clearScr()
         select s from selected
-            select home from env("HOME")
+            select home from home_env()
                 let lines = readlines($"{home}/.local/lib/halppp/{files.at(s)}.ha")
                 content = List<string>(lines)
                 let i = 0

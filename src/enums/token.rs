@@ -77,6 +77,7 @@ pub enum Token {
     Switch,
     Default,
     Case,
+    Raw,
 }
 
 impl Token {
@@ -172,6 +173,7 @@ impl Token {
             "use" => Token::Use,
             "while" => Token::Condition,
             "loop" => Token::Condition,
+            "raw" => Token::Raw,
             _ => Token::Id,
         }
     }

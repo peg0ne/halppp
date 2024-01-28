@@ -5,6 +5,11 @@ fn ast_create string content => vector<AstToken>
     string id = EMPTY
     vector<AstToken> ast = {}
     loop
+        if ast.size() > 0 && ast[ast.size() - 1].token == Token::Raw
+            let raw_str = try_collect_raw(&peekable)
+            ast[ast.size() - 1].name = raw_str
+            ast.push_back(AstToken("\n"))
+        ;
         let c_opt = peekable.next()
         let last_known_index = peekable.index()
         if c_opt.is_none() dobr try_add_token(id, &ast, &peekable)
@@ -189,5 +194,18 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
         peekable->next()
         string numbuf(1, peeked)
         num += numbuf
+    ;
+;
+
+fn try_collect_raw Peekable<char> *peekable => string
+    let raw_str = ""
+    loop
+        let c_opt = peekable->next()
+        select c from c_opt
+            raw_str += c
+            if c == '\n' doremi raw_str
+            continue
+        ;
+        return raw_str
     ;
 ;
