@@ -49,7 +49,7 @@ fn match_lines Compiler *compiler_t => MatchLines
     let lines = MatchLines()
     let x = next_or_exit(compiler_t, "[Match] expected some expression")
     if x.is_do()
-        lines.lines.push_back(expression_construct(compiler_t, x).to_cpp(2))
+        lines.lines.push_back(expression_construct(compiler_t, x, true).to_cpp(2))
         return lines
     ;
     loop
