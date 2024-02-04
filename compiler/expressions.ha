@@ -62,6 +62,10 @@ fn get_let_expr Compiler *compiler_t => Expression
         next_or_exit(compiler_t, "Expected match")
         return match_construct(compiler_t, Some(id), true)
     ;
+    if try_get(compiler_t, Token::Map)
+        next_or_exit(compiler_t, "Expected map")
+        return map_construct(compiler_t, id, true)
+    ;
     loop
         let x = next_or_exit(compiler_t, "[Let] Expected token got nothing")
         if x.token == Token::Eof do break

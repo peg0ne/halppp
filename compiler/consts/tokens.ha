@@ -97,4 +97,6 @@ glob
     TOKEN_WHILE "while"
     TOKEN_ZERO "0"
     TOKEN_RAW "raw"
+    TOKEN_MAP "map"
+    TOKEN_WHERE "where"
 ;

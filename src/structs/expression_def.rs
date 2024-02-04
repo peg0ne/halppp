@@ -51,7 +51,7 @@ impl Expression {
         }
         match self.e_select.as_ref() {
             Some(select_e) => {
-                let wrapped = format!("{}_optional_value", select_e.optional_value);
+                let wrapped = format!("{}_optional_value", select_e.value_name);
                 expression.push_str(format!("\n{{\n auto {} = {};\n", wrapped, select_e.optional_value).as_str());
                 expression.push_str(format!("if ({}.is_some()) {{\n", wrapped).as_str());
                 expression.push_str(format!("auto {} = {}.value_unsafe();\n", select_e.value_name, wrapped).as_str());
