@@ -35,7 +35,7 @@ named => LSP
         vector<string> matches = {}
         vector<LSPFoundTarget> file_names = {}
         let max_len = 0
-        foreach i,f in files
+        foreach f in files
             let found_at_line = 1
             select c from f.text
                 let content = String(c)
