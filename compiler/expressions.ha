@@ -104,6 +104,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
         ;
         switch x.token
         case Token::Id dobr parameters.push_back(x.name)
+        case Token::Equals dobr parameters.push_back(x.name)
         default dobr error("[Lambda] Incorrect parameter value", compiler_t->recap())
         ;
         x = next_or_exit(compiler_t, "[Lambda] Incomplete lambda")

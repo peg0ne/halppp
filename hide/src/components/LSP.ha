@@ -2,6 +2,7 @@ named => LSP
     struct LSPFileAndText
         string file_name
         Option<string> text
+        LSPFileAndText => do return
         LSPFileAndText string file_name, Option<string> text =>
             this->file_name = file_name
             this->text = text
@@ -19,26 +20,17 @@ named => LSP
     fn show_definition string word, string lang => Option<LSPFoundTarget>
         let func_start = $"fn {word} "
         let project_files = LGREP::lgrep()
-        vector<string> lib_files = {}
         select home from home_env()
             let dir = $"{home}/.local/lib"
             let unhandled_files = LGREP::lgrep(dir, 0)
-            let lib_files = map<string>(unhandled_files).select(x => "${dir}/{x}")
+            let lib_files = map<string>(unhandled_files).select(x => $"{dir}/{x}")
+            project_files = linq::take(project_files).join(lib_files).as_vec()
         ;
-        let files = linq::take(project_files)
-            .join(lib_files)
-            .where([lang] (string file_name) {
-                return String(file_name).ends_with($".{lang}");
-            })
-            .operate<LSPFileAndText>([] (string file_name) {
-                return LSPFileAndText(file_name, read(file_name));
-            })
-            .where([] (LSPFileAndText fat) {
-                return fat.text.is_some();
-            })
-            .where([word, func_start] (LSPFileAndText fat) {
-                return String(fat.text.value_or("")).contains(func_start);
-            }).as_vec()
+        let files = map<LSPFileAndText>(project_files)
+            .where(x => String(x).ends_with($".{lang}"))
+            .select(x => LSPFileAndText(x, read(x)))
+            .where(x => x.text.is_some())
+            .where(x => String(x.text.value_or("")).contains(func_start))
 
         vector<string> matches = {}
         vector<LSPFoundTarget> file_names = {}
