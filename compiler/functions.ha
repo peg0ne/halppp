@@ -18,6 +18,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     if !constr
         let func_id = next_or_exit(compiler_t, "[FunctionError]: No Function Id")
         if func_id.token == Token::Id do function.id = func_id.name
+        elif func_id.token == Token::Where do function.id = func_id.name
         else
             switch func_id.token
             case Token::And

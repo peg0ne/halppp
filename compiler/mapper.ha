@@ -1,5 +1,6 @@
 fn map_construct Compiler *compiler_t, string id, bool is_let => Expression
     let map_value = Map()
+    map_value.assigning_value = id
     get_or_exit(compiler_t, Token::LessThan, "[Map] expected '<'")
     let arrow_depth = 1
     // Get the type to output
@@ -10,26 +11,19 @@ fn map_construct Compiler *compiler_t, string id, bool is_let => Expression
         if arrow_depth == 0 do break
         map_value.type_to_output += token.name
     ;
-    get_or_exit(compiler_t, Token::LParen, "[Map] expected '('")
-    let paren_depth = 1
     // Get the item to operate on
-    loop
-        let token = next_or_exit(compiler_t, "[Map] expected some variable/expression and ending ')'")
-        if token.token == Token::LParen do paren_depth++
-        if token.token == Token::RParen do paren_depth--
-        if paren_depth == 0 do break
-        map_value.operator_on_value += token.name
-    ;
+    let raw_operator = String(next_or_exit(compiler_t, "[Map] expected '('").name)
+    if !raw_operator.starts_with("(") && !raw_operator.ends_with(")") do error("[Map] expected (...) expression but got {raw_operator.name}", compiler_t->recap())
+    map_value.operator_on_value = raw_operator.to_string()
     // Get the map operations
     loop
         if try_get(compiler_t, Token::NewLine)
             next_or_exit(compiler_t, "[Map] unkown error")
-            if try_get(compiler_t, Token::Period) dobr compiler_t->prev()
+            if !try_get(compiler_t, Token::Period) dobr compiler_t->prev()
         ;
         get_or_exit(compiler_t, Token::Period, "[Map] expected '.'")
         let operator_type = next_or_exit(compiler_t, "[Map] expected operator type")
         if none(operator_type.token, {Token::Select, Token::Where}) do error($"[Map] invalid operator type {operator_type.name}", compiler_t->recap())
-        get_or_exit(compiler_t, Token::LParen, "[Map] expected '('")
         map_value.operations.push_back(map_operator_construct(compiler_t, operator_type.token))
     ;
     if map_value.operations.size() == 0 do error("[Map] expected operations but got none", compiler_t->recap())
@@ -37,6 +31,18 @@ fn map_construct Compiler *compiler_t, string id, bool is_let => Expression
 ;
 
 fn map_operator_construct Compiler *compiler_t, Token operator_type => MapOperator
+    let raw_operator = String(next_or_exit(compiler_t, "[Map] expected (...) expression").name)
+    if !raw_operator.starts_with("(") && !raw_operator.ends_with(")") do error("[Map] expected (...) expression but got {raw_operator.name}", compiler_t->recap())
+    raw_operator.remove(0)
+    raw_operator.remove_back(1)
+    
+    let ast = ast_create(raw_operator.to_string())
+    let program = Program()
+    let compiler_temp = Compiler(&program, ast, 0)
+    return map_operator_construct_internal(&compiler_temp, operator_type)
+;
+
+fn map_operator_construct_internal Compiler *compiler_t, Token operator_type => MapOperator
     let map_operator = MapOperator()
     map_operator.operator_type = operator_type
     map_operator.obj_name = next_or_exit(compiler_t, "[Map] expected some id").name
@@ -44,12 +50,9 @@ fn map_operator_construct Compiler *compiler_t, Token operator_type => MapOperat
         map_operator.iterator_name = Some(next_or_exit(compiler_t, "[Map] expected some iterator id").name)
     ;
     get_or_exit(compiler_t, Token::CoolArrow, "[Map] expected '=>'")
-    let paren_depth = 1
     loop
         let token = next_or_exit(compiler_t, "[Map] expected some condition")
-        if token.token == Token::LParen do paren_depth++
-        if token.token == Token::RParen do paren_depth--
-        if paren_depth == 0 do break
+        if token.token == Token::Eof do break
         map_operator.expression += token.name
     ;
     return map_operator

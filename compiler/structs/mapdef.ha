@@ -5,13 +5,16 @@ struct MapOperator
     Option<string> iterator_name = None<string>()
     MapOperator => do return
     fn to_ha int order, string operate_on => string
-        let map_op_str = $"let {get_lambda_name(order)} = {operate_on} ()\n"
+        let map_op_str = $"> {get_lambda_name(order)} {operate_on} ()\n"
         map_op_str += $"let {obj_name} = {operate_on}"
         map_op_str += order > 0 ? "().value_unsafe()\n" : "\n"
         map_op_str += $"return "
         switch operator_type
             case Token::Where dobr map_op_str += $"{expression} ? Some({obj_name}) : None({obj_name})\n"
-            case Token::Select dobr map_op_str += $"{obj_name}.is_some() ? Some({expression}) : None({expression})\n"
+            case Token::Select
+                if order > 0 do map_op_str += $"{obj_name}.is_some() ? Some({expression}) : None({expression})\n"
+                else do map_op_str += $"Some({expression})\n"
+                break
         ;
         map_op_str += "\n;\n"
         return map_op_str
@@ -35,8 +38,8 @@ struct Map
         foreach i, operation in operations
             map_str += i == 0 ? operation.to_ha(i, iterator_obj) : operation.to_ha(i, operations[i - 1].get_lambda_name(i - 1))
             if i == operations.size() - 1
-                map_str += "\n{assigning_value}.push_back({operation.get_lambda_name(i)}())\n;\n"
-                break
+                map_str += $"\nselect map_{iterator_obj}_out_sdfgsg from {operation.get_lambda_name(i)}()\n"
+                map_str += $"\n{assigning_value}.push_back(map_{iterator_obj}_out_sdfgsg)\n;\n;\n"
             ;
         ;
         return map_str        

@@ -22,11 +22,8 @@ named => LSP
         vector<string> lib_files = {}
         select home from home_env()
             let dir = $"{home}/.local/lib"
-            lib_files = LGREP::lgrep(dir, 0)
-            lib_files = linq::take(lib_files)
-                .operate([dir](string file) {
-                    return $"{dir}/{file}";
-                }).as_vec()
+            let unhandled_files = LGREP::lgrep(dir, 0)
+            let lib_files = map<string>(unhandled_files).select(x => "${dir}/{x}")
         ;
         let files = linq::take(project_files)
             .join(lib_files)
