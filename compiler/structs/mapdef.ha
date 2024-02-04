@@ -11,10 +11,14 @@ struct MapOperator
         map_op_str += $"let {obj_name} = {obj_name}_as_opt"
         map_op_str += order > 0 ? ".value_unsafe()\n" : "\n"
         map_op_str += $"return "
+        if order > 0 do map_op_str += $"{obj_name}_as_opt.is_some()"
         switch operator_type
-            case Token::Where dobr map_op_str += $"{expression} ? Some({obj_name}) : None({obj_name})\n"
+            case Token::Where 
+                if order > 0 do map_op_str += " && "
+                map_op_str += $"{expression} ? Some({obj_name}) : None({obj_name})\n"
+                break
             case Token::Select
-                if order > 0 do map_op_str += $"{obj_name}_as_opt.is_some() ? Some({expression}) : None({expression})\n"
+                if order > 0 do map_op_str += $" ? Some({expression}) : None({expression})\n"
                 else do map_op_str += $"Some({expression})\n"
                 break
         ;
