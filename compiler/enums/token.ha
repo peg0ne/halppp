@@ -52,6 +52,7 @@ enum Token
     Let,
     LParen,
     MacroDefinition,
+    Map,
     Match,
     MoreThan,
     MoreThanOrEquals,
@@ -86,6 +87,7 @@ enum Token
     Until,
     Use,
     UNKNOWN,
+    Where,
 ;
 
 struct Token_t
@@ -150,6 +152,7 @@ struct Token_t
             TOKEN_LINE_COMMENT => dore t = Token::Comment
             TOKEN_LPAREN => dore t = Token::LParen
             TOKEN_MACRODEFINITION => dore t = Token::MacroDefinition
+            TOKEN_MAP => dore t = Token::Map
             TOKEN_MATCH => dore t = Token::Match
             TOKEN_MORETHAN => dore t = Token::MoreThan
             TOKEN_MORETHANOREQUALS => dore t = Token::MoreThanOrEquals
@@ -180,6 +183,7 @@ struct Token_t
             TOKEN_TRUE => dore t = Token::True
             TOKEN_UNTIL => dore t = Token::Until
             TOKEN_USE => dore t = Token::Use
+            TOKEN_WHERE => dore t = Token::Where
             _ => dore t = Token::Id
         ;
     ;

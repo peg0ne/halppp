@@ -167,11 +167,10 @@ class LGREP
     static fn lgrep_internal int depth, string start_dir =>
         files = {}
         let fs = list_reg_files(start_dir)
-        foreach f in fs
-            if !LGREP::is_valid_suffix(f) do continue
-            if LGREP::is_binary(f) do continue
-            files.push_back(f)
-        ;
+        let filtered_files = map<string>(fs)
+            .where(x => LGREP::is_valid_suffix(x))
+            .where(x => !LGREP::is_binary(x))
+        files = filtered_files
         if depth >= 5 do return
         let dirs = list_dirs(start_dir)
         let current = 0

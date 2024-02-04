@@ -1,4 +1,5 @@
-fn expression_construct Compiler *compiler_t, AstToken first => Expression
+fn expression_construct Compiler *compiler_t, AstToken first => Expression doremi expression_construct(compiler_t, first, false)
+fn expression_construct Compiler *compiler_t, AstToken first, bool is_match => Expression
     let doing = ""
     let expression = ""
     if first.token == Token::Raw doremi Expression(first.name, true)
@@ -29,7 +30,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
         if x.token == Token::Eof dobr expression += doing
         if x.token == Token::NewLine
             select peeked from compiler_t->peek()
-                if none(peeked.token, {Token::Period, Token::Pointer})
+                if none(peeked.token, {Token::Period, Token::Pointer}) || is_match
                     expression += doing
                     break
                 ;
@@ -60,6 +61,10 @@ fn get_let_expr Compiler *compiler_t => Expression
     if try_get(compiler_t, Token::Match)
         next_or_exit(compiler_t, "Expected match")
         return match_construct(compiler_t, Some(id), true)
+    ;
+    if try_get(compiler_t, Token::Map)
+        next_or_exit(compiler_t, "Expected map")
+        return map_construct(compiler_t, id, true)
     ;
     loop
         let x = next_or_exit(compiler_t, "[Let] Expected token got nothing")
@@ -99,6 +104,7 @@ fn get_lambda_expr Compiler *compiler_t => Expression
         ;
         switch x.token
         case Token::Id dobr parameters.push_back(x.name)
+        case Token::Equals dobr parameters.push_back(x.name)
         default dobr error("[Lambda] Incorrect parameter value", compiler_t->recap())
         ;
         x = next_or_exit(compiler_t, "[Lambda] Incomplete lambda")

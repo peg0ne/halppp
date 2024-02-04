@@ -32,8 +32,8 @@ class Terminal => IContent
             changedir(_line.substr(3))
         ;
         else
-            let output = linq::take(system_output($"{_line} 2>&1"))
-                .operate_async([](string o){return String(o).strip_end();}).as_vec()
+            let sysout = system_output($"{_line} 2>&1")
+            let output = map<string>(sysout).select(x => String(x).strip_end())
             _text = linq::take(_text).join(output).as_list()
         ;
         _line = ""
