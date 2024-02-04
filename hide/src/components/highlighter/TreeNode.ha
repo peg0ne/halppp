@@ -10,9 +10,7 @@ struct TreeNode
 
 fn to_string TreeNode t => string
     let s = $"({t.id} [{t.start.y}, {t.start.x}] - [{t.end.y}, {t.end.x}]"
-    foreach n in t.nodes
-        s += $" {n}"
-    ;
+    foreach n in t.nodes do s += $" {n}"
     return s + ")"
 ;
 
