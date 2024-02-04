@@ -1,4 +1,5 @@
-fn expression_construct Compiler *compiler_t, AstToken first => Expression
+fn expression_construct Compiler *compiler_t, AstToken first => Expression doremi expression_construct(compiler_t, first, false)
+fn expression_construct Compiler *compiler_t, AstToken first, bool is_match => Expression
     let doing = ""
     let expression = ""
     if first.token == Token::Raw doremi Expression(first.name, true)
@@ -29,7 +30,7 @@ fn expression_construct Compiler *compiler_t, AstToken first => Expression
         if x.token == Token::Eof dobr expression += doing
         if x.token == Token::NewLine
             select peeked from compiler_t->peek()
-                if none(peeked.token, {Token::Period, Token::Pointer})
+                if none(peeked.token, {Token::Period, Token::Pointer}) || is_match
                     expression += doing
                     break
                 ;
