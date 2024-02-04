@@ -51,12 +51,14 @@ impl Expression {
         }
         match self.e_select.as_ref() {
             Some(select_e) => {
-                expression.push_str(format!("if ({}.is_some()) {{\n", select_e.optional_value).as_str());
-                expression.push_str(format!("auto {} = {}.value_unsafe();\n", select_e.value_name, select_e.optional_value).as_str());
+                let wrapped = format!("{}_optional_value", select_e.optional_value);
+                expression.push_str(format!("\n{{\n auto {} = {};\n", wrapped, select_e.optional_value).as_str());
+                expression.push_str(format!("if ({}.is_some()) {{\n", wrapped).as_str());
+                expression.push_str(format!("auto {} = {}.value_unsafe();\n", select_e.value_name, wrapped).as_str());
                 for line in select_e.lines.iter() {
                     expression.push_str(line.to_cpp(indentation + 1).as_str());
                 }
-                expression.push_str(format!("{}}}\n", spacing).as_str());
+                expression.push_str(format!("{}}}}}\n", spacing).as_str());
                 return expression;
             }
             _ => {}
