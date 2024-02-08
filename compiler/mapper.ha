@@ -36,9 +36,7 @@ fn map_operator_construct Compiler *compiler_t, Token operator_type => MapOperat
     raw_operator.remove(0)
     raw_operator.remove_back(1)
     
-    let ast = ast_create(raw_operator.to_string())
-    let program = Program()
-    let compiler_temp = Compiler(&program, ast, 0)
+    let compiler_temp = temp_compiler(raw_operator.to_string())
     return map_operator_construct_internal(&compiler_temp, operator_type)
 ;
 

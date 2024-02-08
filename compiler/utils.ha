@@ -43,3 +43,8 @@ fn folder_and_name string file_path => FpFn
     file_name = reversed
     return FpFn(folder_path, file_name)
 ;
+fn temp_compiler string emulated_str => Compiler
+    let ast = ast_create(emulated_str)
+    let program = Program()
+    return Compiler(&program, ast, 0)
+;

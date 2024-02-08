@@ -40,20 +40,19 @@ struct Map
     Map => do return
     fn to_ha => string
         let iterator_obj = $"{assigning_value}_out_map_value_xzxzxzxzxzx"
+        let selected_obj = $"map_{iterator_obj}_out_sdfgsg"
         let map_str = $"{iterator_obj} in {operator_on_value}\n"
         foreach i, operation in operations
             map_str += i == 0 ? operation.to_ha(i, iterator_obj) : operation.to_ha(i, operations[i - 1].get_lambda_name(i - 1))
             if i == operations.size() - 1
-                map_str += $"\nselect map_{iterator_obj}_out_sdfgsg from {operation.get_lambda_name(i)}()\n"
-                map_str += $"\n{assigning_value}.push_back(map_{iterator_obj}_out_sdfgsg)\n;\n;\n"
+                map_str += $"\nselect {selected_obj} from {operation.get_lambda_name(i)}()\n"
+                map_str += $"\n{assigning_value}.push_back({selected_obj})\n;\n;\n"
             ;
         ;
         return map_str        
     ;
     fn to_cpp => string
-        let ast = ast_create(to_ha())
-        let program = Program()
-        let compiler_t = Compiler(&program, ast, 0)
+        let compiler_t = temp_compiler(to_ha())
         let map_str = $"vector<{type_to_output}> {assigning_value};\n"
         map_str += for_construct(&compiler_t, true).to_cpp(0)
         return map_str

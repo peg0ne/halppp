@@ -71,6 +71,7 @@ pub
         return Command::Nop
     ;
     fn add_ch int key => Command
+        if !isspace(key)&&!isgraph(key) doremi Command::Nop
         let ch = string(1, key)
         _line += ch
         update(_line)
