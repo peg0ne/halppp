@@ -25,6 +25,8 @@ fn ast_create string content => vector<AstToken>
         ;
         select adv_condition from try_get_advanced_condition(peekable, id, c)
             id = try_add_token(adv_condition, ast, peekable)
+            peekable.next()
+            peekable.next()
             continue
         ;
         select num from try_get_num(peekable, c)
