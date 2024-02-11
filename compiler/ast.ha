@@ -1,3 +1,5 @@
+get => ast_helpers
+
 fn ast_create string content => vector<AstToken>
     vector<char> vec = {}
     foreach i in content do vec.push_back(i)
@@ -5,73 +7,44 @@ fn ast_create string content => vector<AstToken>
     string id = EMPTY
     vector<AstToken> ast = {}
     loop
-        if ast.size() > 0 && ast[ast.size() - 1].token == Token::Raw
-            let raw_str = try_collect_raw(&peekable)
-            ast[ast.size() - 1].name = raw_str
-            ast.push_back(AstToken("\n"))
-        ;
-        let c_opt = peekable.next()
+        try_append_raw(peekable, ast)
+        if next_is_none(peekable) dobr try_add_token(id, ast, peekable)
+        let c = peekable.next().value_or(' ')
         let last_known_index = peekable.index()
-        if c_opt.is_none() dobr try_add_token(id, &ast, &peekable)
-        let c = c_opt.value_or(' ')
-        if c == '('
-            let pairs = get_pair(&peekable, '(', ')')
-            id = try_add_token(id, &ast, &peekable)
-            doco try_add_token(pairs, &ast, &peekable)
+        select pair from try_get_pair(peekable, c)
+            id = try_add_token(id, ast, peekable)
+            doco try_add_token(pair, ast, peekable)
         ;
-        if c == '{'
-            let pairs = get_pair(&peekable, '{', '}')
-            id = try_add_token(id, &ast, &peekable)
-            doco try_add_token(pairs, &ast, &peekable)
+        select concat from try_get_concat(peekable, c)
+            id = try_add_token(id, ast, peekable)
+            doco try_add_token(concat, ast, peekable)
         ;
-        if c == '$' && peekable.peek().value_or(' ') == '"'
-            let concat = get_concat(&peekable) 
-            id = try_add_token(id, &ast, &peekable)
-            doco try_add_token(concat, &ast, &peekable)
+        select matching from try_get_matching(peekable, c)
+            id = try_add_token(id, ast, peekable)
+            doco try_add_token(matching, ast, peekable)
         ;
-        if any(c, {CHAR_QUOTE, CHAR_SINGLE})
-            let matched = get_matching(&peekable, c)
-            id = try_add_token(id, &ast, &peekable)
-            doco try_add_token(matched, &ast, &peekable)
+        select adv_condition from try_get_advanced_condition(peekable, id, c)
+            id = try_add_token(adv_condition, ast, peekable)
+            continue
         ;
-        if id.size() == 0 && c == '='
-            let peeked = peekable.peek().value_or(' ')
-            let third = peekable.at(peekable.index() + 1).value_or(' ')
-            let is_valid = peekable.peek().is_some() && peekable.at(peekable.index() + 1).is_some()
-            let is_part_of_adv = peeked == '&' || peeked == '<' || peeked == '!' || peeked == '|'
-            let is_end_of_adv = third == '='
-            if is_valid && is_part_of_adv && is_end_of_adv
-                string part_one(1, c)
-                string part_two(1, peeked)
-                string part_three(1, third)
-                let combined = part_one + part_two + part_three
-                id = try_add_token(combined, &ast, &peekable)
-                peekable.next()
-                peekable.next()
-                continue
-            ;
-        ;
-        elif is_char_number_t(c)
-            let num = collect_num(&peekable, c)
-            id = try_add_token(id, &ast, &peekable)
+        select num from try_get_num(peekable, c)
+            id = try_add_token(id, ast, peekable)
             doco ast.push_back(num)
         ;
         string ch(1, c)
-        let is_white_space = any(c, {'\n', ' ', '\t', '\r'})
-        let is_both_token = is_str_tokens(id) == is_char_token(c)
-        if !is_both_token
-            id = try_add_token(id, &ast, &peekable)
+        if !is_both_token(id, c)
+            id = try_add_token(id, ast, peekable)
             if peekable.index() != last_known_index do continue
-            if !is_white_space doco id += ch
+            if !is_white_space(c) doco id += ch
         ;
-        if is_both_token && is_str_tokens(id + ch) doco id += ch
+        if is_both_token(id, c) && is_str_tokens(id + ch) doco id += ch
         elif is_char_token(c)
-            id = try_add_token(id, &ast, &peekable)
+            id = try_add_token(id, ast, peekable)
             if peekable.index() != last_known_index do continue
             doco ast.push_back(AstToken(c))
         ;
-        elif is_white_space
-            id = try_add_token(id, &ast, &peekable)
+        elif is_white_space(c)
+            id = try_add_token(id, ast, peekable)
             if c == '\n' do ast.push_back(AstToken("\n"))
             continue
         ;
@@ -87,16 +60,16 @@ fn ast_create string content => vector<AstToken>
     return ast
 ;
 
-fn try_add_token string id, vector<AstToken> *ast, Peekable<char> *peekable => string
+fn try_add_token string id, vector<AstToken> &ast, Peekable<char> &peekable => string
     if id.size() == 0 doremi id
     if id == "//"
         loop
-            let next = peekable->next().value_or('\n')
+            let next = peekable.next().value_or('\n')
             if next == '\n' do break
         ;
         id = "\n"
     ;
-    ast->push_back(AstToken(id))
+    ast.push_back(AstToken(id))
     return EMPTY
 ;
 
