@@ -211,6 +211,7 @@ struct Token_t
         case Token::NewLine
         case Token::SemiColon
         case Token::Struct
+        case Token::Raw
         case Token::Use doremi true
         default doremi false
         ;
