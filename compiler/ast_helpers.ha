@@ -30,7 +30,7 @@ fn try_append_raw Peekable<char> &peekable, vector<AstToken> &ast =>
 
 fn try_get_num Peekable<char> &peekable, char c => Option<AstToken>
     if !is_char_number_t(c) doremi None<AstToken>()
-    return collect_num(&peekable, c)
+    return Some(collect_num(&peekable, c))
 ;
 
 fn try_get_single_char_token Peekable<char> &peekable, char c => Option<AstToken>
@@ -56,5 +56,9 @@ fn try_get_advanced_condition Peekable<char> &peekable, string id, char c => Opt
     let is_part_of_adv = any(second, {'&', '<', '!', '|', '>'})
     let is_end_of_adv = third == '='
     if !is_part_of_adv || !is_end_of_adv doremi None<string>()
-    return Some(string(3, c + second + third))
+    string part_one(1, c)
+    string part_two(1, second)
+    string part_three(1, third)
+    let combined = part_one + part_two + part_three
+    return Some(combined)
 ;

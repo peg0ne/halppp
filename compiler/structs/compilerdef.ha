@@ -90,6 +90,12 @@ struct Compiler
         ;
         return false
     ;
+    fn get_class string id => Option<Class>
+        foreach i in program->classes
+            if i.id == id doremi Some(i)
+        ;
+        return None<Class>()
+    ;
     fn has_inc string id => bool
         foreach i in program->includes
             if i.include == id doremi true
