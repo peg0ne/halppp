@@ -94,6 +94,7 @@ glob
     TOKEN_TYPE "char"
     TOKEN_UNTIL "until"
     TOKEN_USE "use"
+    TOKEN_VIRTUAL "virtual"
     TOKEN_WHILE "while"
     TOKEN_ZERO "0"
     TOKEN_RAW "raw"

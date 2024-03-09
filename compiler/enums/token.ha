@@ -87,6 +87,7 @@ enum Token
     Until,
     Use,
     UNKNOWN,
+    Virtual,
     Where,
 ;
 
@@ -183,6 +184,7 @@ struct Token_t
             TOKEN_TRUE => dore t = Token::True
             TOKEN_UNTIL => dore t = Token::Until
             TOKEN_USE => dore t = Token::Use
+            TOKEN_VIRTUAL => dore t = Token::Virtual
             TOKEN_WHERE => dore t = Token::Where
             _ => dore t = Token::Id
         ;
@@ -211,6 +213,7 @@ struct Token_t
         case Token::NewLine
         case Token::SemiColon
         case Token::Struct
+        case Token::Raw
         case Token::Use doremi true
         default doremi false
         ;

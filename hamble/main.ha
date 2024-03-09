@@ -1,7 +1,7 @@
 inc => string
 use => std
 get => print, files, clap, stringextensions
-get => Manual
+get => Manual, validator
 
 fn halp string info => bool
     println("<-" + info + "->")
@@ -12,6 +12,7 @@ fn halp string info => bool
     println("    -t - transpiles into c++")
     println("run Optional(-r) - build binary and run")
     println("do <CUSTOM COMMAND>")
+    println("validate - tries to compile the tests in the test folder")
     println("man - opens manual")
     println("pack - pack into a hamble package (not implemented)")
     return false
@@ -147,6 +148,9 @@ fn main =>
     elif clap.has("watch")
         select type from clap.peek("watch") doremi watch(type)
         return watch()
+    ;
+    elif clap.has("validate")
+        return validate()
     ;
     elif clap.has("man")
         return manual()

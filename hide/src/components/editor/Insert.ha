@@ -10,6 +10,8 @@ private fn run_ins int key => Command
     case '\b'
     case 127
     case KEY_BACKSPACE dobr text_editing(TextEdit::RemoveChar)
+    case 555 dobr move_word(Dir::Right)
+    case 540 dobr move_word(Dir::Left)
     default
         if !isspace(key)&&!isgraph(key) do break
         text_editing(TextEdit::Insert, string(1, key))
