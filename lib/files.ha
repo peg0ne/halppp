@@ -36,12 +36,14 @@ fn write string content, string path =>
 fn system string command => bool doremi !system(command.c_str())
 fn system_output string command => vector<string>
     vector<string> output = {}
+    system_output(command, &output)
+    return output
+;
+fn system_output string command, vector<string>* output =>
     char buffer[1064]
     let fp = popen(command.c_str(), "r")
-    if fp == NULL doremi output
-    while fgets(buffer, sizeof(buffer), fp) do output.push_back(buffer)
+    while fgets(buffer, sizeof(buffer), fp) do output->push_back(buffer)
     pclose(fp)
-    return output
 ;
 fn remove string path => do remove(path.c_str())
 fn makedir string name => bool

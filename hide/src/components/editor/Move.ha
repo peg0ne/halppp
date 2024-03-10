@@ -57,6 +57,7 @@ private fn move_word Dir dir, bool spacebreak = false =>
 ;
 
 private fn move_word_impl Dir dir, Vector *pos, bool spacebreak =>
+    if _text.len() == 0 do return
     loop
         let last_line = pos->y == _text.len() - 1
         let last_char = pos->x == _text.at(pos->y).size() - 1
