@@ -70,6 +70,7 @@ pub
         //Ye ol commands
         switch cmd
         case Command::Exit
+            _term.close()
             Ncurses::stop()
             return true
         case Command::ModeFileEx dobr _mode_view.set(Mode::FileEx)
