@@ -540,6 +540,7 @@ pub
         ;
         let cmd = Command::Nop
         let key = Ncurses::key()
+        if key == KEY_F(1) doremi cmd = Command::Terminal
         if !run_all(key)
             switch _current_mode
             case Mode::Normal dobr cmd = run_nor(key)

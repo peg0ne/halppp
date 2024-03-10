@@ -53,7 +53,7 @@ class Terminal => IContent
         _text.clear()
         sys_reader.clear()
         if !returner do sys_reader.close()
-        else do update_line = true
+        update_line = true
         return returner
     ;
     fn run_command => bool
@@ -109,11 +109,14 @@ class Terminal => IContent
     ;
     fn try_scroll Dir dir =>
         if sys_reader.started do return
-        scroll_pos += dir == Dir::Down ? -1 : 1
+        scroll_pos += dir == Dir::Down ? -4 : 4
         if scroll_pos < 0 do scroll_pos = 0
-        if scroll_pos > sys_reader.read_lines.size() - _origin->Size().y do scroll_pos--
+        if scroll_pos > sys_reader.read_lines.size() - _origin->Size().y do scroll_pos -= 4
     ;
 pub
+    fn close =>
+        sys_reader.close()
+    ;
     fn show =>
         MEVENT event
         Ncurses::start(true)
