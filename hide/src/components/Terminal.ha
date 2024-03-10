@@ -108,6 +108,7 @@ class Terminal => IContent
         ((IContent*)this)->draw()
     ;
     fn try_scroll Dir dir =>
+        if sys_reader.started do return
         scroll_pos += dir == Dir::Down ? -1 : 1
         if scroll_pos < 0 do scroll_pos = 0
         if scroll_pos > sys_reader.read_lines.size() - _origin->Size().y do scroll_pos--
