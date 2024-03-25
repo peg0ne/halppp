@@ -33,6 +33,9 @@ fn write string content, string path =>
     file << content
     file.close()
 ;
+fn _system string command =>
+    if !system(command.c_str()) do print("")
+;
 fn system string command => bool doremi !system(command.c_str())
 fn system_output string command => vector<string>
     vector<string> output = {}

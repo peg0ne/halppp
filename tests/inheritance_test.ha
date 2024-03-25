@@ -7,6 +7,9 @@ fn not_inherited float t, long c => do return
 
 class B => A
     fn b => int doremi 2
-    fn c int d, string e => bool doremi int false
+    fn c int d, string e => bool doremi false
     fn d => do return
+;
+
+fn main =>
 ;
