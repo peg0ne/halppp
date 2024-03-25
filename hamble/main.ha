@@ -59,25 +59,25 @@ fn build string type => int
         if file == "bin" dobr bin_exists = true
     ;
     if type == "halp"
-        system("halp src/main.ha")
-        if !bin_exists do system("mkdir bin")
-        system("mv src/main bin/main")
+        _system("halp src/main.ha")
+        if !bin_exists do _system("mkdir bin")
+        _system("mv src/main bin/main")
         return 1
     ;
     changedir("src")
     if type == "-t"
-        system("halppp main.ha -t")
+        _system("halppp main.ha -t")
         return 0
     ;
     elif type == "-r"
-        system("halppp main.ha -r")
-        if !bin_exists do system("mkdir ../bin")
-        system("mv main ../bin/main")
+        _system("halppp main.ha -r")
+        if !bin_exists do _system("mkdir ../bin")
+        _system("mv main ../bin/main")
     ;
     else 
-        system("halppp main.ha")
-        if !bin_exists do system("mkdir ../bin")
-        system("mv main ../bin/main")
+        _system("halppp main.ha")
+        if !bin_exists do _system("mkdir ../bin")
+        _system("mv main ../bin/main")
     ;
     return 1
 ;
@@ -89,7 +89,7 @@ fn run string type => int
         return 0
     ;
     changedir("..")
-    system("./bin/main")
+    _system("./bin/main")
     return 1
 ;
 
@@ -98,7 +98,7 @@ fn watch string type => int
     let key = ""
     loop
         run(type)
-        system("clear")
+        _system("clear")
         println("=0.o= Do you want to exit? (y/n)")
         cin >> key
         if key == "y" doremi 1

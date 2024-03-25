@@ -4,6 +4,7 @@ get => option, conditional
 
 class String
     string _value
+    String => do return
     String string value => do this->_value = value
 pub
     fn + string text => String doremi String(_value + text)
