@@ -44,6 +44,7 @@ struct SyntaxCustom
     int capture = 0
     bool bold = false
     bool dim = false
+    string regex_str = ""
     regex expr
     SyntaxCustom => do return
     SyntaxCustom Json *custom =>
@@ -51,7 +52,8 @@ struct SyntaxCustom
         capture = custom->try_get_value_of("capture", 0.0)
         bold = custom->try_get_value_of("bold", false)
         dim = custom->try_get_value_of("dim", false)
-        expr = regex(custom->try_get_value_of("expr", (string)"*"))
+        regex_str = custom->try_get_value_of("expr", (string)"*")
+        expr = regex(regex_str)
     ;
 ;
 
@@ -160,6 +162,7 @@ pub
     fn rules => vector<SyntaxRule> doremi _rules
     fn templates => vector<SyntaxTemplate> doremi _templates
     fn file_type => string doremi _file_type
+    fn set_file_type string type => do _file_type = type
     fn cached_blocks string key => Option<TreeNode>
         if key == _cached_tree doremi _cached_node
         return None<TreeNode>()

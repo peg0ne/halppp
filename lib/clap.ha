@@ -5,6 +5,10 @@ private
     int _argc = 0
     char **_argv
 pub
+    fn at int index => Option<string>
+        if index >= _argc doremi None<string>()
+        return Some((string)_argv[index])
+    ;
     fn has string check => bool
         for i until _argc
             if _argv[i] == check doremi true

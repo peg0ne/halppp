@@ -28,9 +28,11 @@ class ConfigManager => IContent
     fn reload_configs =>
         let home = home_env().value_or(".")
         let configs = list_reg_files($"{home}/.config/hide")
+        _syntaxes = Dictionary<string, Syntax>()
         foreach config_file in configs
             let config = load_json($"{home}/.config/hide/{config_file}")
             let syntax = Syntax(config)
+            syntax.set_file_type(String(config_file).replace(".json", ""))
             _syntaxes.add(syntax.name(), syntax)
             config.destruct()
         ;
@@ -60,6 +62,7 @@ pub
                 default
                     _selector.draw()
                     if !_entry.run() do _state = ConfigState::Selector
+                    if _entry.get_reload() do reload_configs()
                     break
             ;
         ;
