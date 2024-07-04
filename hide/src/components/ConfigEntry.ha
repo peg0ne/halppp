@@ -18,6 +18,14 @@ class ConfigEntry => IContent
         config.destruct()
         _reload = true
     ;
+    fn get_selectable int pos, string label => Selectable*
+        if pos >= _selectables.size() do _selectables.push_back(new Selectable(label))
+        let selectable = _selectables[pos]
+        selectable->set_label(label)
+        selectable->set_outline(true)
+        selectable->clear_func()
+        return selectable
+    ;
 pub
     fn get_reload => bool
         let reload = _reload
@@ -28,60 +36,32 @@ pub
         _syntax = syntax
         _current_selected = 0
         int current = 0
-        if current < _selectables.size()
-            _selectables[current]->set_label("Add Word")
-        ;
-        else
-            _selectables.push_back(new Selectable("Add Word"))
-        ;
-        _selectables[current]->set_outline(true)
-        _selectables[current]->add_func(bind(ConfigUpdater::add_word, syntax.file_type()))
+
+        let add_word = get_selectable(current, "Add Word")
+        add_word->add_func(bind(ConfigUpdater::add_word, syntax.file_type()))
         current++
+
         foreach word in _syntax.wordlist()
-            if current < _selectables.size()
-                _selectables[current]->set_label(word)
-            ;
-            else
-                _selectables.push_back(new Selectable(word))
-            ;
-            _selectables[current]->set_outline(false)
-            _selectables[current]->add_func(bind(ConfigUpdater::edit_word, word, syntax.file_type()))
+            let edit_word = get_selectable(current, word)
+            edit_word->set_outline(false)
+            edit_word->add_func(bind(ConfigUpdater::edit_word, word, syntax.file_type()))
             current++
         ;
         foreach rule in _syntax.rules()
             let value = $"{rule.type} | {rule.value} | {rule.validation_type} | {rule.validation_value}"
-            if current < _selectables.size()
-                _selectables[current]->set_label(value)
-            ;
-            else
-                _selectables.push_back(new Selectable(value))
-            ;
-            _selectables[current]->set_outline(true)
+            let edit_rule = get_selectable(current, value)
             current++
         ;
-        foreach custom in _syntax.custom()
+        foreach i,custom in _syntax.custom()
             let value = $"Rule: {custom.regex_str} | Color: {custom.color} | Capture: {custom.capture} | Bold: {custom.bold} | Dim: {custom.dim}"
-            if current < _selectables.size()
-                _selectables[current]->set_label(value)
-            ;
-            else
-                _selectables.push_back(new Selectable(value))
-            ;
-            _selectables[current]->set_outline(true)
+            let edit_custom = get_selectable(current, value)
+            edit_custom->add_func(bind(ConfigUpdater::edit_custom, custom, i, syntax.file_type()))
             current++
         ;
         foreach t_origin in _syntax.templates()
             let value = $"Name: {t_origin.template_name} | Template: "
-            foreach t in t_origin.templates
-                value += t
-            ;
-            if current < _selectables.size()
-                _selectables[current]->set_label(value)
-            ;
-            else
-                _selectables.push_back(new Selectable(value))
-            ;
-            _selectables[current]->set_outline(true)
+            foreach t in t_origin.templates do value += t
+            let edit_template = get_selectable(current, value)
             current++
         ;
     ;

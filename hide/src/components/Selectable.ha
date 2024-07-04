@@ -19,6 +19,7 @@ pub
         _func = func
         _has_func = true
     ;
+    fn clear_func => do _has_func = false
     fn execute func =>
         if _has_func do _func()
         else do Ncurses::add(0,0,"No Func")
