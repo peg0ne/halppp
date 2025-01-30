@@ -373,6 +373,29 @@ pub
     ;
     fn tab Vector *pos =>
         let v = new Vector(0, pos->y)
+        if pos->y > 0 && pos->y < _text.len()
+            let previous_line = _text.at(pos->y - 1)
+            let current_line = _text.at(pos->y)
+            let previous_tab_text = 0
+            let current_tab_text = 0
+            let new_tab_text = ""
+            foreach c in previous_line
+                if c != ' ' do break
+                previous_tab_text++ 
+            ;
+            foreach c in current_line
+                if c != ' ' do break
+                current_tab_text++
+            ;
+            let diff = max(previous_tab_text - current_tab_text, 0)
+            if diff >= 1
+                for i until diff do new_tab_text += " "
+                insert_snippet(&_text, v, new_tab_text)
+                delete(v)
+                try_move(Vector(diff,0), pos)
+                return
+            ;
+        ;
         insert_snippet(&_text, v, "    ")
         delete(v)
         try_move(Vector(4,0), pos)
