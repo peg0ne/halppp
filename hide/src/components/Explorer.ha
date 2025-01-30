@@ -12,13 +12,13 @@ class Explorer => IContent
     fn get_internal_offset => int
         let size = _origin->Size()
         let y = size.y - 1
+        if _pos < 0 do _pos = _offset
         if _pos > y + _offset
             _offset = _pos - y
         ;
         if _pos < _offset
             _offset = _pos
         ;
-        if _offset < 0 do _offset = 0
         return _offset
     ;
 pub 
