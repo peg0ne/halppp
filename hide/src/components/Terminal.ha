@@ -56,10 +56,17 @@ class Terminal => IContent
         update_line = true
         return returner
     ;
+    fn add_to_buffer string line =>
+        if _buffer.len() > 20 do _buffer.remove(0)
+        _buffer = linq::take(_buffer)
+            .where([line](string item){return item != line;})
+            .as_list()
+        _buffer.add(line)
+        _buffer_pos = _buffer.len()
+    ;
     fn run_command => bool
         scroll_pos = 0
-        if _buffer.len() > 20 do _buffer.remove(0)
-        _buffer.add(_line)
+        add_to_buffer(_line)
         let cmd = String(_line).strip()
         if cmd =|= "exit" : ":q" doremi clear_it(false)
         elif cmd =|= "clear" : ":c" doremi clear_it(true)
