@@ -3,6 +3,8 @@ get => ConfigUpdaterContent
 named => ConfigUpdater
     fn get_new_word string word, IContainer* container => string
         String new_word = String(word)
+        container->SetLabel($"{new_word.to_string()}|")
+        container->draw()
         loop
             let key = Ncurses::key()
             if key == '\n' do break
@@ -17,9 +19,11 @@ named => ConfigUpdater
                 new_word = new_word + key
                 break
             ;
-            container->SetLabel(new_word.to_string())
+            container->SetLabel($"{new_word.to_string()}|")
             container->draw()
         ;
+        container->SetLabel(new_word.to_string())
+        container->draw()
         return new_word.to_string()
     ;
 
