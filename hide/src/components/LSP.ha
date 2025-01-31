@@ -80,4 +80,32 @@ named => LSP
             if pos >= matches.size() do pos = 0
         ;
     ;
+    fn try_find_import List<string> text, Vector pos, string lang => Option<LSPFoundTarget>
+        if pos.y >= text.len() doremi None<LSPFoundTarget>()
+        let line = text.at(pos.y)
+        if line.size() == 0 doremi None<LSPFoundTarget>()
+        if !String(line).starts_with("get =>") doremi None<LSPFoundTarget>()
+
+        let matches = re(line, R"(([A-z_]*))", 1)
+        let matching = ""
+        foreach m in matches
+            if m.position > pos.x do continue
+            if m.reg_match.size() + m.position < pos.x do continue
+            matching = m.reg_match
+            break;
+        ;
+            
+        let project_files = LGREP::lgrep()
+        select home from home_env()
+            let dir = $"{home}/.local/lib"
+            let unhandled_files = LGREP::lgrep(dir, 0)
+            let lib_files = map<string>(unhandled_files).select(x => $"{dir}/{x}")
+            project_files = linq::take(project_files).join(lib_files).as_vec()
+        ;
+        let files = map<string>(project_files)
+            .where(x => String(x).ends_with($"{matching}.{lang}"))
+        
+        if files.size() <= 0 doremi None<LSPFoundTarget>()
+        return Option(LSPFoundTarget(files[0], 0))
+    ;
 ;

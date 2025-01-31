@@ -290,9 +290,9 @@ pub
         ;
     ;
     fn find bool is_reverse = false, bool should_move = true => string
-        if _text.size() == 0 do return ""
+        if _text.size() == 0 doremi ""
         let s = _text.at(_selector.y)
-        if s.size() == 0 do return ""
+        if s.size() == 0 doremi ""
         let matches = re(s, R"(([A-z_]*))", 1)
         let matching = ""
         foreach m in matches
@@ -308,8 +308,8 @@ pub
     fn find string matching, string replace => bool doremi find(matching, replace, false, true)
     fn find string matching, bool is_reverse => bool doremi find(matching, "", is_reverse, false)
     fn find string matching, string replace, bool is_reverse, bool is_replace => bool
-        if _text.size() == 0 do return false
-        if matching == "" do return false
+        if _text.size() == 0 doremi false
+        if matching == "" doremi false
         regex reg = regex(".*")
         vector<RegexMatch> matches = {}
         let y = 0
