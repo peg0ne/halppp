@@ -17,6 +17,10 @@ private fn run_base int key => Command
     case 'P' dobr text_editing(TextEdit::PasteWord)
     case ';' dobr _selections.clear()
     case '.'
+        select f from LSP::try_find_import(_text, _selector, "ha")
+            open(f.file_name, 0)
+            break
+        ;
         select f from LSP::show_definition(find(false, false), "ha")
             open(f.file_name, f.found_at_line)
         ;
