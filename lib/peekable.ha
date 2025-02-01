@@ -20,7 +20,7 @@ pub
     fn size => int doremi _values.size()
     fn is_end => bool doremi _index > _values.size() - 1
     fn is_begin => bool doremi _index == 0
-    fn at int at => Option<T> doremi Some(_values.at(at))
+    fn at int at => Option<T> doremi at < _valuse.size() ? Some(_values.at(at)) : None<T>()
     fn prev => Option<T> doremi !is_begin() ? at(--_index) : None<T>()
     fn peek_prev => Option<T> doremi !is_begin() ? at(_index - 1) : None<T>()
     fn next => Option<T> doremi !is_end() ? at(_index++) : None<T>()
