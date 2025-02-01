@@ -17,12 +17,34 @@ pub
         ;
     ;
     fn clear => do read_lines = {}
-    fn add string line => do read_lines.push_back(line)
+    fn add string line =>
+        let filtered_line = ""
+        vector<char> char_list = {}
+        foreach c in line
+            if isgraph(c) do char_list.push_back(c)
+            elif isspace(c) do char_list.push_back(c)
+        ;
+        let peekable = Peekable<char>(char_list)
+        while peekable.peek().is_some()
+            let c = peekable.next().value_or(' ')
+            let c_one = peekable.at(peekable.index()).value_or(' ')
+            let c_two = peekable.at(peekable.index() + 1).value_or(' ')
+            let c_thr = peekable.at(peekable.index() + 2).value_or(' ')
+            let is_color = c_two == 'm' || c_thr == 'm'
+            if c == '[' && is_color
+                peekable.next()
+                peekable.next()
+                if c_thr == 'm' do peekable.next()
+            ;
+            else do filtered_line += string(1,c)
+        ;
+        read_lines.push_back(filtered_line)
+    ;
     fn update =>
         if !started do return
         char buffer[1064]
         if fgets(buffer, sizeof(buffer), fp)
-            read_lines.push_back(buffer)
+            add(buffer)
             if read_lines.size() > 300
                 for i until 300 do read_lines[i] = read_lines[i+1]
             ;
