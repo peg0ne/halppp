@@ -34,6 +34,10 @@ class HorizontalLayout => GroupedContainer
             switch c->FillX()
             case Fill::Static dobr available_space -= c->Size().x
             case Fill::Flex dobr sharers++
+            case Fill::FlexCustom
+                sharers++
+                available_space -= c->GetCustomFill().x
+                break
             ;
         ;
         if sharers != 0
@@ -47,6 +51,9 @@ class HorizontalLayout => GroupedContainer
             c->SetOffset(offset + _offset.x, _offset.y)
             if c->FillX() == Fill::Flex
                 c->SetSize((available_space / sharers), _size.y)
+            ;
+            if c->FillX() == Fill::FlexCustom
+                c->SetSize((available_space / sharers) + c->GetCustomFill().x, _size.y)
             ;
             if i + 1 == _containers.size()
                 c->SetSize(c->Size().x + extra, _size.y)
