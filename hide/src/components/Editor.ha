@@ -22,7 +22,7 @@ class Editor => IContent
     CommandPallete *_command_pallete
     Mode _current_mode = Mode::Normal
     Editor string path, vector<string> *shared_buffer, IContainer *status_line, CommandPallete *command_pallete =>
-        _origin = new VerticalLayout()
+        _origin = new VerticalLayout(Fill::FlexCustom)
         _highlighter = Some(new Highlighter(path))
         _status_line = status_line
         _command_pallete = command_pallete
@@ -96,6 +96,13 @@ pub
         delete(_base)
         select h from _highlighter do delete(h)
         return this
+    ;
+    fn modify_flex_size Dir dir =>
+        let flex_size = _origin->GetCustomFill()
+        switch dir
+            case Dir::Up dobr _origin->SetCustomFill(Vector(flex_size.x + 10, flex_size.y + 10))
+            case Dir::Down dobr _origin->SetCustomFill(Vector(flex_size.x - 10, flex_size.y - 10))
+        ;
     ;
     fn get_internal_offset => Vector
         let size = _content->Size()

@@ -12,6 +12,7 @@ protected
     Fill _fill_y = Fill::Flex
     Vector _size = Vector(0,0)
     Vector _offset = Vector(0,0)
+    Vector _custom_fill = Vector(0,0)
     bool is_active = true
     bool is_outline = false
     bool is_center_text = false
@@ -43,6 +44,8 @@ protected
         _offset = o
     ;
 pub
+    fn GetCustomFill => Vector doremi _custom_fill
+    fn SetCustomFill Vector custom_fill => do _custom_fill = custom_fill
     fn Type => ContainerType doremi _type
     fn FillY => Fill doremi _fill_y
     fn FillX => Fill doremi _fill_x

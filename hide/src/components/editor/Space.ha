@@ -38,6 +38,8 @@ private fn run_space => Command
     case 'k' doremi Command::EditorDown
     case KEY_LEFT  dobr navigate(false)
     case KEY_RIGHT dobr navigate(true)
+    case KEY_UP dobr modify_flex_size(Dir::Up)
+    case KEY_DOWN dobr modify_flex_size(Dir::Down)
     case 'c' dobr text_editing(TextEdit::CommentToggle)
     case 'P' dobr paste_from_clip()
     case 'p'

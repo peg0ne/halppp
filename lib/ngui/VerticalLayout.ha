@@ -34,6 +34,10 @@ class VerticalLayout => GroupedContainer
             switch c->FillY()
             case Fill::Static dobr available_space -= c->Size().y
             case Fill::Flex dobr sharers++
+            case Fill::FlexCustom
+                sharers++
+                available_space -= c->GetCustomFill().y
+                break
             ;
         ;
         if sharers != 0
@@ -47,6 +51,9 @@ class VerticalLayout => GroupedContainer
             c->SetOffset(_offset.x, offset + _offset.y)
             if c->FillY() == Fill::Flex
                 c->SetSize(_size.x, (available_space / sharers))
+            ;
+            if c->FillY() == Fill::FlexCustom
+                c->SetSize(_size.x, (available_space / sharers) + c->GetCustomFill().y)
             ;
             if i + 1 == _containers.size()
                 c->SetSize(_size.x, c->Size().y + extra)
