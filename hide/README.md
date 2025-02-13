@@ -128,6 +128,8 @@ hide
 -   `SPACE + p` -> opens command pallete
 -   `SPACE + ->` -> moves to next file opened
 -   `SPACE + <-` -> moves to previous file opened
+-   `SPACE + up` -> increase size of editor
+-   `SPACE + down` -> decrease size of editor
 
 ### CmdHan commands
 
