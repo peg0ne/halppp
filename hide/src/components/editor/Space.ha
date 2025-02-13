@@ -16,7 +16,9 @@ private fn run_space => Command
         "s - open file searcher",
         "S - open project searcher",
         "-> - move forward",
-        "<- - move backwards"
+        "<- - move backwards",
+        "up - increase window size",
+        "down - decrease window size"
     }
     foreach c in commands
         let ele = new IContainer(Fill::Flex)
