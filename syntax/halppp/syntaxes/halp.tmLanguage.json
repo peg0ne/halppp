@@ -115,6 +115,10 @@
                     "match": "(?<=struct)\\s*(\\w*)"
                 },
                 {
+                    "name": "entity.other.attribute-name",
+                    "match": "(?<=class)\\s*(\\w*)"
+                },
+                {
                     "name": "keyword.other.unit",
                     "match": "(?<=fn)\\s*(\\w*)"
                 }
@@ -148,7 +152,7 @@
                 },
                 {
                     "name": "variable.name",
-                    "match": "(\\s[A-Z]+\\s?[a-z]+[^0-9\\W])"
+                    "match": "\\b([A-Z][a-zA-Z0-9_]*)\\b"
                 },
                 {
                     "name": "constant.language",

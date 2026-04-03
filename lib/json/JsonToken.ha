@@ -8,6 +8,7 @@ enum JsonToken
     StringLiteral,
     NumberLiteral,
     BooleanLiteral,
+    NullLiteral,
 ;
 
 struct JsonTokenized

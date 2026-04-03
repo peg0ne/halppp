@@ -1,8 +1,1 @@
-{
-    "remember-header": "\n REMEMBER\n --------",
-    "remember-items": [],
-    "header": "\n TODO\n ----",
-    "tasks": [],
-    "completed-tasks": 20,
-    "unfinished-tasks": 20
-}
+{"remember-header":"\n REMEMBER\n --------","remember-items":[],"header":"\n TODO\n ----","tasks":[{"task":"indexer for halpppp","completed":true},{"task":"plugins for hide","completed":false},{"task":"caching of unchanged compiled items","completed":false},{"task":"support unicode","completed":false},{"task":"fix hide LSP","completed":false}],"completed-tasks":21,"unfinished-tasks":25}

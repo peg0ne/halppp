@@ -74,7 +74,12 @@ pub
         return value
     ;
     fn value_or string value => string
-        if _type == JsonType::String doremi String(_text_value).replace("\\\"", "\"")
+        if _type == JsonType::String
+            let sq = String(_text_value).replace("\\\"", "\"")
+            let sn = String(sq).replace("\\n", "\n")
+            let sr = String(sn).replace("\\r", "\r")
+            doremi String(sr).replace("\\t", "\t")
+        ;
         return value
     ;
     fn value_or bool value => bool

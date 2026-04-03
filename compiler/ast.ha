@@ -6,72 +6,85 @@ fn ast_create string content => vector<AstToken>
     let peekable = Peekable<char>(vec)
     string id = EMPTY
     vector<AstToken> ast = {}
+    int current_line = 1
     loop
         try_append_raw(peekable, ast)
-        if next_is_none(peekable) dobr try_add_token(id, ast, peekable)
+        if next_is_none(peekable) dobr try_add_token(id, ast, peekable, current_line)
         let c = peekable.next().value_or(' ')
         let last_known_index = peekable.index()
         select pair from try_get_pair(peekable, c)
-            id = try_add_token(id, ast, peekable)
-            doco try_add_token(pair, ast, peekable)
+            id = try_add_token(id, ast, peekable, current_line)
+            doco try_add_token(pair, ast, peekable, current_line)
         ;
         select concat from try_get_concat(peekable, c)
-            id = try_add_token(id, ast, peekable)
-            doco try_add_token(concat, ast, peekable)
+            id = try_add_token(id, ast, peekable, current_line)
+            doco try_add_token(concat, ast, peekable, current_line)
         ;
         select matching from try_get_matching(peekable, c)
-            id = try_add_token(id, ast, peekable)
-            doco try_add_token(matching, ast, peekable)
+            id = try_add_token(id, ast, peekable, current_line)
+            doco try_add_token(matching, ast, peekable, current_line)
         ;
         select adv_condition from try_get_advanced_condition(peekable, id, c)
-            id = try_add_token(adv_condition, ast, peekable)
+            id = try_add_token(adv_condition, ast, peekable, current_line)
             peekable.next()
             peekable.next()
             continue
         ;
         select num from try_get_num(peekable, c)
-            id = try_add_token(id, ast, peekable)
-            doco ast.push_back(num)
+            id = try_add_token(id, ast, peekable, current_line)
+            ast.push_back(num)
+            doco ast[ast.size() - 1].line = current_line
         ;
         string ch(1, c)
         if !is_both_token(id, c)
-            id = try_add_token(id, ast, peekable)
+            id = try_add_token(id, ast, peekable, current_line)
             if peekable.index() != last_known_index do continue
             if !is_white_space(c) doco id += ch
         ;
         if is_both_token(id, c) && is_str_tokens(id + ch) doco id += ch
         elif is_char_token(c)
-            id = try_add_token(id, ast, peekable)
+            id = try_add_token(id, ast, peekable, current_line)
             if peekable.index() != last_known_index do continue
-            doco ast.push_back(AstToken(c))
+            ast.push_back(AstToken(c))
+            ast[ast.size() - 1].line = current_line
+            if c == '\n' do current_line++
+            continue
         ;
         elif is_white_space(c)
-            id = try_add_token(id, ast, peekable)
-            if c == '\n' do ast.push_back(AstToken("\n"))
+            id = try_add_token(id, ast, peekable, current_line)
             continue
         ;
         id += ch
     ;
-    // "Push extra sets of EOF to ensure it wont break badly"
     ast.push_back(AstToken("EOF"))
+    ast[ast.size() - 1].line = current_line
     ast.push_back(AstToken("EOF"))
+    ast[ast.size() - 1].line = current_line
     ast.push_back(AstToken("EOF"))
+    ast[ast.size() - 1].line = current_line
     ast.push_back(AstToken("EOF"))
+    ast[ast.size() - 1].line = current_line
     ast.push_back(AstToken("EOF"))
+    ast[ast.size() - 1].line = current_line
     ast.push_back(AstToken("EOF"))
+    ast[ast.size() - 1].line = current_line
     return ast
 ;
 
-fn try_add_token string id, vector<AstToken> &ast, Peekable<char> &peekable => string
+fn try_add_token string id, vector<AstToken> &ast, Peekable<char> &peekable, int &line => string
     if id.size() == 0 doremi id
+    let consumed_newline = false
     if id == "//"
         loop
             let next = peekable.next().value_or('\n')
             if next == '\n' do break
         ;
         id = "\n"
+        consumed_newline = true
     ;
     ast.push_back(AstToken(id))
+    ast[ast.size() - 1].line = line
+    if consumed_newline do line++
     return EMPTY
 ;
 
@@ -160,7 +173,7 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
         let peeked = peekable->peek().value_or(' ')
         if !is_char_number_t(peeked) && peeked != '.'
             token.name = num
-            token.token = is_float ? Token::Float : Token::Number 
+            token.token = is_float ? Token::Float : Token::Number
             token.t = Token_t("0")
             token.t.t = is_float ? Token::Float : Token::Number
             return token
