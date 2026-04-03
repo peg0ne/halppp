@@ -56,6 +56,7 @@ fn json_parse_json_arr Peekable<JsonTokenized> *iter => vector<Json*>
         case JsonToken::StringLiteral
         case JsonToken::NumberLiteral
         case JsonToken::BooleanLiteral
+        case JsonToken::NullLiteral
         case JsonToken::LBrace
         case JsonToken::LBox
             objects.push_back(
@@ -93,6 +94,9 @@ fn json_parse_identifier Peekable<JsonTokenized> *iter, JsonTokenized id, bool f
     ;
     elif value.token == JsonToken::LBox
         return new Json(id.literal, json_parse_json_arr(iter), JsonType::Array)
+    ;
+    elif value.token == JsonToken::NullLiteral
+        return new Json()
     ;
     json_parser_panic($"Expected Value got {value.token}")
     return new Json()

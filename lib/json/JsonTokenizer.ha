@@ -55,8 +55,13 @@ fn json_tokenize_json string json => vector<JsonTokenized>
             if buf =|= "true" : "false"
                 tokens.push_back(JsonTokenized(buf, JsonToken::BooleanLiteral))
             ;
-            select num from String(buf).to_num()
-                tokens.push_back(JsonTokenized(buf, JsonToken::NumberLiteral))
+            elif buf == "null"
+                tokens.push_back(JsonTokenized(buf, JsonToken::NullLiteral))
+            ;
+            else
+                select num from String(buf).to_num()
+                    tokens.push_back(JsonTokenized(buf, JsonToken::NumberLiteral))
+                ;
             ;
             buf = ""
             break

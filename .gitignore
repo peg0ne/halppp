@@ -3,3 +3,4 @@ compiler/main
 hamble/main
 stats
 tests/*.cpp
+vibe/
