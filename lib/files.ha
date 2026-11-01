@@ -73,6 +73,62 @@ fn env string env_var => Option<string>
     if e == NULL doremi None<string>()
     return Some((string)e)
 ;
+// Where installed halppp libraries live: $HALPPP_LIB, or ~/.local/lib/halppp
+// (%USERPROFILE%/.local/lib/halppp on Windows). Always ends with a separator.
+fn halppp_lib_dir => Option<string>
+    select custom from env("HALPPP_LIB")
+        if custom.size() > 0 && any(custom.back(), {'/', '\\'}) doremi Some(custom)
+        if custom.size() > 0 doremi Some(custom + "/")
+    ;
+    select home from home_env() doremi Some($"{home}/.local/lib/halppp/")
+    return None<string>()
+;
+// The C++ compiler to call: $HALPPP_CXX, then $CXX, then clang++ on macOS and g++ elsewhere.
+// It must accept g++-style flags (g++, clang++, MinGW).
+fn cxx_compiler => string
+    select cxx from env("HALPPP_CXX")
+        if cxx.size() > 0 doremi cxx
+    ;
+    select cxx from env("CXX")
+        if cxx.size() > 0 doremi cxx
+    ;
+    raw #ifdef __APPLE__
+    return "clang++"
+    raw #else
+    return "g++"
+    raw #endif
+;
+// "linux", "macos" or "windows"
+fn platform_name => string
+    raw #if defined(_WIN32)
+    return "windows"
+    raw #elif defined(__APPLE__)
+    return "macos"
+    raw #else
+    return "linux"
+    raw #endif
+;
+fn is_windows => bool doremi platform_name() == "windows"
+// Name of an executable built from `path`: adds .exe on Windows
+fn exe_name string path => string doremi is_windows() ? path + ".exe" : path
+// Path with the platform's separator, for handing to the shell (cmd.exe treats / as a switch)
+fn native_path string path => string
+    if !is_windows() doremi path
+    let native = path
+    foreach i, c in path
+        if c == '/' do native[i] = '\\'
+    ;
+    return native
+;
+// The shell's null device, for silencing command output
+fn null_device => string doremi is_windows() ? "NUL" : "/dev/null"
+fn clear_screen => do _system(is_windows() ? "cls" : "clear")
+// Move/rename a file or directory, replacing an existing file at `to`
+fn move_path string from, string to => bool
+    raw std::error_code ec;
+    raw std::filesystem::rename(from, to, ec);
+    raw return !ec;
+;
 fn home_env => Option<string>
     raw #ifdef _WIN32
     return env("USERPROFILE")

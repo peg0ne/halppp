@@ -7,23 +7,13 @@ fn get_file_path int argc, char **argv => string
     while argv[1][i] != '\0' do fp.push_back(argv[1][i++])
     return fp
 ;
-// Where installed libraries live: $HALPPP_LIB, or ~/.local/lib/halppp
-// (%USERPROFILE%/.local/lib/halppp on Windows)
-fn lib_dir => Option<string>
-    select custom from env("HALPPP_LIB")
-        if custom.size() > 0 && any(custom.back(), {'/', '\\'}) doremi Some(custom)
-        if custom.size() > 0 doremi Some(custom + "/")
-    ;
-    select home from home_env() doremi Some($"{home}/.local/lib/halppp/")
-    return None<string>()
-;
-fn lib_dir_display => string doremi lib_dir().value_or("$HALPPP_LIB")
+fn lib_dir_display => string doremi halppp_lib_dir().value_or("$HALPPP_LIB")
 
 fn get_content CompilerPath paths, bool can_be_lib => string
     string content, linebuf
     ifstream reader(paths.current)
     if !reader && can_be_lib
-        select dir from lib_dir()
+        select dir from halppp_lib_dir()
             reader = ifstream(dir + paths.current)
         ;
     ;
@@ -41,7 +31,7 @@ fn canonical_path string path => string
 fn resolve_get_path string local_path, string lib_name => string
     let local_reader = ifstream(local_path)
     if local_reader doremi local_path
-    select dir from lib_dir()
+    select dir from halppp_lib_dir()
         let lib_path = dir + lib_name
         let lib_reader = ifstream(lib_path)
         if lib_reader doremi lib_path
@@ -53,21 +43,6 @@ fn write_program string program, CompilerPath paths =>
     ofstream file(paths.main_path_cpp)
     file << program
     file.close()
-;
-// The C++ compiler to call: $HALPPP_CXX, then $CXX, then clang++ on macOS and g++ elsewhere.
-// It must accept g++-style flags (g++, clang++, MinGW).
-fn cxx_compiler => string
-    select cxx from env("HALPPP_CXX")
-        if cxx.size() > 0 doremi cxx
-    ;
-    select cxx from env("CXX")
-        if cxx.size() > 0 doremi cxx
-    ;
-    raw #ifdef __APPLE__
-    return "clang++"
-    raw #else
-    return "g++"
-    raw #endif
 ;
 fn quote_path string path => string doremi $"\"{path}\""
 fn compile_program CompilerPath paths, vector<string> arguments, bool is_release =>

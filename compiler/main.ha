@@ -128,11 +128,25 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 ;
             ;
             Token::Compiler =>
-                arrow_or_exit(&compiler_t, $"[Compiler] Missing start of compiler intent [=>]: {next.name}")
+                // compiler => "-lfoo"                  always
+                // compiler windows, macos => "-lbar"   only when compiling on those platforms
+                vector<string> platforms = {}
+                loop
+                    let platform = next_or_exit(&compiler_t, $"[Compiler] Missing start of compiler intent [=>]: {next.name}")
+                    if platform.token == Token::CoolArrow do break
+                    if platform.token == Token::Comma do continue
+                    if platform.token != Token::Id || none(platform.name, {"linux", "macos", "windows"})
+                        error($"[Compiler] Expected linux, macos, windows or => but got: {platform.name}", compiler_t.recap())
+                    ;
+                    platforms.push_back(platform.name)
+                ;
                 args = get_or_exit(&compiler_t, Token::String, $"[Compiler] Missing value of compiler intent [TString]: {next.name}")
-                compiler_t.add_arg(args)
+                if platforms.size() == 0 || any(platform_name(), platforms) do compiler_t.add_arg(args)
             ;
-            Token::Raw => do output += next.name
+            Token::Raw =>
+                // Top-level raw lines go with the includes so they can pick headers per platform (#ifdef)
+                includes += next.name
+            ;
             _ => do error($"Token not handled: {next.name}", compiler_t.recap())
         ;
     ;

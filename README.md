@@ -38,19 +38,39 @@ hamble++ do make
 ```
 
 ## Windows (PowerShell)
+Install [MSYS2](https://www.msys2.org), then in an MSYS2 MinGW64 shell:
+```bash
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-pdcurses
+```
+and add `C:\msys64\mingw64\bin` to your PATH. PDCurses stands in for ncurses on Windows,
+so `lib/ncurses.ha` (and `hamble man`) work there too.
 ```powershell
 git clone https://github.com/peg0ne/halppp.git
 cd halppp\compiler
 .\rebuild.ps1
-# put compiler\main.exe on your PATH, e.g. as halppp.exe
+# put compiler\main.exe on your PATH as halppp.exe
+# install "build tool"
+cd ..\hamble
+halppp main.ha -r
+# put hamble\main.exe on your PATH as hamble++.exe
 ```
-`hide` depends on ncurses and is not supported on Windows.
+`hide` still relies on Linux tools (xclip, tree-sitter, a POSIX shell) and is not supported on Windows.
 
 ## Configuration
 | Environment variable | Default | Purpose |
 | --- | --- | --- |
 | `HALPPP_CXX` (or `CXX`) | `clang++` on macOS, `g++` elsewhere | C++ compiler used to build the generated code (must accept g++-style flags) |
 | `HALPPP_LIB` | `~/.local/lib/halppp` (`%USERPROFILE%\.local\lib\halppp` on Windows) | Where `get` looks for installed libraries |
+
+## Platform-specific compiler flags
+`compiler =>` passes a flag to the C++ compiler. Name platforms (`linux`, `macos`, `windows`) to only pass it there:
+```
+compiler => "-pthread"
+compiler linux => "-lncursesw"
+compiler macos => "-lncurses"
+compiler windows => "-lpdcurses"
+```
+Top-level `raw` lines are placed with the `#include`s, so a library can pick headers per platform with `#ifdef`.
 
 # Examples
 Hello world
