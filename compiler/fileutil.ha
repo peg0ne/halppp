@@ -1,4 +1,4 @@
-inc => fstream
+inc => fstream, filesystem
 
 fn get_file_path int argc, char **argv => string
     if argc < 2 do error("No file path supplied in arguments!\nExiting...", "")
@@ -21,6 +21,9 @@ fn get_content CompilerPath paths, bool can_be_lib => string
         content += $"{linebuf}\n"
     ;
     return content
+;
+fn canonical_path string path => string
+    raw return std::filesystem::weakly_canonical(std::filesystem::path(path)).string();
 ;
 fn resolve_get_path string local_path, string lib_name => string
     let local_reader = ifstream(local_path)

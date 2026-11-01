@@ -62,12 +62,7 @@ struct Compiler
     fn add_use vector<string> usings =>
         foreach i in usings do program->usings.push_back(Uses(i))
     ;
-    fn add_get vector<string> gets =>
-        foreach i in gets
-            while i.find("/") != -1 do i = i.substr(1)
-            program->gets.push_back(i)
-        ;
-    ;
+    fn add_get string path => do program->gets.push_back(path)
     fn add_arg string arg => do arguments.push_back(String(arg).replace(QUOTE, EMPTY))
     fn add_args vector<string> args =>
         foreach i in args do arguments.push_back(i)
@@ -102,11 +97,9 @@ struct Compiler
         ;
         return false
     ;
-    fn has_get string id => bool
-        let getter = id
-        while getter.find("/") != -1 do getter = getter.substr(1)
+    fn has_get string path => bool
         foreach i in program->gets
-            if i == getter doremi true
+            if i == path doremi true
         ;
         return false
     ;

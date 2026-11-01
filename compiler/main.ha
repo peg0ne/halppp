@@ -109,6 +109,14 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 foreach i in incs
                     let get_name = i + HA_SUFFIX
                     let get_file = resolve_get_path(paths.folder_path + get_name, get_name)
+                    // Dedupe on the resolved path, so a/util and b/util are different files
+                    // while ../lib/print and print (from the lib folder) are the same one
+                    let canonical = canonical_path(get_file)
+                    if compiler_t.has_get(canonical)
+                        hint($"[Get]: Duplicate entry of: {i}")
+                        continue
+                    ;
+                    compiler_t.add_get(canonical)
                     FpFn fpfn = folder_and_name(get_file)
                     let get_path = CompilerPath(get_file, fpfn.f_p, fpfn.f_n)
                     let get_out = compile(get_path, p, false)

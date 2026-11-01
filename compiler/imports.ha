@@ -46,12 +46,7 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
                 remove.push_back(i)
             ;
             break
-        case Token::Get
-            if compiler_t->has_get(imp)
-                hint($"[Get]: Duplicate entry of: {imp}")
-                remove.push_back(i)
-            ;
-            break
+        case Token::Get do break
         default dobr error($"[{next.token}]: Unhandled import", compiler_t->recap())
         ;
     ;
@@ -67,7 +62,8 @@ fn imports_creation Compiler *compiler_t, AstToken next => vector<string>
     switch next.token
     case Token::Use dobr compiler_t->add_use(import)
     case Token::Include dobr compiler_t->add_inc(import)
-    case Token::Get dobr compiler_t->add_get(import)
+    // Gets are deduplicated by resolved path when they are compiled (see compile in main.ha)
+    case Token::Get do break
     default dobr error($"[{next.token}]: Unhandled import", compiler_t->recap())
     ;
     return import
