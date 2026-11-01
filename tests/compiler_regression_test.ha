@@ -20,13 +20,12 @@ fn nested => vector<vector<int>>
 ;
 
 fn main =>
-    // identifiers containing digits
-    int x2 = 3
-    let var1 = x2 + 1
+    int xx = 3
+    let value = xx + 1
     // string interpolation with quotes inside the braces
     map<string,int> m = {}
     m["k"] = 2
-    println($"{var1} {m["k"]}")
+    println($"{value} {m["k"]}")
     // comparisons are not typed after their first literal
     let same = "abc" == "abc"
     println($"{same}")
@@ -34,7 +33,7 @@ fn main =>
     let c = Color::Blue
     // advanced conditions with multi-token operands
     if c =|= Color::Red : Color::Blue do println("any-equals ok")
-    if var1 =!= var1 - 1 : var1 + 1 do println("all-not-equals ok")
+    if value =!= value - 1 : value + 1 do println("all-not-equals ok")
     // static members with initialisers
     let a = Counter()
     let b = Counter()
@@ -42,10 +41,10 @@ fn main =>
     // nested template return types
     println($"{nested()[0].size()}")
     // match: default as first arm, advanced conditional arms
-    match var1
+    match value
         _ => do println("default-first ok")
     ;
-    match var1
+    match value
         =|= 1 : 4 => do println("match any-equals ok")
         _ => do println("match bad")
     ;

@@ -1,6 +1,7 @@
 get => ast_helpers
 
-fn ast_create string content => vector<AstToken>
+fn ast_create string content => vector<AstToken> doremi ast_create(content, 0)
+fn ast_create string content, int line_offset => vector<AstToken>
     vector<char> vec = {}
     foreach i in content do vec.push_back(i)
     let peekable = Peekable<char>(vec)
@@ -30,10 +31,11 @@ fn ast_create string content => vector<AstToken>
             peekable.next()
             continue
         ;
+        // Identifiers may not contain numbers, e.g. `var1`
         if is_char_number_t(c) && id.size() > 0 && !is_str_tokens(id)
+            let line = current_line - line_offset
             string digit(1, c)
-            id += digit
-            continue
+            error($"[Lexer] Identifiers cannot contain numbers: {id}{digit}... (line {line})", "")
         ;
         select num from try_get_num(peekable, c)
             id = try_add_token(id, ast, peekable, current_line)
@@ -183,6 +185,9 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
     let token = AstToken()
     loop
         let peeked = peekable->peek().value_or(' ')
+        // A number ends at the first char that can't be part of a literal.
+        // Letters/underscore are kept for suffixes and hex (1.5f, 10u, 0x1F),
+        // but `..` is a range operator, not a decimal point (0..10).
         let next_peeked = peekable->at(peekable->index() + 1).value_or(' ')
         let is_range = peeked == '.' && next_peeked == '.'
         if is_range || (!isalnum(peeked) && peeked != '.' && peeked != '_')

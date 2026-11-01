@@ -87,6 +87,8 @@ fn adv_conditional_construct Compiler *compiler_t, ConditionalExpression *expr, 
         if x.is_do() do return
         if x.is_conditional_sep() do return
         if x.is_nl() do return
+        // Operands are separated by `:` and may span several tokens
+        // (Color::Red, n - 1), so only start a new `|| left op` after a `:`
         if x.token == Token::Colon
             new_operand = true
             doco compiler_t->next()

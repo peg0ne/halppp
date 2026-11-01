@@ -1,14 +1,18 @@
+fn same_signature Function a, Function b => bool
+    if a.id != b.id || a.templates != b.templates doremi false
+    if a.arguments.size() != b.arguments.size() doremi false
+    for j until a.arguments.size()
+        if a.arguments[j].v_type != b.arguments[j].v_type doremi false
+    ;
+    return true
+;
+
+// Member functions are validated per class in class_internal_declarations
 fn validate_function Function function, Compiler *compiler_t =>
     if function.is_member do return
     foreach f in compiler_t->program->functions
-        if f.is_member || f.id != function.id do continue
-        if f.templates != function.templates do continue
-        if f.arguments.size() != function.arguments.size() do continue
-        let same = true
-        for j until f.arguments.size()
-            if f.arguments[j].v_type != function.arguments[j].v_type dobr same = false
-        ;
-        if same do error($"Duplicate instances Function of: {function.id}", compiler_t->recap())
+        if f.is_member do continue
+        if same_signature(f, function) do error($"Duplicate instances Function of: {function.id}", compiler_t->recap())
     ;
 ;
 

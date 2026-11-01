@@ -45,6 +45,7 @@ fn folder_and_name string file_path => FpFn
 ;
 fn temp_compiler string emulated_str => Compiler
     let ast = ast_create(emulated_str)
-    let program = new Program()
-    return Compiler(program, ast, 0)
+    // Shared scratch program: must outlive the returned Compiler
+    raw static Program program;
+    return Compiler(&program, ast, 0)
 ;

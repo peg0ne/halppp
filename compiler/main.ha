@@ -57,7 +57,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
         extras += "\ninc => string\nuse => std\n"
         content = extras + content
     ;
-    let ast = ast_create(content)
+    let ast = ast_create(content, extralines)
     let compiler_t = Compiler(p, ast, extralines)
     vector<string> incs = {}
     string args = EMPTY
@@ -107,7 +107,8 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             Token::Get =>
                 incs = imports_creation(&compiler_t, next)
                 foreach i in incs
-                    let get_file = resolve_get_path(paths.folder_path + i + HA_SUFFIX, i + HA_SUFFIX)
+                    let get_name = i + HA_SUFFIX
+                    let get_file = resolve_get_path(paths.folder_path + get_name, get_name)
                     FpFn fpfn = folder_and_name(get_file)
                     let get_path = CompilerPath(get_file, fpfn.f_p, fpfn.f_n)
                     let get_out = compile(get_path, p, false)

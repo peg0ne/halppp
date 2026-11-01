@@ -16,12 +16,10 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
     //Statements to match
     loop
         let op = "=="
-        let is_adv = false
-        let adv_token = Token::Id
+        let adv_token = Token::UNKNOWN
         select peeked from compiler_t->peek()
             if peeked.is_adv_conditional()
                 compiler_t->next()
-                is_adv = true
                 adv_token = peeked.token
             ;
             elif peeked.is_conditional() || peeked.token == Token::Period || peeked.token == Token::Pointer
@@ -29,7 +27,7 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
                 op = peeked.name
             ;
         ;
-        if is_adv
+        if adv_token != Token::UNKNOWN
             operators.push_back(EMPTY)
             statments.push_back(match_adv_statements(compiler_t, adv_token))
         ;

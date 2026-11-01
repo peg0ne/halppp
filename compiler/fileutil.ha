@@ -23,13 +23,14 @@ fn get_content CompilerPath paths, bool can_be_lib => string
     return content
 ;
 fn resolve_get_path string local_path, string lib_name => string
-    ifstream local_reader(local_path)
+    let local_reader = ifstream(local_path)
     if local_reader doremi local_path
     select home from home_env()
         let lib_path = $"{home}/.local/lib/halppp/{lib_name}"
-        ifstream lib_reader(lib_path)
+        let lib_reader = ifstream(lib_path)
         if lib_reader doremi lib_path
     ;
+    hint($"[Get]: {lib_name} not found locally ({local_path}) or in ~/.local/lib/halppp")
     return local_path
 ;
 fn write_program string program, CompilerPath paths =>
