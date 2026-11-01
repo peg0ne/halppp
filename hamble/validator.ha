@@ -13,7 +13,7 @@ fn good string msg => do println($"\033[32m{msg}\033[0m")
 
 fn validate => bool
     let files = list_reg_files("./tests")
-    if files.size() <= 0 doremi 1
+    if files.size() <= 0 doremi true
     let tests = map<string>(files)
         .where(x => String(x).ends_with(".ha"))
     
@@ -67,5 +67,6 @@ fn validate => bool
         if failed_program.contains(test) do error(test)
         else do good(test)
     ;
-    return failed.keys().size() > 0
+    let failures = failed.keys().size() + failed_compile.keys().size() + failed_program.keys().size()
+    return failures == 0
 ;
