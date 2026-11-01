@@ -47,6 +47,8 @@ glob
     TOKEN_GLOBAL "glob"
     TOKEN_IFS "if"
     TOKEN_IN "in"
+    TOKEN_INCREMENT "++"
+    TOKEN_DECREMENT "--"
     TOKEN_INCLUDE "inc"
     TOKEN_INT "int"
     TOKEN_LBLOCK "{"

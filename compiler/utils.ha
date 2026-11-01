@@ -43,6 +43,15 @@ fn folder_and_name string file_path => FpFn
     file_name = reversed
     return FpFn(folder_path, file_name)
 ;
+// Concatenate a token onto generated code without letting operators merge:
+// `a - -1` must not become `a--1`, nor `a + +b` become `a++b`
+fn join_token string code, string token => string
+    if code.size() == 0 || token.size() == 0 doremi code + token
+    let last = code.back()
+    let first = token.front()
+    if last == first && any(last, {'-', '+'}) doremi code + " " + token
+    return code + token
+;
 fn temp_compiler string emulated_str => Compiler
     let ast = ast_create(emulated_str)
     // Shared scratch program: must outlive the returned Compiler

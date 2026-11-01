@@ -15,7 +15,7 @@ fn get_value Compiler *compiler_t, bool found_setter, bool in_args => Option<str
         let next = next_or_exit(compiler_t, VAR_ERR_VAL)
         if next.is_nl() do break
         if in_args && any(next.token, {Token::Comma, Token::CoolArrow}) do break
-        value += next.name
+        value = join_token(value, next.name)
         if next.token == Token::New do value += " "
     ;
     return value.size() == 0 ? None<string>() : Some(value)

@@ -47,7 +47,7 @@ fn expression_construct Compiler *compiler_t, AstToken first, bool is_match => E
             case Token::Let dobr expression += "auto"
             case Token::Return dobr expression += "return "
             case Token::New dobr expression += "new "
-            default dobr expression += x.name
+            default dobr expression = join_token(expression, x.name)
         ;
     ;
     return Expression(expression)
@@ -78,7 +78,7 @@ fn get_let_expr Compiler *compiler_t => Expression
             if !is_member do break
         ;
         if x.is_conditional() || x.is_conditional_sep() || x.is_adv_conditional() do has_operator = true
-        value += x.name
+        value = join_token(value, x.name)
         if x.token == Token::New do value += " "
     ;
     let token = Token_t(value)

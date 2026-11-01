@@ -32,6 +32,8 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
             case Token::Or
             case Token::Sum
             case Token::Sub
+            case Token::Increment
+            case Token::Decrement
             case Token::Bang
             case Token::Asterix
             case Token::DblLessThan
