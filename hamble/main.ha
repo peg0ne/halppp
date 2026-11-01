@@ -10,6 +10,7 @@ fn halp string info => bool
     println("build Optional(-r, -t) - build binary")
     println("    -r - creates a release build")
     println("    -t - transpiles into c++")
+    println("    -s - single c++ file, skips the incremental build cache")
     println("run Optional(-r) - build binary and run")
     println("do <CUSTOM COMMAND>")
     println("validate - tries to compile the tests in the test folder")
@@ -48,7 +49,7 @@ fn init string name =>
     // Run git inside the project so the name never reaches the shell
     if !system(string("git init")) do println("Git couldn't be initialized")
     write("# " + name, "README.md")
-    write("bin/*\n", ".gitignore")
+    write("bin/*\n.halppp-cache/\n", ".gitignore")
     write(hamble_base(name), "hamble.haml")
     if !makedir("bin") dore println("Unable to create binary directory")
     if !makedir("src") dore println("Unable to create src directory")
@@ -87,8 +88,9 @@ fn build string type => int
         if !system(string("halppp main.ha -t")) doremi 0
         return 1
     ;
-    let release = type == "-r" ? " -r" : ""
-    if !system($"halppp main.ha{release}")
+    // -r: release build, -s: single c++ file without the incremental build cache
+    let flag = type == "-r" || type == "-s" ? $" {type}" : ""
+    if !system($"halppp main.ha{flag}")
         println("Build failed")
         return 0
     ;

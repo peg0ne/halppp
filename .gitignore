@@ -4,3 +4,4 @@ hamble/main
 stats
 tests/*.cpp
 vibe/
+.halppp-cache/

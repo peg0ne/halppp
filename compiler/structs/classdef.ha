@@ -43,7 +43,23 @@ struct Class
         return class_str
     ;
     fn to_cpp_h => string doremi to_cpp_start() + LINE_END
-    fn to_cpp => string
+    fn to_cpp => string doremi to_cpp_decl(false) + to_cpp_statics()
+    // Incremental builds: the class body for the shared header. Methods of a
+    // non-template class become declarations; their bodies go in to_cpp_impl
+    fn to_cpp_header => string
+        if templates.size() > 0 doremi to_cpp()
+        return to_cpp_decl(true)
+    ;
+    // Method bodies and static member definitions for the file's own unit
+    fn to_cpp_impl => string
+        if templates.size() > 0 doremi EMPTY
+        string impl = EMPTY
+        foreach f in functions
+            if !f.header_only() do impl += f.to_cpp_out_of_line(id)
+        ;
+        return impl + to_cpp_statics()
+    ;
+    fn to_cpp_decl bool split => string
         let class_str = to_cpp_start_inherit()
         class_str += BLOCK_START
         let previous_state = VariableState::Private
@@ -61,9 +77,13 @@ struct Class
                 class_str += variable_state_to_cpp(f.variable_state)
                 previous_state = f.variable_state
             ;
-            class_str += f.to_cpp(true)
+            if split && !f.header_only() do class_str += f.to_cpp_start(true) + LINE_END
+            else do class_str += f.to_cpp(true)
         ;
-        class_str += $"{RBRACK}{LINE_END}"
+        return class_str + $"{RBRACK}{LINE_END}"
+    ;
+    fn to_cpp_statics => string
+        string class_str = EMPTY
         foreach v in variables
             if !v.staticness do continue
             let owner = qualified_id()

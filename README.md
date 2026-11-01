@@ -61,6 +61,24 @@ halppp main.ha -r
 | --- | --- | --- |
 | `HALPPP_CXX` (or `CXX`) | `clang++` on macOS, `g++` elsewhere | C++ compiler used to build the generated code (must accept g++-style flags) |
 | `HALPPP_LIB` | `~/.local/lib/halppp` (`%USERPROFILE%\.local\lib\halppp` on Windows) | Where `get` looks for installed libraries |
+| `HALPPP_JOBS` | number of CPU cores | How many C++ files to compile in parallel |
+| `HALPPP_PCH` | on | Set to `0` to not precompile the shared header |
+
+## Incremental builds
+`halppp main.ha` only recompiles what changed. Every `.ha` file becomes its own C++ file in
+`.halppp-cache/<name>-<debug|release>/` next to `main.ha`, all sharing one generated `program.h`
+(includes, types, class layouts, function declarations). Function and method bodies live in their
+file's own `.cpp`, so editing them only recompiles that one file and relinks.
+Changing what goes in `program.h` (a signature, a class field, a template, a new import) recompiles
+everything, with the header precompiled once so that is about as fast as a full build used to be.
+
+| Flag | Effect |
+| --- | --- |
+| `-r` | release build (`-O3`), cached separately from debug builds |
+| `-t` | only transpile to a single `main.cpp`, don't compile |
+| `-s` | build the old way: one single C++ file, no cache (whole-program optimisation for releases) |
+
+Add `.halppp-cache/` to your `.gitignore` (`hamble++ init` does this for you).
 
 ## Platform-specific compiler flags
 `compiler =>` passes a flag to the C++ compiler. Name platforms (`linux`, `macos`, `windows`) to only pass it there:
