@@ -1,6 +1,5 @@
 use std::{
     env,
-    str::from_utf8,
     fs::{File, remove_file},
     io::{Read, Write},
     path::Path,
@@ -58,11 +57,13 @@ pub fn compile_program(paths: &CompilerPath, arguments: Vec<String>, should_remo
     }
     let base_cmd = format!("{} {}", cxx_compiler(), cmd.join(" "));
     let cmd_output = Command::new(cxx_compiler()).args(&cmd).output().expect("Failed to compile!");
-    let result = match from_utf8(&cmd_output.stderr) {
-        Ok(v) => v,
-        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-    };
+    let result = String::from_utf8_lossy(&cmd_output.stderr);
     println!("{}", base_cmd);
+    if !cmd_output.status.success() {
+        // Keep the generated .cpp around to debug the failure
+        eprintln!("\x1b[93m{}\x1b[0m", result);
+        display_err_message(&format!("{} failed: {}", cxx_compiler(), cmd_output.status));
+    }
     println!("compilation completed\n\x1b[93m{}\x1b[0m", result);
     if !should_remove_cpp { return }
     let _ = remove_file(paths.main_path_cpp.to_owned());
