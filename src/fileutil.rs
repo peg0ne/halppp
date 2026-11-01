@@ -47,12 +47,17 @@ pub fn write_program(program: String, paths: &CompilerPath) {
 }
 
 pub fn compile_program(paths: &CompilerPath, arguments: Vec<String>, should_remove_cpp: bool) {
-    let mut base_cmd = paths.output.to_owned();
-    if arguments.len() > 0 { 
-        base_cmd = format!("{} {}", base_cmd, arguments.join(" ")); 
+    let mut cmd: Vec<String> = vec![
+        "-std=c++17".to_owned(),
+        paths.main_path_cpp.to_owned(),
+        "-o".to_owned(),
+        paths.main_path_bin.to_owned(),
+    ];
+    for arg in arguments.iter() {
+        cmd.extend(arg.split_whitespace().map(|a| a.to_owned()));
     }
-    let cmd: Vec<&str> = base_cmd.split(" ").collect();
-    let cmd_output = Command::new("g++").args(cmd).output().expect("Failed to compile!");
+    let base_cmd = format!("{} {}", cxx_compiler(), cmd.join(" "));
+    let cmd_output = Command::new(cxx_compiler()).args(&cmd).output().expect("Failed to compile!");
     let result = match from_utf8(&cmd_output.stderr) {
         Ok(v) => v,
         Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
@@ -61,4 +66,14 @@ pub fn compile_program(paths: &CompilerPath, arguments: Vec<String>, should_remo
     println!("compilation completed\n\x1b[93m{}\x1b[0m", result);
     if !should_remove_cpp { return }
     let _ = remove_file(paths.main_path_cpp.to_owned());
+}
+
+/// $HALPPP_CXX, then $CXX, then clang++ on macOS and g++ elsewhere
+fn cxx_compiler() -> String {
+    for var in ["HALPPP_CXX", "CXX"] {
+        if let Ok(cxx) = env::var(var) {
+            if !cxx.is_empty() { return cxx; }
+        }
+    }
+    if cfg!(target_os = "macos") { "clang++".to_owned() } else { "g++".to_owned() }
 }

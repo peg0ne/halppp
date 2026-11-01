@@ -14,8 +14,8 @@ pub struct CompilerPath {
 impl CompilerPath {
     pub fn from(main: String) -> CompilerPath {
         let (f_p, f_n) = get_folder_and_name(&main);
-        let cpp = main.replace(".ha", ".cpp");
-        let bin = main.replace(".ha", "");
+        let bin = main.strip_suffix(".ha").unwrap_or(&main).to_owned();
+        let cpp = format!("{}.cpp", bin);
         CompilerPath {
             folder_path: f_p.to_owned(),
             file_path: f_n.to_owned(),
