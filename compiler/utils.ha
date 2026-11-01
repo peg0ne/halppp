@@ -33,7 +33,7 @@ fn folder_and_name string file_path => FpFn
         if folder_path.size() == 0 do break
         let ch = folder_path.back()
         folder_path.pop_back()
-        if ch == '/' dobr folder_path.push_back('/')
+        if any(ch, {'/', '\\'}) dobr folder_path.push_back(ch)
         file_name.push_back(ch)
     ;
     while file_name.size() > 0

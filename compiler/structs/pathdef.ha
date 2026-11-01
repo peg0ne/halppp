@@ -7,9 +7,10 @@ struct CompilerPath
     string output = EMPTY
     string current = EMPTY
     CompilerPath string main, string f_p, string f_n =>
-        let main_str = String(main)
-        let cpp = main_str.replace(HA_SUFFIX, CPP_SUFFIX)
-        let bin = main_str.replace(HA_SUFFIX, EMPTY)
+        // Only swap the extension, not a `.ha` elsewhere in the path
+        let has_suffix = String(main).ends_with(HA_SUFFIX)
+        let bin = has_suffix ? main.substr(0, main.size() - 3) : main
+        let cpp = bin + CPP_SUFFIX
         this->folder_path = f_p
         this->file_path = f_n
         this->main_path = main

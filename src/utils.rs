@@ -35,8 +35,8 @@ pub fn get_folder_and_name(file_path: &String) -> (String, String) {
         if i == 0 { break; }
         match folder_path.pop() {
             Some(p) => {
-                if p == '/' {
-                    folder_path.push('/');
+                if p == '/' || p == '\\' {
+                    folder_path.push(p);
                     break;
                 }
                 file_name.push(p);

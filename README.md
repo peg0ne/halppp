@@ -17,6 +17,10 @@ I really haven't got to formatting the documentation of the language yet. But it
 There's alot of interesting features that's probably very confusing to see first time. like the `do/dore/dobr/doco/doremi` and `select`
 
 # Installing
+Requirements: [Rust/cargo](https://rustup.rs) (only to bootstrap) and a g++-compatible C++17 compiler
+(g++ on Linux, clang++ from the Xcode command line tools on macOS, [MinGW-w64](https://www.msys2.org) on Windows).
+
+## Linux / macOS
 ```bash
 git clone https://github.com/peg0ne/halppp.git
 # install compiler
@@ -27,11 +31,26 @@ cp main $HOME/.local/bin/halppp
 cd ../hamble
 halppp main.ha -r
 cp main $HOME/.local/bin/hamble++
-# install texteditor
+# install texteditor (needs ncurses)
 cd ../hide
 hamble++ build -r
 hamble++ do make
 ```
+
+## Windows (PowerShell)
+```powershell
+git clone https://github.com/peg0ne/halppp.git
+cd halppp\compiler
+.\rebuild.ps1
+# put compiler\main.exe on your PATH, e.g. as halppp.exe
+```
+`hide` depends on ncurses and is not supported on Windows.
+
+## Configuration
+| Environment variable | Default | Purpose |
+| --- | --- | --- |
+| `HALPPP_CXX` (or `CXX`) | `clang++` on macOS, `g++` elsewhere | C++ compiler used to build the generated code (must accept g++-style flags) |
+| `HALPPP_LIB` | `~/.local/lib/halppp` (`%USERPROFILE%\.local\lib\halppp` on Windows) | Where `get` looks for installed libraries |
 
 # Examples
 Hello world
