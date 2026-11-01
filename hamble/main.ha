@@ -70,8 +70,8 @@ fn build string type => int
     ;
     changedir("src")
     if type == "-t"
-        _system("halppp main.ha -t")
-        return 0
+        if !system(string("halppp main.ha -t")) doremi 0
+        return 1
     ;
     let release = type == "-r" ? " -r" : ""
     if !system($"halppp main.ha{release}")
@@ -90,7 +90,7 @@ fn run string type => int
         return 0
     ;
     changedir("..")
-    _system(native_path(exe_name("./bin/main")))
+    if !system(native_path(exe_name("./bin/main"))) doremi 0
     return 1
 ;
 
@@ -120,8 +120,7 @@ fn custom string argument => bool
         for i until argument.size() + 1
             l.remove(0)
         ;
-        system(l.to_string())
-        doremi true
+        return system(l.to_string())
     ;
     return halp("Unkown command")
 ;
@@ -132,7 +131,12 @@ fn manual => int
     return 1
 ;
 
+// Commands return 1/true on success; main turns that into a process exit code
 fn main =>
+    if hamble(argc, argv) doremi 0
+    return 1
+;
+fn hamble int argc, char **argv => int
     let clap = Clap(argc, argv)
     select name from clap.peek("init")
         init(name)
