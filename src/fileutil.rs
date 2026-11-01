@@ -14,6 +14,11 @@ pub fn get_file_path() -> String {
     if args.len() < 2 {
         display_err_message("No file path supplied in arguments!\nExiting...");
     }
+    if !args[1].ends_with(".ha") {
+        // The binary is written next to the source with `.ha` stripped, so
+        // any other name would overwrite the source file
+        display_err_message("Source file must end in .ha\nExiting...");
+    }
     return args[1].to_owned();
 }
 
