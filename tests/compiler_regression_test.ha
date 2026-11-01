@@ -14,6 +14,21 @@ pub
     Counter => do count++
 ;
 
+class Box<T>
+pub
+    static int made = 0
+    T value
+    Box T v =>
+        value = v
+        made++
+    ;
+;
+
+fn items int *calls => vector<int>
+    (*calls)++
+    return {1, 2, 3}
+;
+
 fn nested => vector<vector<int>>
     vector<vector<int>> v = {{1, 2}}
     return v
@@ -54,4 +69,20 @@ fn main =>
     case -1 dobr println("negative case ok")
     default do break
     ;
+    // unary operators keep their spacing
+    int five = 5
+    int six = five - -1
+    int dec = five
+    dec++
+    --dec
+    println($"{six} {dec}")
+    // foreach evaluates its collection once
+    int calls = 0
+    let total = 0
+    foreach x in items(&calls) do total += x
+    println($"{total} {calls}")
+    // statics in template classes
+    let bi = Box<int>(1)
+    let bs = Box<string>("s")
+    println($"{Box<int>::made} {Box<string>::made}")
 ;
