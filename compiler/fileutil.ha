@@ -44,7 +44,21 @@ fn write_program string program, CompilerPath paths =>
     file << program
     file.close()
 ;
-fn quote_path string path => string doremi $"\"{path}\""
+// Quote a path for system(). POSIX shells still expand $(...) and `...` inside
+// double quotes, so use single quotes there and escape embedded ones as '\''.
+// cmd.exe has no single quotes, and Windows paths cannot contain `"`.
+fn quote_path string path => string
+    raw #ifdef _WIN32
+    return $"\"{path}\""
+    raw #else
+    let quoted = "'"
+    foreach c in path
+        if c == '\'' do quoted += "'\\''"
+        else do quoted.push_back(c)
+    ;
+    return quoted + "'"
+    raw #endif
+;
 fn compile_program CompilerPath paths, vector<string> arguments, bool is_release =>
     let base_cmd = cxx_compiler()
     // std::filesystem & friends need C++17; Apple clang defaults to an older standard
