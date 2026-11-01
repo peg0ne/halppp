@@ -18,21 +18,35 @@ fn halp string info => bool
     return false
 ;
 
+// Quote an argument for the shell that runs hamble.haml commands.
+// POSIX shells expand $(...) and `...` inside double quotes, so use single
+// quotes there; cmd.exe has no single quotes and paths cannot contain `"`.
+fn shell_quote string arg => string
+    if is_windows() doremi $"\"{arg}\""
+    let quoted = "'"
+    foreach c in arg
+        if c == '\'' do quoted += "'\\''"
+        else do quoted.push_back(c)
+    ;
+    return quoted + "'"
+;
+
 fn hamble_base string name => string
     let base = "[commands]\n"
     let home = home_env().value_or("~")
     let bin = native_path(exe_name("bin/main"))
     let target = native_path(exe_name($"{home}/.local/bin/{name}"))
     let copy = is_windows() ? "copy /Y" : "cp"
-    base += $"make={copy} {bin} \"{target}\"\n"
+    base += $"make={copy} {bin} {shell_quote(target)}\n"
     base += "[rules]\n[dependencies]\n"
     return base
 ;
 
 fn init string name =>
     if !makedir(name) dore println("Project couldn't be initialized here!")
-    if !system("git init " + name) do println("Git couln't be initialized")
     if !changedir(name) dore println("Unable to move into project directory")
+    // Run git inside the project so the name never reaches the shell
+    if !system(string("git init")) do println("Git couldn't be initialized")
     write("# " + name, "README.md")
     write("bin/*\n", ".gitignore")
     write(hamble_base(name), "hamble.haml")
