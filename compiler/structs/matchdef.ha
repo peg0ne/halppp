@@ -39,8 +39,10 @@ struct MatchDef
         matcher += "{"
         matcher += $"\n{TAB}auto _match_expr_ = {matcher_expr}{LINE_END}"
         foreach i, statment in statments
-            if i == 0 do matcher += $"if (_match_expr_ {operators[i]} {statment}) {BLOCK_START}"
-            elif statment != "_" do matcher += $"else if (_match_expr_ {operators[i]} {statment}) {BLOCK_START}"
+            let condition = operators[i].size() == 0 ? statment : $"_match_expr_ {operators[i]} {statment}"
+            if statment == "_" do condition = "true"
+            if i == 0 do matcher += $"if ({condition}) {BLOCK_START}"
+            elif statment != "_" do matcher += $"else if ({condition}) {BLOCK_START}"
             else do matcher += "else {\n"
             let s_lines = lines[i]
             foreach j, line in s_lines.lines

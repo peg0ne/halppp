@@ -45,6 +45,6 @@ fn folder_and_name string file_path => FpFn
 ;
 fn temp_compiler string emulated_str => Compiler
     let ast = ast_create(emulated_str)
-    let program = Program()
-    return Compiler(&program, ast, 0)
+    let program = new Program()
+    return Compiler(program, ast, 0)
 ;

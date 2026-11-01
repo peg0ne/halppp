@@ -32,12 +32,16 @@ fn get_type Compiler *compiler_t => Variable
         if !variable.has_id()
             error(VAR_ERR_TEM + variable.v_type, compiler_t->recap())
         ;
-        next = next_or_exit(compiler_t, VAR_ERR_INV)
-        variable.v_type += next.name
+        let depth = 0
         loop
             next = next_or_exit(compiler_t, VAR_ERR_INV)
+            if next.is_nl() || next.is_do() || next.is_terminator() do error(VAR_ERR_INV, compiler_t->recap())
             variable.v_type += next.name
-            if next.token == Token::MoreThan do break
+            if next.token == Token::LessThan do depth++
+            if next.token == Token::MoreThan do depth--
+            if next.token == Token::DblMoreThan do depth -= 2
+            if next.token == Token::AllMoreThan do depth -= 3
+            if depth <= 0 do break
         ;
     ;
     tried = try_get(compiler_t, Token::Asterix)

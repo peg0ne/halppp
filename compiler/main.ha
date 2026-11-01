@@ -107,8 +107,9 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             Token::Get =>
                 incs = imports_creation(&compiler_t, next)
                 foreach i in incs
-                    FpFn fpfn = folder_and_name(paths.folder_path + i + HA_SUFFIX)
-                    let get_path = CompilerPath(paths.folder_path + i + HA_SUFFIX, fpfn.f_p, fpfn.f_n)
+                    let get_file = resolve_get_path(paths.folder_path + i + HA_SUFFIX, i + HA_SUFFIX)
+                    FpFn fpfn = folder_and_name(get_file)
+                    let get_path = CompilerPath(get_file, fpfn.f_p, fpfn.f_n)
                     let get_out = compile(get_path, p, false)
                     output += get_out.output
                     includes += get_out.includes

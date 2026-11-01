@@ -36,7 +36,9 @@ struct Class
                 class_str += variable_state_to_cpp(v.variable_state)
                 previous_state = v.variable_state
             ;
-            class_str += v.to_cpp(TAB, LINE_END)
+            let declared = v
+            if v.staticness && !v.constantness do declared.v_value = None<string>()
+            class_str += declared.to_cpp(TAB, LINE_END)
         ;
         foreach i,f in functions
             if i == 0 || f.variable_state != previous_state
@@ -48,6 +50,7 @@ struct Class
         class_str += $"{RBRACK}{LINE_END}"
         foreach v in variables
             if !v.staticness do continue
+            if v.constantness doco class_str += $"const {v.v_type} {id}::{v.id}{LINE_END}"
             class_str += $"{v.v_type} {id}::{v.id}"
             select value from v.v_value
                 class_str += $" = {value}"

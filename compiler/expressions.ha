@@ -58,6 +58,7 @@ fn get_let_expr Compiler *compiler_t => Expression
     get_or_exit(compiler_t, Token::Equals,"[Let] Required equals after id")
     let variable_type = ""
     let value = ""
+    let has_operator = false
     if try_get(compiler_t, Token::Match)
         next_or_exit(compiler_t, "Expected match")
         return match_construct(compiler_t, Some(id), true)
@@ -76,11 +77,13 @@ fn get_let_expr Compiler *compiler_t => Expression
             ;
             if !is_member do break
         ;
+        if x.is_conditional() || x.is_conditional_sep() || x.is_adv_conditional() do has_operator = true
         value += x.name
         if x.token == Token::New do value += " "
     ;
     let token = Token_t(value)
-    if token.is_bool() do variable_type = "bool "
+    if has_operator do variable_type = "auto "
+    elif token.is_bool() do variable_type = "bool "
     elif token.is_num() do variable_type = "int "
     elif token.is_float() do variable_type = "float "
     elif token.is_char() do variable_type = "char "

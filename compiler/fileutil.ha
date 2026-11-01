@@ -22,6 +22,16 @@ fn get_content CompilerPath paths, bool can_be_lib => string
     ;
     return content
 ;
+fn resolve_get_path string local_path, string lib_name => string
+    ifstream local_reader(local_path)
+    if local_reader doremi local_path
+    select home from home_env()
+        let lib_path = $"{home}/.local/lib/halppp/{lib_name}"
+        ifstream lib_reader(lib_path)
+        if lib_reader doremi lib_path
+    ;
+    return local_path
+;
 fn write_program string program, CompilerPath paths =>
     ofstream file(paths.main_path_cpp)
     file << program
@@ -40,6 +50,7 @@ fn compile_program CompilerPath paths, vector<string> arguments, bool is_release
     println("compiling: " + base_cmd)
     char cmd[base_cmd.size() + 1]
     char cpp_path[paths.main_path_cpp.size() + 1]
-    let _ = system(to_char_arr(base_cmd, cmd))
+    let status = system(to_char_arr(base_cmd, cmd))
     remove(to_char_arr(paths.main_path_cpp, cpp_path))
+    if status != 0 do exit(1)
 ;

@@ -1,19 +1,22 @@
 fn validate_function Function function, Compiler *compiler_t =>
-    if compiler_t->has_function(function.id)
-        foreach f in compiler_t->program->functions
-            if f.arguments.size() != function.arguments.size() do return
-            for j until f.arguments.size()
-                if f.arguments[j].v_type != function.arguments[j].v_type do return
-                j++
-            ;
+    if function.is_member do return
+    foreach f in compiler_t->program->functions
+        if f.is_member || f.id != function.id do continue
+        if f.templates != function.templates do continue
+        if f.arguments.size() != function.arguments.size() do continue
+        let same = true
+        for j until f.arguments.size()
+            if f.arguments[j].v_type != function.arguments[j].v_type dobr same = false
         ;
-        error($"Duplicate instances Function of: {function.id}", compiler_t->recap())
+        if same do error($"Duplicate instances Function of: {function.id}", compiler_t->recap())
     ;
 ;
 
-fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function doremi function_construct(compiler_t, state, constr, {})
-fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables => Function
+fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function doremi function_construct(compiler_t, state, constr, {}, false)
+fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables => Function doremi function_construct(compiler_t, state, constr, variables, true)
+fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables, bool is_member => Function
     let function = Function(state)
+    function.is_member = is_member
     vector<Variable> variables_in_func = {}
     if !constr
         let func_id = next_or_exit(compiler_t, "[FunctionError]: No Function Id")
