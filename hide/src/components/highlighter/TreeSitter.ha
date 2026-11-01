@@ -11,7 +11,13 @@ class TreeSitter
         this->offset = container->Offset()
         this->size = container->Size()
         this->syntax = s
-        this->path = $"temp_tree_sitter.{s->file_type()}"
+        // The extension comes from the opened file's name; keep only
+        // alphanumerics so it can't smuggle shell syntax into the parse command
+        let ext = ""
+        foreach c in s->file_type()
+            if isalnum(static_cast<unsigned char>(c)) do ext.push_back(c)
+        ;
+        this->path = $"temp_tree_sitter.{ext}"
         this->lines = text
         this->text = join_text(text)
     ;
