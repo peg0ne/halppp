@@ -20,8 +20,11 @@ fn halp string info => bool
 
 fn hamble_base string name => string
     let base = "[commands]\n"
-    let home = home_env().value_or("HOME")
-    base += $"make=cp bin/main ${home}/.local/bin/" + name + "\n"
+    let home = home_env().value_or("~")
+    let bin = native_path(exe_name("bin/main"))
+    let target = native_path(exe_name($"{home}/.local/bin/{name}"))
+    let copy = is_windows() ? "copy /Y" : "cp"
+    base += $"make={copy} {bin} \"{target}\"\n"
     base += "[rules]\n[dependencies]\n"
     return base
 ;
@@ -58,10 +61,11 @@ fn build string type => int
     foreach file in files
         if file == "bin" dobr bin_exists = true
     ;
+    let binary = exe_name("main")
     if type == "halp"
         _system("halp src/main.ha")
-        if !bin_exists do _system("mkdir bin")
-        _system("mv src/main bin/main")
+        if !bin_exists do makedir("bin")
+        move_path($"src/{binary}", $"bin/{binary}")
         return 1
     ;
     changedir("src")
@@ -69,16 +73,13 @@ fn build string type => int
         _system("halppp main.ha -t")
         return 0
     ;
-    elif type == "-r"
-        _system("halppp main.ha -r")
-        if !bin_exists do _system("mkdir ../bin")
-        _system("mv main ../bin/main")
+    let release = type == "-r" ? " -r" : ""
+    if !system($"halppp main.ha{release}")
+        println("Build failed")
+        return 0
     ;
-    else 
-        _system("halppp main.ha")
-        if !bin_exists do _system("mkdir ../bin")
-        _system("mv main ../bin/main")
-    ;
+    if !bin_exists do makedir("../bin")
+    if !move_path(binary, $"../bin/{binary}") doremi 0
     return 1
 ;
 
@@ -89,7 +90,7 @@ fn run string type => int
         return 0
     ;
     changedir("..")
-    _system("./bin/main")
+    _system(native_path(exe_name("./bin/main")))
     return 1
 ;
 
@@ -98,7 +99,7 @@ fn watch string type => int
     let key = ""
     loop
         run(type)
-        _system("clear")
+        clear_screen()
         println("=0.o= Do you want to exit? (y/n)")
         cin >> key
         if key == "y" doremi 1

@@ -10,8 +10,8 @@ class Manual
     Manual =>
         Ncurses::init()
         Ncurses::start()
-        select home from home_env()
-            let found = list_reg_files($"{home}/.local/lib/halppp")
+        select lib from halppp_lib_dir()
+            let found = list_reg_files(lib)
             foreach f in found
                 let s = String(f)
                 s.remove_back(3)
@@ -136,8 +136,8 @@ class Manual
     fn draw_content =>
         Ncurses::clearScr()
         select s from selected
-            select home from home_env()
-                let lines = readlines($"{home}/.local/lib/halppp/{files.at(s)}.ha")
+            select lib from halppp_lib_dir()
+                let lines = readlines($"{lib}{files.at(s)}.ha")
                 content = List<string>(lines)
                 let i = 0
                 skipMan = currentMan

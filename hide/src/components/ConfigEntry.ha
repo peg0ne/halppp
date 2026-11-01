@@ -1,3 +1,4 @@
+inc => functional
 get => ConfigUpdater
 
 class ConfigEntry => IContent

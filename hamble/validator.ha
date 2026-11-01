@@ -1,10 +1,13 @@
 get => dictionary
 
-fn run_test string file => bool doremi system($"halppp ./tests/{file} -t 2>&1 /dev/null")
-fn run_compile_test string file => bool doremi system($"g++ ./tests/{file}.cpp -o tests/{file}")
-fn run_program_test string file => bool doremi system($"./tests/{file}")
+fn run_test string file => bool doremi system($"halppp tests/{file} -t > {null_device()} 2>&1")
+fn run_compile_test string file => bool
+    let program = exe_name($"tests/{file}")
+    return system($"{cxx_compiler()} -std=c++17 \"tests/{file}.cpp\" -o \"{program}\"")
+;
+fn run_program_test string file => bool doremi system(native_path(exe_name($"./tests/{file}")))
 fn clean_up_cpp string file => do remove($"./tests/{file}.cpp")
-fn clean_up_program string file => do remove($"./tests/{file}")
+fn clean_up_program string file => do remove(exe_name($"./tests/{file}"))
 fn error string msg => do println($"\033[31m{msg}\033[0m")
 fn good string msg => do println($"\033[32m{msg}\033[0m")
 
@@ -52,7 +55,7 @@ fn validate => bool
     foreach test in tests
         if failed.contains(test) do continue
         if failed_compile.contains(test) do continue
-        if !run_program_test(String(test).replace(".ha", "")) do failed_compile.add(test, false)
+        if !run_program_test(String(test).replace(".ha", "")) do failed_program.add(test, false)
         clean_up_program(String(test).replace(".ha", ""))
     ;
     

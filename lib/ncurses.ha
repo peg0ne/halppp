@@ -1,7 +1,20 @@
-inc => ncurses.h, curses.h, wchar.h, locale.h, iostream, cstring
+// ncurses on Linux/macOS, PDCurses on Windows. Both ship curses.h;
+// MSYS2 installs PDCurses as pdcurses.h so it can sit next to ncurses.
+// NCURSES_MOUSE_VERSION makes PDCurses use the ncurses getmouse(MEVENT*) API.
+raw #ifdef _WIN32
+raw #define NCURSES_MOUSE_VERSION 2
+raw #endif
+raw #if defined(_WIN32) && __has_include(<pdcurses.h>)
+raw #include <pdcurses.h>
+raw #else
+raw #include <curses.h>
+raw #endif
+inc => wchar.h, locale.h, iostream, cstring
 use => std
 get => vector, option
-compiler => "-lncursesw"
+compiler linux => "-lncursesw"
+compiler macos => "-lncurses"
+compiler windows => "-lpdcurses"
 
 glob =>
     N_LEFT_UP_CORNER "┌"
@@ -37,22 +50,31 @@ pub
             init_pair(12, COLOR_BLACK, COLOR_MAGENTA)
         ;
     ;
+    // Draws a box-drawing character: the UTF-8 glyph with ncurses, the curses ACS
+    // character on Windows (PDCurses only understands UTF-8 when built with it)
+    static fn line_char int y, int x, string glyph, chtype acs =>
+        raw #ifdef _WIN32
+        mvaddch(y, x, acs)
+        raw #else
+        add(y, x, glyph)
+        raw #endif
+    ;
     static fn box_char int y, int x, int pos =>
-        if pos == 0 dore add(y,x,"┌")
-        if pos == 1 dore add(y,x,"│")
-        if pos == 2 dore add(y,x,"└")
+        if pos == 0 dore line_char(y, x, "┌", ACS_ULCORNER)
+        if pos == 1 dore line_char(y, x, "│", ACS_VLINE)
+        if pos == 2 dore line_char(y, x, "└", ACS_LLCORNER)
         if pos == 3 dore add(y,x," ")
     ;
     static fn stop_box_char int y, int x, int pos =>
-        if pos == 0 dore add(y, x, "┐")
-        if pos == 1 dore add(y, x, "│")
-        if pos == 2 dore add(y, x, "┘")
+        if pos == 0 dore line_char(y, x, "┐", ACS_URCORNER)
+        if pos == 1 dore line_char(y, x, "│", ACS_VLINE)
+        if pos == 2 dore line_char(y, x, "┘", ACS_LRCORNER)
         if pos == 3 dore add(y, x, " ")
     ;
     static fn center_box_char int y, int x, int pos =>
-        if pos == 0 dore add(y, x, "─")
+        if pos == 0 dore line_char(y, x, "─", ACS_HLINE)
         if pos == 1 dore add(y, x, " ")
-        if pos == 2 dore add(y, x, "─")
+        if pos == 2 dore line_char(y, x, "─", ACS_HLINE)
         if pos == 3 dore add(y, x, " ")
     ;
     static fn box_line int y, int x, int len, int pos, bool invis =>
@@ -110,9 +132,7 @@ pub
     static fn add Vector xy, string s, bool is_bold = false => do add(xy.y, xy.x, s, is_bold)
     static fn add int y, int x, string s, bool is_bold = false =>
         if is_bold do bold(true)
-        char ch[s.size() + 1]
-        strcpy(ch, s.c_str())
-        mvaddstr(y,x,ch)
+        mvaddstr(y, x, s.c_str())
         if is_bold do bold(false)
     ;
     static fn add_col Vector xy, char c, short color, bool is_bold = false => do add_col(xy.y, xy.x, c, color, is_bold)
