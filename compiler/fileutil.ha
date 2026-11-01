@@ -5,6 +5,9 @@ fn get_file_path int argc, char **argv => string
     let fp = ""
     let i = 0
     while argv[1][i] != '\0' do fp.push_back(argv[1][i++])
+    // The binary is written next to the source with `.ha` stripped,
+    // so any other name would overwrite the source file
+    if !String(fp).ends_with(HA_SUFFIX) do error($"Source file must end in {HA_SUFFIX}: {fp}\nExiting...", "")
     return fp
 ;
 fn lib_dir_display => string doremi halppp_lib_dir().value_or("$HALPPP_LIB")
