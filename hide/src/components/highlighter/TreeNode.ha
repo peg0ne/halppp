@@ -62,9 +62,18 @@ fn parse_node Peekable<char> *p => TreeNode
     return node
 ;
 
+// Single-quote for the POSIX shell; $(...) and `...` still expand inside double quotes
+fn sh_quote string arg => string
+    let quoted = "'"
+    foreach c in arg
+        if c == '\'' do quoted += "'\\''"
+        else do quoted.push_back(c)
+    ;
+    return quoted + "'"
+;
 fn parse_sitter string path => TreeNode
     let content = ""
-    let output = system_output($"tree-sitter parse {path} 2>&1 /dev/null")
+    let output = system_output($"tree-sitter parse {sh_quote(path)} 2>&1 /dev/null")
     foreach line in output do content += line
     let peekable = Peekable<char>(content)
     peekable.next()
