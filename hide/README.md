@@ -131,6 +131,11 @@ hide
 -   `SPACE + up` -> increase size of editor
 -   `SPACE + down` -> decrease size of editor
 
+### Spiral layout
+
+Editors normally sit side by side. To switch to the spiral layout, use `:layout spiral`, or `editor toggle spiral layout` from the command pallete (`SPACE + p`, search `spiral`).
+To start `hide` in spiral layout, set `HIDE_LAYOUT=spiral`, for example `alias hide='HIDE_LAYOUT=spiral hide'`.
+
 ### CmdHan commands
 
 -   `q` -> exits out of the current window, will exit entirely if it's the last editor left.
@@ -138,6 +143,8 @@ hide
 -   `wq` -> does `w` then `q`
 -   `touch <filename>` -> creates a new file with the specified file name
 -   `mkdir <filename>` -> create a new directory with the specified director name
+-   `layout spiral` -> arrange editors in a spiral: the first editor takes half the screen and each new one splits what's left
+-   `layout horizontal` -> arrange editors side by side again (the default)
 -   `syntax <lang>` -> sets the syntax of the editor with the specified language (EX: `syntax rs`, `syntax py`)
 -   `!<command>` -> executes the command in the shell
 -   `<number>` -> moves cursor of active editor to the line that corresponds to the specified number

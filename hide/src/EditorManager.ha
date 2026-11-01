@@ -1,8 +1,11 @@
 get => components/Editor
 class EditorManager => IContent
     vector<Editor*> _editors = {}
-    vector<HorizontalLayout*> _editorspaces = {}
-    Option<HorizontalLayout*> _activeSpace = None<HorizontalLayout*>()
+    // Each space is a row of editors: side by side (HorizontalLayout), or
+    // spiralling inwards (SpiralLayout) when _spiral is on
+    vector<IContainer*> _editorspaces = {}
+    Option<IContainer*> _activeSpace = None<IContainer*>()
+    bool _spiral = false
     Option<Editor*> _activeEditor = None<Editor*>()
     vector<string> _shared_buffer = {}
     IContainer *_status_line
@@ -10,7 +13,52 @@ class EditorManager => IContent
     EditorManager IContainer *status_line =>
         _status_line = status_line
         _origin = new VerticalLayout(Fill::Flex)
+        // HIDE_LAYOUT=spiral starts hide with spiral layout
+        select layout from env("HIDE_LAYOUT") do _spiral = layout == "spiral"
         add_space()
+    ;
+    fn new_space => IContainer*
+        if _spiral doremi (IContainer*)new SpiralLayout(Fill::Flex)
+        return (IContainer*)new HorizontalLayout(Fill::Flex)
+    ;
+    fn space_editors IContainer *space => vector<IContainer*>
+        if _spiral doremi ((SpiralLayout*)space)->elements()
+        return space->containers()->as_vec()
+    ;
+    fn space_add IContainer *space, IContainer *editor =>
+        if _spiral do ((SpiralLayout*)space)->add_element(editor)
+        else do space->add(editor)
+    ;
+    fn free_space IContainer *space =>
+        if _spiral do ((SpiralLayout*)space)->destruct()
+        delete(space)
+    ;
+    // Replaces all spaces with new ones of the current layout holding the given
+    // editors (empty groups are dropped), keeping the active editor's space active
+    fn rebuild_spaces vector<vector<IContainer*>> groups, bool spiral =>
+        foreach space in _editorspaces do free_space(space)
+        _spiral = spiral
+        _editorspaces = {}
+        _activeSpace = None<IContainer*>()
+        _origin->clear()
+        foreach group in groups
+            if group.size() == 0 do continue
+            let space = new_space()
+            foreach editor in group
+                space_add(space, editor)
+                select active from _activeEditor
+                    if active->origin() == editor do _activeSpace = Some(space)
+                ;
+            ;
+            _editorspaces.push_back(space)
+            _origin->add(space)
+        ;
+        if _activeSpace.is_none() && _editorspaces.size() > 0 do _activeSpace = Some(get_last(&_editorspaces))
+    ;
+    fn space_groups => vector<vector<IContainer*>>
+        vector<vector<IContainer*>> groups = {}
+        foreach space in _editorspaces do groups.push_back(space_editors(space))
+        return groups
     ;
     fn activate Dir dir =>
         switch dir
@@ -41,11 +89,12 @@ class EditorManager => IContent
 
                 let active = _editorspaces.at(i)
                 _activeSpace = Some(active)
-                if index >= active->size()
-                    index = active->size() - 1
+                let editors = space_editors(active)
+                if index >= editors.size()
+                    index = editors.size() - 1
                 ;
                 
-                let editor = active->containers()->at(index)
+                let editor = editors.at(index)
                 _activeEditor = find_editor_from_offset(editor->Offset())
                 return
             ;
@@ -57,7 +106,8 @@ class EditorManager => IContent
         select index from find_active_in_space()
         select space from _activeSpace
     
-        let size = space->containers()->size()
+        let editors = space_editors(space)
+        let size = editors.size()
         switch dir
         case Dir::Left
             if index == 0 dobr index = size - 1
@@ -68,7 +118,7 @@ class EditorManager => IContent
             index++
             break
         ;
-        let editor = space->containers()->at(index)
+        let editor = editors.at(index)
         _activeEditor = find_editor_from_offset(editor->Offset())
 
         ;;
@@ -87,12 +137,9 @@ class EditorManager => IContent
     fn find_editor_in_space string path => Option<int>
         select editor from try_find_editor(path)
         select space from _activeSpace
-        let editors = space->containers()
-        let size = editors->size()
-        for i until size
-            let e = editors->at(i)
-            let offset = e->Offset()
-            if offset.eq(editor->Offset()) doremi Some(i)
+        let editors = space_editors(space)
+        foreach i, e in editors
+            if e->Offset().eq(editor->Offset()) doremi Some(i)
         ;;;
         return None<int>()
     ;
@@ -113,7 +160,6 @@ pub
     fn close_editor bool forced = false => Command
         if _editors.size() == 0 doremi Command::Exit
         _origin->clear()
-        let closed = None<Editor*>()
         select a from _activeEditor
             if !a->has_changes() || forced
                 a->close()
@@ -126,27 +172,15 @@ pub
                 return Command::ModeCmdHan
             ;
         ;
-        vector<HorizontalLayout*> spaces = {}
-        foreach space in _editorspaces
-            let containers = space->containers()
+        vector<vector<IContainer*>> groups = {}
+        foreach group in space_groups()
             vector<IContainer*> buf = {}
-            for i until containers->size()
-                let editor = containers->at(i)
-                if !editor->Active() do continue
-                else do buf.push_back(editor)
+            foreach editor in group
+                if editor->Active() do buf.push_back(editor)
             ;
-            space->clear()
-            if buf.size() == 0 do continue
-            foreach editor in buf do space->add(editor)
-            spaces.push_back(space)
+            groups.push_back(buf)
         ;
-        select e from closed
-            delete e->origin()
-            delete(e)
-        ;
-        _editorspaces = spaces
-        _origin->clear()
-        foreach space in _editorspaces do _origin->add(space)
+        rebuild_spaces(groups, _spiral)
         vector<Editor*> editors = {}
         foreach editor in _editors
             if editor->is_active() do editors.push_back(editor)
@@ -183,16 +217,23 @@ pub
         select active from _activeSpace
             let editor = get_last(&_editors)
             _activeEditor = Some(editor)
-            active->add(editor->origin())
+            space_add(active, editor->origin())
         ;
     ;
     fn add_space =>
-        _editorspaces.push_back(new HorizontalLayout(Fill::Flex))
+        _editorspaces.push_back(new_space())
         let space = get_last(&_editorspaces)
         _origin->add(space)
         _activeSpace = Some(space)
         add_editor()
     ;
+    fn is_spiral => bool doremi _spiral
+    // Switches every space between side by side and spiral layout
+    fn set_spiral bool spiral =>
+        if spiral == _spiral do return
+        rebuild_spaces(space_groups(), spiral)
+    ;
+    fn toggle_spiral => do set_spiral(!_spiral)
     fn try_find_editor string path => Option<Editor*>
         for i until _editors.size()
             let p = _editors.at(i)->path()

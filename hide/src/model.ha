@@ -86,6 +86,7 @@ pub
         case Command::EditorReplace   dobr _manager.replace()
         case Command::Terminal        dobr _term.show()
         case Command::ConfigManager   dobr _config.show()
+        case Command::ToggleSpiral    dobr _manager.toggle_spiral()
         case Command::Nop do break
         ;
         _explorer.set_visibility(_mode_view.mode())
