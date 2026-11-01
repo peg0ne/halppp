@@ -15,14 +15,26 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
     ;
     //Statements to match
     loop
+        let op = "=="
+        let adv_token = Token::UNKNOWN
         select peeked from compiler_t->peek()
-            if peeked.is_conditional() || peeked.is_adv_conditional() || peeked.token == Token::Period || peeked.token == Token::Pointer
+            if peeked.is_adv_conditional()
                 compiler_t->next()
-                operators.push_back(peeked.name)
+                adv_token = peeked.token
             ;
-            else do operators.push_back("==")
+            elif peeked.is_conditional() || peeked.token == Token::Period || peeked.token == Token::Pointer
+                compiler_t->next()
+                op = peeked.name
+            ;
         ;
-        statments.push_back(match_statements(compiler_t))
+        if adv_token != Token::UNKNOWN
+            operators.push_back(EMPTY)
+            statments.push_back(match_adv_statements(compiler_t, adv_token))
+        ;
+        else
+            operators.push_back(op)
+            statments.push_back(match_statements(compiler_t))
+        ;
         internal.push_back(match_lines(compiler_t))
         if try_get(compiler_t, Token::NewLine) do next_or_exit(compiler_t, "[Match] Missing new line")
         if try_get(compiler_t, Token::SemiColon)
@@ -40,6 +52,29 @@ fn match_statements Compiler *compiler_t => string
         let x = next_or_exit(compiler_t, "[Match] statement not finalized")
         if x.token == Token::CoolArrow do break
         if x.token == Token::Eof do break
+        statement += x.name
+    ;
+    return statement
+;
+
+fn match_adv_statements Compiler *compiler_t, Token adv => string
+    let op = "=="
+    let sep = " && "
+    switch adv
+        case Token::AllLessOrEquals dobr op = "<="
+        case Token::AllLessThan dobr op = "<"
+        case Token::AllMoreOrEquals dobr op = ">="
+        case Token::AllMoreThan dobr op = ">"
+        case Token::AllNotEquals dobr op = "!="
+        case Token::AnyEquals dobr sep = " || "
+        default do break
+    ;
+    let statement = $"_match_expr_ {op} "
+    loop
+        let x = next_or_exit(compiler_t, "[Match] statement not finalized")
+        if x.token == Token::CoolArrow do break
+        if x.token == Token::Eof do break
+        if x.token == Token::Colon doco statement += $"{sep}_match_expr_ {op} "
         statement += x.name
     ;
     return statement

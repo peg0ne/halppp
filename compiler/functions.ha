@@ -1,19 +1,26 @@
+fn same_signature Function a, Function b => bool
+    if a.id != b.id || a.templates != b.templates doremi false
+    if a.arguments.size() != b.arguments.size() doremi false
+    for j until a.arguments.size()
+        if a.arguments[j].v_type != b.arguments[j].v_type doremi false
+    ;
+    return true
+;
+
+// Member functions are validated per class in class_internal_declarations
 fn validate_function Function function, Compiler *compiler_t =>
-    if compiler_t->has_function(function.id)
-        foreach f in compiler_t->program->functions
-            if f.arguments.size() != function.arguments.size() do return
-            for j until f.arguments.size()
-                if f.arguments[j].v_type != function.arguments[j].v_type do return
-                j++
-            ;
-        ;
-        error($"Duplicate instances Function of: {function.id}", compiler_t->recap())
+    if function.is_member do return
+    foreach f in compiler_t->program->functions
+        if f.is_member do continue
+        if same_signature(f, function) do error($"Duplicate instances Function of: {function.id}", compiler_t->recap())
     ;
 ;
 
-fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function doremi function_construct(compiler_t, state, constr, {})
-fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables => Function
+fn function_construct Compiler *compiler_t, VariableState state, bool constr => Function doremi function_construct(compiler_t, state, constr, {}, false)
+fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables => Function doremi function_construct(compiler_t, state, constr, variables, true)
+fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables, bool is_member => Function
     let function = Function(state)
+    function.is_member = is_member
     vector<Variable> variables_in_func = {}
     if !constr
         let func_id = next_or_exit(compiler_t, "[FunctionError]: No Function Id")
@@ -25,6 +32,8 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
             case Token::Or
             case Token::Sum
             case Token::Sub
+            case Token::Increment
+            case Token::Decrement
             case Token::Bang
             case Token::Asterix
             case Token::DblLessThan

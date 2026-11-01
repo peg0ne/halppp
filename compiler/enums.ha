@@ -66,7 +66,16 @@ fn enums_construct Compiler *compiler_t => Enum
             ;
             e_err(EnumError::ValueNoId, EMPTY, true, compiler_t->recap())
         ;
-        if any(next.token, {Token::SemiColon, Token::Eof}) do break
+        if any(next.token, {Token::SemiColon, Token::Eof})
+            if enum_def.name.size() == 0 do break
+            foreach i in enumerator.enums
+                if i.name == enum_def.name
+                    e_err(EnumError::Member, enum_def.name, true, compiler_t->recap())
+                ;
+            ;
+            enumerator.enums.push_back(enum_def)
+            break
+        ;
         if any(next.token, {Token::Id, Token::NewLine, Token::Comma}) do continue
         e_err(EnumError::Unexpected, EMPTY, true, compiler_t->recap())
     ;

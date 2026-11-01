@@ -35,6 +35,10 @@ fn create_case Compiler *compiler_t, bool is_default => vector<Expression>
     let label = ""
     if !is_default
         let next = next_or_exit(compiler_t, "[Switch] Case unfinished")
+        if next.token == Token::Sub && try_get(compiler_t, Token::Number)
+            next = next_or_exit(compiler_t, "[Switch] Case unfinished")
+            next.name = "-" + next.name
+        ;
         label = "case " + next.name
         let name = String(next.name)
         if next.is_id() && !name.starts_with("KEY_")

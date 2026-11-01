@@ -17,6 +17,7 @@ enum ClassError
     ConstNotValid,
     VirtualNotValid,
     DoubleDeclaration,
+    DuplicateFunction,
 ;
 
 fn c_err ClassError err => string doremi c_err(err, EMPTY, false, "")
@@ -38,6 +39,7 @@ fn c_err ClassError err, string opt, bool display, string recap => string
     case ClassError::ConstNotValid     dobr msg += "Cannot make this const: "
     case ClassError::VirtualNotValid   dobr msg += "Cannot make this virtual: "
     case ClassError::DoubleDeclaration dobr msg += "Duplicate instance of variable: "
+    case ClassError::DuplicateFunction dobr msg += "Duplicate instance of function: "
     case ClassError::InheritanceTemplate  dobr msg += "Function inheritance template misaligned: "
     case ClassError::InheritanceArguments dobr msg += "Function inheritance arguments misaligned: "
     case ClassError::InheritanceReturnValue dobr msg += "Function inheritance return value misaligned: "
@@ -79,6 +81,14 @@ fn class_validate Class class_def, Compiler *compiler_t =>
             return
         ;
         c_err(ClassError::Inheritance, class_def.id, true, compiler_t->recap())
+    ;
+;
+
+fn class_validate_function Class *class_def, Function function, Compiler *compiler_t =>
+    foreach f in class_def->functions
+        if !same_signature(f, function) do continue
+        let name = function.id.size() == 0 ? "constructor" : function.id
+        c_err(ClassError::DuplicateFunction, $"{class_def->id}::{name}", true, compiler_t->recap())
     ;
 ;
 
@@ -146,12 +156,14 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
             let function = function_construct(compiler_t, variable_state, false, class_def->variables)
             function.staticness = staticness
             function.virtualness = virtualness
+            class_validate_function(class_def, function, compiler_t)
             doco class_def->functions.push_back(function)
         ;
         elif any(next.token, {Token::Id, Token::Type})
             if next.name == class_def->id
                 let function = function_construct(compiler_t, VariableState::Public, true, class_def->variables)
                 function.return_value = Some(Variable(EMPTY, class_def->id))
+                class_validate_function(class_def, function, compiler_t)
                 doco class_def->functions.push_back(function)
             ;
             let vnb = construct_args(compiler_t, Some(next.name))

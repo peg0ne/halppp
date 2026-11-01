@@ -89,6 +89,8 @@ enum Token
     UNKNOWN,
     Virtual,
     Where,
+    Increment,
+    Decrement,
 ;
 
 struct Token_t
@@ -144,6 +146,8 @@ struct Token_t
             TOKEN_GET => dore t = Token::Get
             TOKEN_GLOBAL => dore t = Token::Global
             TOKEN_IN => dore t = Token::In
+            TOKEN_INCREMENT => dore t = Token::Increment
+            TOKEN_DECREMENT => dore t = Token::Decrement
             TOKEN_INCLUDE => dore t = Token::Include
             TOKEN_LBLOCK => dore t = Token::LBlock
             TOKEN_LBRACK => dore t = Token::LBrack

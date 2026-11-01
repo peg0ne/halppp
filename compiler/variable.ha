@@ -15,7 +15,7 @@ fn get_value Compiler *compiler_t, bool found_setter, bool in_args => Option<str
         let next = next_or_exit(compiler_t, VAR_ERR_VAL)
         if next.is_nl() do break
         if in_args && any(next.token, {Token::Comma, Token::CoolArrow}) do break
-        value += next.name
+        value = join_token(value, next.name)
         if next.token == Token::New do value += " "
     ;
     return value.size() == 0 ? None<string>() : Some(value)
@@ -32,12 +32,16 @@ fn get_type Compiler *compiler_t => Variable
         if !variable.has_id()
             error(VAR_ERR_TEM + variable.v_type, compiler_t->recap())
         ;
-        next = next_or_exit(compiler_t, VAR_ERR_INV)
-        variable.v_type += next.name
+        let depth = 0
         loop
             next = next_or_exit(compiler_t, VAR_ERR_INV)
+            if next.is_nl() || next.is_do() || next.is_terminator() do error(VAR_ERR_INV, compiler_t->recap())
             variable.v_type += next.name
-            if next.token == Token::MoreThan do break
+            if next.token == Token::LessThan do depth++
+            if next.token == Token::MoreThan do depth--
+            if next.token == Token::DblMoreThan do depth -= 2
+            if next.token == Token::AllMoreThan do depth -= 3
+            if depth <= 0 do break
         ;
     ;
     tried = try_get(compiler_t, Token::Asterix)

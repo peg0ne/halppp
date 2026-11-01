@@ -1,6 +1,7 @@
 get => ast_helpers
 
-fn ast_create string content => vector<AstToken>
+fn ast_create string content => vector<AstToken> doremi ast_create(content, 0)
+fn ast_create string content, int line_offset => vector<AstToken>
     vector<char> vec = {}
     foreach i in content do vec.push_back(i)
     let peekable = Peekable<char>(vec)
@@ -29,6 +30,12 @@ fn ast_create string content => vector<AstToken>
             peekable.next()
             peekable.next()
             continue
+        ;
+        // Identifiers may not contain numbers, e.g. `var1`
+        if is_char_number_t(c) && id.size() > 0 && !is_str_tokens(id)
+            let line = current_line - line_offset
+            string digit(1, c)
+            error($"[Lexer] Identifiers cannot contain numbers: {id}{digit}... (line {line})", "")
         ;
         select num from try_get_num(peekable, c)
             id = try_add_token(id, ast, peekable, current_line)
@@ -149,15 +156,22 @@ fn get_concat Peekable<char> *peekable => string
     peekable->next()
     string concat = "\""
     let escaped = false
+    let depth = 0
     loop
         let c_opt = peekable->next()
         if c_opt.is_none() doremi concat
         let c = c_opt.value_or(' ')
-        if c == '{' && !escaped
-            concat += "\" + to_string("
+        if depth > 0
+            if c == '"' doco concat += get_matching(peekable, '"')
+            if c == '\'' doco concat += get_matching(peekable, '\'')
+            if c == '{' do depth++
+            if c == '}' do depth--
+            if depth == 0 doco concat += ") + \""
+            doco concat += c
         ;
-        elif c == '}' && !escaped
-            concat += ") + \""
+        if c == '{' && !escaped
+            depth = 1
+            concat += "\" + to_string("
         ;
         else do concat += c
         if c == '"' && !escaped doremi concat
@@ -171,7 +185,12 @@ fn collect_num Peekable<char> *peekable, char ch => AstToken
     let token = AstToken()
     loop
         let peeked = peekable->peek().value_or(' ')
-        if !is_char_number_t(peeked) && peeked != '.'
+        // A number ends at the first char that can't be part of a literal.
+        // Letters/underscore are kept for suffixes and hex (1.5f, 10u, 0x1F),
+        // but `..` is a range operator, not a decimal point (0..10).
+        let next_peeked = peekable->at(peekable->index() + 1).value_or(' ')
+        let is_range = peeked == '.' && next_peeked == '.'
+        if is_range || (!isalnum(peeked) && peeked != '.' && peeked != '_')
             token.name = num
             token.token = is_float ? Token::Float : Token::Number
             token.t = Token_t("0")

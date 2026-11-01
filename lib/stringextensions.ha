@@ -124,33 +124,36 @@ pub
     ;
     fn replace string from, string to => string
         string replaced = _value
+        if from.size() == 0 doremi replaced
         size_t last = 0
         loop 
             size_t start_pos = replaced.find(from, last)
             if start_pos == -1 doremi replaced
             replaced.replace(start_pos, from.length(), to)
-            last = start_pos + 1
+            last = start_pos + to.length()
         ;
     ;
     fn replace_into string from, string to => String*
+        if from.size() == 0 doremi this
         string replaced = _value
         size_t last = 0
         loop 
             size_t start_pos = replaced.find(from, last)
             if start_pos == -1 dobr _value = replaced
             replaced.replace(start_pos, from.length(), to)
-            last = start_pos + 1
+            last = start_pos + to.length()
         ;
         return this
     ;
     fn replace string from, string to, int amount => string
         string replaced = _value
+        if from.size() == 0 doremi replaced
         size_t last = 0
         for i until amount
             size_t start_pos = replaced.find(from, last)
             if start_pos == -1 doremi replaced
             replaced.replace(start_pos, from.length(), to)
-            last = start_pos + 1
+            last = start_pos + to.length()
         ;
         return replaced
     ;

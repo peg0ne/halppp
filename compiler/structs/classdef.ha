@@ -11,12 +11,28 @@ struct Class
         ;
         return false
     ;
-    fn to_cpp_start => string
-        string class_str = templates.size() > 0 ? TEMPLATE : ""
+    fn template_header => string
+        string header = templates.size() > 0 ? TEMPLATE : ""
         for i until templates.size()
-            class_str += templates.at(i)
-            class_str += i + 1 < templates.size() ? TEMPLATE_MID : TEMPLATE_END
+            header += templates.at(i)
+            header += i + 1 < templates.size() ? TEMPLATE_MID : TEMPLATE_END
         ;
+        return header
+    ;
+    // Name used outside the class body, e.g. Foo<T, ...Rest> -> Foo<T, Rest...>
+    fn qualified_id => string
+        if templates.size() == 0 doremi id
+        let qualified = id + LARROW
+        foreach i, t in templates
+            let name = String(t)
+            if name.starts_with("...") do qualified += t.substr(3) + "..."
+            else do qualified += t
+            if i + 1 < templates.size() do qualified += ARG_SEP
+        ;
+        return qualified + RARROW
+    ;
+    fn to_cpp_start => string
+        string class_str = template_header()
         class_str += is_struct ? STRUCT : CLASS
         class_str += id
         return class_str
@@ -36,7 +52,9 @@ struct Class
                 class_str += variable_state_to_cpp(v.variable_state)
                 previous_state = v.variable_state
             ;
-            class_str += v.to_cpp(TAB, LINE_END)
+            let declared = v
+            if v.staticness && !v.constantness do declared.v_value = None<string>()
+            class_str += declared.to_cpp(TAB, LINE_END)
         ;
         foreach i,f in functions
             if i == 0 || f.variable_state != previous_state
@@ -48,7 +66,10 @@ struct Class
         class_str += $"{RBRACK}{LINE_END}"
         foreach v in variables
             if !v.staticness do continue
-            class_str += $"{v.v_type} {id}::{v.id}"
+            let owner = qualified_id()
+            class_str += template_header()
+            if v.constantness doco class_str += $"const {v.v_type} {owner}::{v.id}{LINE_END}"
+            class_str += $"{v.v_type} {owner}::{v.id}"
             select value from v.v_value
                 class_str += $" = {value}"
             ;

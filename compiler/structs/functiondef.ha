@@ -7,6 +7,7 @@ struct Function
     vector<string> templates = {}
     bool staticness = false
     bool virtualness = false
+    bool is_member = false
     Function VariableState state =>
         this->variable_state = state
     ;

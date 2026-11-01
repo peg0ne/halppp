@@ -80,16 +80,23 @@ fn adv_conditional_construct Compiler *compiler_t, ConditionalExpression *expr, 
     let op = $"{expr->operator_value} "
     let left = $"{expr->value_left} "
     let is_first = true
+    let new_operand = true
     loop
         let x = compiler_t->peek().value_or(' ')
         if compiler_t->peek().is_none() do return
         if x.is_do() do return
         if x.is_conditional_sep() do return
         if x.is_nl() do return
-        if x.name == ":" doco compiler_t->next()
-        if !is_first do expr->value_right += separator + left + op
+        // Operands are separated by `:` and may span several tokens
+        // (Color::Red, n - 1), so only start a new `|| left op` after a `:`
+        if x.token == Token::Colon
+            new_operand = true
+            doco compiler_t->next()
+        ;
+        if new_operand && !is_first do expr->value_right += separator + left + op
         expr->value_right += $"{x.name} "
         compiler_t->next()
         is_first = false
+        new_operand = false
     ;
 ;
