@@ -30,6 +30,7 @@ class ConfigManager => IContent
         let configs = list_reg_files($"{home}/.config/hide")
         _syntaxes = Dictionary<string, Syntax>()
         foreach config_file in configs
+            if config_file == SETTINGS_FILE do continue
             let config = load_json($"{home}/.config/hide/{config_file}")
             let syntax = Syntax(config)
             syntax.set_file_type(String(config_file).replace(".json", ""))

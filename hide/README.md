@@ -134,7 +134,13 @@ hide
 ### Spiral layout
 
 Editors normally sit side by side. To switch to the spiral layout, use `:layout spiral`, or `editor toggle spiral layout` from the command pallete (`SPACE + p`, search `spiral`).
-To start `hide` in spiral layout, set `HIDE_LAYOUT=spiral`, for example `alias hide='HIDE_LAYOUT=spiral hide'`.
+To start `hide` in spiral layout, add it to `~/.config/hide/settings.json`:
+
+```json
+{
+    "layout": "spiral"
+}
+```
 
 ### CmdHan commands
 

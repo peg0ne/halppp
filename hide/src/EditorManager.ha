@@ -1,4 +1,9 @@
 get => components/Editor
+
+// General hide settings; every other .json in ~/.config/hide is a syntax
+glob
+    SETTINGS_FILE "settings.json"
+;
 class EditorManager => IContent
     vector<Editor*> _editors = {}
     // Each space is a row of editors: side by side (HorizontalLayout), or
@@ -13,13 +18,16 @@ class EditorManager => IContent
     EditorManager IContainer *status_line =>
         _status_line = status_line
         _origin = new VerticalLayout(Fill::Flex)
-        // HIDE_LAYOUT=spiral starts hide with spiral layout
-        select layout from env("HIDE_LAYOUT") do _spiral = layout == "spiral"
+        // "layout": "spiral" in ~/.config/hide/settings.json starts in spiral layout
+        let home = home_env().value_or(".")
+        let settings = load_json($"{home}/.config/hide/{SETTINGS_FILE}")
+        _spiral = settings.try_get_value_of("layout", (string)"horizontal") == "spiral"
+        settings.destruct()
         add_space()
     ;
     fn new_space => IContainer*
-        if _spiral doremi (IContainer*)new SpiralLayout(Fill::Flex)
-        return (IContainer*)new HorizontalLayout(Fill::Flex)
+        if _spiral doremi new SpiralLayout(Fill::Flex)
+        return new HorizontalLayout(Fill::Flex)
     ;
     fn space_editors IContainer *space => vector<IContainer*>
         if _spiral doremi ((SpiralLayout*)space)->elements()
