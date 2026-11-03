@@ -8,7 +8,7 @@ get => structs/[importsdef, globaldef, structdef]
 get => structs/[fordef, conditiondef, selectdef, matchdef, expressiondef]
 get => structs/[functiondef, classdef]
 get => structs/[programdef, compilerdef]
-get => structs/[mapdef]
+get => structs/[mapdef, unitdef]
 get => message, utils, fileutil
 get => ast, imports, enums, foreacher, expressions, matching, mapper
 get => switch, selects, conditions, variable, template
@@ -21,7 +21,11 @@ struct CompileOutput
     string headers = ""
     string fnheaders = ""
     vector<string> arguments = {}
+    // Same as output, but with function and method bodies moved into units
+    string header_output = ""
+    vector<Unit> units = {}
     fn content => string doremi includes + headers + fnheaders + output
+    fn header => string doremi includes + headers + fnheaders + header_output
     CompileOutput string output, string includes, string headers, string fnheaders, vector<string> args =>
         this->output = output
         this->includes = includes
@@ -37,8 +41,13 @@ fn main =>
     let paths = CompilerPath(get_file_path(argc, argv), fpfn.f_p, fpfn.f_n)
     let p = Program()
     let output = compile_main(paths, &p)
-    write_program(output.content(), paths)
-    if !clap.has("-t") do compile_program(paths, output.arguments, clap.has("-r"))
+    // -t: only transpile, -s: build everything as one translation unit (no cache)
+    if clap.has("-t") || clap.has("-s")
+        write_program(output.content(), paths)
+        if !clap.has("-t") do compile_program(paths, output.arguments, clap.has("-r"))
+        return 0
+    ;
+    compile_incremental(paths, output.header(), output.units, output.arguments, clap.has("-r"))
 ;
 
 fn compile_main CompilerPath paths, Program *p => CompileOutput doremi compile(paths, p, true)
@@ -49,6 +58,12 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     let headers = ""
     let fnheaders = ""
     let is_named = false
+    // Incremental builds: header_output is shared by every unit, unit_output only
+    // holds this file's function bodies so editing them rebuilds just this file
+    let header_output = ""
+    let unit_output = ""
+    let unit_has_code = false
+    vector<Unit> units = {}
     let content = get_content(paths, !is_main)
     let extralines = 0
     if is_main
@@ -72,6 +87,12 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             let classdef = class_construct(&compiler_t, next.token == Token::Struct, paths)
             output += classdef.to_cpp()
             headers += classdef.to_cpp_h()
+            header_output += classdef.to_cpp_header()
+            let impl = classdef.to_cpp_impl()
+            if impl.size() > 0
+                unit_output += impl
+                unit_has_code = true
+            ;
             continue
         ;
         match next.token
@@ -81,16 +102,28 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
                 let id = id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
                 output += $"namespace {id}\n" + "{\n"
+                header_output += $"namespace {id}\n" + "{\n"
+                unit_output += $"namespace {id}\n" + "{\n"
             ;
             Token::Function =>
                 let fndef = function_construct(&compiler_t, VariableState::Public, false)
                 output += fndef.to_cpp(false)
                 fnheaders += fndef.to_cpp_h()
+                if fndef.templates.size() > 0 do header_output += fndef.to_cpp(false)
+                elif fndef.header_only() do header_output += "inline " + fndef.to_cpp(false)
+                else
+                    header_output += fndef.to_cpp_h()
+                    unit_output += fndef.to_cpp(false)
+                    unit_has_code = true
+                ;
             ;
             Token::Enum =>
                 let enumdef = enums_construct(&compiler_t)
                 output += enumdef.to_cpp()
                 headers += enumdef.to_cpp_h()
+                header_output += enumdef.to_cpp_header()
+                unit_output += enumdef.to_cpp_string()
+                unit_has_code = true
             ;
             Token::Global =>
                 let global = global_construct(&compiler_t)
@@ -121,6 +154,8 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                     let get_path = CompilerPath(get_file, fpfn.f_p, fpfn.f_n)
                     let get_out = compile(get_path, p, false)
                     output += get_out.output
+                    header_output += get_out.header_output
+                    foreach u in get_out.units do units.push_back(u)
                     includes += get_out.includes
                     headers += get_out.headers
                     fnheaders += get_out.fnheaders
@@ -150,9 +185,17 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             _ => do error($"Token not handled: {next.name}", compiler_t.recap())
         ;
     ;
-    if is_named do output += "\n}\n"
+    if is_named
+        output += "\n}\n"
+        header_output += "\n}\n"
+        unit_output += "\n}\n"
+    ;
+    if unit_has_code do units.push_back(Unit(unit_name(paths.current), unit_output))
     validate_compiled(compiler_t, is_main)
-    return CompileOutput(output, includes, headers, fnheaders, compiler_t.arguments)
+    let result = CompileOutput(output, includes, headers, fnheaders, compiler_t.arguments)
+    result.header_output = header_output
+    result.units = units
+    return result
 ;
 
 fn validate_compiled Compiler compiler, bool is_main =>

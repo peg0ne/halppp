@@ -39,6 +39,14 @@ pub
             makedir(_line.substr(6))
             return update_return(Command::ModeNormal)
         ;
+        elif _line == "layout spiral"
+            _editorManager->set_spiral(true)
+            return update_return(Command::ModeNormal)
+        ;
+        elif _line == "layout horizontal"
+            _editorManager->set_spiral(false)
+            return update_return(Command::ModeNormal)
+        ;
         elif s.starts_with("syntax ")
             _editorManager->set_syntax(_line.substr(7))
             return update_return(Command::ModeNormal)

@@ -42,4 +42,27 @@ struct Function
         fun_str += BLOCK_END
         return fun_str
     ;
+    // Template functions and deduced (auto) return types need their body wherever
+    // they are called, so incremental builds keep them in the shared header
+    fn header_only => bool
+        if templates.size() > 0 doremi true
+        return String(return_value.value_or(Variable(true)).v_type).contains("auto")
+    ;
+    // Out-of-class definition for a method of owner: `ret owner::id(args) {...}`
+    fn to_cpp_out_of_line string owner => string
+        string fun_str = id.size() == 0 ? EMPTY : return_value.value_or(Variable(true)).v_type + SPACE
+        fun_str += id.size() == 0 ? $"{owner}::{owner}(" : $"{owner}::{id}("
+        for i until arguments.size()
+            let arg = arguments.at(i)
+            arg.v_value = None<string>()
+            fun_str += arg.to_cpp(EMPTY, EMPTY)
+            fun_str += i + 1 < arguments.size() ? ARG_SEP : EMPTY
+        ;
+        fun_str += $"{RPAREN}{BLOCK_START}"
+        foreach e in expressions
+            fun_str += e.to_cpp(1)
+        ;
+        fun_str += BLOCK_END
+        return fun_str
+    ;
 ;

@@ -10,6 +10,7 @@ fn halp string info => bool
     println("build Optional(-r, -t) - build binary")
     println("    -r - creates a release build")
     println("    -t - transpiles into c++")
+    println("    -s - single c++ file, skips the incremental build cache")
     println("run Optional(-r) - build binary and run")
     println("do <CUSTOM COMMAND>")
     println("validate - tries to compile the tests in the test folder")
@@ -42,13 +43,36 @@ fn hamble_base string name => string
     return base
 ;
 
+// Every project ignores its binaries and halppp's incremental build cache.
+// Also fixes up projects made before the cache existed.
+fn ensure_gitignore =>
+    let wanted = vector<string>({"bin/*", ".halppp-cache/"})
+    let lines = readlines(".gitignore")
+    let missing = ""
+    foreach entry in wanted
+        let found = false
+        foreach line in lines
+            // Accept CRLF files and the entry written with or without slashes
+            let l = String(line).replace("\r", "")
+            if l == entry || l == "/" + entry || l + "/" == entry dobr found = true
+        ;
+        if !found do missing += entry + "\n"
+    ;
+    if missing.size() == 0 do return
+    let content = ""
+    select existing from read(".gitignore") do content = existing
+    while content.size() > 0 && content.back() == '\n' do content.pop_back()
+    if content.size() > 0 do content += "\n"
+    write(content + missing, ".gitignore")
+;
+
 fn init string name =>
     if !makedir(name) dore println("Project couldn't be initialized here!")
     if !changedir(name) dore println("Unable to move into project directory")
     // Run git inside the project so the name never reaches the shell
     if !system(string("git init")) do println("Git couldn't be initialized")
     write("# " + name, "README.md")
-    write("bin/*\n", ".gitignore")
+    ensure_gitignore()
     write(hamble_base(name), "hamble.haml")
     if !makedir("bin") dore println("Unable to create binary directory")
     if !makedir("src") dore println("Unable to create src directory")
@@ -70,6 +94,7 @@ fn build string type => int
         println("This is not a valid project to build from")
         return 0
     ;
+    ensure_gitignore()
     let files = list_files(".")
     let bin_exists = false
     foreach file in files
@@ -87,8 +112,9 @@ fn build string type => int
         if !system(string("halppp main.ha -t")) doremi 0
         return 1
     ;
-    let release = type == "-r" ? " -r" : ""
-    if !system($"halppp main.ha{release}")
+    // -r: release build, -s: single c++ file without the incremental build cache
+    let flag = type == "-r" || type == "-s" ? $" {type}" : ""
+    if !system($"halppp main.ha{flag}")
         println("Build failed")
         return 0
     ;

@@ -41,6 +41,7 @@ class CommandPallete
         commands.add(" editor move right", Command::EditorRight)
         commands.add(" editor move up", Command::EditorUp)
         commands.add(" editor move down", Command::EditorDown)
+        commands.add(" editor toggle spiral layout", Command::ToggleSpiral)
         commands.add(" templates", Command::EditorTemplates)
         commands.add(" search", Command::EditorSearch)
         commands.add(" replace", Command::EditorReplace)

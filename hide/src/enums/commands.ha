@@ -25,5 +25,6 @@ enum Command
     LSPSearch,
     Terminal,
     ConfigManager,
+    ToggleSpiral,
     Nop,
 ;
