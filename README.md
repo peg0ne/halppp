@@ -192,3 +192,9 @@ fn main =>
 //file A/hello.ha
 fn hello => do println($"hello world {val}")
 ```
+
+# Tests
+`tests/run.sh` builds every `tests/*.ha` both as a single file (`-s`) and incrementally, runs it,
+and compares the output with `tests/expected/<name>.out`. Pass another compiler as the first
+argument (`tests/run.sh path/to/halppp`) and test names after it to run only those.
+`UPDATE=1 tests/run.sh` rewrites the expected files after an intended change in output.

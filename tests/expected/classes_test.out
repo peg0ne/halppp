@@ -1,0 +1,10 @@
+4,6 len_sq=52
+equal
+rect area=6
+square area=16
+virtual 16
+count 3
+ba left=0
+hello 5
+9
+pear

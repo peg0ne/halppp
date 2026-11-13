@@ -1,0 +1,14 @@
+4 2
+1
+any-equals ok
+all-not-equals ok
+2 10
+2
+default-first ok
+match any-equals ok
+negative case ok
+6 5
+6 1
+1 1
+hello world hello bob
+{6}
