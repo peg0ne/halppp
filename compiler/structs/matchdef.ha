@@ -35,8 +35,9 @@ struct MatchDef
                 let l = lines[default_statement]
                 let initial = l.lines[l.lines.size() - 1]
                 // auto would make a string literal a const char*, which the other arms can't assign to
-                let first = initial.find_first_not_of(" \t\n")
-                let is_literal = first != string::npos && initial[first] == '"'
+                let code = strip_line_directives(initial)
+                let first = code.find_first_not_of(" \t\n")
+                let is_literal = first != string::npos && code[first] == '"'
                 matcher += is_literal ? $"string {returner} = " : $"auto {returner} = "
                 matcher += initial
             ;

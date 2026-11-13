@@ -6,6 +6,8 @@ struct Compiler
     vector<string> file_imports = {}
     List<string> current_text = List<string>({"\033[0m>>"})
     int current_line = 0
+    // The .ha file being compiled, for #line directives (empty: don't emit any)
+    string source_file = EMPTY
     Compiler Program *p, Peekable<AstToken> ast, int extra_lines =>
         this->program = p
         this->ast = ast

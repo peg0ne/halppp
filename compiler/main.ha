@@ -75,6 +75,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     ;
     let ast = ast_create(content, extralines)
     let compiler_t = Compiler(p, ast, extralines)
+    compiler_t.source_file = paths.current
     vector<string> incs = {}
     string args = EMPTY
     loop
@@ -88,7 +89,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
             let classdef = class_construct(&compiler_t, next.token == Token::Struct, paths)
             output += classdef.to_cpp()
             headers += classdef.to_cpp_h()
-            header_output += classdef.to_cpp_header()
+            header_output += strip_line_directives(classdef.to_cpp_header())
             let impl = classdef.to_cpp_impl()
             if impl.size() > 0
                 unit_output += impl
@@ -114,8 +115,8 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 output += fndef.to_cpp_def()
                 fnheaders += fndef.to_cpp_h()
                 // fnheaders already declares every function (with its default arguments)
-                if fndef.templates.size() > 0 do header_output += fndef.to_cpp_def()
-                elif fndef.header_only() do header_output += "inline " + fndef.to_cpp_def()
+                if fndef.templates.size() > 0 do header_output += strip_line_directives(fndef.to_cpp_def())
+                elif fndef.header_only() do header_output += "inline " + strip_line_directives(fndef.to_cpp_def())
                 else
                     unit_output += fndef.to_cpp_def()
                     unit_has_code = true

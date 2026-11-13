@@ -6,6 +6,8 @@ struct Expression
     Option<MatchDef> e_matcher = None<MatchDef>()
     Option<string> line = None<string>()
     Option<string> raw_line = None<string>()
+    int src_line = 0
+    string src_file = EMPTY
     Expression => do return
     Expression Condition conditions => 
         this->e_condition = Some(conditions)
@@ -38,7 +40,37 @@ struct Expression
     fn to_cpp int indentation => string doremi expr_to_cpp(this, indentation)
 ;
 
+// A #line directive on its own line is valid anywhere between tokens, even mid-statement
 fn expr_to_cpp Expression *self, int indent => string
+    let body = expr_body_to_cpp(self, indent)
+    if self->src_line <= 0 || self->raw_line.is_some() doremi body
+    let file = ""
+    foreach c in self->src_file
+        if c == '\\' || c == '"' do file += '\\'
+        file += c
+    ;
+    // Leading newlines (e.g. from `do`) would push the code below the line the directive names
+    let start = body.find_first_not_of(" \t\n")
+    if start == string::npos doremi body
+    return $"\n#line {self->src_line} \"{file}\"\n{body.substr(start)}"
+;
+
+// Shared headers leave out #line, so editing one line doesn't change program.h
+// (which would rebuild every unit)
+fn strip_line_directives string code => string
+    let result = ""
+    let line = ""
+    foreach c in code
+        line += c
+        if c != '\n' do continue
+        if !String(line).starts_with("#line ") do result += line
+        line = ""
+    ;
+    if !String(line).starts_with("#line ") do result += line
+    return result
+;
+
+fn expr_body_to_cpp Expression *self, int indent => string
     let condition = self->e_condition
     let foreacher = self->e_for
     let selects = self->e_select

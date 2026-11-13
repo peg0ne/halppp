@@ -1,5 +1,15 @@
 fn expression_construct Compiler *compiler_t, AstToken first => Expression doremi expression_construct(compiler_t, first, false)
+// Remembers where the expression starts, so g++ errors point at the .ha line (see expr_to_cpp)
 fn expression_construct Compiler *compiler_t, AstToken first, bool is_match => Expression
+    let line = compiler_t->current_line + 1
+    let expr = expression_construct_at(compiler_t, first, is_match)
+    if compiler_t->source_file.size() > 0 && line > 0
+        expr.src_line = line
+        expr.src_file = compiler_t->source_file
+    ;
+    return expr
+;
+fn expression_construct_at Compiler *compiler_t, AstToken first, bool is_match => Expression
     let doing = ""
     let expression = ""
     if first.token == Token::Raw doremi Expression(first.name, true)

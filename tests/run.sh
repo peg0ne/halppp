@@ -50,6 +50,27 @@ for name in "${tests[@]}"; do
     rm -f "$name" "$name.exe" "$name.cpp"
 done
 
+# errors/*.ha must fail to build, with every `// expect: text` of the file in the output
+if [ ${#@} -eq 0 ]; then
+    for f in errors/*.ha; do
+        name="${f%.ha}"
+        if (cd errors && "$HALPPP" "$(basename "$f")" -s > "$WORK/build.log" 2>&1) && [ -x "$name" ]; then
+            echo "FAIL $name: built but should not have"
+            failed=$((failed + 1))
+        else
+            missing=0
+            while IFS= read -r expect; do
+                if ! grep -qF -- "$expect" "$WORK/build.log"; then
+                    echo "FAIL $name: output lacks: $expect"
+                    missing=1
+                fi
+            done < <(sed -n 's|^// expect: ||p' "$f")
+            if [ $missing -eq 0 ]; then echo "ok   $name"; else failed=$((failed + 1)); fi
+        fi
+        rm -f "$name" "$name.exe" "$name.cpp"
+    done
+fi
+
 if [ $failed -ne 0 ]; then
     echo "$failed failure(s)"
     exit 1
