@@ -25,6 +25,8 @@ fn sum_odd int n => int
     return total
 ;
 
+fn count_to int n => do for i until n do print(i)
+
 fn main =>
     println(classify(-5))
     println(classify(0))
@@ -69,4 +71,13 @@ fn main =>
         default dobr println("high")
         ;
     ;
+    // a do can be followed by another statement
+    count_to(4)
+    println("")
+    if pairs > 1 do for i until 3 do print(i)
+    println("")
+    for i until 3 do if i == 2 do println("two again")
+    let w = 0
+    while w < 4 do for j until 2 do w++
+    println(w)
 ;

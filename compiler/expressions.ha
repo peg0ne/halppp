@@ -3,6 +3,21 @@ fn expression_construct Compiler *compiler_t, AstToken first, bool is_match => E
     let doing = ""
     let expression = ""
     if first.token == Token::Raw doremi Expression(first.name, true)
+    // `if x do for ...`: a plain do followed by a statement builds that statement
+    if first.token == Token::Do
+        let peeked = compiler_t->peek().value_or(AstToken("\n"))
+        if any(peeked.token, {Token::For, Token::Foreach, Token::Condition, Token::Switch, Token::Select, Token::Match})
+            let statement = next_or_exit(compiler_t, "[Expression] Expected statement after do")
+            switch statement.token
+                case Token::Foreach
+                case Token::For doremi for_construct(compiler_t, statement.token == Token::Foreach)
+                case Token::Condition doremi condition_construct(compiler_t, statement.name)
+                case Token::Switch doremi switch_construct(compiler_t)
+                case Token::Select doremi select_construct(compiler_t)
+                default doremi match_construct(compiler_t)
+            ;
+        ;
+    ;
     if first.token == Token::Let doremi get_let_expr(compiler_t)
     if first.token == Token::MoreThan doremi get_lambda_expr(compiler_t)
     if first.token == Token::Id && try_get(compiler_t, Token::Equals)
