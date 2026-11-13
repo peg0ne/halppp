@@ -67,6 +67,7 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     let content = get_content(paths, !is_main)
     let extralines = 0
     if is_main
+        includes += foreach_helper()
         extralines = 5
         let extras = "\nfn to_string string value => string doremi value\n" 
         extras += "\ninc => string\nuse => std\n"

@@ -98,6 +98,15 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
         if any(x.token, {Token::SemiColon, Token::Eof}) do break
         if x.token == Token::Function dobr error($"Function above is not closed {function.id}", compiler_t->recap())
         if x.is_nl() do continue
+        // `fn f => do for ...`: a one-line body that is itself a statement
+        let one_line_statement = false
+        if x.token == Token::Do
+            let peeked = compiler_t->peek().value_or(AstToken("\n"))
+            if any(peeked.token, {Token::For, Token::Foreach, Token::Condition, Token::Switch, Token::Select, Token::Match})
+                x = next_or_exit(compiler_t, "[Function] Expected statement after do")
+                one_line_statement = true
+            ;
+        ;
         switch x.token
             case Token::Foreach
             case Token::For dobr function.add_expr(for_construct(compiler_t, x.token == Token::Foreach))
@@ -129,7 +138,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
                 
                 break
         ;
-        if x.is_do() do break
+        if x.is_do() || one_line_statement do break
     ;
     if function.id == "main" do function.add_expr(Expression((string)"return 0"))
     validate_function(function, compiler_t)
