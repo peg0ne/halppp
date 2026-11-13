@@ -54,3 +54,15 @@ fn foreach_helper => string
     h += "}\n"
     return h
 ;
+
+// Interpolation calls to_string on every value: show a char as itself and a bool as true/false
+// (std::to_string would give their numbers). const char* needs its own overload, or string
+// literals would convert to bool, and other pointers are rejected for the same reason.
+fn to_string_helper => string
+    let h = "#include <string>\n"
+    h += "inline std::string to_string(char value) { return std::string(1, value); }\n"
+    h += "inline std::string to_string(bool value) { return value ? \"true\" : \"false\"; }\n"
+    h += "inline std::string to_string(const char* value) { return std::string(value); }\n"
+    h += "template <class T> std::string to_string(T* value) = delete;\n"
+    return h
+;

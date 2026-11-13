@@ -71,4 +71,9 @@ fn main =>
     char q = '\''
     println(q)
     println("tab\tend")
+    // chars interpolate as themselves and bools as true/false
+    char letter = 'z'
+    let yes = 3 > 2
+    println($"{letter} {yes} {!yes} {"lit"}")
+    println(yes)
 ;
