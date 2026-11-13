@@ -20,6 +20,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr => 
 fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables => Function doremi function_construct(compiler_t, state, constr, variables, true)
 fn function_construct Compiler *compiler_t, VariableState state, bool constr, vector<Variable> variables, bool is_member => Function
     let function = Function(state)
+    let start_line = compiler_t->current_line + 1
     function.is_member = is_member
     vector<Variable> variables_in_func = {}
     if !constr
@@ -95,7 +96,8 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
     ;
     loop
         let x = next_or_exit(compiler_t, $"Function is not closed {function.id}")
-        if any(x.token, {Token::SemiColon, Token::Eof}) do break
+        if x.token == Token::Eof do unclosed_error(compiler_t, $"[Function] {function.id.size() > 0 ? function.id : "constructor"}", start_line)
+        if x.token == Token::SemiColon do break
         if x.token == Token::Function dobr error($"Function above is not closed {function.id}", compiler_t->recap())
         if x.is_nl() do continue
         switch x.token

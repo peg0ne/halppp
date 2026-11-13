@@ -1,5 +1,6 @@
 fn for_construct Compiler *compiler_t, bool is_foreach => Expression
     let for_def = For(is_foreach)
+    let start_line = compiler_t->current_line + 1
     let mid_checker = is_foreach ? Token::In : Token::Until
     for_def.iterator = id_or_exit(compiler_t, "[For] For loop is not closed")
     if is_foreach
@@ -21,6 +22,7 @@ fn for_construct Compiler *compiler_t, bool is_foreach => Expression
     ;
     loop
         let x = next_or_exit(compiler_t, "[For] For loop is not closed")
+        if x.token == Token::Eof do unclosed_error(compiler_t, "[For] loop", start_line)
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token

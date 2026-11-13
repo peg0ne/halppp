@@ -95,6 +95,7 @@ fn class_validate_function Class *class_def, Function function, Compiler *compil
 fn class_construct Compiler *compiler_t, bool is_struct, CompilerPath paths => Class
     let class_def = Class()
     class_def.is_struct = is_struct
+    let start_line = compiler_t->current_line + 1
     
     class_def.id = id_or_exit(compiler_t, c_err(ClassError::NoId))
     // Set Inheritance Or Template
@@ -106,13 +107,15 @@ fn class_construct Compiler *compiler_t, bool is_struct, CompilerPath paths => C
     if next.token == Token::CoolArrow
         class_def.inherit = Some(id_or_exit(compiler_t, c_err(ClassError::NoInheritor, class_def.id)))
     ;
-    class_internal_declarations(compiler_t, is_struct, &class_def, paths)
+    let end = class_internal_declarations(compiler_t, is_struct, &class_def, paths)
+    if end == Token::Eof do unclosed_error(compiler_t, $"[Class] {class_def.id}", start_line)
     class_validate(class_def, compiler_t)
     compiler_t->add(class_def)
     return class_def
 ;
 
-fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *class_def, CompilerPath paths =>
+// Returns the token that ended the declarations (Eof when the file ran out first)
+fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *class_def, CompilerPath paths => Token
     //Construct inner Class values
     let variable_state = !is_struct ? VariableState::Private : VariableState::Public
     loop
@@ -175,7 +178,7 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
             ;
             doco class_def->variables.push_back(vnb.variable)
         ;
-        elif any(next.token, {Token::Eof, Token::SemiColon, Token::Class}) do break
+        elif any(next.token, {Token::Eof, Token::SemiColon, Token::Class}) doremi next.token
         switch next.token
         case Token::Private dobr variable_state = VariableState::Private
         case Token::Protected dobr variable_state = VariableState::Protected
@@ -183,4 +186,5 @@ fn class_internal_declarations Compiler *compiler_t, bool is_struct, Class *clas
         default do break
         ;
     ;
+    return Token::SemiColon
 ;

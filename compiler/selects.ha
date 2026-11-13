@@ -1,5 +1,6 @@
 fn select_construct Compiler *compiler_t => Expression
     let select_def = Select()
+    let start_line = compiler_t->current_line + 1
     select_def.value_name = id_or_exit(compiler_t, "[Select] is not closed")
     get_or_exit(compiler_t, Token::From, "[Select] Missing keyword: from")
     select_def.optional_value = compiler_t->next().value_or(AstToken("NONE")).name
@@ -14,6 +15,7 @@ fn select_construct Compiler *compiler_t => Expression
     ;
     loop
         let x = next_or_exit(compiler_t, "[Select] is not closed")
+        if x.token == Token::Eof do unclosed_error(compiler_t, "[Select] block", start_line)
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token

@@ -71,3 +71,8 @@ fn temp_compiler string emulated_str => Compiler
     raw static Program program;
     return Compiler(&program, ast, 0)
 ;
+
+// A block reached the end of the file without its closing ;
+fn unclosed_error Compiler *compiler_t, string what, int line =>
+    error($"{what} starting on line {line} is not closed: end its block with ;", compiler_t->recap())
+;

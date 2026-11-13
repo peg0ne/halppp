@@ -17,6 +17,7 @@ fn co_err ConditionError err, string opt, bool display, string recap => string
 
 fn condition_construct Compiler *compiler_t, string condition_type => Expression
     let cond = Condition(condition_type)
+    let start_line = compiler_t->current_line + 1
     let expression = ConditionalExpression()
     if condition_type == "elif" do cond = Condition("else if")
     if condition_type == "loop"
@@ -47,6 +48,7 @@ fn condition_construct Compiler *compiler_t, string condition_type => Expression
     ;
     loop
         let x = next_or_exit(compiler_t, co_err(ConditionError::Closed))
+        if x.token == Token::Eof do unclosed_error(compiler_t, $"[{condition_type}] block", start_line)
         if x.is_terminator() do break
         if x.is_nl() do continue
         switch x.token
