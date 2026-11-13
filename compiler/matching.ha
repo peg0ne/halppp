@@ -1,5 +1,6 @@
 fn match_construct Compiler *compiler_t => Expression doremi match_construct(compiler_t, None<string>(), false)
-fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expression
+fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expression doremi match_construct(compiler_t, id, is_let, false)
+fn match_construct Compiler *compiler_t, Option<string> id, bool is_let, bool is_return => Expression
     let matcher = ""
     vector<string> statments = {}
     vector<MatchLines> internal = {}
@@ -43,7 +44,9 @@ fn match_construct Compiler *compiler_t, Option<string> id, bool is_let => Expre
         ;
         elif try_get(compiler_t, Token::Eof) do error("[Match] Unclosed match statement", compiler_t->recap())
     ;
-    return Expression(MatchDef(matcher, statments, internal, id, is_let, operators))
+    let match_def = MatchDef(matcher, statments, internal, id, is_let, operators)
+    match_def.is_return = is_return
+    return Expression(match_def)
 ; 
 
 fn match_statements Compiler *compiler_t => string

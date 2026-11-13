@@ -13,6 +13,7 @@ struct MatchDef
     Option<string> id = None<string>()
     bool is_let = false
     vector<string> operators = {}
+    bool is_return = false
     MatchDef => do return
     MatchDef string matcher_expr, vector<string> statments, vector<MatchLines> lines, Option<string> id, bool is_let, vector<string> operators =>
         this->matcher_expr = matcher_expr
@@ -26,14 +27,18 @@ struct MatchDef
         let matcher = ""
         select returner from id
             if is_let
-                matcher += $"auto {returner} = "
                 let default_statement = -1
                 foreach i, statment in statments
                     if statment == "_" dobr default_statement = i
                 ;
                 if default_statement == -1 do error("[Match] match let statement requires default statement!", "")
                 let l = lines[default_statement]
-                matcher += l.lines[l.lines.size() - 1]
+                let initial = l.lines[l.lines.size() - 1]
+                // auto would make a string literal a const char*, which the other arms can't assign to
+                let first = initial.find_first_not_of(" \t\n")
+                let is_literal = first != string::npos && initial[first] == '"'
+                matcher += is_literal ? $"string {returner} = " : $"auto {returner} = "
+                matcher += initial
             ;
         ;
         matcher += "{"
@@ -50,6 +55,7 @@ struct MatchDef
                     select returner from id
                         matcher += $"{returner} = "
                     ;
+                    if is_return do matcher += "return "
                 ;
                 matcher += $"{line}\n"
             ;

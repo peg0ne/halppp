@@ -26,6 +26,8 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
         let func_id = next_or_exit(compiler_t, "[FunctionError]: No Function Id")
         if func_id.token == Token::Id do function.id = func_id.name
         elif func_id.token == Token::Where do function.id = func_id.name
+        // Top-level keywords mean nothing after fn, so `fn get` and `fn use` are fine
+        elif any(func_id.token, {Token::Get, Token::Include, Token::Use, Token::Named, Token::Compiler}) do function.id = func_id.name
         else
             switch func_id.token
             case Token::And
@@ -75,6 +77,16 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
                 error("Return value invalid on main function", compiler_t->recap())
             ;
         ;
+    ;
+    elif constr
+        // Constructor initializer list: `Square int s => Rect(s, s), label("sq")`
+        loop
+            let peeked = compiler_t->peek().value_or(AstToken("\n"))
+            if peeked.is_nl() || peeked.is_do() || peeked.is_terminator() do break
+            compiler_t->next()
+            function.initializer = join_token(function.initializer, peeked.name)
+        ;
+        function.return_value = Some(Variable(true))
     ;
     else
         peeked_opt = compiler_t->peek()

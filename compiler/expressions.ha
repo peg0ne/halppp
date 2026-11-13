@@ -14,6 +14,11 @@ fn expression_construct Compiler *compiler_t, AstToken first, bool is_match => E
             return match_construct(compiler_t, Some(first.name), false)
         ;
     ;
+    elif first.token == Token::Return && try_get(compiler_t, Token::Match)
+        // return match x ... : every arm returns its last line
+        next_or_exit(compiler_t, "[Expression] Expected match")
+        return match_construct(compiler_t, None<string>(), false, true)
+    ;
     else
         switch first.token
             case Token::Doco dobr doing = ";\ncontinue "

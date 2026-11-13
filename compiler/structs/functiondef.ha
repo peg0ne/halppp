@@ -8,6 +8,7 @@ struct Function
     bool staticness = false
     bool virtualness = false
     bool is_member = false
+    string initializer = EMPTY
     Function VariableState state =>
         this->variable_state = state
     ;
@@ -40,6 +41,7 @@ struct Function
     fn to_cpp_def => string doremi to_cpp(false, false)
     fn to_cpp bool in_class, bool defaults => string
         let fun_str = to_cpp_start(in_class, defaults)
+        if initializer.size() > 0 do fun_str += $" : {initializer}"
         fun_str += BLOCK_START
         foreach e in expressions
             fun_str += e.to_cpp(1 + in_class)
@@ -64,7 +66,9 @@ struct Function
             fun_str += arg.to_cpp(EMPTY, EMPTY)
             fun_str += i + 1 < arguments.size() ? ARG_SEP : EMPTY
         ;
-        fun_str += $"{RPAREN}{BLOCK_START}"
+        fun_str += RPAREN
+        if initializer.size() > 0 do fun_str += $" : {initializer}"
+        fun_str += BLOCK_START
         foreach e in expressions
             fun_str += e.to_cpp(1)
         ;

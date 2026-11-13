@@ -103,7 +103,8 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 let id = id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
                 output += $"namespace {id}\n" + "{\n"
                 headers += $"namespace {id}\n" + "{\n"
-                fnheaders += $"namespace {id}\n" + "{\n"
+                // The namespace's own to_string (e.g. for its enums) would hide the global ones
+                fnheaders += $"namespace {id}\n" + "{\nusing ::to_string;\nusing std::to_string;\n"
                 header_output += $"namespace {id}\n" + "{\n"
                 unit_output += $"namespace {id}\n" + "{\n"
             ;
