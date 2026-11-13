@@ -52,7 +52,7 @@ fn function_construct Compiler *compiler_t, VariableState state, bool constr, ve
             case Token::LBrack
                 function.id = "operator[]"
                 break
-            default dobr error($"Expected id or operator but got: {func_id.name}", compiler_t->recap())
+            default dobr error($"Expected id or operator but got: {func_id.name}{keyword_note(func_id)}", compiler_t->recap())
             ;
         ;
     ;

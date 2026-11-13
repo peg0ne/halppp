@@ -2,6 +2,8 @@ struct Compiler
     Program *program
     Peekable<AstToken> ast
     vector<string> arguments = {}
+    // inc/use/get entries seen in this file, to only hint about duplicates within one file
+    vector<string> file_imports = {}
     List<string> current_text = List<string>({"\033[0m>>"})
     int current_line = 0
     Compiler Program *p, Peekable<AstToken> ast, int extra_lines =>
@@ -63,6 +65,17 @@ struct Compiler
         foreach i in usings do program->usings.push_back(Uses(i))
     ;
     fn add_get string path => do program->gets.push_back(path)
+    // Records an import for this file, returns false if the file already had it
+    fn add_file_import string kind, string id => bool
+        // The prelude the compiler adds to the main file (lines <= 0) isn't the user's
+        if current_line <= 0 doremi true
+        let key = $"{kind}:{id}"
+        foreach i in file_imports
+            if i == key doremi false
+        ;
+        file_imports.push_back(key)
+        return true
+    ;
     fn add_arg string arg => do arguments.push_back(String(arg).replace(QUOTE, EMPTY))
     fn add_args vector<string> args =>
         foreach i in args do arguments.push_back(i)

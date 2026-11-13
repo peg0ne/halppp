@@ -148,8 +148,9 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                     // Dedupe on the resolved path, so a/util and b/util are different files
                     // while ../lib/print and print (from the lib folder) are the same one
                     let canonical = canonical_path(get_file)
+                    let first_in_file = compiler_t.add_file_import("Get", canonical)
                     if compiler_t.has_get(canonical)
-                        hint($"[Get]: Duplicate entry of: {i}")
+                        if !first_in_file do hint($"[Get]: Duplicate entry of: {i}")
                         continue
                     ;
                     compiler_t.add_get(canonical)

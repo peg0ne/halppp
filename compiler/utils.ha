@@ -19,8 +19,21 @@ fn try_get Compiler *compiler_t, Token token => bool
 ;
 fn get_or_exit Compiler *compiler_t, Token token, string s => string
     let next = compiler_t->next()
-    if next.is_none() || next.value_or(AstToken()).token != token do error(s, compiler_t->recap())
-    return next.value_or(AstToken()).name
+    if next.is_none() do error(s, compiler_t->recap())
+    let got = next.value_or(AstToken())
+    if got.token != token
+        if token == Token::Id do s += keyword_note(got)
+        error(s, compiler_t->recap())
+    ;
+    return got.name
+;
+// ` (`def` is a keyword)` when a word was lexed as a keyword where a name was expected
+fn keyword_note AstToken t => string
+    if t.token == Token::Id || t.token == Token::Type || t.name.size() == 0 doremi EMPTY
+    foreach c in t.name
+        if !isalpha(c) && c != '_' doremi EMPTY
+    ;
+    return $" (`{t.name}` is a keyword and can't be used as a name)"
 ;
 fn id_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Id, s)
 fn eq_or_exit Compiler *compiler_t, string s => string doremi get_or_exit(compiler_t, Token::Equals, s)
