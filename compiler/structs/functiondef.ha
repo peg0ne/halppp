@@ -13,7 +13,8 @@ struct Function
     ;
     fn add_args Variable var => do arguments.push_back(var)
     fn add_expr Expression expr => do expressions.push_back(expr)
-    fn to_cpp_start bool in_class => string
+    fn to_cpp_start bool in_class => string doremi to_cpp_start(in_class, true)
+    fn to_cpp_start bool in_class, bool defaults => string
         string fun_str = templates.size() > 0 ? TEMPLATE : EMPTY
         for i until templates.size()
             fun_str += templates.at(i)
@@ -25,15 +26,20 @@ struct Function
         fun_str += return_value.value_or(Variable(true)).v_type
         fun_str += $" {id}("
         for i until arguments.size()
-            fun_str += arguments.at(i).to_cpp(EMPTY, EMPTY)
+            let arg = arguments.at(i)
+            if !defaults do arg.v_value = None<string>()
+            fun_str += arg.to_cpp(EMPTY, EMPTY)
             fun_str += i + 1 < arguments.size() ? ARG_SEP : EMPTY
         ;
         fun_str += RPAREN
         return fun_str
     ;
     fn to_cpp_h => string doremi to_cpp_start(false) + LINE_END
-    fn to_cpp bool in_class => string
-        let fun_str = to_cpp_start(in_class)
+    fn to_cpp bool in_class => string doremi to_cpp(in_class, true)
+    // A definition that follows its declaration must not repeat default arguments
+    fn to_cpp_def => string doremi to_cpp(false, false)
+    fn to_cpp bool in_class, bool defaults => string
+        let fun_str = to_cpp_start(in_class, defaults)
         fun_str += BLOCK_START
         foreach e in expressions
             fun_str += e.to_cpp(1 + in_class)

@@ -34,6 +34,10 @@ fn nested => vector<vector<int>>
     return v
 ;
 
+fn greet string name = "world" => string
+    return $"hello {name}"
+;
+
 fn main =>
     int xx = 3
     let value = xx + 1
@@ -85,4 +89,8 @@ fn main =>
     let bi = Box<int>(1)
     let bs = Box<string>("s")
     println($"{Box<int>::made} {Box<string>::made}")
+    // default arguments are only given on the declaration
+    println($"{greet()} {greet("bob")}")
+    // {{ and }} are literal braces in interpolated strings
+    println($"{{{six}}}")
 ;

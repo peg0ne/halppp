@@ -102,18 +102,20 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
                 arrow_or_exit(&compiler_t, "[Named] missing => in declaration");
                 let id = id_or_exit(&compiler_t, "[Named] cannot create namespace without Id");
                 output += $"namespace {id}\n" + "{\n"
+                headers += $"namespace {id}\n" + "{\n"
+                fnheaders += $"namespace {id}\n" + "{\n"
                 header_output += $"namespace {id}\n" + "{\n"
                 unit_output += $"namespace {id}\n" + "{\n"
             ;
             Token::Function =>
                 let fndef = function_construct(&compiler_t, VariableState::Public, false)
-                output += fndef.to_cpp(false)
+                output += fndef.to_cpp_def()
                 fnheaders += fndef.to_cpp_h()
-                if fndef.templates.size() > 0 do header_output += fndef.to_cpp(false)
-                elif fndef.header_only() do header_output += "inline " + fndef.to_cpp(false)
+                // fnheaders already declares every function (with its default arguments)
+                if fndef.templates.size() > 0 do header_output += fndef.to_cpp_def()
+                elif fndef.header_only() do header_output += "inline " + fndef.to_cpp_def()
                 else
-                    header_output += fndef.to_cpp_h()
-                    unit_output += fndef.to_cpp(false)
+                    unit_output += fndef.to_cpp_def()
                     unit_has_code = true
                 ;
             ;
@@ -187,6 +189,8 @@ fn compile CompilerPath paths, Program *p, bool is_main => CompileOutput
     ;
     if is_named
         output += "\n}\n"
+        headers += "\n}\n"
+        fnheaders += "\n}\n"
         header_output += "\n}\n"
         unit_output += "\n}\n"
     ;

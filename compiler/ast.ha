@@ -169,6 +169,11 @@ fn get_concat Peekable<char> *peekable => string
             if depth == 0 doco concat += ") + \""
             doco concat += c
         ;
+        // {{ and }} are a literal brace, as in C#
+        if (c == '{' || c == '}') && !escaped && peekable->peek().value_or(' ') == c
+            peekable->next()
+            doco concat += c
+        ;
         if c == '{' && !escaped
             depth = 1
             concat += "\" + to_string("

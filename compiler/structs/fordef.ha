@@ -14,7 +14,7 @@ struct For
         // Evaluate the foreach collection once: `foreach x in f()` must not call f() every iteration.
         // auto&& binds to lvalues by reference and extends the lifetime of temporaries.
         let container = $"{iter}_container"
-        string to = is_foreach ? $"{container}.size()" : until
+        string to = is_foreach ? $"(int){container}.size()" : until
         for i until indent do for_str += TAB
         if is_foreach
             for_str += "\n{\n"

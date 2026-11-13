@@ -222,7 +222,9 @@ fn compile_incremental CompilerPath paths, string header, vector<Unit> units, ve
         if !in_shell_chain && String(arg).starts_with("-") && !is_link_flag(arg) do compile_flags += $" {arg}"
         link_args += $" {arg}"
     ;
-    write_if_changed(cache + "program.h", "#pragma once\n" + header)
+    // An include guard, not #pragma once: the header is also compiled on its own as the PCH
+    let guard = "HALPPP_PROGRAM_H\n"
+    write_if_changed(cache + "program.h", $"#ifndef {guard}#define {guard}{header}\n#endif\n")
     let header_key = fnv_hash(compile_flags + "\n" + header)
     vector<string> commands = {}
     vector<string> stamps = {}
